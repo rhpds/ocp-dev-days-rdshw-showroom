@@ -612,7 +612,7 @@ NOTE: If no prompt appears, click **Merge Requests** in the left sidebar, then *
 +
 image::gitlab-merged.png[Merge complete,link=self,window=blank,width=700]
 
-Your changes are now merged into the main branch. The dev environment pipeline, as seen in the primary *Parasol Insurance* Component in Developer Hub, will pick this up and redeploy automatically. But to promote to production, you need to create a release.
+Your changes are now merged into the main branch. To see the dev environment pipeline that picks this up automatically, navigate back to *Developer Hub*, open the *Catalog*, and select the primary *Parasol Insurance* component -- this is the top-level component, _not_ the one associated with your feature branch. The pipeline will redeploy to the dev environment. To promote to production, you need to create a release.
 
 image::rhdh-dev-merge-build.png[Pipeline Run triggered after merging our MR,link=self,window=blank,width=700]
 
@@ -635,7 +635,7 @@ In a real organization, promoting code to production is typically handled by pla
 +
 image::gitlab-create-tag.png[Creating a release tag in GitLab,link=self,window=blank,width=700]
 
-Creating this tag triggers a pipeline behind the scenes. When the pipeline completes (it will take a few minutes), it generates a merge request against your `{user}/parasol-insurance-manifests` repository -- this is the GitOps manifests repo that drives production deployments through Argo CD.
+Creating this tag triggers a pipeline behind the scenes. You can monitor its progress in *Developer Hub* by navigating to the *Catalog* and selecting the primary *Parasol Insurance* component (not the feature branch one) -- check the *CI* tab to see the tag pipeline running. When the pipeline completes (it will take a few minutes), it generates a merge request against your `{user}/parasol-insurance-manifests` repository -- this is the GitOps manifests repo that drives production deployments through Argo CD.
 
 === Exercise 3: Approve the GitOps promotion
 
@@ -649,7 +649,7 @@ You can find it by clicking the GitLab logo in the top-left to go to the home pa
 
 . Find the merge request that bumps the Argo CD values to your new tag (`1.1`). Click on it.
 +
-TIP: If the merge request has not appeared yet, wait a minute -- the tag pipeline needs to complete first. Refresh the page to check again.
+TIP: If the merge request has not appeared yet, wait a minute -- the tag pipeline needs to complete first. You can check its progress on the primary *Parasol Insurance* component's *CI* tab in Developer Hub. Refresh this page to check again once the pipeline finishes.
 
 . Review the changes -- you will see the image tag being updated to reference your new release.
 
