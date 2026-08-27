@@ -6,3 +6,7 @@
 :url-rocketchat: https://rocketchat-rocketchat.{openshift_cluster_ingress_domain}
 :url-codeready: https://devspaces.{openshift_cluster_ingress_domain}/
 :url-devconsole: https://console-openshift-console.{openshift_cluster_ingress_domain}/topology/ns/{username-url}-devspaces
+
+ifndef::url-docserver[]
+:url-docserver: https://docserver-showroom.{openshift_cluster_ingress_domain}
+endif::[]

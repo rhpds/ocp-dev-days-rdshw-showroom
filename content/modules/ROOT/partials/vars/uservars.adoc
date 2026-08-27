@@ -1,10 +1,16 @@
 // User-specific variables
-// In local dev: username is set by the playbook (plain text)
-// In production: username is not set, so we define fallbacks here
+// Tier 1: username set explicitly (local dev via local-site.yml)
+// Tier 2: username not set, but user available (multi-module, per-user Showroom)
+// Tier 3: neither set (old SSO production with proxy cookie)
 ifndef::username[]
+ifdef::user[]
+:username: {user}
+endif::user[]
+ifndef::user[]
 :username: pass:[<span class="uservar">username</span>]
 :username-url: SHOWROOM_USERNAME
 :_uservar-mode:
+endif::user[]
 endif::[]
 ifndef::_uservar-mode[]
 :username-url: {username}
