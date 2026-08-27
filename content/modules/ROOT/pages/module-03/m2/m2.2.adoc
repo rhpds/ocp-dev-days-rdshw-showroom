@@ -13,7 +13,7 @@ TIP: If you're unfamiliar with link:https://www.rocket.chat/[_Rocket.Chat_,windo
 
 {blank}
 
-. Open _Rockat.Chat's_  web client:
+. Open _Rocket.Chat's_  web client:
 +
 Click on the link below to open the Login page in _Rocket.Chat_ (opens a new tab).
 +
