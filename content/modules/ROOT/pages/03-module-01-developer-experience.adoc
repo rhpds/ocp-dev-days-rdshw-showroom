@@ -95,9 +95,9 @@ image::rhdh-lightspeed.png[Lightspeed AI assistant in Developer Hub,link=self,wi
 
 . Try asking a question about the Parasol application:
 +
-[source,role="copypaste"]
+[source,subs="attributes",role="copypaste"]
 ----
-Tell me about the parasol-insurance-api API in the catalog
+Tell me about the parasol-insurance-api-{user} API in the catalog
 ----
 
 . Review the response. Lightspeed pulls information from the software catalog and documentation to give you contextual answers.
