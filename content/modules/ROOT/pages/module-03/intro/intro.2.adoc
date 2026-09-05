@@ -1,0 +1,224 @@
+// :imagesdir: ../assets/images/module-03
+:page-time: 5
+include::partial$style.adoc[]
+
+[id='dev-environment']
+== Development environment
+
+The following instructions introduce you to your development environment, and the cluster where you'll deploy your applications throughout this workshop.
+
+=== Overview
+
+Built on the open Eclipse Che project, Red Hat OpenShift Dev Spaces uses Kubernetes and containers to provide any member of the development or IT team with a consistent, secure, and zero-configuration development environment. The experience is as fast and familiar as an integrated development environment on your laptop.
+
+[.text-center]
+image::module-03/intro/devspaces-ide-developer.png[width=70%]
+
+OpenShift Dev Spaces is included with your OpenShift subscription and is available in the Operator Hub. It provides development teams a faster and more reliable foundation on which to work, and it gives operations centralized control and peace of mind.
+
+{empty} +
+
+=== Log in OpenShift Dev Spaces
+
+To access your development environment:
+
+. Click this link:{url-codeready}[Console, window="_blank"] link. +
+(Also accessible from the *Resources* panel on the right, under *Red Hat OpenShift Dev Spaces*).
++
+{empty} +
+
+. You'll be first prompted to choose _OpenShift_ to log in. +
+Click the button `Log in with OpenShift`:
++
+image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
++
+{empty} +
+
+url-docserver: {url-docserver}
+
+. Then, log in using your lab credentials:
++
+--
+* Username: `{user-username}`
+* Password: `{user-password}`
+--
++
+image:module-03/intro/devspaces-login.jpg[width=50%]
++
+{empty} +
++
+. Next, authorise access, click `Allow selected permissions`
++
+image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
++
+{empty} +
++
+Once you are logged in, you'll see the _Dev Spaces_ dashboard. This lists available workspaces.
++
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces Dashboard, role="integr8ly-img-responsive"]
+
+{empty} +
+
+=== Accessing your Dev Spaces Workspace
+
+This workshop provides a single, pre-configured workspace with plugins, source code, and even container images that have various Command-Line Interface (CLI) tools installed.
+
+. Click the *Open* link for the workspace named `camel-lab`.
++
+image::module-03/intro/devspaces-dashboard-open.png[Open Dev Spaces Workspace, role="integr8ly-img-responsive"]
++
+{blank}
++
+This will start an instance of the workspace. Please wait a few moments while it downloads the required container images and configuration setup.
++
+{empty} +
+
+. When the IDE appears:
++
+--
+.. Ensure you click `Yes, I trust the authors` when the following message shows on your screen:
++
+image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, role="integr8ly-img-responsive", width=40%]
++
+{empty} +
++
+.. Also, ensure you click `Trust Publisher & Install`
++
+image::module-03/intro/devspaces-trust-redhat.png[Trust Publisher Red Hat, width=40%]
++
+{empty} +
+--
++
+NOTE: This IDE is based on _Microsoft VS Code_. It will look familiar if you have already used it.
++
+{empty} +
+
+
+
+. Close all the tabs in the editor.
++
+--
+Find the menu in the top right corner of the editor and click as follows:
+
+[.indent2]
+[#close-tabs-img]
+image::module-03/common/dev-close-tabs.png[width=50%]
+
+[.overlay]
+****
+[.target]
+close-tabs-img
+
+[.arrows]
+{x: 97, y: 30, rot: 270, size: 2}
+{x: 97, y: 68, rot: 270, size: 2}
+
+[.numbers]
+{x: 138, y: 30, size: 3}
+{x: 138, y: 68, size: 3}
+****
+
+{blank}
+
+1. Click the kbd:[...] button +
+1. Select  kbd:[Close All].
+--
++
+{empty} +
+
+// . Close the `Get Started...` tab by clicking the pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>]. +
+// The Explorer shows you the *workshop* folder where you will be working.
+// +
+// image::intro/devspaces-get-started.png[Dev Spaces Get Started screen, role="integr8ly-img-responsive"]
+// +
+// NOTE: This IDE is based on _Microsoft VS Code_. It will look familiar if you have already used it.
+// +
+// You might get extra tabs opening, close them all:
+// +
+// image::intro/close-tabs.jpg[width=30%]
+// +
+// {empty} +
+
+
+=== Open a Terminal
+
+From _Dev Spaces_, open a terminal following the steps illustrated below:
+
+image::module-03/intro/toggle-terminal.png[width=40%]
+
+{empty} +
+
+=== Copy/Paste Commands
+
+You'll use command actions all along the lab. +
+When the lab's instructions present a command to execute, perform the steps described below, as illustrated:
+
+image::module-03/intro/copypaste.png[width=60%]
+
+{blank}
+
+. Click the button _Copy to clipboard_
+. Paste the command in the terminal:
+- on Linux: kbd:[Ctrl+Shift+v]
+- on Mac: kbd:[⌘+v]
++
+. Try it with:
++
+[.copypaste]
+****
+echo "this is a multiline \
+copy/paste test"
+****
++
+[NOTE]
+====
+You'll be asked to share the clipboard and next to confirm the action.
+
+Click `Allow` -> image:module-03/intro/devspaces-share-clipboard.png[width=18%] -> next, tick `[✓] Do not ask me again` -> `Paste` ->
+image:module-03/intro/devspaces-paste-confirm.png[width=30%] 
+====
++
+--
+WARNING: It's been reported that these key-combos not always work. Your machine may not respond to the above descriptions. Please try other key or mouse click alternatives, for example, right-click, or middle-click.
+--
+
+. If the paste action fails and you see _Dev Spaces_ showing the following notification:
++
+image::module-03/intro/clipboard-notification.png[width=30%]
++
+{blank}
++
+Find in your web browser's settings where to enable clipboard permissions. The image below shows how to enable them using _Chrome_:
++
+image::module-03/intro/clipboard-settings.png[width=100%]
+
+{empty} +
+
+
+// === Tips for a Better Learning
+
+// If you have a wide or multi-monitor setup, it is mostly recommended to organise your browser tabs with the _Dev Spaces_ view next to your lab instructions side by side, as per the image below:
+
+// [.text-center]
+// image::intro/better-learning.png[width=80%]
+
+// {empty} +
+
+// You're now all set and ready to start your ride.
+
+// {empty} +
+
+
+
+
+
+[.verification]
+****
+Did your terminal show and your copy/paste action worked?
+
+[.success]
+You are now ready to start working !
+
+[.fail]
+Make sure you follow the commands above. Try again.
+****

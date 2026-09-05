@@ -1,0 +1,75 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='lab1-introduction']
+== Introduction
+
+
+
+Ingest data from customers, store it in a backend database, and generate PDF invoices — all orchestrated by Apache Camel with secure cross-cluster connectivity powered by {rhsi}.
+
+{empty} +
+
+*The Business Need*
+
+Customers send Purchase Orders (POs) in EDI format to the platform. These orders need to be ingested, transformed, stored in a backend database, and rendered as PDF invoices for archival. The database resides on a separate infrastructure and is not directly accessible from OpenShift — a secure connectivity solution is required.
+
+{empty} +
+
+*The Technical Solution*
+
+An Apache Camel integration exposes an API endpoint that receives incoming EDI Purchase Orders. The flow transforms the EDI data into XML format, stores it in a backend Database via {rhsi}, and renders PDF invoices that are uploaded to S3 object storage (OpenShift Data Foundation).
+
+{rhsi} enables secure connectivity between the OpenShift cluster and the remote backend database without exposing the database to the public network.
+
+{empty} +
+
+*Architecture Overview*
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+
+    Customer --> Shop -->|"EDI message"| Camel
+
+    subgraph LocalEnvironment [OpenShift]
+        Shop
+        Camel --> |"① XML data"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② PDF Invoices"|Storage
+    end
+
+    subgraph RemoteEnvironment [Remote Environment]
+        ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
+    end
+
+    ServiceInterconnect --- |"🔒 secure link"| ServiceInterconnect2{{"Service\nInterconnect"}}
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel Integration", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Customer", pos: "b", h: 80, w: 80, constraint: "on" }
+    Shop@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Shop", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style LocalEnvironment fill:#fce4e4,stroke:#EE0000
+    style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Shop fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style Database fill:none,stroke:none
+----
+
+{empty} +
+
+*What you will do in this lab:*
+
+. *Enable connectivity* — Configure {rhsi} to establish a secure link to the backend database.
+. *Complete the flow* — Implement the Camel integration that ingests, transforms, stores, and renders Purchase Orders.
+. *Test and validate* — Run the flow locally and validate the results.
+
+{empty} +

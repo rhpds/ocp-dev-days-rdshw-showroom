@@ -1,0 +1,27 @@
+++++
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var pathMatch = window.location.pathname.match(/\/([^\/]+\/[^\/]+?)(?:\.html)?$/);
+  if (!pathMatch) return;
+  var pageKey = pathMatch[1];
+  localStorage.setItem('visited:' + pageKey, 'true');
+  // Save last visited URL per module for resume
+  var prefixMatch = pageKey.match(/([^\/]*\/)/);
+  if (prefixMatch) localStorage.setItem('resume:' + prefixMatch[1], window.location.pathname);
+
+  // Override "Previous" link when it crosses module boundaries → go to Home
+  var currentDir = window.location.pathname.replace(/[^\/]*$/, '');
+  var prevLink = document.querySelector('.nav-prev a')
+    || document.querySelector('.pagination .prev a');
+  if (prevLink) {
+    var prevUrl = new URL(prevLink.getAttribute('href'), window.location.href);
+    var prevDir = prevUrl.pathname.replace(/[^\/]*$/, '');
+    if (currentDir !== prevDir) {
+      var homeLink = document.querySelector('.nav-list > .nav-item:first-child > a.nav-link');
+      prevLink.setAttribute('href', homeLink ? homeLink.getAttribute('href') : './');
+      prevLink.textContent = 'Home';
+    }
+  }
+});
+</script>
+++++

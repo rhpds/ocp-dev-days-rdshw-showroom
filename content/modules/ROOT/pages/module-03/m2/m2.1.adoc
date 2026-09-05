@@ -1,0 +1,96 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="matrix-chat"]
+== Matrix platform onboarding
+
+TIP: If you're unfamiliar with link:https://matrix.org/[_Matrix_,window="_blank"], it is an open standard and communication protocol for real-time decentralized communication. It works seamlessly between different service providers.
+
+{empty} +
+
+=== Join your Matrix room.
+
+{blank}
+
+. Open _Matrix's_ web client
++
+Click on the link below to open the Login page in _Matrix_ (opens a new tab).
++
+--
+- link:{url-element}[Matrix Login page,window="_blank"]
+--
++
+{blank}
++
+You'll be presented with a Login page.
++
+{empty} +
+
+. Login with your credentials
++
+You will be prompted to enter your credentials, as shown below:
++
+image::module-03/m2/matrix-login-credentials.jpg[width=60%]
++
+{blank}
++
+====
+. Enter the following:
++
+* **Username**
++
+[.copypaste]
+****
+{user-username}
+****
++
+* **Password**
++
+[.copypaste]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
++
+{empty} +
++
+. Then, click **_"Sign in"_**
+====
++
+{empty} +
++
+You will be asked to confirm your identity. Enter your password to do so, as shown below:
++
+image::module-03/m2/matrix-login-confirm.jpg[width=60%]
++
+{blank}
++
+Confirm by clicking on _"Continue"_.
++
+{empty} +
++
+Finally, you'll notice looking at your _Matrix_ screen, a pending invitation to join your room. +
+Follow the steps below to accept your invitation:
++
+image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
++
+--
+. Click on your room.
+. And, click on _"Accept"_.
+--
+
+{empty} +
+
+
+[.verification]
+****
+Were you able to join the Matrix room successfully?
+****
+
+{empty} +

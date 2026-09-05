@@ -1,0 +1,25 @@
+[subs=attributes]
+++++
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const p = document.querySelector('.doc-sidebar p');
+  if (!p) return;
+
+  const dot = (color) =>
+    '<div style="width:15px;height:15px;border-radius:50%;background:' + color + ';display:inline-block;vertical-align:middle;margin-top:-2px"></div>';
+
+  var dsHeaders = {};
+  document.cookie.split(';').forEach(function(c) {
+    var parts = c.trim().split('=');
+    if (parts[0] === 'username') {
+      dsHeaders['user'] = decodeURIComponent(parts[1]);
+    }
+  });
+
+  fetch('{url-docserver}/status', { headers: dsHeaders })
+    .then(r => r.text())
+    .then(() => { p.innerHTML = 'Status: ' + dot('#3e8635'); })
+    .catch(() => { p.innerHTML = 'Status: ' + dot('red'); });
+});
+</script>
+++++

@@ -1,0 +1,834 @@
+:imagesdir: ../../assets/images
+:page-time: 11
+include::partial$style.adoc[]
+
+[id='lab4-agentic-flow']
+== Developing the AI assistant
+
+=== Open the Camel route
+
+In your editor's file explorer, click on the following file — Kaoto will automatically open it and render the route as a visual diagram.
+
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent.camel.yaml* +
+--
+
+[TIP]
+--
+.New to Kaoto?
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+
+Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main agentic flow.
+
+You may find the routes displayed vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+
+[.bordered]
+image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+
+{empty} +
+
+The file contains several routes. To focus on the main agentic flow:
+
+. Click the *Routes* dropdown in the upper-left toolbar
+. Select `rocketchat-to-agent` from the list
++
+{empty} +
++
+[#kaoto-routes-m4]
+[.bordered]
+image::module-03/m4/kaoto-routes-dropdown.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes-m4
+
+[.arrows]
+{x: 24, y: 24, rot: 210, size: .8}
+{x: 30, y: 63, rot: 230, size: .8}
+
+[.numbers]
+{x: 33, y: -8, size: 1.5}
+{x: 45, y: 39, size: 1.5}
+****
+
+{empty} +
+
+To center the route in the canvas, click the *Reset View* button at the bottom:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-reset-view.png[width=50%]
+
+TIP: Use the mouse wheel to zoom in and out of the canvas, and click and drag to pan around the view.
+
+{empty} +
+
+You should now see the route you'll be working with — the starting point for the customer support flow:
+
+{blank}
+
+[#kaoto-agent-route]
+[.bordered]
+image::module-03/m4/kaoto-agent-route.png[width=90%]
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
+
+{empty} +
+
+Reading left to right, the route listens for messages from _Rocket.Chat_ and extracts the text — but the flow is incomplete. The `set system prompt` step is disabled, and the pass:[<code style="background-color: #dde4f6; color: #335;">To do: Agent</code>] block contains only a `dummy response` that returns "Hello World" regardless of what the user says.
+
+Throughout this exercise, you'll be guided to complete this flow step by step:
+
+. Enable the `set system prompt` step — this will instruct the AI agent how to behave
+. Replace the `dummy response` with a MaaS-powered AI agent, and progressively equip it with tools to handle real customer requests
+
+{empty} +
+
+=== Start the dev loop
+
+From this point on, you'll work in a rapid development cycle — _Camel JBang_ runs in dev mode, which means every change you make to the route is instantly picked up and applied. You can modify the flow, save the file, and immediately observe the new behaviour without restarting.
+
+Start by running the Camel route as-is to see the placeholder behaviour in action:
+
+{blank}
+
+[.copypaste]
+****
+camel run agent --dev
+****
+
+[TIP]
+--
+.What does this command do?
+[%collapsible]
+====
+* `camel run agent` — loads the resources under the `agent` directory and runs the route defined inside it.
+* `--dev` — dev mode, automatically reloads when you save changes to any source file.
+====
+--
+
+Wait for _Camel_ to fully start — you should see `...(agent) started...` in the terminal.
+
+Switch to your _Rocket.Chat_ window.
+
+TIP: If you haven't logged in yet, follow the xref:module-03/m2/m2.2.adoc[Rocket.Chat platform onboarding,window=_blank] instructions (opens in a new tab).
+
+In the left sidebar, find and select the `ai-support` channel that matches your user number:
+
+[subs=attributes]
+++++
+<div style="display: inline-flex; align-items: center; gap: 8px; background: #2f343d; border-radius: 4px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 8px 0;">
+  <span style="width: 32px; height: 32px; background: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">A</span>
+  <span style="color: #ccc; font-size: 15px;">&#x2317; <b>ai-support<span id="rc-channel-num"></span></b></span>
+</div>
+<script>
+(function() {
+  var el = document.getElementById('rc-channel-num');
+  function resolve() {
+    var name = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    if (!name) {
+      var uv = document.querySelector('.uservar');
+      if (uv) name = uv.textContent;
+    }
+    var num = (name || '').replace(/\D/g, '');
+    el.textContent = num || 'N';
+  }
+  if (document.readyState === 'complete') resolve();
+  else window.addEventListener('load', resolve);
+})();
+</script>
+++++
+
+Then type a simple message:
+
+{blank}
+
+[.copypaste]
+****
+Hi
+****
+
+The Camel bot picks up the message and responds with `Hello World` — confirming the route is working end to end:
+
+{blank}
+
+:fig-time: 5:05 PM
+:fig-user-msg: Hi
+:fig-bot-msg: Hello World
+include::_figures/rc-interaction.adoc[]
+
+This is expected — the route is still using the hardcoded dummy response. In the next steps, you'll replace it with a real AI agent that can reason and respond naturally.
+
+{empty} +
+
+=== Wire the AI agent
+
+Now replace the dummy response with a real AI agent. Head back to the _Kaoto_ canvas and follow the steps below:
+
+{empty} +
+
+. *Enable the system prompt*
++
+The `set system prompt` step is currently disabled — it's greyed out because there was no AI agent to use it.
++
+[caption=]
+.Enable it:
+[cols="1a,6a"]
+|===
+|
+[.bordered]
+[#kaoto-enable-step]
+image::module-03/m4/kaoto-enable-step.png[width=100%]
+
+[.overlay]
+****
+[.target]
+kaoto-enable-step
+
+[.numbers]
+{x: 80, y: 5, size: 8}
+****
+|
+. Hover the step and click the {btn-enable} button (next to the {nbsp}{btn-replace}{nbsp} button).
+|===
+
+. *Replace the dummy response with an Agent*
++
+The `dummy response` step is a placeholder — it always returns "Hello World". Replace it with the _LangChain4j Agent_ component that connects to MaaS.
++
+1. Hover the `dummy response` step and click the floating {nbsp}{btn-replace}{nbsp} button.
+1. Type `lang` in the {ui-filter} to find the _LangChain4j Agent_ component, then select it.
+1. Click the _LangChain4j Agent_ step to open the configuration panel.
+1. Select the `Required` configuration tab.
+1. Set the `Agent Id` to:
++
+{blank}
++
+[.copypaste]
+****
+myagent
+****
++
+image::module-03/m4/kaoto-agent-steps.png[width=100%]
++
+{empty} +
++
+Because you're running in dev mode, _Camel_ hot-reloads automatically. Watch the terminal — the logs should confirm the agent is running:
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: #818181">2026-03-24 18:14:11.113  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> : <span style="color:#fff">Routes reloaded summary</span> (total:<span style="color:#0FBC7A">2</span> started:<span style="color:#0FBC7A">2</span>)
+2026-03-24 18:14:11.115  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">rocketchat-to-agent</span> (platform-http:///ai-support)
+2026-03-24 18:14:11.116  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">to-rocketchat</span> (direct://to-rocketchat)</pre>
+++++
++
+{empty} +
+
+. *Check the updated flow*
++
+The system prompt is now active (1) and the AI agent has replaced (2) the dummy response. Your route should look like this:
++
+{blank}
++
+[.bordered]
+[#kaoto-agent-route-complete]
+image::module-03/m4/kaoto-agent-route-complete.png[width=90%]
++
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route-complete
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
++
+{empty} +
+
+. *Interact with the agent*
++
+Switch back to your _Rocket.Chat_ window and type:
++
+{blank}
++
+[.copypaste]
+****
+Hi again
+****
++
+The AI agent processes your message — it sends it to the LLM via MaaS, which reasons about it and returns a natural language response. You should see something like:
++
+{blank}
++
+:fig-time: 5:06 PM
+:fig-user-msg: Hi again
+:fig-bot-msg: Hello! How can I assist you today?
+include::_figures/rc-interaction.adoc[]
++
+{empty} +
++
+The bot is responding, but can it do real work? +
+*Not yet*. The MCP servers and tools exist in the exercise but are not active yet.
++
+{blank}
++
+Try asking for something specific:
++
+{blank}
++
+[.copypaste]
+****
+Can you show me invoice 61356291
+****
++
+NOTE: Your lab comes with a sample invoice (`61356291`) ready to use. This is the one referenced in the command above.
++
+TIP: You can also try fetching invoices you generated during the Ingestion lab — feel free to use any invoice number from your earlier exercises.
++
+{empty} +
++
+The bot responds with something like:
++
+{blank}
++
+:fig-time: 5:07 PM
+:fig-user-msg: Can you show me invoice 61356291
+:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
+include::_figures/rc-interaction.adoc[]
++
+As expected, the bot declines the request.
++
+--
+.Why did the bot respond that way?
+[caption=]
+====
+The AI agent doesn't have access to the tools it needs — the MCP servers haven't been wired in yet.
+
+The `system.message` file contains the system prompt that guides the AI agent's behaviour. One of its rules explicitly instructs the model to decline when it lacks the right tool:
+
+----
+# CRITICAL CONSTRAINTS
+* **NO TOOL, NO URL:** If there is no tool fit for the job (missing),
+  you MUST return Pattern 2 with the text: "I'm sorry, I don't have 
+  the capability to retrieve that PDF right now."
+----
+
+Once you register the tools, the agent will discover and use them automatically.
+====
+--
+
+{empty} +
+
+=== Wire in the MCP servers
+
+The project includes MCP servers to provide the necessary tools for the Camel agentic flow — but the agent doesn't know about them yet. You need to wire them in to the agentic flow.
+
+The diagram below shows how the Agentic Integration (once MCP is active) routes tool calls from the AI model. Two MCP servers provide distinct toolsets — Node.js and Camel Quarkus. When the AI model needs a tool, the Agentic Integration routes the request to the appropriate MCP server, which executes the tool against the backend systems and returns the result.
+
+[.mermaid]
+----
+flowchart LR
+
+    MaaS <-->|Tool calls| INTLabel
+
+    INTLabel <--> |"Toolset 1"| NodeJSLabel
+    INTLabel <--> |"Toolset 2"| CamelQuarkusLabel
+    NodeJSLabel --> |"Integrations"| ToolsInner
+    CamelQuarkusLabel --> |"Integrations"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Agentic Integration\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI reasoning<br>• Tool calling<br>• Integrations</div></div>\n]
+
+    subgraph ToolsLabel ["<br><br><br>Backend Systems&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph NodeJSLabel [" "]
+        NodeJS
+    end
+
+  subgraph CamelQuarkusLabel [" "]
+        CamelQuarkus
+    end
+
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI Model", pos: "b", h: 80, w: 80, constraint: "on" }
+    NodeJS@{ img: "../../_images/module-03/common/nodejs-icon.svg", label: "MCP NodeJS", pos: "b", h: 80, w: 80, constraint: "on" }
+    CamelQuarkus@{ img: "../../_images/module-03/common/camel-quarkus-icon.svg", label: "MCP Camel Quarkus", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "HelpDesk", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style MaaS fill:none,stroke:none
+    style NodeJS fill:none,stroke:none
+    style CamelQuarkus fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style NodeJSLabel fill:none,stroke:none
+    style CamelQuarkusLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+NOTE: The Agentic Integration can work with MCP servers implemented in different languages. This lab includes a Node.js MCP server and a Camel Quarkus MCP server — each providing distinct tools to the AI model.
+
+
+[TIP]
+--
+In Camel you don't need MCP servers to define tools. You can define them directly as regular routes that starts with the `langchain4j-tools` component. The route describes what the tool does — the agent discovers it automatically via tags and invokes it when needed.
+
+For example, this is how you would define a local tool that retrieves the PDF URL for a given invoice:
+
+image::module-03/m4/kaoto-tool-route.png[width=50%]
+
+The route starts with the `langchain4j-tools` source, processes the request through a series of steps, and returns the result to the LLM. No special wiring is needed. Camel uses tags to match agents with tools — when an agent's tag matches a tool's tag, the agent can call that tool.
+--
+
+{empty} +
+
+. *Wire in the MCP servers* (Node.js and Camel Quarkus)
++
+[loweralpha]
+1. Stop the process running in your terminal with kbd:[CTRL+C].
+1. Open your agent's configuration file file.
++
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties*
++
+1. Uncomment the properties for the MCP servers. You should see this:
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #689956"># MCP server (Node JS)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.url<span style="color: #FFD800">]</span>=http://localhost:9090/mcp
+
+<span style="color: #689956"># MCP server (Camel Quarkus)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>quarkus.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>quarkus.url<span style="color: #FFD800">]</span>=http://localhost:9091/mcp</pre>
+++++
++
+{blank}
++
+1. Now, use the `mcp` script to start the MCP servers, as follows:
++
+{blank}
++
+[.copypaste]
+****
++++./mcp start+++
+****
++
+{blank}
++
+You should see the MCP servers starting up in the terminal:
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server started (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Starting Quarkus dev mode...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Waiting for Quarkus to start (this may take 10–20 seconds)...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Server started (PID: 89867)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
++
+[TIP]
+--
+.First-time startup delay
+[%collapsible]
+====
+The first time the Camel Quarkus MCP server starts, it needs to compile code and download dependencies. This can take 1-2 minutes.
+
+You can monitor the startup logs with:
+
+{blank}
+
+[.copypaste]
+****
++++./mcp logs quarkus -f+++
+****
+
+The `-f` flag follows the logs in real-time.
+
+{blank}
+
+Camel Quarkus is ready when you see the routes started and the final startup message:
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">... (Quarkus Main Thread) Routes startup (total:6 started:6 kamelets:1)
+... (Quarkus Main Thread)     Started route1 (direct://tool-amend-invoice)
+... (Quarkus Main Thread)     Started get-invoice-data (direct://get-invoice-data)
+... (Quarkus Main Thread)     Started route2 (direct://tool-get-data)
+... (Quarkus Main Thread)     Started route3 (direct://tool-create-ticket)
+... (Quarkus Main Thread)     Started store-pdf-s3 (direct://store-pdf-s3)
+... (Quarkus Main Thread)     Started route4 (direct://tool-share-ticket)
+<span style="background-color: #F5F541; color: #1F1F1F; padding: 2px 4px;">... (Quarkus Main Thread) Apache Camel 4.18.2 (camel-1) started in 1s543ms</span></pre>
+++++
+
+{blank}
+
+Once you see the highlighted line confirming Apache Camel has started, the server is ready.
+====
+--
++
+[TIP]
+--
+.How do I check if the MCP servers are running?
+[%collapsible]
+====
+You can check the status of the MCP servers at any time by running:
+
+{blank}
+
+[.copypaste]
+****
++++./mcp status+++
+****
+
+{blank}
+
+You should see output similar to:
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> Checking MCP servers status...
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89867)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Quarkus]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
+====
+--
++
+{empty} +
+
+. *Restart the Camel agent*
++
+The MCP servers are now running and your agent is configured. +
+Restart it to pick up the new configuration:
++
+{blank}
++
+[.copypaste]
+****
+camel run agent
+****
++
+{empty} +
+
+. *Try it out*
++
+Go back to _Rocket.Chat_ and ask again:
++
+{blank}
++
+[.copypaste]
+****
+Can you show me invoice 61356291
+****
++
+[TIP]
+--
+.What if the AI still says it can't help?
+[%collapsible]
+====
+The workshop uses a small LLM that can be inconsistent. The system prompt tells it to re-evaluate its tools before responding, but sometimes it replies as if no tools are available, for example:
+
+{blank}
+
+:fig-time: 5:10 PM
+:fig-user-msg: Can you show me invoice 61356291
+:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
+include::_figures/rc-interaction.adoc[]
+
+If that happens, try one or both of these options:
+
+1. Send a more specific request:
++
+{blank}
++
+[.copypaste]
+****
+Please try again using the tool to get invoices
+****
++
+This points the LLM to the right tool, which is usually enough to get it working.
++
+{blank}
+2. Stop the process with kbd:[CTRL+C] and restart it. A fresh start gives the LLM a clean tool list.
+
+====
+--
++
+If all goes well, this time the LLM discovers the tool, calls it, and responds with the invoice:
++
+{blank}
++
+:fig-time: 6:47 PM
+:fig-user-msg: Can you show me invoice 61356291
+:fig-bot-msg: Here is the PDF for Invoice 61356291.
+:fig-attach-title: Invoice 61356291 PDF ▾
+:fig-attach-desc: Click to view or download
+include::_figures/rc-interaction-attach.adoc[]
++
+{blank}
++
+The bot identified the right tool, retrieved the invoice, and returned a download link to the support agent. Clicking the link opens the PDF in a new tab.
++
+{blank}
++
+.See the sample invoice
+[%collapsible]
+=====
+{blank}
+
+include::_figures/invoice-pdf.adoc[]
+=====
+
+{empty} +
+
+=== Amend the invoice
+
+The ai-bot can do more than just retrieve data — it can act on it. Imagine the customer has changed their mind and wants to return one of the items. Ask the AI assistant to amend the invoice:
+
+{blank}
+
+[.copypaste]
+****
+The customer would like to return stemless wine glasses, could you please adjust the invoice?
+****
+
+The agentic system inspects the invoice, identifies the matching item, triggers the necessary tools to update the database, and responds with a summary of the changes:
+
+{blank}
+
+:fig-time: 6:49 PM
+:fig-user-msg: The customer would like to return stemless wine glasses, could you please adjust the invoice?
+:fig-bot-msg: The database records have been updated. The stemless wine glasses item (Item 4) has been removed, and the summary values have been recalculated. Would you like to see the new PDF invoice?
+include::_figures/rc-interaction.adoc[]
+
+The agentic system acted autonomously — it inspected the invoice, identified the item, updated the quantity in the database, recalculated the totals, and confirmed the changes. All from a single natural language request.
+
+Notice the bot's response — it may suggest viewing the updated invoice (LLMs are unpredictable, so the exact wording varies). If it does, simply reply `yes`. If it doesn't, ask to see the amended invoice:
+
+{blank}
+
+[.copypaste]
+****
+Can you show me the updated invoice?
+****
+
+Either way, the bot responds with the updated PDF link:
+
+{blank}
+
+:fig-time: 6:50 PM
+:fig-bot-msg: Here is the updated PDF for Invoice 61356291.
+:fig-attach-title: Invoice 61356291 PDF ▾
+:fig-attach-desc: Click to view or download
+include::_figures/rc-bot-attach.adoc[]
+
+Click the link to open the regenerated invoice.
+
+{blank}
+
+.See a sample of the amended invoice
+[%collapsible]
+====
+{blank}
+
+include::_figures/invoice-pdf-amended.adoc[]
+====
+
+NOTE: Notice the red *Amended* tag in the upper-right corner of the invoice — this indicates the document has been modified from the original.
+
+Inspect the document and verify the modifications are correct — the stemless wine glasses (item 4) should be removed, and the totals recalculated accordingly.
+
+{empty} +
+
+=== Raise a ticket
+
+A customer support process rarely ends with a single action. Returning an item involves multiple departments — confirming the goods were received, processing the refund, updating inventory, notifying the customer. Rather than handling each step manually, ask the AI agent to raise a ticket that coordinates everything:
+
+{blank}
+
+[.copypaste]
+****
+Could you please raise a ticket? Include the details explained, and ask the right departments to refund the customer accordingly.
+****
+
+The agentic system gathers the context from the conversation, creates a ticket in the HelpDesk system, and responds with a confirmation:
+
+{blank}
+
+:fig-time: 6:52 PM
+:fig-user-msg: Could you please raise a ticket? Include the details explained, and ask the right departments to refund the customer accordingly.
+:fig-bot-msg: A ticket has been created with ID 1025. Would you like to share this ticket with the customer?
+include::_figures/rc-interaction.adoc[]
+
+{empty} +
+
+IMPORTANT: Before going any further, make sure you have already onboarded to _Matrix_ and accepted the room invitation — the ticket will be shared with the customer there. Remember, _Matrix_ represents the customer side, while _Rocket.Chat_ is where the support agent works. If you haven't done this yet, follow the xref:module-03/m2/m2.1.adoc[Matrix platform onboarding,window=_blank] instructions.
+
+The interaction above illustrates a simple request and response — but because LLMs are non-deterministic, the bot may have responded differently. Here's what to expect and how to handle each case:
+
+* **The bot asks to share the ticket** (as shown above) — reply with:
++
+{blank}
++
+[.copypaste]
+****
+Yes, please share it with the customer.
+****
++
+{blank}
+
+* **The bot doesn't mention sharing at all** — ask it explicitly:
++
+{blank}
++
+[.copypaste]
+****
+Could you share the ticket with the customer?
+****
++
+{blank}
++
+* **The bot shares the ticket automatically** without asking — no action needed, skip ahead.
++
+{empty} +
+
+Either way, the final outcome is the same — the bot shares the ticket and the customer receives a link to the HelpDesk system:
+
+{blank}
+
+:fig-time: 6:53 PM
+:fig-bot-msg: The ticket #1025 has been successfully shared with the customer. They will receive a link to the HelpDesk system.
+:fig-attach-title: Ticket 1025 ▾
+:fig-attach-desc: Click to open HelpDesk and select ticket 1025
+include::_figures/rc-bot-attach.adoc[]
+
+Remember — the customer communicates from the _Matrix_ messaging platform. The bot indicated the ticket was shared, which means the customer should have received a message with the ticket reference. Switch to your _Matrix_ window and check.
+
+You should see a message like this:
+
+{blank}
+
+:fig-time: 11:05
+:fig-sender: ai@rocketchat:
+:fig-msg: pass:[&#x1F4C4; Ticket <span style="color: #6D28D9; font-weight: bold;">#1025</span> created.<br>(Click to open in HelpDesk)]
+include::_figures/matrix-message.adoc[]
+
+{empty} +
+
+=== Verify the ticket from the customer's perspective
+
+Now put yourself in the customer's shoes. The customer received a message in _Matrix_ with a link to the _Globex HelpDesk_ ticketing system. Click the ticket link in the _Matrix_ window.
+
+A new tab opens with the _Globex HelpDesk_ login page:
+
+{blank}
+
+include::_figures/helpdesk-login.adoc[]
+
+Log in using the credentials below:
+
+* *Username*:
++
+[.copypaste]
+****
+{user-username}
+****
+
+* *Password*:
++
+[.copypaste]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
+
+{empty} +
+
+Once logged in, the _Globex HelpDesk_ displays the list of open tickets. You should see the ticket the AI agent just created:
+
+{blank}
+
+include::_figures/helpdesk-tickets.adoc[]
+
+Click the ticket to inspect its details. The AI agent composed the ticket body from the conversation — it includes a summary of the changes and a link to the updated invoice:
+
+{blank}
+
+include::_figures/helpdesk-ticket-detail.adoc[]
+
+The full circle is complete: the AI assistant retrieved an invoice, amended it, raised a ticket with all the relevant details, and shared it with the customer across messaging platforms. All from natural conversation.
+
+{empty} +
+
+[.verification]
+****
+Can you see the ticket details and the link to the updated invoice in the _Globex HelpDesk_?
+
+[.success]
+Well done — you've built an agentic flow that can retrieve, reason about, and modify data, raise tickets, and coordinate across departments through natural conversation.
+
+[.fail]
+Review your steps — make sure the agentic flow has tools enabled (`Tags` = `all`) and the system prompt is active. Check the _Matrix_ window for the correct room.
+****
+
+{empty} +
+
+
+

@@ -1,0 +1,73 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="rocketchat-chat"]
+== Rocket.Chat platform onboarding
+
+TIP: If you're unfamiliar with link:https://www.rocket.chat/[_Rocket.Chat_,window="_blank"], it is an open-source communications platform with strict data protection standards. It enables real-time conversations between colleagues, other companies, or your customers across web, desktop, or mobile devices.
+
+{empty} +
+
+=== Join your Rocket.Chat room.
+
+{blank}
+
+. Open _Rocket.Chat's_  web client:
++
+Click on the link below to open the Login page in _Rocket.Chat_ (opens a new tab).
++
+--
+- link:{url-rocketchat}[Rocket.Chat Login page,window="_blank"]
+--
++
+{empty} +
+
+. You will be prompted to enter your credentials, as shown below:
++
+image::module-03/m2/rchat-login-credentials.png[width=50%]
++
+{blank}
++
+====
+. Enter the following:
++
+* **Email or username**
++
+[.copypaste]
+****
+{user-username}
+****
++
+* **Password**
++
+[.copypaste]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
++
+{empty} +
++
+. Then, click **_"Login"_**
+====
++
+{empty} +
+
+. When you log in, you'll see your home page in _Rocket.Chat_, and your room listed in the left panel of your screen, as shown below:
++
+image::module-03/m2/rchat-room.png[width=60%]
+
+{empty} +
+
+[.verification]
+****
+Were you able to join the _Rocket.Chat_ room successfully?
+****
+
+{empty} +

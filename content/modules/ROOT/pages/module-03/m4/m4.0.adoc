@@ -1,0 +1,97 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id='lab4-ai-customer-support']
+== Lab 4 - AI Customer Support
+
+Use an AI agent to orchestrate backend actions based on natural language chat — powered by Agentic Apache Camel and Model-as-a-Service (MaaS).
+
+{empty} +
+
+Recommended: +
+--
+* For the best experience, complete the following modules first to follow the storyline:
++
+image::module-03/m4/prereq.png[width=75%]
+
+{empty} +
+--
+
+*The Business Need*
+
+When a customer reaches out about a purchase order — whether to update details, return items, or resolve a discrepancy — support agents traditionally have to manually navigate multiple backend databases and file systems to address the request. This is slow, error-prone, and frustrating for both agents and customers. They need a faster, frictionless way to handle these cases.
+
+{empty} +
+
+*The Technical Solution*
+
+Support agents interact with an AI bot directly within their Rocket.Chat window using natural language. Powered by Agentic Apache Camel and Model-as-a-Service (MaaS), the AI acts as a smart assistant — it interprets the agent's request, autonomously decides which tools to call, updates the database, and regenerates the corrected invoice in S3 storage. This dramatically reduces resolution time and eliminates manual "swivel-chair" tasks for support teams.
+
+{empty} +
+
+*How it works*
+
+[.mermaid]
+----
+flowchart LR
+
+    Agent -->|① message| RC <-->|② forward| INTLabel
+
+    INTLabel -- ⑤ reply--> RC
+
+    RC -- ⑥ response --> Agent
+
+    INTLabel <--> |"③ reason"| MaaSLabel
+    INTLabel --> |"④ tool calls\n(MCP)"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Agentic Integration\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI reasoning<br>• Tool calling<br>• Integrations</div></div>\n]
+
+    subgraph ToolsLabel ["MCP & Backend Systems&nbsp;&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph MaaSLabel [" "]
+        MaaS
+    end
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 80, w: 80, constraint: "on" }
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI Model", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "HelpDesk", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style MaaS fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style MaaSLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+
+The AI agent follows a reasoning loop — it consults the LLM via MaaS, which decides what actions to take. Camel then executes the appropriate tools via *MCP* (update the database, regenerate a PDF invoice in S3), feeds the results back to the LLM, and returns the final answer to the support agent in Rocket.Chat.
+
+[NOTE]
+====
+*What is MCP?* The Model Context Protocol (MCP) is an open standard that lets AI agents interact with external systems — databases, APIs, file storage, and more — using a consistent set of tools. In this lab, Apache Camel implements an MCP server that exposes backend actions (e.g. update database, upload to S3) as callable tools. The AI model decides which tools to invoke based on the user's natural language request.
+====
+
+{empty} +
+
+*What you will do in this lab:*
+
+. *Set up the environment* — Prepare the working folder and configure the AI agent.
+. *Develop the Agent* — Progressively enable the AI agent, from basic routes to fully-equipped with tools.
+. *Complete the flow* — Finish the integration that links Rocket.Chat, the AI agent, the database, and S3 storage.
+. *Test the flow* — Simulate a customer/agent interaction and validate the results.
+
+{empty} +

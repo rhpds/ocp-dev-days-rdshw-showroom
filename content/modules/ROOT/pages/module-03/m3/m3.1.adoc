@@ -1,0 +1,81 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup"]
+== Setup the Lab working folder
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+. From your terminal in _Dev Spaces_, run the following command:
++
+{blank}
++
+[.copypaste]
+****
+step 4
+****
++
+[TIP]
+--
+Run the command above anytime to reset the exercise.
+
+.Helper commands
+[%collapsible]
+====
+* `step N` — reset the lab to the beginning of step N
+* `steps` — list all available steps in the lab
+* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
+* `ff` — fast-forward to the next step
+* `rw` — rewind to the previous step
+====
+--
++
+{empty} +
+
+. Check your lab folder
++
+After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 pass:[<b>k2r</b> <small style="color: #999">(Kafka to Rocket.Chat)</small>] +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>⚙</b>&nbsp;</mark>] *application.properties* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *k2r.camel.yaml* +
+
+[.indent2]
+[NOTE]
+====
+The `application.properties` file contains pre-configured connection settings for your environment — it's ready to use. This lets you focus on building the integration logic rather than wiring up configuration.
+
+.What's inside?
+[%collapsible]
+=====
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat credentials</span>
+<span style="color: #a6e22e">rocketchat.token</span>=<span style="color: #e6db74">&lt;your-token&gt;</span>
+<span style="color: #a6e22e">rocketchat.userid</span>=<span style="color: #e6db74">&lt;your-userid&gt;</span></pre>
+++++
+=====
+====
+
+--
++
+{empty} +
+
+[.verification]
+****
+Do you see the same folder structure and files?
+
+[.success]
+You're ready to continue.
+
+[.fail]
+Make sure the syntax of the commands are compatible with with your environment and try again.
+****
+
+
+{empty} +

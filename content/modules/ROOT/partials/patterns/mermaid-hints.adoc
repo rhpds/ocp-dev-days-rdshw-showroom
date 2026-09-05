@@ -1,0 +1,176 @@
+++++
+
+<style>
+/* Hide mermaid-hints sidebar blocks before JS transforms them */
+.sidebarblock[class*="mermaid-hints-"] {
+  display: none;
+}
+
+/* Mermaid hints popover */
+.mh-popover {
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  background: #272822;
+  border-radius: 8px;
+  padding: 14px 20px;
+  max-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.mh-popover-title {
+  color: #7986cb;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.mh-popover-text {
+  color: #ddd;
+  font-size: 13px;
+  line-height: 1.5;
+}
+</style>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  // Find all mermaid-hints-* sidebar blocks
+  var allSidebars = document.querySelectorAll('.sidebarblock');
+  var hintBlocks = [];
+  allSidebars.forEach(function(sb) {
+    var classes = sb.className.split(/\s+/);
+    for (var i = 0; i < classes.length; i++) {
+      if (classes[i].indexOf('mermaid-hints-') === 0) {
+        hintBlocks.push(sb);
+        break;
+      }
+    }
+  });
+
+  if (!hintBlocks.length) return;
+
+  // Create a single shared popover
+  var pop = document.createElement('div');
+  pop.className = 'mh-popover';
+  pop.innerHTML = '<div class="mh-popover-title"></div><div class="mh-popover-text"></div>';
+  document.body.appendChild(pop);
+
+  var popTitle = pop.querySelector('.mh-popover-title');
+  var popText = pop.querySelector('.mh-popover-text');
+
+  pop.addEventListener('mouseleave', function() {
+    pop.style.display = 'none';
+  });
+
+  function findNode(svg, key) {
+    return svg.querySelector('[id*="flowchart-' + key + '-"]')
+        || svg.getElementById(key)
+        || svg.querySelector('[id$="-' + key + '"]');
+  }
+
+  hintBlocks.forEach(function(sb) {
+    // Parse hint lines from paragraphs: "NodeId | Title | Description"
+    var content = sb.querySelector('.content');
+    if (!content) return;
+
+    var hints = {};
+    var hintOrder = [];
+    var lastKey = null;
+    var paragraphs = content.querySelectorAll('.paragraph p');
+    paragraphs.forEach(function(p) {
+      var lines = p.innerHTML.split(/<br\s*\/?>/gi);
+      lines.forEach(function(line) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = line;
+        var text = tmp.textContent.trim();
+        if (!text) return;
+
+        // Lines matching "NodeId | Title | Description" start a new hint.
+        // Lines without two | delimiters are continuations of the previous hint.
+        var first = text.indexOf('|');
+        var second = first !== -1 ? text.indexOf('|', first + 1) : -1;
+
+        if (first !== -1 && second !== -1) {
+          var nodeId = text.substring(0, first).trim();
+          var title = text.substring(first + 1, second).trim();
+          var desc = text.substring(second + 1).trim();
+          if (nodeId && title) {
+            hints[nodeId] = [title, desc];
+            hintOrder.push(nodeId);
+            lastKey = nodeId;
+          }
+        } else if (lastKey) {
+          // Continuation line — append to previous hint's description
+          hints[lastKey][1] += '\n' + text;
+        }
+      });
+    });
+
+    if (!Object.keys(hints).length) return;
+
+    // Find the preceding .listingblock.mermaid (the original, before mermaid.adoc
+    // replaces it). Walk backwards through siblings.
+    var diagramBlock = null;
+    var el = sb.previousElementSibling;
+    while (el) {
+      if (el.classList.contains('listingblock') && el.classList.contains('mermaid')) {
+        diagramBlock = el;
+        break;
+      }
+      el = el.previousElementSibling;
+    }
+    if (!diagramBlock) return;
+
+    // Wrap the diagram block in a container div. When mermaid.adoc later calls
+    // replaceChild on the listingblock, the replacement goes INSIDE this wrapper.
+    // This gives us a stable reference to find the rendered SVG.
+    var wrapper = document.createElement('div');
+    wrapper.className = 'mh-diagram-wrapper';
+    diagramBlock.parentNode.insertBefore(wrapper, diagramBlock);
+    wrapper.appendChild(diagramBlock);
+
+    // Remove the sidebar block
+    sb.parentNode.removeChild(sb);
+
+    // Poll until mermaid.adoc has rendered the SVG inside the wrapper
+    var firstKey = Object.keys(hints)[0];
+    var check = setInterval(function() {
+      var svg = wrapper.querySelector('svg');
+      if (!svg) return;
+
+      if (!findNode(svg, firstKey)) return;
+      clearInterval(check);
+
+      Object.keys(hints).forEach(function(key) {
+        var node = findNode(svg, key);
+        if (!node) return;
+
+        node.style.cursor = 'pointer';
+
+        node.addEventListener('mouseenter', function() {
+          var rect = node.getBoundingClientRect();
+          popTitle.textContent = hints[key][0];
+          popText.innerHTML = hints[key][1].replace(/\n/g, '<br>');
+          pop.style.display = 'block';
+
+          var popW = pop.offsetWidth;
+          var left = rect.left + (rect.width / 2) - (popW / 2);
+          if (left < 8) left = 8;
+          if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+          pop.style.left = left + 'px';
+          pop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+        });
+
+        node.addEventListener('mouseleave', function(e) {
+          var to = e.relatedTarget;
+          if (to && (to === pop || pop.contains(to))) return;
+          pop.style.display = 'none';
+        });
+      });
+    }, 200);
+  });
+
+});
+</script>
+
+++++

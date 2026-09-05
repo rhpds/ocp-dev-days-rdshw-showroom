@@ -1,0 +1,24 @@
+// User-specific variables
+// Tier 1: username set explicitly (local dev via local-site.yml)
+// Tier 2: username not set, but user available (multi-module, per-user Showroom)
+// Tier 3: neither set (old SSO production with proxy cookie)
+ifndef::username[]
+ifdef::user[]
+:username: {user}
+endif::user[]
+ifndef::user[]
+:username: pass:[<span class="uservar">username</span>]
+:username-url: SHOWROOM_USERNAME
+:_uservar-mode:
+endif::user[]
+endif::[]
+ifndef::_uservar-mode[]
+:username-url: {username}
+endif::[]
+
+// Old Solution Explorer safety net
+:user-username: {username}
+
+ifndef::user-password[]
+:user-password: pass:[<span class="uservar" data-fetch="/credentials/openshift">user-password</span>]
+endif::[]

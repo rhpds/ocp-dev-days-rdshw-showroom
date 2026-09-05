@@ -1,0 +1,266 @@
+:imagesdir: ../../assets/images
+:page-time: 5
+include::partial$style.adoc[]
+
+== Authentication
+
+
+=== Components Provisioned for This Phase
+
+The following resources have been set up for you so you can focus on the policy configuration:
+
+[cols="1,2", options="header"]
+|===
+| Resource | Purpose
+
+| **GatewayClass, Gateway, HTTPRoute**
+| The _Gateway API_ stack that routes traffic from the chat interface to the LLM API. The LLM API could be an internal or external endpoint -- the gateway abstracts this away and provides a consistent point to apply policies.
+
+| **Kuadrant Operator & System**
+| The _Connectivity Link_ operator, installed in the `kuadrant-system` namespace.
+
+| **User Secrets**
+| API key secrets for two tiers: `silver` and `gold`. Details below.
+|===
+
+{empty} +
+
+=== Verify Your Environment
+
+Confirm everything is ready before starting the labs:
+
+{blank}
+
+. From the terminal in your Dev Spaces IDE, run the following command to check that gateway is up and running:
++
+{blank}
++
+[.copypaste]
+****
+oc get gateway internal-ai-gateway -n ai-gateway
+****
++
+{empty} +
+
+. You should see output confirming the gateway exists and is in a ready state, similar to:
++
+{blank}
++
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre; overflow-x: auto; font-family: monospace; font-size: 13px; color: white">NAME                  CLASS               ADDRESS                                                              PROGRAMMED   AGE
+internal-ai-gateway   openshift-default   internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local   True         14h</pre>
+++++
+{empty} +
+
+. A dedicated HTTPRoute named `ai-proxy-route` has been created in your namespace `{user-username}-devspaces`, targeting the LLM API. This is the Gateway API resource you'll attach authentication and rate limiting policies to.
++
+Run the following command to verify it is present:
++
+{blank}
++
+[.copypaste]
+****
+oc describe httproute -n {user-username}-devspaces | grep -E "Name:|Backend|Hostnames"
+****
++
+This command lists the HTTPRoute details including the backend reference to the LLM API and the gateway it is attached to (which is the `internal-ai-gateway` that you verified earlier). 
++
+{empty} +
+
+. Look for output confirming the HTTPRoute exists and is correctly configured, similar to:
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         ai-proxy-route
+    <span style="color: #F14C4B;font-weight:bold">Name:</span>       internal-ai-gateway
+    <span style="color: #F14C4B;font-weight:bold">Backend </span>Refs:
+      <span style="color: #F14C4B;font-weight:bold">Name:</span>       ai-api-external
+          <span style="color: #F14C4B;font-weight:bold">Name:</span>   Host
+    Controller<span style="color: #F14C4B;font-weight:bold"> Name:</span>         openshift.io/gateway-controller/v1
+      <span style="color: #F14C4B;font-weight:bold">Name:</span>       internal-ai-gateway
+
+++++
+
+{empty} +
+
+NOTE: You should see both the `internal-ai-gateway` Gateway and `ai-proxy-route` HTTPRoute in the output. If either is missing, contact the workshop facilitator.
+
+{empty} +
+
+=== Auth Policy Powered by Connectivity Link
+Now that you understand the concepts and the intended architecture, it's time to lock down the LLM endpoint. In this exercise you will create an **AuthPolicy** that is applied to the HTTPRoute (`ai-proxy-route`)  and enforces a key-based authentication scheme. This will ensure that only authorized users with a valid API key can access the LLM, and it will extract identity information that we can use for rate limiting in the next step.
+
+NOTE: We are using simple API key authentication for this workshop to keep things straightforward and simple, but _Connectivity Link_ supports a wide range of authentication methods, including JWT, OAuth2 and more.
+
+{empty} +
+
+=== Understanding the User Secrets
+
+Two API key secrets have already been *pre-created*. Understanding their structure is important because both policies reference the labels and annotations on these secrets.
+
+**Silver tier user:**
+[source,yaml,subs="attributes"]
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trlp-tutorial-api-key-silver-{user-username}
+  namespace: kuadrant-system
+  labels:
+    authorino.kuadrant.io/managed-by: authorino
+    app: my-llm-{user-username}
+  annotations:
+    kuadrant.io/groups: silver
+    secret.kuadrant.io/user-id: {user-username}
+stringData:
+  api_key: [some_random_string]
+type: Opaque
+----
+
+Key fields in this secret:
+
+* `authorino.kuadrant.io/managed-by: authorino` -- Marks this secret as managed by _Authorino_ (the auth engine behind _Connectivity Link_).
+* `app: my-llm-{username}` -- Label selector -- the AuthPolicy uses this to discover valid API keys.
+* `kuadrant.io/groups: silver` -- Group membership (Silver tier) -- determines which rate limit tier applies.
+* `secret.kuadrant.io/user-id: {user-username}` -- Unique user ID -- used as a counter key for per-user rate limiting.
+
+{empty} +
+
+The **Gold tier** secret follows the same structure but with:
+
+* `kuadrant.io/groups: gold`
+
+{empty} +
+
+// == Securing the LLM with Authentication
+
+// Now that you understand the architecture and the setup, it's time to lock down the LLM endpoint so that only authorized users in the organization can access it. You will create an **AuthPolicy** that is applied to the `ai-proxy-route` HTTPRoute and enforces:
+
+// 1. **API Key Authentication** -- Only requests with a valid Bearer token (matching a known secret) are allowed.
+// 2. **Group-based Authorization** -- Only users belonging to the `lite` or `pro` groups can access the API.
+// 3. **Identity Extraction** -- The user's group and user ID are extracted from the secret's annotations and passed downstream for use by the TokenRateLimitPolicy that we will create in the next section.
+
+=== Review and Apply the AuthPolicy
+
+Examine the AuthPolicy and *apply* it by pasting the following command in your terminal:
+
+[.copypaste]
+****
+oc apply -f - <<EOF
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: ai-proxy-auth
+  namespace: {user-username}-devspaces
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ai-proxy-route
+  rules:
+    authentication:
+      api-key-users:
+        apiKey:
+          selector:
+            matchLabels:
+              app: my-llm-{user-username}
+        credentials:
+          authorizationHeader:
+            prefix: Bearer
+    response:
+      success:
+        filters:
+          identity:
+            json:
+              properties:
+                groups:
+                  selector: auth.identity.metadata.annotations.kuadrant\.io/groups
+                userid:
+                  selector: auth.identity.metadata.annotations.secret\.kuadrant\.io/user-id
+        headers:
+          authorization:
+            plain:
+              selector: auth.identity.metadata.annotations.secret\.kuadrant\.io/upstream-token
+      unauthenticated:
+        headers:
+          "content-type":
+            value: application/json
+        body:
+          value: |
+            {
+              "error": "Unauthenticated",
+              "message": "Invalid or missing API Key."
+            }
+      unauthorized:
+        headers:
+          "content-type":
+            value: application/json
+        body:
+          value: |
+            {
+              "error": "Forbidden",
+              "message": "Access denied. Your account does not have the required permissions (gold/silver)."
+            }
+    authorization:
+      allow-groups:
+        opa:
+          rego: |
+            groups := split(object.get(input.auth.identity.metadata.annotations, "kuadrant.io/groups", ""), ",")
+            allow { groups[pass:[_]] == "gold" }
+            allow { groups[pass:[_]] == "silver" }
+EOF
+****
+
+Key fields in this policy:
+
+* `namespace: {user-username}-devspaces` -- The policy is created in your namespace.
+* `name: ai-proxy-route` -- Targets the `ai-proxy-route` HTTPRoute -- any request matching this route must pass authentication.
+* `app: my-llm-{user-username}` -- Looks for _Kubernetes_ Secrets with this label to find valid API keys.
+* `prefix: Bearer` -- Expects the API key in the `Authorization` header.
+* `kuadrant\.io/groups` -- Extracts the group annotation from the matched secret and exposes it as `groups` in the response filter.
+* `secret\.kuadrant\.io/user-id` -- Extracts the user ID annotation and exposes it as `userid`.
+* `rego` -- OPA (Open Policy Agent) rule that only allows users whose group is `gold` or `silver`.
+
+{empty} +
+
+=== Verify the AuthPolicy
+
+{blank}
+
+. From the devspaces terminal, run the following command to check that the AuthPolicy was created successfully:
++
+{blank}
++
+[.copypaste]
+****
+oc describe authpolicy -n {user-username}-devspaces | grep -v "Content" | grep -E "Name:|Target Ref:|Type:|Status:"
+****
++
+{blank}
+. You should see output confirming the AuthPolicy exists, is targeting the correct HTTPRoute, and is in an enforced state, similar to:
++
+{blank}
++
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #F14C4B;font-weight:bold">Name:</span>         ai-proxy-auth
+  <span style="color: #F14C4B;font-weight:bold">Target Ref:</span>
+    <span style="color: #F14C4B;font-weight:bold">Name:</span>   ai-proxy-route
+<span style="color: #F14C4B;font-weight:bold">Status:</span>
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
+++++
+{empty} +
+
+[.verification]
+****
+Does the `ai-proxy-auth` AuthPolicy show status **True** and Type **Enforced** ?
+
+[.success]
+The AuthPolicy is enforced. Proceed to test authentication.
+
+[.fail]
+Check that you pasted the correct YAML and that the namespace is set to `{user-username}-devspaces`.
+****

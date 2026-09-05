@@ -1,0 +1,38 @@
+++++
+<div style="width: 420px; background: #f0f0f0; border: 1px solid #ccc; box-shadow: 2px 2px 8px rgba(0,0,0,0.15); padding: 40px 40px 50px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center;">
+
+  <!-- Logo + Title -->
+  <div style="margin-bottom: 40px;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 4px;">
+      <!-- Globe icon -->
+      <svg width="70" height="70" viewBox="0 0 100 100" fill="none" stroke="#8B1A1A" stroke-width="3">
+        <circle cx="50" cy="50" r="40"/>
+        <ellipse cx="50" cy="50" rx="20" ry="40"/>
+        <line x1="10" y1="50" x2="90" y2="50"/>
+        <path d="M16 30 Q50 25 84 30"/>
+        <path d="M16 70 Q50 75 84 70"/>
+      </svg>
+      <span style="font-size: 48px; font-weight: 900; color: #8B1A1A; letter-spacing: 2px;">GLOBEX</span>
+    </div>
+    <div style="font-size: 28px; font-weight: 300; color: #666; letter-spacing: 12px;">HELPDESK</div>
+  </div>
+
+  <!-- Login form -->
+  <div style="text-align: left; padding: 0 10px;">
+    <div style="margin-bottom: 30px;">
+      <div style="font-size: 14px; color: #999; margin-bottom: 8px;">Username</div>
+      <div style="border-bottom: 3px solid #d32f2f; padding-bottom: 8px;">
+        <span style="font-size: 16px; color: #333; border-left: 2px solid #333; padding-left: 4px;">&nbsp;</span>
+      </div>
+    </div>
+    <div style="margin-bottom: 35px;">
+      <div style="font-size: 14px; color: #999; margin-bottom: 8px;">Password</div>
+      <div style="border-bottom: 1px solid #ccc; padding-bottom: 8px;">&nbsp;</div>
+    </div>
+    <div style="text-align: center;">
+      <span style="font-size: 16px; font-weight: 600; color: #d32f2f; letter-spacing: 2px; cursor: pointer;">LOGIN</span>
+    </div>
+  </div>
+
+</div>
+++++
