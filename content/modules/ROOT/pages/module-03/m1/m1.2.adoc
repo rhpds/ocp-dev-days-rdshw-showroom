@@ -1,0 +1,252 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id="lab3-ingestion-flow"]
+== The Ingestion Flow
+
+With database connectivity in place via {rhsi}, you can now implement the complete ingestion flow. The Camel integration will handle the full lifecycle of an incoming Purchase Order — from reception to archival.
+
+{empty} +
+
+*Data Flow Overview*
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+
+    Customer --> Shop -->|"EDI message"| Camel
+
+    subgraph LocalEnvironment [OpenShift]
+        Shop
+        Camel --> |"① XML data"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② PDF Invoices"|Storage
+    end
+
+    subgraph RemoteEnvironment [Remote Environment]
+        ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
+    end
+
+    ServiceInterconnect --- |"🔒 secure link"| ServiceInterconnect2{{"Service\nInterconnect"}}
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel Integration", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Customer", pos: "b", h: 80, w: 80, constraint: "on" }
+    Shop@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Shop", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style LocalEnvironment fill:#fce4e4,stroke:#EE0000
+    style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Shop fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style Database fill:none,stroke:none
+----
+
+{empty} +
+
+*Sequence of Operations*
+
+The sequence diagram below details each step the Camel integration performs when processing a Purchase Order:
+
+{blank}
+
+[.mermaid]
+----
+sequenceDiagram
+    actor Customer
+    participant Camel
+    participant ServiceInterconnect as Service Interconnect
+    participant DB@{ "type": "database", "alias": "Database" }
+    participant S3Bucket@{ "type": "collections", "alias": "S3 Bucket" }
+    Customer->>Camel: Send PO (EDI)
+    Camel->>Camel: Transform EDI → XML
+    Camel->>ServiceInterconnect: Push XML data
+    ServiceInterconnect->>DB: Store data
+    DB-->>ServiceInterconnect: Confirmation
+    ServiceInterconnect-->>Camel: Data saved
+    Camel->>Camel: Render PDF from XML
+    Camel->>S3Bucket: Upload PDF
+    S3Bucket-->>Camel: Upload complete
+----
+
+{empty} +
+
+=== Prepare the working folder
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+. From your terminal in _Dev Spaces_, run the following command:
++
+{blank}
++
+[.copypaste]
+****
+step 2
+****
++
+[TIP]
+--
+.Run the command above anytime to reset the exercise.
+[%collapsible]
+====
+The workshop includes handy helper scripts that let you jump to any step or reset the lab to a known good state:
+
+* `step N` — reset the lab to the beginning of step N
+* `steps` — list all available steps in the lab
+* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
+* `ff` — fast-forward to the *next* step
+* `rw` — rewind to the *previous* step
+====
+--
++
+{empty} +
+
+. Check your lab folder
++
+After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;&lt;&gt;</b></mark>] *index.html* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *kaoto-datamapper-e6fb3e6b-4288.xsl* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *s3Presigner.java* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;≋&nbsp;&nbsp;</b></mark>] *X12-850.dfdl.xsd* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *x12.java* +
+
+TIP: The `index.html` file is a simple shopping app that simulates a customer placing purchase orders. Camel JBang can serve static HTML alongside your routes, so you'll use it in the next sections to trigger orders and test your integration end to end.
+--
++
+{empty} +
+
+. Review your configuration
++
+The `application.properties` file is already pre-configured with the credentials for both backends used by the ingestion flow:
++
+--
+* *Database* — connection settings for the PostgreSQL database (reachable via Service Interconnect)
+* *S3 object storage* — access key, secret, and endpoint for uploading generated PDF invoices
+--
++
+{blank}
++
+[.mermaid]
+----
+flowchart LR
+    X[ ] -->|"✅ configured"| DB[(Database)] ~~~ Y[ ] -->|"✅ configured"| S3[(S3 / ODF)]
+
+    style DB fill:#e8f5e9,stroke:#66bb6a
+    style S3 fill:#e8f5e9,stroke:#66bb6a
+    style X fill:none,stroke:none
+    style Y fill:none,stroke:none
+----
++
+{empty} +
+
+=== Quick overview of Kaoto
+
+include::../_shared/kaoto-intro.adoc[]
+
+{empty} +
+
+You'll start working on the Kaoto canvas in the next sections.
+
+{empty} +
+
+=== Open the ingestion flow in Kaoto
+
+In your editor's file explorer, click on the following file — Kaoto will automatically open it and render the ingestion route as a visual diagram.
+
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
+--
+
+Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main ingestion flow.
+
+By default, Kaoto displays routes stacked vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+
+[.bordered]
+image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+
+{empty} +
+
+The file contains several routes. To focus on the main ingestion flow:
+
+. Click the *Routes* dropdown in the upper-left toolbar
+. Select `service-x12` from the list
+
+{empty} +
+
+[#kaoto-routes]
+[.bordered]
+image::module-03/m1/kaoto-routes-dropdown.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes
+
+[.arrows]
+{x: 25, y: 25, rot: 210, size: .8} +
+{x: 19, y: 70, rot: 230, size: .8}
+
+[.numbers]
+{x: 34, y: -10, size: 1.5} +
+{x: 35, y: 43, size: 1.5}
+****
+
+{empty} +
+
+Kaoto will now display only the `service-x12` route. To center it in the canvas, click the *Reset View* button at the bottom:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-reset-view.png[width=50%]
+
+TIP: Use the mouse wheel to zoom in and out of the canvas, and click and drag to pan around the view.
+
+{empty} +
+
+You should now see the `service-x12` route — the main ingestion flow:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-service-x12-route.png[width=90%]
+
+Reading left to right, each step in the pipeline handles a stage of the Purchase Order lifecycle:
+
+* `platform-http` — the API endpoint that receives incoming Purchase Orders
+* `transform-x12` — transforms the EDI data into XML
+* `sql` — stores the data in the backend database
+* `store-pdf-s3` — renders a PDF invoice and uploads it to S3
+
+NOTE: Notice the two blue *To do: Enable* blocks — these are disabled steps that you'll activate in the next exercise. By the end, the full flow will be connected and functional.
+
+{empty} +
+
+[.verification]
+****
+Can you see the source files in the file explorer and the `service-x12` ingestion flow in Kaoto?
+
+[.success]
+You're all set — continue to the next exercise to complete the flow.
+
+[.fail]
+Make sure you ran the `step 2` command, opened `ingest.camel.yaml`, and selected the `service-x12` route.
+****

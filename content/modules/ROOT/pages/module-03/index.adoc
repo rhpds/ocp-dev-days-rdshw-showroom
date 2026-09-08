@@ -1,0 +1,71 @@
+:imagesdir: ../assets/images
+include::partial$style.adoc[]
+
+++++
+<style>.pagination, .nav-footer { display: none !important; }</style>
+++++
+
+== Application Connectivity for AI
+
+Welcome to __App Connectivity for AI__. This module is designed to provide you with a comprehensive introduction to building AI data flows using Red Hat's powerful tools and technologies. Whether you're new to AI or an experienced developer, this workshop will guide you through the process of creating efficient and secure data flows that can power your AI applications.
+
+
+[TIP]
+--
+.How to approach this module
+[%collapsible]
+====
+For the best experience, we recommend following the module in order. Each section builds on the previous one, allowing you to gradually develop your skills and understanding of the concepts, but feel free to select specific sections that interest you the most.
+
+[.text-center]
+image::module-03/intro/tiles-progression.png[width=70%]
+
+Each section page includes a progress indicator and a time estimate so you can plan your session.
+
+If you have any questions during the labs, reach out to the workshop facilitators.
+====
+--
+
+Select a module below to get started.
+
+[.tile]
+****
+xref:module-03/intro/intro.1.adoc[Introduction]
+
+Get familiar with the workshop goals, the technologies at play, the scenario, and set up your development environment.
+****
+
+[.tile]
+****
+xref:module-03/m1/m1.0.adoc[Lab 1 -- Ingest Service]
+
+Ingest EDI Purchase Orders, transform and store them in a backend database, and generate PDF invoices — with secure cross-cluster connectivity powered by Service Interconnect.
+****
+
+[.tile]
+****
+xref:module-03/m2/m2.0.adoc[Lab 2 -- Messaging Access]
+
+Onboard onto the Matrix and Rocket.Chat platforms and explore the first integration flow connecting both messaging systems.
+****
+
+[.tile]
+****
+xref:module-03/m3/m3.0.adoc[Lab 3 -- Multi-channel Hub]
+
+Decouple the messaging architecture using Kafka as the backbone, adopt a standard data model, and deploy the full event-driven solution on OpenShift.
+****
+
+[.tile]
+****
+xref:module-03/m4/m4.0.adoc[Lab 4 -- AI Customer Support]
+
+Build an AI-powered support agent that resolves invoice issues through natural language in Rocket.Chat — orchestrated by Agentic Apache Camel and MaaS.
+****
+
+[.tile]
+****
+xref:module-03/m5/m5.0.adoc[Lab 5 -- LLM Governance]
+
+Secure and govern LLM access with Red Hat Connectivity Link — enforce API key authentication and token-based rate limiting per user tier.
+****

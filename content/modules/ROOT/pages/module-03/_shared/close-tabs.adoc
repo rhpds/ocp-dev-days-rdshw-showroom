@@ -1,0 +1,39 @@
+
+[TIP]
+--
+Close tabs to clean your workspace before starting a new exercise.
+
+.How to close all tabs
+[%collapsible]
+====
+
+From your workspace in your link:{url-codeready}[Red Hat OpenShift Dev Spaces, window="_blank"] environment, follow the steps below:
+
+Find the menu in the top right corner of the editor and click as follows:
+
+[.indent2]
+[#close-tabs-img]
+image::module-03/common/dev-close-tabs.png[width=50%]
+
+[.overlay]
+****
+[.target]
+close-tabs-img
+
+[.arrows]
+{x: 97, y: 30, rot: 270, size: 2}
+{x: 97, y: 68, rot: 270, size: 2}
+
+[.numbers]
+{x: 138, y: 30, size: 3}
+{x: 138, y: 68, size: 3}
+****
+
+{blank}
+
+1. Click the kbd:[...] button +
+1. Select  kbd:[Close All].
+====
+--
+
+{empty} +

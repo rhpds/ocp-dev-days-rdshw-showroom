@@ -1,0 +1,63 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='messaging-access']
+== Lab 2 - Messaging Access
+
+Get familiar with the two messaging platforms used in this workshop — Matrix and Rocket.Chat — and log in to both so you're ready for the integration exercises ahead.
+
+{empty} +
+
+Recommended: +
+--
+* For the best experience, complete the following modules first to follow the storyline:
++
+image::module-03/m2/prereq.png[width=50%]
+
+{empty} +
+--
+
+NOTE: Matrix and Rocket.Chat are messaging platforms similar to Slack, Telegram, or WhatsApp. This workshop uses them because they can be self-hosted on OpenShift, so no external accounts are needed.
+
+{empty} +
+
+=== The messaging scenario
+
+Customers who have placed Purchase Orders may need to reach out to customer support — whether it's a complaint, a request to return items, or changes to an existing order. On the other side, support agents are ready to assist them.
+
+The interesting part is that each side uses a *different* messaging platform:
+
+* *Matrix* — where customers connect to submit their enquiries
+* *Rocket.Chat* — where support agents work and respond
+
+[TIP]
+--
+.What are these platforms?
+[%collapsible]
+====
+*Matrix* is an open standard and communication protocol for real-time decentralized communication. It works seamlessly between different service providers.
+
+*Rocket.Chat* is an open-source communications platform with strict data protection standards. It enables real-time conversations between colleagues, other companies, or your customers across web, desktop, or mobile devices.
+====
+--
+
+In the upcoming modules you'll use Apache Camel and Kafka to build the integrations that bridge both platforms — so that a message sent from one side appears seamlessly on the other.
+
+[.mermaid]
+----
+flowchart LR
+    C([Customer]) --> MX
+    MX <-->|"messages"| Integration(Integrations) <-->|"messages"| RC
+    RC --> A([Support Agent])
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    style MX fill:none,stroke:none
+    style RC fill:none,stroke:none
+----
+
+Both platforms are deployed on OpenShift with web access, so you can interact with them directly from your browser. The next pages will guide you through logging in to each one, so you're ready when the integration work begins.
+
+{empty} +

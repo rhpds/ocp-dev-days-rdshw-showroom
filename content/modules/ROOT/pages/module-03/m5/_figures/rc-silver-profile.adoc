@@ -1,0 +1,51 @@
+[subs=attributes]
+++++
+<div style="display: flex; align-items: flex-start; gap: 15px;">
+  <div style="display: flex; flex-direction: column; align-items: center; flex-shrink: 0;">
+    <div style="width: 90px; height: 90px; background-color: #f5455c; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="white">
+        <g transform="translate(-2 -2) scale(.9)">
+          <path d="M 7.5488281 5 C 6.2638281 5 5.055 5.3086094 4 5.8496094 C 5.422467 6.9694938 6.4322525 8.5274703 6.8359375 10.300781 C 5.0652471 11.854193 4 13.838545 4 16 C 4 18.1 5.0028438 20.110797 6.8398438 21.716797 C 6.5498438 22.966797 5.9480312 24.134047 5.0820312 25.123047 L 4.0136719 26.345703 L 5.5859375 26.751953 C 6.2259375 26.917953 6.8868281 27 7.5488281 27 C 9.7768281 27 11.841828 26.197516 13.423828 24.728516 C 14.425828 24.908516 15.458 25 16.5 25 C 23.393 25 29 20.962 29 16 C 29 11.038 23.393 7 16.5 7 C 15.440923 7 14.418235 7.1058017 13.435547 7.2851562 C 11.913547 5.8774278 9.8442485 5 7.5488281 5 z M 16.5 9 C 22.29 9 27 12.14 27 16 C 27 19.86 22.29 23 16.5 23 C 15.412 23 14.338594 22.888969 13.308594 22.667969 L 12.757812 22.548828 L 12.371094 22.957031 C 11.147094 24.252031 9.469625 24.976 7.640625 25 C 8.290625 23.917 8.727875 22.724516 8.921875 21.478516 L 9.0136719 20.896484 L 8.5488281 20.535156 C 6.9058281 19.256156 6 17.646 6 16 C 6 12.14 10.71 9 16.5 9 z M 11.5 15 A 1.5 1.5 0 0 0 11.5 18 A 1.5 1.5 0 0 0 11.5 15 z M 16.5 15 A 1.5 1.5 0 0 0 16.5 18 A 1.5 1.5 0 0 0 16.5 15 z M 21.5 15 A 1.5 1.5 0 0 0 21.5 18 A 1.5 1.5 0 0 0 21.5 15 z"/>
+        </g>
+      </svg>
+    </div>
+    <span style="font-size: 16px; color: #000; font-weight: 500; margin-top: 5px;">rocket.chat</span>
+  </div>
+  <div style="border: 1px solid #ddd; border-radius: 4px; background: #fff; width: 660px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 8px 10px; gap: 10px; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <!-- Bot response — Silver Profile -->
+    <div style="gap: 10px; display: flex; flex-direction: row;">
+      <div style="width: 36px; height: 36px; background-color: #3ea18e; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; flex-shrink: 0;">
+        A
+      </div>
+      <div style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
+        <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; line-height: 1.2;">
+          <span style="font-weight: bold; font-size: 14px; color: #333;">ai-bot</span>
+          <span style="font-size: 11px; color: #aaa;">{fig-time}</span>
+        </div>
+        <div style="font-size: 14px; color: #333; line-height: 1.5;">
+          <hr style="border: none; border-top: 2px solid #333; margin: 6px 0 10px 0;">
+          <div style="font-size: 22px; font-weight: bold; margin-bottom: 4px;">&#x1F948; SILVER TIER ANALYSIS</div>
+          <hr style="border: none; border-top: 2px solid #333; margin: 0 0 12px 0;">
+
+          <div style="margin-bottom: 10px;">
+            <div style="font-size: 16px; font-weight: bold; margin-bottom: 4px;">&#x1F4CA; Customer Profile</div>
+            <ul style="margin: 2px 0; padding-left: 20px; line-height: 1.5; list-style-type: disc; color: #000;">
+              <li style="margin-bottom: 2px;"><span style="font-weight:bold">Chapman, Kim and Green</span>, Gold membership, <span style="font-weight:bold">US-East</span> region</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom: 4px;">
+            <div style="font-size: 16px; font-weight: bold; margin-bottom: 4px;">&#x1F4CB; Open Issues</div>
+            <ul style="margin: 2px 0; padding-left: 20px; line-height: 1.5; list-style-type: disc; color: #000;">
+              <li style="margin-bottom: 2px;"><span style="font-weight:bold">TKT-1025</span> &#x2014; Refund request &#x2014; Stemless wine glasses returned (Invoice 61356291)</li>
+              <li style="margin-bottom: 2px;"><span style="font-weight:bold">TKT-0871</span> &#x2014; Delayed shipment &#x2014; Order 58201437 (resolved)</li>
+              <li style="margin-bottom: 2px;"><span style="font-weight:bold">TKT-0943</span> &#x2014; Pricing correction &#x2014; Order 59843102 (resolved)</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+++++

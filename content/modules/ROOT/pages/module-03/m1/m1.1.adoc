@@ -1,0 +1,937 @@
+:imagesdir: ../../assets/images
+:page-time: 8
+include::partial$style.adoc[]
+
+[id='lab3-service-interconnect']
+== Enabling Database Connectivity
+
+The integration flow needs access to the database, but it isn't reachable yet. Let's find out why, and enable the connection.
+
+NOTE: This exercise uses a single cluster to keep things focused, but Service Interconnect is designed for far more than a network policy can handle — multi-site meshes spanning clusters, regions, and cloud providers. A brief real-world example at the end shows it in that broader context.
+
+{empty} +
+
+=== Why can't you reach the database?
+
+The backend database is hosted in an isolated namespace (`shared-database`) with strict network policies — no direct access is allowed from other namespaces.
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB Client]
+        end
+    end
+
+    Client -.-x|"❌ unreachable"| SVC
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+Try it yourself — run a simple query against the database (from your terminal in _Dev Spaces_):
+
+{blank}
+
+// [.copypaste]
+// ****
+// curl postgres.shared-database.svc:5432 \
+// -v --connect-timeout 3
+// ****
+
+// [TIP]
+// --
+// .What does this command do?
+// [%collapsible]
+// ====
+// * `postgres.shared-database.svc:5432` — target service, namespace, and PostgreSQL port
+// * `-v` — verbose, shows the connection attempt
+// * `--connect-timeout 3` — gives up after 3 seconds instead of hanging
+// ====
+// --
+
+[.copypaste]
+****
+sql postgres.shared-database.svc:5432 \
+"SELECT count(*) FROM invoices"
+****
+
+[TIP]
+--
+.What does this command do?
+[%collapsible]
+====
+* `sql` — a lab helper script that connects to a PostgreSQL database and runs a query
+* `postgres.shared-database.svc:5432` — database address: service, namespace, and port
+* `"SELECT count(*) FROM invoices"` — counts the number of records in the database
+====
+--
+
+The connection will time out — the database is not directly accessible from your namespace:
+
+{blank}
+
+// ++++
+// <pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">*   Trying 172.31.163.169:5432...
+// * Connection timed out after 3001 milliseconds
+// * Closing connection 0
+// curl: (28) Connection timed out after 3001 milliseconds</pre>
+// ++++
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres.shared-database.svc:5432 (timeout: 5s)...</span>
+
+<span style="color: #f4796d">ERROR: Cannot connect to postgres.shared-database.svc:5432</span></pre>
+++++
+
+{empty} +
+
+=== Bridging namespaces with Service Interconnect
+
+NOTE: {rhsi} is a supported offering built from the upstream https://skupper.io[Skupper.io,window=_blank] open-source project.
+
+{rhsi} solves this by creating encrypted application-level connections between namespaces — without requiring VPNs, firewall rules, or exposing services to the public network.
+
+Once configured, a local service is created in your namespace that transparently forwards traffic to the remote database:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB Client]
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Client --> SI1
+
+    SI1 -.-|"🔒 secure link"| SI2
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    SI2 --> SVC
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+From your application's perspective, the database will appear as a local service — no special configuration needed.
+
+{empty} +
+
+//NOTE: In this exercise you're connecting two namespaces on the same cluster — a deliberately simple setup to focus on learning the core concepts. You might wonder why Service Interconnect is needed for something that could be solved with a simple network policy. The answer is scale: Service Interconnect is designed for multi-site networks where services span multiple clusters, regions, and cloud providers — with many connections sharing the same secure mesh. What you learn here applies directly to those real-world scenarios. We'll look at a brief example at the end of this exercise.
+
+//{empty} +
+
+=== Under the hood
+
+Service Interconnect uses a set of resources to establish and manage the connection. Here's how the previous diagram breaks down:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB Client]
+            SVC2((svc))
+            subgraph S2 ["Site(2)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 secure link"| S1
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            subgraph S1 ["Site(1)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S1 fill:#e8eaf6,stroke:#7986cb
+    style Grant fill:#fff,stroke:#7986cb
+    style Listener fill:#fff,stroke:#7986cb
+    style Token fill:#fff,stroke:#7986cb
+    style Connector fill:#fff,stroke:#7986cb
+    style DB fill:#336,color:#fff
+----
+
+[.mermaid-hints-simple]
+****
+S2 | Site | The foundation of the Skupper network. Each participating namespace runs a Site. Sites discover each other through AccessGrants and AccessTokens. +
+S1 | Site | The foundation of the Skupper network. Each participating namespace runs a Site. Sites discover each other through AccessGrants and AccessTokens. +
+Grant | AccessGrant | Created on the receiving side. It generates credentials that allow a remote Site to connect. Think of it as an invitation to join the network. +
+Token | AccessToken | Created on the connecting side using the grant details. It establishes the encrypted link between two Sites. +
+Listener | Listener | Exposes a remote service locally in your namespace. It matches a Connector on the other side by routing key, making the remote service appear as a local one. +
+Connector | Connector | Connects a local service to the Skupper network. It publishes the service so that matching Listeners in other namespaces can reach it. +
+SVC2 | Service (auto-created) | When a Listener is created, Service Interconnect automatically creates a local Kubernetes service. Your application connects to this service as if the database were local.
+****
+
+TIP: Hover over each component in the diagram to learn what it does.
+
+NOTE: The database lives in a secure, air-tight environment — no inbound ports are exposed. To keep it that way, the link is initiated *from* the database side *outward* to your site. This is why you create an AccessGrant on your side: it gives the database site permission to connect to you and establish a bidirectional communication link. Its environment never opens an entrypoint that could be exploited.
+
+{empty} +
+
+=== What you will do
+
+Every Service Interconnect setup follows two stages: first you *establish the network* — the secure mesh that connects your environments — then you *expose services* through it. Once the network is in place, adding a new service is just a matter of pairing a Listener with a Connector — no network changes needed.
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+    subgraph netLabel ["① Establish the network"]
+        subgraph net [" "]
+            direction LR
+            S1@{ shape: processes, label: "Sites" } -.-|"🔒 secure links"| S2@{ shape: processes, label: "Sites" }
+        end
+    end
+
+    subgraph svcLabel ["② Expose services"]
+        subgraph svc [" "]
+            direction LR
+            LA@{ shape: processes, label: "Listeners" } --- CA@{ shape: processes, label: "Connectors" }
+        end
+    end
+
+    netLabel ~~~ svcLabel
+
+    style netLabel fill:none,stroke:none
+    style svcLabel fill:none,stroke:none
+    style net fill:#e8eaf6,stroke:#7986cb
+    style svc fill:#e8f5e9,stroke:#66bb6a
+    style S1 fill:#fff,stroke:#7986cb
+    style S2 fill:#fff,stroke:#7986cb
+    style LA fill:#fff,stroke:#66bb6a
+    style CA fill:#fff,stroke:#66bb6a
+----
+
+In this exercise, that translates to:
+
+*Establish the network* — create the secure link between namespaces:
+
+[start=0]
+. A *Site* already exists in the `shared-database` namespace _(pre-configured)_
+. Create a *Site* in your namespace with `linkAccess` enabled
+. Generate an *AccessGrant* so the database namespace can connect to you
+. Create an *AccessToken* in the database namespace to establish the link
+
+*Expose the database service* — make the remote database accessible locally (in `{username}-devspaces`):
+
+[start=4]
+. A *Connector* already bridges the Skupper network to PostgreSQL on port `5432` _(pre-configured)_
+. Create a *Listener* to expose the remote database as a local service
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel2 ["{username}-devspaces"]
+        subgraph yours2 [" "]
+            Client[DB Client]
+            SVC2((svc))
+            subgraph S2 ["✏️ Site(2)"]
+                Listener(("✏️ Listener"))
+                Grant["✏️ AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 secure link"| S1
+
+    subgraph sharedLabel2 [shared-database]
+        subgraph shared2 [" "]
+            subgraph S1 ["✅ Site(1)"]
+                Connector(("✅ Connector"))
+                Token["✏️ AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel2 fill:none,stroke:none
+    style sharedLabel2 fill:none,stroke:none
+    style S2 fill:#ffe0b2,stroke:#fb8c00
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Listener fill:#fff3e0,stroke:#fb8c00
+    style Grant fill:#fff3e0,stroke:#fb8c00
+    style Token fill:#fff3e0,stroke:#fb8c00
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+[.indent2]
+✅ Already configured by the platform team +
+✏️ Your tasks
+
+{empty} +
+
+=== Step 0: Explore the Server Side (Optional)
+
+You have read-only access to the `shared-database` namespace. Take a moment to inspect what the platform team has set up.
+
+View the Skupper resources:
+
+{blank}
+
+[.copypaste]
+****
+oc get site,connector -n shared-database
+****
+
+You should see output similar to:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME                            STATUS   SITES IN NETWORK   MESSAGE
+site.skupper.io/database-site   Ready    1                  OK
+
+NAME                            ROUTING KEY   PORT   HOST   SELECTOR       STATUS    HAS MATCHING LISTENER   MESSAGE
+connector.skupper.io/postgres   postgres      5432          app=postgres   Pending                           No matching listeners</pre>
+++++
+
+Notice the Connector status is `Pending` with `No matching listeners` — that's expected. You will create the matching Listener later in this exercise.
+
+These are the two pre-configured resources from the diagram. Here's what you need to complete:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector</div>"]
+
+    Progress["33% Complete<br/>████████░░░░░░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== Establish the network
+
+The first step is to set up the secure network between your namespace and the database namespace. This involves creating a Site, an AccessGrant, and an AccessToken — together, these establish an encrypted link between the two environments.
+
+{empty} +
+
+==== Step 1: Create a Site in Your Namespace
+
+Create a Site with `linkAccess` enabled. This makes your namespace a *listening site* that can accept incoming connections from the database.
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Site
+metadata:
+  name: {username}-site
+  namespace: {username}-devspaces
+spec:
+  linkAccess: route
+EOF
+****
+
+Verify the Site is ready:
+
+{blank}
+
+[.copypaste]
+****
+oc get site {username}-site -n {username}-devspaces
+****
+
+Wait until the `STATUS` column shows `Ready`:
+
+{blank}
+
+[subs=attributes]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME         STATUS   SITES IN NETWORK   MESSAGE
+{username}-site   Ready    1                  OK</pre>
+++++
+
+Your Site is ready. Here's your progress:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)</div>"]
+
+    Progress["50% Complete<br/>█████████████░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== Step 2: Create an AccessGrant
+
+Before jumping in, remember that the link is initiated *from* Site(1) (database) *to* Site(2) (yours). Here's how the grant and token work together to make that happen:
+
+{blank}
+
+[.mermaid]
+----
+sequenceDiagram
+    actor A as Admin<br/>(You)
+    participant S2 as Site(2)
+    participant S1 as Site(1)
+
+    A-->>S2: Create AccessGrant
+
+    Note over S2: AccessGrant
+
+    A-->>S1: Create AccessToken
+
+    Note over S1: AccessToken
+
+    S1-->>S2: Redeem token
+    S2-->>S1: Transfer link details
+    S1->>S2: Create link
+
+    Note over S2,S1: 🔒 secure link established
+----
+
+You create an AccessGrant on your Site(2) and an AccessToken on Site(1). The database site then redeems the token to establish a secure link back to you.
+
+{blank}
+
+Now, create the AccessGrant:
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessGrant
+metadata:
+  name: grant-{username}
+  namespace: {username}-devspaces
+spec:
+  redemptionsAllowed: 1
+  expirationWindow: 168h
+EOF
+****
+
+Wait for the AccessGrant to be ready and retrieve its details:
+
+{blank}
+
+[.copypaste]
+****
+oc get accessgrant grant-{username} -n {username}-devspaces
+****
+
+Wait until the `STATUS` column shows `Ready`:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            REDEMPTIONS ALLOWED   REDEMPTIONS MADE   EXPIRATION             STATUS   MESSAGE
+grant-userN     1                                        2026-03-27T11:29:08Z   Ready    OK</pre>
+++++
+
+Your AccessGrant is ready. Here's your progress:
+
+{blank}
+
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant</div>"]
+
+    Progress["67% Complete<br/>████████████████░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== Step 3: Create an AccessToken in the Database Namespace
+
+Now create an AccessToken in the `shared-database` namespace to establish the link from the database to your namespace. The token must be named `token-{username}`.
+
+Extract the grant details and create the AccessToken:
+
+{blank}
+
+[.copypaste]
+****
+URL=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.url}')
+CODE=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.code}')
+CA=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.ca}' | sed 's/^/    /')
+
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessToken
+metadata:
+  name: token-{username}
+  namespace: shared-database
+spec:
+  url: "${URL}"
+  code: "${CODE}"
+  ca: |
+${CA}
+EOF
+****
+
+IMPORTANT: The AccessToken name *must* follow the pattern `token-<your-username>`. Any other name will be rejected.
+
+After a few moments, a *Link* resource is automatically created in `shared-database`. Verify:
+
+{blank}
+
+[.copypaste]
+****
+oc get link token-{username} -n shared-database
+****
+
+Wait until the link status shows `Ready`:
+
+{blank}
+
+[subs="attributes"]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            STATUS   REMOTE SITE    MESSAGE
+token-{username}     Ready    {username}-site     OK</pre>
+++++
+
+Almost there — one more resource to go:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken</div>"]
+
+    Progress["83% Complete<br/>█████████████████████░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== Expose the database service
+
+The network is now in place — your namespace and the database namespace are connected through an encrypted link. But having a network alone doesn't give you access to the database. You still need to tell Service Interconnect *which service* to expose into your namespace.
+
+This is where Listeners and Connectors come in. The Connector on the database side is already configured (you saw it in Step 0). Now you need to create a matching Listener on your side.
+
+{empty} +
+
+==== Step 4: Create a Listener to Expose the Database Locally
+
+The Listener creates a local service in your namespace that forwards traffic to the remote PostgreSQL database through the encrypted link.
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: postgres-listener
+  namespace: {username}-devspaces
+spec:
+  routingKey: postgres
+  host: postgres
+  port: 5432
+EOF
+****
+
+IMPORTANT: The `routingKey` must match the one configured on the Connector in the `shared-database` namespace. The platform team set it to `postgres`.
+
+Verify the Listener is ready:
+
+{blank}
+
+[.copypaste]
+****
+oc get listener postgres-listener -n {username}-devspaces
+****
+
+You should see output similar to:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME                ROUTING KEY   PORT   HOST       STATUS   HAS MATCHING CONNECTOR   MESSAGE
+postgres-listener   postgres      5432   postgres   Ready    true                     OK</pre>
+++++
+
+When a Listener is created, Service Interconnect automatically exposes the backend service as a local service in your environment:
+
+{blank}
+
+[.mermaid]
+----
+flowchart RL
+
+    subgraph S2 [" "]
+        Listener((Listener))
+    end
+    Listener -.->|creates| SVC2((svc))
+
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+----
+
+Verify the `postgres` service is available:
+
+{blank}
+
+[.copypaste]
+****
+oc get svc postgres -n {username}-devspaces
+****
+
+You should see the service available locally:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+postgres   ClusterIP   172.31.121.30   &lt;none&gt;        5432/TCP   21s</pre>
+++++
+
+All resources are in place:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Progress["100% Complete<br/>██████████████████████████"]
+
+    Left --- Progress
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#e8f5e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+----
+
+{empty} +
+
+==== Step 5: Verify the connection
+
+// Now let's verify the connection works. The database credentials are already configured in `application.properties`. Query the database using Camel's `cmd` tool:
+
+// {blank}
+
+// [.copypaste]
+// ****
+// camel cmd send \
+// --uri "sql:SELECT count(*) FROM invoices" \
+// --properties application.properties \
+// --reply
+// ****
+
+// [TIP]
+// --
+// .What does this command do?
+// [%collapsible]
+// ====
+// * `camel cmd send` — sends a message to a Camel endpoint from the command line
+// * `--uri "sql:SELECT count(*) FROM invoices"` — runs a SQL query against the configured database
+// * `--properties application.properties` — loads database connection settings
+// * `--reply` — waits for and displays the response
+// ====
+// --
+
+// You should see output similar to:
+
+// {blank}
+
+// ++++
+// <pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #818181">2026-03-23 10:14:08.939  <span style="color:#A649A6">11530</span> ---   <span style="color:#10A9CD">sql://SELECT%20count(*)%20FROM%20invoice</span> : <span style="color:#0FBC7A">Reply received</span> <span style="color:#0FBC7A">(success)</span> <span style="color:#fff">(304ms)</span>
+//  <span style="color:#fff">Endpoint</span>  <span style="color:#fff">sql://SELECT%20count(*)%20FROM%20invoices</span>
+//  <span style="color:#fff">Exchange</span>  (DefaultExchange)  <span style="color:#6F416E">InOut</span>   <span style="color:#fff">E3D444D7E02ADCD-0000000000000000</span>
+//  <span style="color:#fff">Message</span>   (DefaultMessage)
+//  <span style="color:#fff">Header</span>    (Integer)             <span style="color:#fff">CamelSqlRowCount  1</span>
+//  <span style="color:#fff">Body</span>      (ArrayList) (size: 1 bytes: 11)
+//  <span style="background-color: yellow; color: black">[{count=1}]</span></pre>
+// ++++
+
+Now let's verify the connection works. Run the same query as before, but this time targeting the local service — thanks to _Service Interconnect_, the database is now reachable from your namespace:
+
+{blank}
+
+[.copypaste]
+****
+sql postgres:5432 \
+"SELECT count(*) FROM invoices"
+****
+
+[TIP]
+--
+.What does this command do?
+[%collapsible]
+====
+* `sql` — a lab helper script that connects to a PostgreSQL database and runs a query
+* `postgres:5432` — the database service exposed locally by _Service Interconnect_
+* `"SELECT count(*) FROM invoices"` — counts the number of records in the database
+====
+--
+
+You should see output similar to:
+
+{blank}
+
+++++
+<pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres:5432 (timeout: 5s)...</span>
+<span style="color: #0FBC7A">count</span>
+<span style="color: #0FBC7A">-----</span>
+<span style="color: #0FBC7A">1</span>
+
+<span style="color: #0FBC7A">(1 row(s))</span></pre>
+++++
+
+[.overlay]
+****
+[.target]
+sql-count-output
+
+[.arrows]
+{x: 9, y: 88, rot: -45, size: .8, color: "red"}
+****
+
+NOTE: The count is `1` because your lab environment comes with a sample entry already loaded in the database.
+
+{empty} +
+
+=== Summary
+
+Here's the full picture of what you've built:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel3 ["{username}-devspaces"]
+        subgraph yours3 [" "]
+            Client[DB Client]
+            SVC2((svc))
+            subgraph S2 ["✅ Site(2)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 secure link"| S1
+
+    subgraph sharedLabel3 [shared-database]
+        subgraph shared3 [" "]
+            subgraph S1 ["✅ Site(1)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel3 fill:none,stroke:none
+    style sharedLabel3 fill:none,stroke:none
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Grant fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Token fill:#e8f5e9,stroke:#66bb6a
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+You have successfully:
+
+* *Established the network* — Created a Site and AccessGrant in your namespace, and an AccessToken in the database namespace to form an encrypted link.
+* *Exposed the service* — Created a Listener that makes the remote database accessible locally through the network.
+* *Verified connectivity* — Used a script to query the database through the encrypted link.
+
+The database lives in a secure, air-tight environment — the connection was initiated *from* the database side *to* yours through an encrypted Skupper link. No network policy changes, no VPNs, no elevated permissions required.
+
+The link you've established will stay active — you'll need it in the next exercise to implement the full data flow: ingesting Purchase Orders, storing them in the database, and rendering PDF invoices.
+
+{empty} +
+
+=== Beyond this exercise: Service Interconnect at scale
+
+In this lab you connected two namespaces on the same cluster — a simple setup to demonstrate the concepts. In the real world, Service Interconnect shines when connecting services across multiple clusters, regions, and cloud providers — all sharing the same secure mesh.
+
+Consider a retail organization with stores across different regions, each running AI-powered services. Edge sites collect training data and run inference against locally deployed models. Redundant on-prem data centers handle the heavy lifting — training new AI/ML models and pushing updated versions back to the stores. Regional hubs aggregate traffic from nearby edges before forwarding it to the core.
+
+{blank}
+
+[.text-center]
+[.mermaid]
+----
+flowchart LR
+    subgraph left [" "]
+        direction TB
+        subgraph E1L ["London"]
+            E1["AI data →\nAI model ←"]
+        end
+        subgraph E2L ["Berlin"]
+            E2["AI data →\nAI model ←"]
+        end
+    end
+
+    HL((Hub\nFrankfurt))
+
+    subgraph coreLabel [" "]
+        direction TB
+        subgraph DC1 ["Data Center 1"]
+            AI1(AI Model Training)
+        end
+        subgraph DC2 ["Data Center 2"]
+            AI2(AI Model Training)
+        end
+    end
+
+    HR((Hub\nSingapore))
+
+    subgraph right [" "]
+        direction TB
+        subgraph E3L ["Tokyo"]
+            E3["← AI data\n→ AI model"]
+        end
+        subgraph E4L ["Sydney"]
+            E4["← AI data\n→ AI model"]
+        end
+    end
+
+    E1 -.-|"🔒 N links"| HL
+    E2 -.-|"🔒 N links"| HL
+    HL -.-|"🔒 N links"| AI1
+    HL -.-|"🔒 N links"| AI2
+    AI1 -.-|"🔒 N links"| HR
+    AI2 -.-|"🔒 N links"| HR
+    HR -.-|"🔒 N links"| E3
+    HR -.-|"🔒 N links"| E4
+
+    style left fill:none,stroke:none
+    style right fill:none,stroke:none
+    style E1L fill:none,stroke:none
+    style E2L fill:none,stroke:none
+    style E3L fill:none,stroke:none
+    style E4L fill:none,stroke:none
+    style coreLabel fill:none,stroke:none
+    style DC1 fill:#e8eaf6,stroke:#7986cb
+    style DC2 fill:#e8eaf6,stroke:#7986cb
+    style AI1 fill:#fff,stroke:#7986cb
+    style AI2 fill:#fff,stroke:#7986cb
+    style HL fill:#e8eaf6,stroke:#7986cb
+    style HR fill:#e8eaf6,stroke:#7986cb
+    style E1 fill:#f5f5f5,stroke:#ccc
+    style E2 fill:#f5f5f5,stroke:#ccc
+    style E3 fill:#f5f5f5,stroke:#ccc
+    style E4 fill:#f5f5f5,stroke:#ccc
+----
+
+Each edge site pushes training data to the core and pulls updated models back. Multiple links between sites provide redundant routing — if one path fails, traffic flows through another. Hubs add a further layer of resilience: if the Frankfurt hub goes down, edges can reroute through Singapore. Redundant data centers ensure the AI pipeline stays available even during maintenance or outages.
+
+The same two-stage pattern you just learned applies here: Sites and links form the network, while Listeners and Connectors expose the specific services at each end. The difference is scale — instead of two namespaces on one cluster, this spans multiple regions, hubs, and data centers. But the building blocks are identical.
+
+{empty} +
+
+[.verification]
+****
+Did the command output show `[{count=1}]` confirming a successful database query?
+
+[.success]
+Well done — your database connectivity is ready. Continue to the next exercise.
+
+[.fail]
+Review your Service Interconnect resources and ensure the link status is `Ready` before running the command again.
+****
