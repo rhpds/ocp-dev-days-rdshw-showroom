@@ -77,7 +77,7 @@ If you see the message "Trust the Authors" then click on the "Trust the Authors"
 
 image::module-05-mta-dls/dls-03.png[VSCode Tab,link=self,window=blank,title="Manage profiles"]
 
-Managing multiple profiles is a powerful feature of the MTA extension. It allows you to switch between different analysis profiles easily. You can create a new profile by clicking on the "New Profile" button as shown in Step 3 in the image below. We have already created two profiles one with custom rules `audit-logging` and the other `quarkus-profile`. to migration our applicaiton to Quarkus. Click on the `Manage Profiles` button to open the profiles management panel.
+Managing multiple profiles is a powerful feature of the MTA extension. It allows you to switch between different analysis profiles easily. You can create a new profile by clicking on the "New Profile" button as shown in Step 3 in the image below. We have already created two profiles one with custom rules `audit-logging` and the other `quarkus-profile`. to migrate our application to Quarkus. Click on the `Manage Profiles` button to open the profiles management panel.
 
 image::module-05-mta-dls/dls-04.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
 

@@ -97,5 +97,5 @@ Agent will also keep on fixing issues as it finds them, at each step it will ask
 
 [IMPORTANT]
 ====
-Please try out some of the fixes from the agents, and feel free to press **No** if you dont want to continue with the agent changes. You can also accept or reject fixes suggested by the agent as you see fit.
+Please try out some of the fixes from the agents, and feel free to press **No** if you don't want to continue with the agent changes. You can also accept or reject fixes suggested by the agent as you see fit.
 ====
