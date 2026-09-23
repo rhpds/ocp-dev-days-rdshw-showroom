@@ -11,3 +11,10 @@
 ** xref:03-module-01-developer-experience.adoc#section-4[Section 4: Ship it]
 ** xref:03-module-01-developer-experience.adoc#section-5[Section 5: Call in the AI]
 ** xref:03-module-01-developer-experience.adoc#section-6[Section 6: Go live]
+
+* xref:module-05-01-goals.adoc[Module 5: AI-powered migration using MTA]
+** xref:module-05-01-goals.adoc[Section 1: Goals]
+** xref:module-05-02-introduction.adoc[Section 2: Introduction]
+** xref:module-05-03-configure-mta-extension.adoc[Section 3: Configure MTA extension]
+** xref:module-05-04-mdb-to-reactive-messaging.adoc[Section 4: MDB to Reactive Messaging]
+** xref:module-05-05-ejb-to-rest.adoc[Section 5: EJB to REST]

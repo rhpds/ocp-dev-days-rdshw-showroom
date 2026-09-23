@@ -1,0 +1,30 @@
+= Section 2: Introduction to Developer Lightspeed for MTA
+include::partial$_attributes.adoc[]
+:imagesdir: ../assets/images
+
+Migration Toolkit for Applications has long been the industry-leading solution for assessing and analyzing applications for cloud migration. **Developer Lightspeed** (**DLS**) is MTA's **AI-powered code refactoring** feature—not a separate extension. It brings generative AI-assisted migration into the developer's IDE, transforming how organizations approach application modernization.
+
+== The challenge of application modernization
+
+Enterprises face several critical challenges when modernizing their application portfolios:
+
+* **Security concerns** - Outdated applications and frameworks introduce significant risks to business operations, potentially leading to data breaches and compliance violations.
+* **Complexity of legacy systems** - Legacy codebases often lack compatibility with modern platforms, have tightly coupled dependencies, and may be unfamiliar to current development teams.
+* **Competing priorities** - Organizations must balance the urgency of modernization with limited resources, often prioritizing new features over improving existing applications.
+* **Scale and consistency** - Large enterprises may have hundreds of applications requiring similar changes, making manual migration impractical.
+
+== How Developer Lightspeed transforms modernization
+
+**Red Hat Developer Lightspeed for MTA** denotes MTA modernization that uses both static analysis and **Developer Lightspeed** (generative AI). In the IDE, the **MTA extension** for Visual Studio Code provides MTA static analysis and Developer Lightspeed together. That combination addresses these challenges:
+
+* **Speed up application modernization with GenAI** - The MTA extension applies MTA's proven static code analysis together with Developer Lightspeed generative AI to identify migration issues and propose context-aware solutions. The AI generates tailored code recommendations directly within the IDE, eliminating context switching and keeping developers focused on their work. The system handles ripple effects of code changes automatically, maintaining code integrity throughout the refactoring process. Additionally, it tracks migration metrics and learns from previous solutions to continuously improve recommendations over time.
+
+* **Get helpful refactored code suggestions developers trust** - The system uses rule-based analysis to guide the LLM on what migration issues to look for and how to solve them, ensuring recommendations are grounded in proven migration patterns. Every suggestion includes clear explanations of what needs to change and why, helping developers understand the reasoning behind each proposed fix. Real-time IDE diagnostic data ensures fixes address actual compilation and runtime issues rather than hypothetical problems. Throughout the process, developers review and approve changes, maintaining full control over the refactoring process and ensuring code quality.
+
+* **Modernize custom and proprietary technologies** - Developer Lightspeed enables creating custom rules that specify conditions and actions for organization-specific frameworks, allowing the AI to understand and work with a unique technology stack. This capability automates code transformation for applications using proprietary or corporate libraries that aren't covered by standard migration rules. Extend the out-of-the-box migration paths with organizational knowledge, making the tool adaptable to specific business needs.
+
+* **Scale modernization across the portfolio** - Developer Lightspeed learns from changes made during the migration process, building institutional knowledge that improves over time. As it encounters similar patterns across applications, it accurately predicts and generates solutions for similar applications across the portfolio. This learning capability enables refactoring multiple applications predictably and efficiently with consistent quality, making portfolio-scale modernization achievable.
+
+* **Seamless integration into development workflows** - All analysis and refactoring happens directly in Red Hat Dev Spaces, keeping developers in their familiar environment. Detailed issues, proposed solutions, and code diffs are visible without switching contexts or jumping between different tools. Once refactoring is complete, push the refactored code through existing CI/CD pipelines for automated testing and deployment, ensuring the modernized application integrates seamlessly with established development processes.
+
+* **Choose an AI model** - Developer Lightspeed supports using a custom LLM—public or self-hosted—with no fine-tuning required, eliminating vendor lock-in. The RAG architecture learns from past solutions and stores them in a knowledge base, continuously improving its recommendations based on the organization's migration history. The system is compatible with multiple LLM providers through OpenAI-compatible APIs, including Red Hat OpenShift AI (enterprise model builder & inference server), Red Hat Enterprise Linux AI (enterprise inference server), and vLLM (popular enterprise inference server). This flexibility supports balancing performance, cost, and data privacy according to specific requirements.
