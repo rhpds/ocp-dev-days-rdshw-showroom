@@ -1,6 +1,6 @@
 = Section 4: Modernize Message-Driven Bean (MDB) to Reactive Messaging
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 [.goal]
 .Goal

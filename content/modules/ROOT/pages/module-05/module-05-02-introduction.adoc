@@ -1,6 +1,6 @@
 = Section 2: Introduction to Developer Lightspeed for MTA
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 Migration Toolkit for Applications has long been the industry-leading solution for assessing and analyzing applications for cloud migration. **Developer Lightspeed** (**DLS**) is MTA's **AI-powered code refactoring** feature—not a separate extension. It brings generative AI-assisted migration into the developer's IDE, transforming how organizations approach application modernization.
 

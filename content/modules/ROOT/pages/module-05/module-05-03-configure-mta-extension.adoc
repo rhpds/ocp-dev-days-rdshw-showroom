@@ -1,6 +1,6 @@
 = Section 3: Access Dev Spaces and configure the MTA extension
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 [IMPORTANT]
 ====

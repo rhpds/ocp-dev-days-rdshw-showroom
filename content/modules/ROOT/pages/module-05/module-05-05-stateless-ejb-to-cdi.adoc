@@ -1,6 +1,6 @@
 = Section 5: Stateless EJB to CDI (`ClaimService`)
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 [.goal]
 .Goal

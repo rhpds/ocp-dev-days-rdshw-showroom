@@ -1,6 +1,6 @@
 = Section 1: Goals of this lab
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 Experience end-to-end application modernization with **Red Hat Developer Lightspeed for MTA** (**DLS**) in **Red Hat OpenShift Dev Spaces**: use the **MTA extension** for static analysis and **Developer Lightspeed** (generative AI) to move the legacy **Java EE / EAP** **Parasol Insurance** application (`parasol-insurance-eap`) toward **Quarkus** and **Jakarta EE**, and understand how analysis, AI-assisted fixes, and the **Solution Server** fit together on the path to OpenShift.
 
