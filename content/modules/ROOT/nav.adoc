@@ -17,4 +17,4 @@
 ** xref:module-05-02-introduction.adoc[Section 2: Introduction]
 ** xref:module-05-03-configure-mta-extension.adoc[Section 3: Configure MTA extension]
 ** xref:module-05-04-mdb-to-reactive-messaging.adoc[Section 4: MDB to Reactive Messaging]
-** xref:module-05-05-ejb-to-rest.adoc[Section 5: EJB to REST]
+** xref:module-05-05-stateless-ejb-to-cdi.adoc[Section 5: Stateless EJB to CDI]

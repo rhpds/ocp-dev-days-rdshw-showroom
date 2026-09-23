@@ -2,17 +2,17 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../assets/images
 
-Experience end-to-end application modernization with **Red Hat Developer Lightspeed for MTA** (**DLS**) in **Red Hat OpenShift Dev Spaces**: use the **MTA extension** for static analysis and **Developer Lightspeed** (generative AI) to move legacy **Java EE** coolstore code toward **Quarkus** and **Jakarta EE**, and understand how analysis, AI-assisted fixes, and the **Solution Server** fit together on the path to OpenShift.
+Experience end-to-end application modernization with **Red Hat Developer Lightspeed for MTA** (**DLS**) in **Red Hat OpenShift Dev Spaces**: use the **MTA extension** for static analysis and **Developer Lightspeed** (generative AI) to move the legacy **Java EE / EAP** **Parasol Insurance** application (`parasol-insurance-eap`) toward **Quarkus** and **Jakarta EE**, and understand how analysis, AI-assisted fixes, and the **Solution Server** fit together on the path to OpenShift.
 
 As enterprise organizations accelerate their cloud adoption journey, one of the most significant challenges they face is modernizing legacy Java applications to run on modern platforms like Red Hat OpenShift. The traditional approach to code refactoring is time-consuming, error-prone, and requires deep knowledge of both legacy and target technologies.
 
-The goal of this lab is to experience how **Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA)** revolutionizes application modernization by combining static code analysis with generative AI to accelerate the migration of JavaEE 7 applications to **Quarkus**.
+The goal of this lab is to experience how **Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA)** revolutionizes application modernization by combining static code analysis with generative AI to accelerate the migration of a Java EE 8 / EAP 7 application to **Quarkus**.
 
 == Learning objectives
 
 By the end of this module, you will be able to:
 
 * Configure the MTA extension in Red Hat Dev Spaces, including Developer Lightspeed (AI-assisted migration)
-* Analyze the application and receive AI-powered code refactoring recommendations
-* Apply intelligent fixes and migrate the application to Quarkus and Jakarta EE
-* Deploy and validate the modernized application on OpenShift
+* Analyze `parasol-insurance-eap` and receive AI-powered code refactoring recommendations
+* Modernize `EmailIntakeMDB` (JMS MDB → Reactive Messaging) and `ClaimService` (`@Stateless` EJB → `@ApplicationScoped` + `@Transactional`)
+* Apply intelligent fixes and migrate the application toward Quarkus and Jakarta EE

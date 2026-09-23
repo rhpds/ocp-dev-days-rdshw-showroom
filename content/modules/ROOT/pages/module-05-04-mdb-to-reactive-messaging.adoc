@@ -6,18 +6,20 @@ include::partial$_attributes.adoc[]
 .Goal
 [NOTE]
 ====
-Use **MTA** analysis and **Developer Lightspeed** to modernize a legacy **Message-Driven Bean** (`OrderServiceMDB`) from **Java EE / JMS**-style processing toward **Quarkus** with **SmallRye Reactive Messaging** (`@Incoming`, CDI), and review an AI-generated patch before accepting changes.
+Use **MTA** analysis and **Developer Lightspeed** to modernize the legacy **Message-Driven Bean** `EmailIntakeMDB` in **parasol-insurance-eap** from **Java EE / JMS**-style processing toward **Quarkus** with **SmallRye Reactive Messaging** (`@Incoming`, CDI), and review an AI-generated patch before accepting changes.
 ====
 
 Modernizing legacy "Enterprise Java" (Java EE/Jakarta EE) applications is often a manual, error-prone process. This lab guide focuses on **Developer Lightspeed**—the AI feature of MTA, delivered through the MTA extension—which combines static code analysis with Large Language Models (LLMs) to automate the refactoring of legacy patterns into modern, cloud-native **Quarkus** code.
 
-In this lab, let's transform a legacy `OrderServiceMDB` into a modern Quarkus service using SmallRye Reactive Messaging.
+In Parasol Insurance's EAP application, inbound email JSON arrives on the JMS queue `java:/jms/queue/email-intake`. The class `com.parasol.mdb.EmailIntakeMDB` is a `@MessageDriven` bean that implements `MessageListener`, looks up the payload from a `TextMessage`, and forwards it to `EmailRoutingService` / `EmailStoreBean` via `@EJB` injection.
+
+In this lab, let's transform that legacy `EmailIntakeMDB` into a modern Quarkus consumer using SmallRye Reactive Messaging.
 
 == The architectural shift: Synchronous vs. Asynchronous
 
 Legacy Java EE relies on **JMS (Java Message Service)**. While technically asynchronous, JMS in an MDB context often operates in a "blocking" mindset. The MDB container requires heavy resource-consuming threads to sit and wait for messages to arrive.
 
-**Reactive Messaging** (via brokers like Kafka) is built on the **Reactive Streams** standard. Instead of a thread "waiting," the system uses a non-blocking stream. When a message arrives at a Kafka topic, it is "pushed" through a functional pipeline.
+**Reactive Messaging** (via brokers like Kafka) is built on the **Reactive Streams** standard. Instead of a thread "waiting," the system uses a non-blocking stream. When a message arrives at a Kafka topic (or mapped channel), it is "pushed" through a functional pipeline.
 
 == Why cloud-native?
 
@@ -25,103 +27,107 @@ Legacy Java EE relies on **JMS (Java Message Service)**. While technically async
 * **Elastic Scaling:** Reactive services scale up and down rapidly in Kubernetes because they lack the "baggage" of an EJB container.
 * **Developer Experience:** Quarkus replaces dozens of lines of XML or complex `@ActivationConfigProperty` with a simple `@Incoming` annotation.
 
-== Exercise 1: Review analysis for OrderServiceMDB
+== Exercise 1: Review analysis for EmailIntakeMDB
 
 . The first step is to review the Analysis from our previous lab.
-In the `Analysis panel` search box type the class name `OrderServiceMDB`.
+In the `Analysis panel` search box type the class name `EmailIntakeMDB`.
 +
-image::module-05-mta-dls/orderservicemdb-analysis-results.jpg[OrderServiceMDB,link=self,window=blank,title="OrderServiceMDB"]
+image::module-05-mta-dls/orderservicemdb-analysis-results.jpg[EmailIntakeMDB analysis results,link=self,window=blank,title="EmailIntakeMDB"]
 
-Let's review the issues the static code analyzer has reported. The issues are reported in a list as shown in the image above. Click on the `>` icon to get more details. You should be able to see the following issues reported.
+Let's review the issues the static code analyzer has reported. The issues are reported in a list as shown in the image above. Click on the `>` icon to get more details. You should be able to see findings similar to the following.
 
-* `@MessageDrivenBean` - EJBs are not supported in Quarkus.
-  Enterprise Java Beans (EJBs) are not supported in Quarkus. CDI must be used. Please replace the @MessageDriven annotation with a CDI scope annotation like @ApplicationScoped.
+* `@MessageDriven` / MDB - EJBs are not supported in Quarkus.
+  Enterprise Java Beans (EJBs) are not supported in Quarkus. CDI must be used. Please replace the `@MessageDriven` annotation with a CDI scope annotation like `@ApplicationScoped`.
 * Configure message listener method with `@Incoming`.
-  The destinationLookup property can be migrated by annotating a message handler method (potentially onMessage) with the org.eclipse.microprofile.reactive.messaging.Incoming annotation, indicating the name of the queue as a value. For example:
+  The `destinationLookup` property (`java:/jms/queue/email-intake`) can be migrated by annotating a message handler method (typically `onMessage`) with `org.eclipse.microprofile.reactive.messaging.Incoming`, indicating the channel name as a value. For example:
 +
 [.console-input]
 [source,java,subs="+attributes,macros+"]
 ----
-// Modernized Quarkus Code
+// Modernized Quarkus-style consumer
 @ApplicationScoped
-public class OrderService {
-    @Incoming("orders")
-    public void process(Order order) {
-        // Business logic here
+public class EmailIntakeMDB {
+    @Incoming("email-intake")
+    public void onMessage(String json) {
+        // Route and store the email payload
     }
 }
 ----
 * JMS is not supported in Quarkus.
-  References to JavaEE/JakartaEE JMS elements should be removed and replaced with their Quarkus SmallRye/Microprofile equivalents.
+  References to Java EE / Jakarta EE JMS types (`Message`, `TextMessage`, `MessageListener`) should be removed and replaced with SmallRye / MicroProfile Reactive Messaging equivalents.
+* `@EJB` injection is not supported.
+  Replace `@EJB` with CDI `@Inject` for `EmailRoutingService` and `EmailStoreBean` (those collaborators will also move to CDI over time).
 * The package `javax` has been replaced by `jakarta`.
-  Replace the javax.jms import statement with jakarta.jms
+  Replace `javax.*` imports with their `jakarta.*` counterparts where still needed.
 
 == Exercise 2: Generate and review an AI solution
 
-. Now that we understand the issues of JavaEE to Quarkus migration in context of messaging, lets ask the LLM to generate curated fixes for this migration scenario.
+. Now that we understand the issues of Java EE to Quarkus migration in the context of email intake messaging, ask the LLM to generate curated fixes for this scenario.
 +
-Developer Lightspeed can request fix for a single issue, but it can also request a fix for the entire file. Click on the drop down menu as shown in the image below, and select `Files` option. This will group all the issues together.
+Developer Lightspeed can request a fix for a single issue, but it can also request a fix for the entire file. Click on the drop down menu as shown in the image below, and select the `Files` option. This will group all the issues together.
 +
-image::module-05-mta-dls/orderservicemdb-analysis-selection.jpg[OrderServiceMDB,link=self,window=blank,title="OrderServiceMDB"]
+image::module-05-mta-dls/orderservicemdb-analysis-selection.jpg[EmailIntakeMDB file selection,link=self,window=blank,title="EmailIntakeMDB"]
 
-. Next click on the `AI` dropdown as shown in the image below and click `Get Solution`. This will trigger a new tab that will now send the entire context to the LLM. The context includes the issue itself, but it also includes more details like examples, and whats expected as a fix. This approach helps us to engineer the context in a way which is more specific to the requirements. A chat-bot would usually be a free flow of questions and messages. Here the context is prepared by Developer Lightspeed based on the static code analysis, in order to get the best results without wasting time or tokens.
+. Next click on the `AI` dropdown as shown in the image below and click `Get Solution`. This will trigger a new tab that will now send the entire context to the LLM. The context includes the issue itself, but it also includes more details like examples, and what is expected as a fix. This approach helps engineer the context in a way which is more specific to the requirements. A chat-bot would usually be a free flow of questions and messages. Here the context is prepared by Developer Lightspeed based on the static code analysis, in order to get the best results without wasting time or tokens.
 +
-image::module-05-mta-dls/orderservicemdb-get-solution.jpg[OrderServiceMDB,link=self,window=blank,title="OrderServiceMDB"]
+image::module-05-mta-dls/orderservicemdb-get-solution.jpg[EmailIntakeMDB Get Solution,link=self,window=blank,title="EmailIntakeMDB"]
 
-. The results start to appear in our `MTA Resolution Details` tab. You can note that the LLM provides additional information that is useful for developers, it describes the chain of thought, and finally sends back a git patch for us to review. At this moment we have 3 options, "Review", "Accept" and "Reject". Lets review by clicking `Review in Editor`, which should open up the editor window with details about the code. Notice that the `Red` highlight is for the code that has been removed and the `Green` highlight is for the code that has been added by Developer Lightspeed.
+. The results start to appear in the `MTA Resolution Details` tab. You can note that the LLM provides additional information that is useful for developers, it describes the chain of thought, and finally sends back a git patch for us to review. At this moment we have 3 options, "Review", "Accept" and "Reject". Lets review by clicking `Review in Editor`, which should open up the editor window with details about the code. Notice that the `Red` highlight is for the code that has been removed and the `Green` highlight is for the code that has been added by Developer Lightspeed.
 +
-image::module-05-mta-dls/orderservicemdb-generated-results.jpg[OrderServiceMDB,link=self,window=blank,title="OrderServiceMDB"]
+image::module-05-mta-dls/orderservicemdb-generated-results.jpg[EmailIntakeMDB generated results,link=self,window=blank,title="EmailIntakeMDB"]
 
-Let's review the changes made.
+Let's review the kinds of changes you should expect for `EmailIntakeMDB`.
 
-All javax. imports are remove. And you can see that it has added the `ApplicationScoped` for the bean and `Incoming` for reactive messaging using microprofile.
+JMS / EJB imports and annotations are removed. CDI and Reactive Messaging imports are added:
 [.console-input]
 [source,java,subs="+attributes,macros+"]
 ----
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import javax.enterprise.context.ApplicationScoped;
 ----
 
-Next the following JMS lines are removed, as its no longer used.
+The following `@MessageDriven` activation config (bound to the EAP JMS queue) is removed, as it is no longer used:
 [.console-input]
 [source,java,subs="+attributes,macros+"]
 ----
-@MessageDriven(name = "OrderServiceMDB", activationConfig = {
-	@ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "topic/orders"),
-	@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
-	@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")})
+@MessageDriven(activationConfig = {
+        @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "java:/jms/queue/email-intake"),
+        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")
+})
 ----
 
-The following code is added. Note the use of `Incoming` annotation, which has the `topic/orders`. The topic is chosen based on the context of the code plus the guidance from Developer Lightspeed.
+A Quarkus-friendly handler is added. Note the use of `@Incoming` for the `email-intake` channel (derived from the original queue), `@ApplicationScoped`, and `@Inject` instead of `@EJB`. The core business flow — parse / route / store — should remain:
 
 [.console-input]
 [source,java,subs="+attributes,macros+"]
 ----
-    @Incoming("topic/orders")
-    public void onMessage(String orderStr) {
-        System.out.println("\nMessage recd !");
-        try {
-            System.out.println("Received order: " + orderStr);
-            Order order = Transformers.jsonToOrder(orderStr);
-            System.out.println("Order object is " + order);
-            orderService.save(order);
-            order.getItemList().forEach(orderItem -> {
-                catalogService.updateInventoryItems(orderItem.getProductId(), orderItem.getQuantity());
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+@ApplicationScoped
+public class EmailIntakeMDB {
+
+    @Inject
+    EmailRoutingService routingService;
+
+    @Inject
+    EmailStoreBean emailStore;
+
+    @Incoming("email-intake")
+    public void onMessage(String json) {
+        Email email = routingService.route(json);
+        emailStore.add(email);
     }
+}
 ----
-Following image shows the entire patch generated by Developer Lightspeed. You can click on the image to get a larger view.
 
-image::module-05-mta-dls/orderservicemdb-git-patch.jpg[OrderServiceMDB,link=self,window=blank,title="OrderServiceMDB"]
+Following image shows an example patch generated by Developer Lightspeed. You can click on the image to get a larger view.
+
+image::module-05-mta-dls/orderservicemdb-git-patch.jpg[EmailIntakeMDB git patch,link=self,window=blank,title="EmailIntakeMDB"]
 
 == What we learnt
 
 * **Concepts:** How legacy JMS and MDB-style messaging differs from SmallRye Reactive Messaging on Quarkus—reactive streams, non-blocking handling, and typical cloud-native benefits (fewer threads, easier scaling, simpler code than heavy EJB and JMS configuration).
 * **Tooling:** How Developer Lightspeed in the MTA extension pairs static analysis with an LLM to suggest concrete refactors from Java EE and Jakarta EE patterns toward Quarkus.
-* **Analysis skills:** How to find a class (`OrderServiceMDB`) in the Analysis panel and interpret findings—for example that EJBs and `@MessageDriven` are not supported, that you should use `@Incoming`, that JMS should give way to MicroProfile Reactive Messaging, and that `javax` imports move to `jakarta`.
+* **Analysis skills:** How to find a class (`EmailIntakeMDB`) in the Analysis panel and interpret findings—for example that EJBs and `@MessageDriven` are not supported, that you should use `@Incoming`, that JMS should give way to MicroProfile Reactive Messaging, that `@EJB` becomes `@Inject`, and that `javax` imports move to `jakarta`.
 * **Workflow:** How to group issues by file, use **Get Solution**, and read results in **MTA Resolution Details**—including explanation and a git-style patch—with **Review**, **Accept**, **Reject**, and **Review in Editor** (removed code highlighted in red, added code in green).
-* **Outcome:** A worked example of modernizing the MDB: `@ApplicationScoped`, `@Incoming` for the channel (for example `topic/orders`), removing `@MessageDriven`, activation configuration, and JMS-centric setup, while preserving the core message-handling logic—so you have seen analysis → AI-generated fix → reviewable patch end to end.
+* **Outcome:** A worked example of modernizing Parasol's email intake MDB: `@ApplicationScoped`, `@Incoming("email-intake")`, removing `@MessageDriven` / activation configuration / JMS `MessageListener` plumbing, while preserving the route-and-store logic—so you have seen analysis → AI-generated fix → reviewable patch end to end.

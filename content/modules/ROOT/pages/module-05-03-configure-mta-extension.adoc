@@ -13,10 +13,10 @@ In this lab, we will use the **Migration Toolkit for Applications** Visual Studi
 .Goal
 [NOTE]
 ====
-Prepare the **OpenShift Dev Spaces** workspace and **MTA extension** for the rest of the lab: open the **dls-coolstore** project, create a **migration profile** (source and target technologies), and connect **Developer Lightspeed** to the LLM via **GenAI** / **provider-settings.yaml** so you can analyze and modernize ACME’s applications with AI assistance.
+Prepare the **OpenShift Dev Spaces** workspace and **MTA extension** for the rest of the lab: open the **parasol-insurance-eap** project, create a **migration profile** (source and target technologies), and connect **Developer Lightspeed** to the LLM via **GenAI** / **provider-settings.yaml** so you can analyze and modernize Parasol Insurance’s legacy EAP application with AI assistance.
 ====
 
-We will start by setting up the development environment with AI capabilities to start modernizing ACME's coolstore applications.
+We will start by setting up the development environment with AI capabilities to start modernizing Parasol Insurance's `parasol-insurance-eap` application.
 
 Prepare to launch Dev Spaces and configure the MTA extension, including Developer Lightspeed (AI) settings.
 
@@ -58,7 +58,7 @@ image::module-05-mta-dls/workspace-listing.jpg[Open Workspace,link=self,window=b
 
 . Wait for the workspace to initialize and open:
 +
-The **dls-coolstore** gitea repository loads in Dev Spaces and the development environment is ready.
+The **parasol-insurance-eap** repository loads in Dev Spaces and the development environment is ready.
 +
 The workspace opens in a new browser tab.
 +
@@ -117,7 +117,7 @@ Confirm the Dev Spaces environment and MTA extension (including Developer Lights
 * The **Get Ready to Analyze** pane will open on the right hand side of the screen
 * There should be green check marks in all four of the message boxes and each should be listed as completed
 
-. Confirm the Dev Spaces workspace is pointing to the correct gitea repository
+. Confirm the Dev Spaces workspace is pointing to the correct repository
 * Click on the file icon on the left side of the Dev Spaces environment
-* The File _EXPLORER_ lists the **dls-coolstore** directory
-* Expand directories with the file explorer arrows if needed
+* The File _EXPLORER_ lists the **parasol-insurance-eap** directory
+* Expand directories with the file explorer arrows if needed — you should see packages such as `com.parasol.mdb` (`EmailIntakeMDB`) and `com.parasol.ejb` (`ClaimService`)
