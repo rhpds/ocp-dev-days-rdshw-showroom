@@ -1,0 +1,576 @@
+:imagesdir: ../../assets/images
+:page-time: 7
+include::partial$style.adoc[]
+
+[id='lab3-flow-implementation']
+== Flow Implementation
+
+Now that you understand the full ingestion flow, let's build it step by step. Here's the Camel route you'll be working with:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-service-x12-route.png[width=90%]
+
+Notice that `sql` and `store-pdf-s3` are grayed out — they're disabled in the route. Camel will skip them when running. The idea is to start small: get the first steps working, verify the results, then enable the next ones as you progress.
+
+{empty} +
+
+=== EDI to XML transformation
+
+With the active steps (`platform-http` and `transform-x12`), the route receives a policy application in EDI format and returns it as XML:
+
+TIP: Hover over the _Policy Application_ and _Policy Document_ nodes in the diagram below to see what the EDI and XML formats look like.
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    PO["📄 Policy Application\n(EDI)"] -->|HTTP request| Camel((Camel)) -->|response| XML["📄 Policy Document\n(XML)"]
+----
+
+++++
+<div id="xml-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:520px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">XML Policy Document (output)</div>
+  <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px">&lt;<span style="color:#ff6188">PolicyDocument</span>&gt;
+  &lt;<span style="color:#ff6188">PolicyNumber</span>&gt;61356291&lt;/<span style="color:#ff6188">PolicyNumber</span>&gt;
+  &lt;<span style="color:#ff6188">DateOfIssue</span>&gt;20120906&lt;/<span style="color:#ff6188">DateOfIssue</span>&gt;
+  &lt;<span style="color:#ff6188">Insurer</span>&gt;
+    &lt;<span style="color:#ff6188">Name</span>&gt;Parasol Insurance&lt;/<span style="color:#ff6188">Name</span>&gt;
+    &lt;<span style="color:#ff6188">Address</span>&gt;...&lt;/<span style="color:#ff6188">Address</span>&gt;
+    &lt;<span style="color:#ff6188">TaxId</span>&gt;939988477&lt;/<span style="color:#ff6188">TaxId</span>&gt;
+    &lt;<span style="color:#ff6188">IBAN</span>&gt;GB50ACIE59715038217063&lt;/<span style="color:#ff6188">IBAN</span>&gt;
+  &lt;/<span style="color:#ff6188">Insurer</span>&gt;
+  &lt;<span style="color:#ff6188">Policyholder</span>&gt;
+    &lt;<span style="color:#ff6188">Name</span>&gt;Alex Morgan&lt;/<span style="color:#ff6188">Name</span>&gt;
+    &lt;<span style="color:#ff6188">Address</span>&gt;
+      &lt;<span style="color:#ff6188">Street</span>&gt;742 Maple Avenue&lt;/<span style="color:#ff6188">Street</span>&gt;
+      &lt;<span style="color:#ff6188">City</span>&gt;Austin&lt;/<span style="color:#ff6188">City</span>&gt;
+      &lt;<span style="color:#ff6188">State</span>&gt;TX&lt;/<span style="color:#ff6188">State</span>&gt;
+      &lt;<span style="color:#ff6188">PostalCode</span>&gt;78701&lt;/<span style="color:#ff6188">PostalCode</span>&gt;
+    &lt;/<span style="color:#ff6188">Address</span>&gt;
+  &lt;/<span style="color:#ff6188">Policyholder</span>&gt;
+  &lt;<span style="color:#ff6188">Items</span>&gt;
+    &lt;<span style="color:#ff6188">Item</span>&gt;
+      &lt;<span style="color:#ff6188">Description</span>&gt;Personal Liability – Standard Plan | Bodily injury &amp;amp; property damage | Limit: $100,000/occurrence&lt;/<span style="color:#ff6188">Description</span>&gt;
+    &lt;/<span style="color:#ff6188">Item</span>&gt;
+  &lt;/<span style="color:#ff6188">Items</span>&gt;
+&lt;/<span style="color:#ff6188">PolicyDocument</span>&gt;</pre>
+</div>
+<div id="edi-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:600px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">EDI Policy Application (X12 850)</div>
+  <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px"><span style="color:#ff6188">ISA</span>*00*          *00*          *01*939988477    *01*949849105    *120906*1200*U*00401*000000001*0*P*:~
+<span style="color:#ff6188">GS</span>*PO*939988477*949849105*20120906*1200*1*X*004010~
+<span style="color:#ff6188">ST</span>*850*0001~
+<span style="color:#ff6188">BEG</span>*00*SA*61356291**20120906~
+<span style="color:#ff6188">N1</span>*BY*Rodriguez-Stevens*91*939988477~
+<span style="color:#ff6188">N3</span>*2280 Angela Plain~
+<span style="color:#ff6188">N4</span>*Hortonshire*MS*93248~
+<span style="color:#ff6188">N1</span>*SE*Chapman, Kim and Green*91*949849105~
+<span style="color:#ff6188">N3</span>*64731 James Branch~
+<span style="color:#ff6188">N4</span>*Smithmouth*NC*26872~
+<span style="color:#ff6188">N9</span>*IB*GB50ACIE59715038217063~
+<span style="color:#ff6188">PO1</span>*1*5*EA*12.00*QT*SK*LIAB-STD01~
+<span style="color:#ff6188">PID</span>*F****Personal Liability Coverage – Standard Plan~
+<span style="color:#ff6188">CTT</span>*4*11~
+<span style="color:#ff6188">AMT</span>*TT*212.09~
+<span style="color:#ff6188">SE</span>*15*0001~
+<span style="color:#ff6188">GE</span>*1*1~
+<span style="color:#ff6188">IEA</span>*1*000000001~</pre>
+  <div style="color:#888; font-size:10px; margin-top:10px; border-top:1px solid #555; padding-top:6px"><span style="color:#ff6188">ISA/GS</span>=Header &nbsp; <span style="color:#ff6188">BEG</span>=Order &nbsp; <span style="color:#ff6188">N1</span>=Name &nbsp; <span style="color:#ff6188">N3/N4</span>=Address &nbsp; <span style="color:#ff6188">PO1/PID</span>=Line Item &nbsp; <span style="color:#ff6188">AMT</span>=Total &nbsp;·&nbsp; <code style="color:#fff">*</code> separates fields &nbsp; <code style="color:#fff">~</code> ends segments</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var pop = document.getElementById('edi-popover');
+  var check = setInterval(function() {
+    var node = document.querySelector('[id*="flowchart-PO-"]');
+    if (!node) return;
+    clearInterval(check);
+    node.style.cursor = 'pointer';
+    node.addEventListener('mouseenter', function(e) {
+      var rect = node.getBoundingClientRect();
+      pop.style.left = rect.left + 'px';
+      pop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+      pop.style.display = 'block';
+    });
+    node.addEventListener('mouseleave', function(e) {
+      var to = e.relatedTarget;
+      if (to && (to === pop || pop.contains(to))) return;
+      pop.style.display = 'none';
+    });
+    pop.addEventListener('mouseleave', function() {
+      pop.style.display = 'none';
+    });
+    var xmlPop = document.getElementById('xml-popover');
+    var xmlNode = document.querySelector('[id*="flowchart-XML-"]');
+    if (xmlNode) {
+      xmlNode.style.cursor = 'pointer';
+      xmlNode.addEventListener('mouseenter', function(e) {
+        var rect = xmlNode.getBoundingClientRect();
+        xmlPop.style.left = (rect.right - xmlPop.offsetWidth) + 'px';
+        xmlPop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+        xmlPop.style.display = 'block';
+      });
+      xmlNode.addEventListener('mouseleave', function(e) {
+        var to = e.relatedTarget;
+        if (to && (to === xmlPop || xmlPop.contains(to))) return;
+        xmlPop.style.display = 'none';
+      });
+      xmlPop.addEventListener('mouseleave', function() {
+        xmlPop.style.display = 'none';
+      });
+    }
+  }, 200);
+});
+</script>
+++++
+
+Before running the route, let's configure the data mapping so the XML output includes Parasol Insurance as the Insurer.
+
+{empty} +
+
+=== Explore and modify the data mapping
+
+The `transform-x12` step uses a Kaoto data mapper to convert EDI fields into XML. Let's open it to see how the mappings work, and configure the Insurer address with Parasol Insurance's details.
+
+Switch to the `transform-x12` route:
+
+. Click the *Routes* dropdown
+. Select `transform-x12`
+
+{empty} +
+
+[#kaoto-routes-transform]
+[.bordered]
+image::module-03/m1/kaoto-routes-transform.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes-transform
+
+[.arrows]
+{x: 27, y: 22, rot: 220, size: 1} +
+{x: 21, y: 85, rot: 230, size: .9}
+
+[.numbers]
+{x: 42, y: -15, size: 1.5} +
+{x: 38, y: 57, size: 1.5}
+****
+
+{empty} +
+
+You should now see the `transform-x12` route:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-transform-x12-route.png[width=80%]
+
+Reading left to right, the route:
+
+* `unmarshal` — parses the raw EDI data into a structured format using the X12-850 schema
+* pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] — contains the `kaoto-datamapper` step where the EDI-to-XML field mappings are defined
+* `get policyid` — (set variable step) obtains the policy number from the resulting XML for use downstream
+
+{empty} +
+
+==== *The Data Mapper view*
+
+This is what the data mapper looks like — *Source* on the left (where data comes from) and *Target* on the right (where data is mapped to):
+
+{blank}
+
+image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+
+{empty} +
+
+==== Open and explore the data mapping
+
+. *Find the data mapping definition as follows:*
++
+[cols="5a,4a", grid=none]
+|===
+|
+--
+{empty} +
+
+. Click the `kaoto-datamapper` step inside the pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] container
+. Click the pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>] button to open the data mapper
+--
+|
+--
+[.bordered]
+[#kaoto-datamapper-configure]
+image::module-03/m1/kaoto-datamapper-configure.png[width=70%]
+
+[.overlay]
+****
+[.target]
+kaoto-datamapper-configure
+
+[.arrows]
+{x: 12, y: 52, rot: 90, size: 1}
+{x: 40, y: 91, rot: 90, size: 1}
+
+[.numbers]
+{x: -22, y: 52, rot: 0, size: 3}
+{x: -1, y: 91, rot: 0, size: 3}
+****
+--
+|===
++
+You should see the mapping with the EDI source fields on the left (X12_850) connected to the XML target fields on the right (PolicyDocument):
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-datamapper-mappings.png[width=90%]
++
+{empty} +
+
+. *Explore the mappings*
++
+On the right side (Target), find near the top the *Insurer > Address* section. Each address field is mapped using XPath expressions that extract values from the original EDI data.
++
+{empty} +
+
+. *Configure the Insurer information*
++
+The Insurer is Parasol Insurance. Let's replace the mapped fields with Parasol's hardcoded details. Overwrite the following fields in the *Target* with hardcoded values:
++
+--
+... `Name` — the insurer's name +
+... `Street` — street address +
+... `City` +
+... `State` +
+... `PostalCode`
+--
++
+IMPORTANT: String values must be wrapped in double quotes (e.g. `"Atlanta"`). Without quotes, the data mapper treats the value as an XPath expression instead of a literal string.
++
+{blank}
++
+[TIP]
+--
+.Parasol Insurance details:
+[%collapsible]
+====
+`Name`:
+[.copypaste]
+****
+"Parasol Insurance"
+****
+
+{blank}
+
+`Street`:
+[.copypaste]
+****
+"One Parasol Plaza"
+****
+
+{blank}
+
+`City`:
+[.copypaste]
+****
+"Atlanta"
+****
+
+{blank}
+
+`State`:
+[.copypaste]
+****
+"GA"
+****
+
+{blank}
+
+`PostalCode`:
+[.copypaste]
+****
+"30313"
+****
+====
+--
++
+Your data mapper should now show Parasol Insurance's hardcoded values in the Insurer fields:
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-datamapper-personalized.png[width=90%]
++
+{empty} +
++
+To return to the canvas, click the *Design* tab:
++
+image::module-03/common/kaoto-design-tab.png[width=50%]
++
+{empty} +
+
+. *Run the route and test*
++
+In the VS Code terminal inside Dev Spaces, run the route:
++
+{blank}
++
+[.copypaste]
+****
+camel run * --dev
+****
++
+[TIP]
+--
+.What does this command do?
+[%collapsible]
+====
+* `camel run` — runs a Camel integration using JBang
+* `*` — includes all source files in the current directory (routes, properties, supporting code)
+* `--dev` — enables dev mode: Camel watches for file changes and reloads the route automatically
+====
+--
++
+DevSpaces will detect that port 8080 is open and show a notification — click *Open In New Tab* to open the embedded Test Portal in your browser.
++
+{blank}
++
+[.bordered]
+image::module-03/m1/devspaces-port-notification.png[width=50%]
++
+In the Test Portal:
++
+{blank}
++
+[#testshop-order]
+[.bordered]
+image::module-03/m1/testshop-order.png[width=60%]
++
+[.overlay]
+****
+[.target]
+testshop-order
+
+[.numbers]
+{x: 82, y: 12, size: 1.5}
+{x: 35, y: 88, size: 1.5}
+{x: 68, y: 60, size: 1.5}
+****
++
+{blank}
++
+--
+. Select a coverage — note the total amount
+. Expand *EDI X12 850 Preview* to peek at the raw EDI message — no need to fully understand it, but you may spot the coverage name, quantity, and total amount in the data
+. Click *Submit Application* — the portal sends the Policy Application to your Camel route
+--
++
+Once processed, Camel returns the transformed XML and the Test Portal displays it. Notice the Insurer now shows Parasol Insurance's hardcoded details — not the original EDI data:
++
+{blank}
++
+++++
+<pre style="background-color: #e8f0f8; padding: 14px 20px; line-height: 1.5; white-space: pre; font-family: monospace; font-size: 13px; color: #333; border-radius: 6px">&lt;<span style="color:#555">Insurer</span>&gt;
+    &lt;<span style="color:#555">Name</span>&gt;<span style="background-color: #d4e4f4">Parasol Insurance</span>&lt;/<span style="color:#555">Name</span>&gt;
+    &lt;<span style="color:#555">Address</span>&gt;
+        &lt;<span style="color:#555">Street</span>&gt;<span style="background-color: #d4e4f4">One Parasol Plaza</span>&lt;/<span style="color:#555">Street</span>&gt;
+        &lt;<span style="color:#555">City</span>&gt;<span style="background-color: #d4e4f4">Atlanta</span>&lt;/<span style="color:#555">City</span>&gt;
+        &lt;<span style="color:#555">State</span>&gt;<span style="background-color: #d4e4f4">GA</span>&lt;/<span style="color:#555">State</span>&gt;
+        &lt;<span style="color:#555">PostalCode</span>&gt;<span style="background-color: #d4e4f4">30313</span>&lt;/<span style="color:#555">PostalCode</span>&gt;
+    &lt;/<span style="color:#555">Address</span>&gt;
+    &lt;<span style="color:#555">TaxId</span>&gt;939988477&lt;/<span style="color:#555">TaxId</span>&gt;
+    &lt;<span style="color:#555">IBAN</span>/&gt;
+&lt;/<span style="color:#555">Insurer</span>&gt;</pre>
+++++
++
+Now click *Check Database* — since the `sql` step is still disabled in the route, the policy data was never stored. You should see:
++
+{blank}
++
+++++
+<div style="display: flex; align-items: center; gap: 14px; padding: 8px 0">
+  <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg> Check Database
+  </div>
+  <span style="display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 20px; white-space: nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> No record found (Policy Document 19462522)</span>
+</div>
+++++
++
+This is expected — you'll enable the database step next.
+
+{empty} +
+
+=== Enable the SQL step
+
+With the transformation working, it's time to enable the next step in the route — persisting the policy data to the database.
+
+Ensure you are in the *Design* view:
+
+image::module-03/common/kaoto-design-tab.png[width=50%]
+
+{empty} +
+
+. *Switch back to the main flow*
++
+Select pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] from the *Routes* dropdown.
++
+{empty} +
+
+. *Enable the `sql` step*
++
+--
+. Hover over the `sql` step — a toolbar appears above it
+. Click the *Enable step* button (the tick icon)
+
+{empty} +
+
+[#kaoto-enable-step]
+[.bordered]
+image::module-03/m1/kaoto-enable-step.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-enable-step
+
+[.arrows]
+{x: 35, y: 15, rot: -130, size: 1}
+
+[.numbers]
+{x: 40, y: 68, size: 2.5}
+{x: 60, y: -18, size: 2.5}
+****
+
+Since Camel is running in `--dev` mode, the route will reload automatically with the new step active.
+--
++
+{empty} +
+
+. *Place a new order*
++
+Go back to the Test Portal and submit a new policy application. The route will now transform the EDI and insert the data into the database.
++
+{empty} +
+
+. *Check the database*
++
+This time, click *Check Database* — the policy data should now be stored:
++
+{blank}
++
+++++
+<div style="display: flex; align-items: center; gap: 14px; padding: 8px 0">
+  <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg> Check Database
+  </div>
+  <span style="display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 20px; white-space: nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Record found (Policy Document 71960809)</span>
+</div>
+++++
+
+{empty} +
+
+=== Enable the S3 storage step
+
+The last step in the route generates a PDF policy document from the XML and uploads it to S3 object storage.
+
+{empty} +
+
+. *Enable the `store-pdf-s3` step*
++
+Same as before — hover over the `store-pdf-s3` step and click the *Enable step* button (the tick icon). The route will reload automatically.
++
+{empty} +
++
+With all steps enabled, the full ingestion flow is now active:
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-service-x12-all-enabled.png[width=90%]
++
+[TIP]
+--
+.What does `store-pdf-s3` do?
+[%collapsible]
+====
+Select it from the *Routes* dropdown to see its sub-route — it applies an XSLT template to produce a PDF from the XML policy document, uploads it to S3 object storage, and returns a presigned link to the document.
+
+[.bordered]
+image::module-03/m1/kaoto-store-pdf-s3-route.png[width=90%]
+====
+--
++
+{empty} +
+
+. *Place a new order*
++
+Go back to the Test Portal and submit another policy application. This time, the full flow runs — transformation, database insert, PDF generation, and S3 upload. The Test Portal will display a confirmation with a link to the generated policy document:
++
+{blank}
++
+++++
+<div style="background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; max-width: 480px; font-family: sans-serif; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 8px; color: #3a7d44; font-weight: 700; font-size: 17px; padding: 16px 24px; border-bottom: 1px solid #e0e0e0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    Policy Document Generated
+  </div>
+  <div style="padding: 24px; text-align: center">
+    <p style="color: #555; font-size: 15px; margin: 0 0 20px 0">Your application has been processed and a policy document is ready.</p>
+    <div style="display: inline-flex; align-items: center; gap: 8px; background: #3a7d44; color: white; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: 8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      View Policy Document (PDF)
+    </div>
+    <div style="color: #aaa; font-size: 13px; font-family: monospace; margin-top: 10px">invoice_66507812.pdf</div>
+    <div style="margin-top: 16px">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: 8px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+        Check Database
+      </div>
+    </div>
+  </div>
+</div>
+++++
++
+{empty} +
++
+Click *View Policy Document (PDF)* to open it in your browser. The Insurer section should display Parasol Insurance's details:
++
+{blank}
++
+++++
+<div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px 28px; max-width: 380px; font-family: sans-serif; color: #222; line-height: 1.6">
+  <div style="display: flex; align-items: center; margin-bottom: 8px; margin-left: 38px">
+    <div style="width: 28px; height: 14px; background: #aaa; border-radius: 2px; margin-right: 10px; margin-left: -38px"></div>
+    <span style="font-weight: bold; font-size: 15px">Insurer:</span>
+  </div>
+  <div style="font-size: 14px; margin-left: 38px">
+    Parasol Insurance<br/>
+    One Parasol Plaza<br/>
+    Atlanta, GA 30313
+  </div>
+</div>
+++++
+
+{empty} +
+
+When you're done, press kbd:[Ctrl+C] in the terminal to stop Camel.
+
+{empty} +
+
+[.verification]
+****
+Does the Insurer section show Parasol Insurance?
+
+[.success]
+The full ingestion flow is working — EDI transformation, database storage, and PDF generation are all connected. You're ready to deploy.
+
+[.fail]
+Review the data mapper values and make sure Camel reloaded after saving. Try sending the request again.
+****

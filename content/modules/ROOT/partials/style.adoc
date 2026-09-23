@@ -1,0 +1,289 @@
+++++
+
+<style>
+.doc {
+    max-width: 70rem;
+}
+
+.underline {
+  cursor: pointer;
+}
+
+u {
+    cursor: pointer;
+}
+
+summary  {
+    cursor: pointer;
+}
+
+/* Push TOC down to make room for fixed overlays */
+.toc.sidebar .toc-menu {
+  top: 13rem !important;
+}
+
+.label {
+    color: #fff;
+    padding: .2em .6em .3em;
+    font-weight: 700;
+    border-radius: .25em;
+    font-size: 90%;
+}
+
+.added {background-color: #007700;}
+.changed {background-color: #088;}
+.updated {background-color: #3344bb;}
+
+.imageblock {
+    align-items: flex-start !important;
+}
+.imageblock.text-center .content {
+    width: 100%;
+    text-align: center;
+}
+.imageblock.text-center .content img {
+    display: inline-block;
+}
+.imageblock.bordered img {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Scale Mermaid diagrams: [.mermaid-w20] through [.mermaid-w90] */
+.mermaid-w20 svg { width: 20% !important; max-width: 20% !important; }
+.mermaid-w30 svg { width: 30% !important; max-width: 30% !important; }
+.mermaid-w40 svg { width: 40% !important; max-width: 40% !important; }
+.mermaid-w50 svg { width: 50% !important; max-width: 50% !important; }
+.mermaid-w60 svg { width: 60% !important; max-width: 60% !important; }
+.mermaid-w70 svg { width: 70% !important; max-width: 70% !important; }
+.mermaid-w80 svg { width: 80% !important; max-width: 80% !important; }
+.mermaid-w90 svg { width: 90% !important; max-width: 90% !important; }
+
+/* Center Mermaid diagrams with [.text-center] role */
+.mermaid.text-center svg {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Inline images: vertically center with surrounding text */
+.doc span.image img {
+    vertical-align: middle;
+}
+
+/* Inline code styling — :not([style]) excludes passthrough <code> with inline styles */
+.doc code:not([style]) {
+  background-color: #DDF4FF !important;
+  font-family: monospace !important;
+}
+
+
+/* kbd styling — override Antora theme */
+.doc kbd {
+  color: black;
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 0px 1px black;
+  font-size: .85em;
+  line-height: .85em;
+  display: inline-block;
+  font-weight: 600;
+  letter-spacing: .05em;
+  padding: 3px 5px;
+  white-space: nowrap;
+  border-radius: 5px;
+}
+
+/* Inline code inside admonitions: keep same color */
+.doc .admonitionblock code {
+  background-color: #DDF4FF !important;
+}
+
+/* Copypaste textarea inside admonitions: darker background for contrast */
+.admonitionblock textarea {
+  background-color: #ddd !important;
+}
+
+/* Listing/source blocks — match copypaste textarea appearance */
+.doc .listingblock pre {
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+  padding: 10px 15px;
+  line-height: 1.4;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Properties source blocks — dark theme overriding highlight.js */
+.doc .listingblock pre:has(code[data-lang="properties"]) {
+  background-color: #2b2b2b !important;
+  color: #CBCBCB !important;
+}
+.doc .listingblock pre code[data-lang="properties"] {
+  background-color: transparent !important;
+  color: #CBCBCB !important;
+}
+.doc .listingblock code[data-lang="properties"] .hljs-comment { color: #689956 !important; font-style: italic; }
+.doc .listingblock code[data-lang="properties"] .hljs-attr { color: #569DD6 !important; }
+.doc .listingblock code[data-lang="properties"] .hljs-string { color: #CBCBCB !important; }
+.doc .listingblock code[data-lang="properties"] .hljs-meta,
+.doc .listingblock code[data-lang="properties"] .hljs-keyword { color: #569DD6 !important; }
+.doc .listingblock code[data-lang="properties"] .hljs-link { color: #CBCBCB !important; }
+
+/* Ensure topbar dropdown appears above fixed overlays */
+.navbar {
+  z-index: 1001 !important;
+}
+
+/* Right sidebar: .doc-sidebar — fixed status overlay at top-right */
+.doc-sidebar {
+  position: fixed !important;
+  top: 6.5rem;
+  right: 1rem;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  z-index: 1000;
+  border-radius: 4px !important;
+}
+.doc-sidebar .sidebarblock {
+  padding: 0.3rem 0.5rem !important;
+}
+.doc-sidebar .sidebarblock p {
+  margin: 0 !important;
+}
+
+/* Task sidebar: fixed overlay below doc-sidebar */
+.task-sidebar {
+  position: fixed !important;
+  top: 12rem;
+  right: 1rem;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 1000;
+  font-size: 0.85em;
+}
+.task-sidebar .sidebarblock {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.4rem;
+}
+.task-sidebar .sidebarblock .title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.task-sidebar .sidebarblock ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* Indent helper for admonitions after file listings */
+.indent2 {
+  padding-left: 2rem;
+}
+
+/* Collapsible block styling — HTML passthrough details/summary */
+summary {
+  cursor: pointer;
+  list-style: none;
+}
+.triangle {
+  margin-right: .5em;
+}
+summary:hover .sumtext {
+  text-decoration: underline;
+}
+.triangle::before {
+  content: "\25B6";
+}
+details[open] .triangle::before {
+  content: "\25BC";
+}
+
+/* Collapsible block styling — native AsciiDoc [%collapsible] */
+.doc details > summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-size: inherit;
+  color: inherit;
+}
+.doc details > summary::-webkit-details-marker {
+  display: none;
+}
+.doc details > summary::before {
+  content: "\25B6";
+  margin-right: 0.5em;
+  text-decoration: none;
+  display: inline-block;
+}
+.doc details[open] > summary::before {
+  content: "\25BC";
+}
+.doc details > summary:hover {
+  text-decoration: underline;
+  text-decoration-skip-ink: auto;
+}
+.doc details > summary:hover::before {
+  text-decoration: none;
+}
+
+
+</style>
+
+<script>
+(function() {
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#ee0000"/><text x="16" y="23" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="20" fill="white">S</text></svg>';
+  var dataUri = 'data:image/svg+xml,' + encodeURIComponent(svg);
+
+  // Set favicon on this document
+  var link = document.querySelector('link[rel="icon"]');
+  if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+  link.type = 'image/svg+xml';
+  link.href = dataUri;
+
+  // If inside an iframe, also set favicon on the top-level document
+  try {
+    if (window.top !== window.self) {
+      var topLink = window.top.document.querySelector('link[rel="icon"]');
+      if (!topLink) { topLink = window.top.document.createElement('link'); topLink.rel = 'icon'; window.top.document.head.appendChild(topLink); }
+      topLink.type = 'image/svg+xml';
+      topLink.href = dataUri;
+    }
+  } catch(e) { /* cross-origin iframe — cannot access top */ }
+})();
+
+</script>
+
+++++
+
+
+:experimental:
+
+include::./vars/uservars.adoc[]
+include::./vars/urls.adoc[]
+include::./vars/icons.adoc[]
+include::./vars/sidebar.adoc[]
+include::./vars/products.adoc[]
+// Hidden element carrying the {username} value so the uservar JS can
+// detect local dev mode (plain text) vs production (uservar span),
+// and set the username cookie automatically for docserver requests.
+ifdef::username[]
+[subs=attributes]
+++++
+<span id="uv-source" hidden>{username}</span>
+++++
+endif::[]
+
+include::./patterns/all.adoc[]
+
+ifdef::page-time[]
+[subs=attributes]
+++++
+<span class="page-time" data-time="{page-time}" hidden></span>
+++++
+endif::[]

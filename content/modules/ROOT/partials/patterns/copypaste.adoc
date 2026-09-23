@@ -1,0 +1,172 @@
+[subs=attributes]
+++++
+
+<style>
+/* Hide copypaste sidebar blocks before JS transforms them */
+.sidebarblock.copypaste {
+  display: none;
+}
+
+/* Copypaste tooltip (cp- prefix avoids collision with mytooltip) */
+.cp-tooltip {
+  position: relative;
+  display: inline-block;
+}
+.cp-tooltip .cp-tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cp-tooltip .cp-tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+.cp-tooltip:hover .cp-tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+</style>
+
+<div id="cp-docserver-url" data-url="{url-docserver}" hidden></div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  // Copy SVG icon
+  var copySvg = '<svg fill="currentColor" height="1em" width="1em" viewBox="0 0 448 512" aria-hidden="true" role="img" style="vertical-align: -0.125em;"><path d="M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z"></path></svg>';
+
+  // Replace REPLACE tokens with fetched comma-separated values
+  function replaceTokens(templateString, values) {
+    var valueArray = values.split(',').map(function(val) { return val.trim(); });
+    var result = templateString;
+    var i = 0;
+    while (result.indexOf('REPLACE') !== -1 && i < valueArray.length) {
+      result = result.replace('REPLACE', valueArray[i]);
+      i++;
+    }
+    return result;
+  }
+
+  // Copy textarea content to clipboard
+  function cpCopy(btn) {
+    var textarea = btn.previousElementSibling;
+    textarea.select();
+    var text = textarea.textContent;
+    navigator.clipboard.writeText(text + '\n')
+      .then(function() { console.log('Copied to clipboard'); })
+      .catch(function(err) { console.error('Failed to copy:', err); });
+  }
+
+  // Read docserver base URL from hidden div
+  var dsDiv = document.getElementById('cp-docserver-url');
+  var dsUrl = dsDiv ? dsDiv.getAttribute('data-url') : '';
+
+  // Read username from cookie for docserver requests
+  var dsHeaders = {};
+  document.cookie.split(';').forEach(function(c) {
+    var parts = c.trim().split('=');
+    if (parts[0] === 'username') {
+      dsHeaders['user'] = decodeURIComponent(parts[1]);
+    }
+  });
+
+  // Transform all .copypaste sidebar blocks
+  var blocks = document.querySelectorAll('.sidebarblock.copypaste');
+  blocks.forEach(function(sb) {
+    var content = sb.querySelector('.content');
+    if (!content) return;
+
+    var paragraphs = content.querySelectorAll('.paragraph');
+    var pathValue = '';
+    var defaultValue = '';
+    var textParts = [];
+
+    paragraphs.forEach(function(p) {
+      if (p.classList.contains('path')) {
+        pathValue = (p.querySelector('p') ? p.querySelector('p').textContent : p.textContent).trim();
+      } else if (p.classList.contains('default')) {
+        defaultValue = (p.querySelector('p') ? p.querySelector('p').textContent : p.textContent).trim();
+      } else {
+        // Preserve <br> as newlines
+        var html = p.querySelector('p') ? p.querySelector('p').innerHTML : p.innerHTML;
+        var text = html.replace(/<br\s*\/?>/gi, '\n');
+        // Strip remaining HTML tags
+        var tmp = document.createElement('div');
+        tmp.innerHTML = text;
+        textParts.push(tmp.textContent.trim());
+      }
+    });
+
+    var rawTemplate = textParts.join('\n\n');
+
+    // Apply defaults: use [.default] values if provided, otherwise built-in '<unavailable>'
+    var displayText = rawTemplate;
+    if (rawTemplate.indexOf('REPLACE') !== -1) {
+      var count = (rawTemplate.match(/REPLACE/g) || []).length;
+      var builtIn = Array(count).fill('<unavailable>').join(', ');
+      displayText = replaceTokens(rawTemplate, defaultValue || builtIn);
+    }
+
+    // Build replacement UI: textarea + copy button
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'border: 1px solid #f0f0f0; border-bottom-color: #8a8d90; display: flex; align-items: flex-start;';
+
+    var textarea = document.createElement('textarea');
+    textarea.readOnly = true;
+    textarea.style.cssText = 'border: none; background-color: #f0f0f0; width: 100%; resize: none; font-size: 14px; font-family: monospace; padding: 10px 15px; overflow: hidden;';
+    textarea.rows = 1;
+    textarea.textContent = displayText;
+
+    var btn = document.createElement('button');
+    btn.className = 'cp-tooltip';
+    btn.style.cssText = 'border: none; background-color: white; padding: 5px 15px; border-bottom: 1px solid transparent; transition: border-bottom-color 0.2s; cursor: pointer;';
+    btn.innerHTML = copySvg + '<span class="cp-tooltiptext">Copy to clipboard</span>';
+    btn.addEventListener('click', function() { cpCopy(this); });
+
+    wrapper.appendChild(textarea);
+    wrapper.appendChild(btn);
+
+    // Replace sidebar block with the new UI
+    sb.parentNode.replaceChild(wrapper, sb);
+
+    // Auto-size textarea height after render
+    function autoSize() {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    if (pathValue) {
+      // Dynamic: fetch from docserver then replace tokens
+      fetch(dsUrl + pathValue, { headers: dsHeaders })
+        .then(function(response) { return response.text(); })
+        .then(function(data) {
+          textarea.textContent = replaceTokens(rawTemplate, data);
+          requestAnimationFrame(autoSize);
+        })
+        .catch(function(err) { console.error('Copypaste fetch error:', err); });
+    }
+
+    requestAnimationFrame(autoSize);
+  });
+
+});
+</script>
+
+++++

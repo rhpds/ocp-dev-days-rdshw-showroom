@@ -1,0 +1,93 @@
+++++
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  var source = document.getElementById('uv-source');
+  if (!source) return;
+
+  // Check if uv-source contains a .uservar span (production mode)
+  // or plain text (local dev mode)
+  var innerSpan = source.querySelector('.uservar');
+
+  // Read cookies (needed by both modes)
+  var cookies = {};
+  document.cookie.split(';').forEach(function(c) {
+    var parts = c.trim().split('=');
+    if (parts.length === 2) {
+      cookies[parts[0].trim()] = decodeURIComponent(parts[1].trim());
+    }
+  });
+
+  if (!innerSpan) {
+    // Local dev: attribute resolved at build time, set the cookie
+    var username = source.textContent.trim();
+    if (username) {
+      document.cookie = 'username=' + encodeURIComponent(username) + '; Path=/';
+      cookies['username'] = username;
+    }
+  } else {
+    // Production: replace .uservar spans from cookies
+    var spans = document.querySelectorAll('.uservar');
+    spans.forEach(function(span) {
+      var key = span.textContent.trim();
+      if (cookies[key] !== undefined) {
+        span.textContent = cookies[key];
+      }
+    });
+  }
+
+  // Fetch-based uservars: spans with data-fetch get their value from the docserver
+  var dsDiv = document.getElementById('cp-docserver-url');
+  var dsUrl = dsDiv ? dsDiv.getAttribute('data-url') : '';
+  if (dsUrl) {
+    var fetchSpans = document.querySelectorAll('.uservar[data-fetch]');
+    var fetchPaths = {};
+    fetchSpans.forEach(function(span) {
+      var path = span.getAttribute('data-fetch');
+      if (!fetchPaths[path]) fetchPaths[path] = [];
+      fetchPaths[path].push(span);
+    });
+    var fetchHeaders = {};
+    if (cookies['username']) fetchHeaders['user'] = cookies['username'];
+    Object.keys(fetchPaths).forEach(function(path) {
+      fetch(dsUrl + path, { headers: fetchHeaders })
+        .then(function(r) { return r.text(); })
+        .then(function(data) {
+          if (data) {
+            fetchPaths[path].forEach(function(s) { s.textContent = data.trim(); });
+          }
+        })
+        .catch(function() {});
+    });
+  }
+
+  // Fix hrefs that use the SHOWROOM_USERNAME placeholder
+  // (used by {username-url} in URL attributes where HTML spans can't go)
+  if (cookies['username']) {
+    document.querySelectorAll('a[href*="SHOWROOM_USERNAME"]').forEach(function(a) {
+      a.setAttribute('href', a.getAttribute('href').replace(/SHOWROOM_USERNAME/g, cookies['username']));
+    });
+  }
+
+  // Logout: redirect to docs-proxy /logout endpoint, which clears
+  // the httponly _oauth_proxy and username cookies server-side,
+  // then redirects back to docs-proxy to trigger a fresh OAuth flow.
+  var host = window.location.hostname;
+  var appsIndex = host.indexOf('.apps.');
+  if (appsIndex !== -1) {
+    var domain = host.substring(appsIndex + 1);
+    var logoutUrl = 'https://docs.' + domain + '/logout';
+    var logoutLinks = document.querySelectorAll('.navbar-item-right-content');
+    logoutLinks.forEach(function(link) {
+      if (link.textContent.trim() === 'Log out') {
+        link.href = logoutUrl;
+        link.target = '_top';
+      }
+    });
+  }
+
+});
+</script>
+
+++++

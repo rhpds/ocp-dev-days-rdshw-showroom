@@ -1,0 +1,180 @@
+++++
+
+<style>
+/* Hide verification sidebar blocks before JS transforms them */
+.sidebarblock.verification {
+  display: none;
+}
+
+/* Verification "Check your work" component */
+.verification-box {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  max-width: 600px;
+}
+.verification-box .vb-header {
+  background-color: #3e8635;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+.verification-box .vb-body {
+  padding: 16px;
+  background: #fff;
+}
+.verification-box .vb-question {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.verification-box .vb-options label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.verification-box .vb-options input[type="radio"] {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.verification-box .vb-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: none;
+}
+.verification-box .vb-feedback.success {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+.verification-box .vb-feedback.fail {
+  background-color: #fce8e6;
+  color: #c5221f;
+}
+</style>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  // Transform AsciiDoc .verification sidebar blocks into verification-box HTML
+  var sidebars = document.querySelectorAll('.sidebarblock.verification');
+  sidebars.forEach(function(sb, idx) {
+    var content = sb.querySelector('.content');
+    if (!content) return;
+    var paragraphs = content.querySelectorAll('.paragraph');
+    var question = '', successMsg = '', failMsg = '';
+    paragraphs.forEach(function(p) {
+      if (p.classList.contains('success')) {
+        successMsg = p.querySelector('p') ? p.querySelector('p').innerHTML : p.textContent;
+      } else if (p.classList.contains('fail')) {
+        failMsg = p.querySelector('p') ? p.querySelector('p').innerHTML : p.textContent;
+      } else if (!question) {
+        question = p.querySelector('p') ? p.querySelector('p').innerHTML : p.textContent;
+      }
+    });
+    if (!successMsg) successMsg = 'Great, you may continue to the next section.';
+    if (!failMsg) failMsg = 'Review your steps and try again.';
+    var name = 'verify-' + idx;
+    var box = document.createElement('div');
+    box.className = 'verification-box';
+    box.innerHTML =
+      '<div class="vb-header">Check your work</div>' +
+      '<div class="vb-body">' +
+        '<div class="vb-question">' + question + '</div>' +
+        '<div class="vb-options">' +
+          '<label><input type="radio" name="' + name + '" value="yes"> Yes</label>' +
+          '<label><input type="radio" name="' + name + '" value="no"> No</label>' +
+        '</div>' +
+        '<div class="vb-feedback success">' + successMsg + '</div>' +
+        '<div class="vb-feedback fail">' + failMsg + '</div>' +
+      '</div>';
+    sb.parentNode.replaceChild(box, sb);
+  });
+
+  // Now process all verification boxes (both pre-existing HTML and transformed ones)
+  var boxes = document.querySelectorAll('.verification-box');
+  if (!boxes.length) return;
+
+  // Derive page key from URL path (e.g. "m1/m1.2")
+  var pathMatch = window.location.pathname.match(/\/([^\/]+\/[^\/]+?)(?:\.html)?$/);
+  var pageKey = pathMatch ? pathMatch[1] : window.location.pathname;
+
+  // Register total verification count for this page
+  localStorage.setItem('verify:' + pageKey + ':total', boxes.length);
+
+  // Find Antora's Next page link
+  var navNext = document.querySelector('.nav-next a')
+    || document.querySelector('.pagination .next a')
+    || document.querySelector('a.page-next');
+  if (!navNext) {
+    document.querySelectorAll('a').forEach(function(a) {
+      if (a.closest('.toolbar') || a.closest('.nav-container')) {
+        if (a.textContent.trim().toLowerCase().indexOf('next') !== -1) navNext = a;
+      }
+    });
+  }
+
+  // Disable Next link on load
+  if (navNext) {
+    navNext.style.pointerEvents = 'none';
+    navNext.style.opacity = '0.3';
+  }
+
+  function checkAll() {
+    var allYes = true;
+    boxes.forEach(function(box, i) {
+      var selected = box.querySelector('input[type="radio"]:checked');
+      if (!selected || selected.value !== 'yes') allYes = false;
+      // Persist each verification state
+      if (selected) {
+        localStorage.setItem('verify:' + pageKey + ':' + i, selected.value);
+      }
+    });
+    if (navNext) {
+      navNext.style.pointerEvents = allYes ? '' : 'none';
+      navNext.style.opacity = allYes ? '' : '0.3';
+    }
+  }
+
+  boxes.forEach(function(box, i) {
+    // Restore saved state
+    var saved = localStorage.getItem('verify:' + pageKey + ':' + i);
+    if (saved) {
+      var radio = box.querySelector('input[value="' + saved + '"]');
+      if (radio) {
+        radio.checked = true;
+        var ok = box.querySelector('.vb-feedback.success');
+        var fail = box.querySelector('.vb-feedback.fail');
+        if (saved === 'yes') {
+          ok.style.display = 'block'; fail.style.display = 'none';
+        } else {
+          ok.style.display = 'none'; fail.style.display = 'block';
+        }
+      }
+    }
+
+    box.querySelectorAll('input[type="radio"]').forEach(function(r) {
+      r.addEventListener('change', function() {
+        var ok = box.querySelector('.vb-feedback.success');
+        var fail = box.querySelector('.vb-feedback.fail');
+        if (this.value === 'yes') {
+          ok.style.display = 'block'; fail.style.display = 'none';
+        } else {
+          ok.style.display = 'none'; fail.style.display = 'block';
+        }
+        checkAll();
+      });
+    });
+  });
+
+  // Run initial check (handles restored state)
+  checkAll();
+
+});
+</script>
+
+++++
