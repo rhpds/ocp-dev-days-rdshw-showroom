@@ -1,23 +1,17 @@
 * xref:index.adoc[Home]
 
-* xref:01-overview.adoc[Workshop overview]
+* xref:module-01/00-intro.adoc[Module 1: The Developer Experience]
+** xref:module-01/00-intro.adoc[Introduction]
+** xref:module-01/01-environment.adoc[Environment Details]
+** xref:module-01/02-developer-experience.adoc[The Developer Experience]
+*** xref:module-01/02-developer-experience.adoc#section-1[Section 1: Meet the platform]
+*** xref:module-01/02-developer-experience.adoc#section-2[Section 2: Your mission]
+*** xref:module-01/02-developer-experience.adoc#section-3[Section 3: Build the feature]
+*** xref:module-01/02-developer-experience.adoc#section-4[Section 4: Ship it]
+*** xref:module-01/02-developer-experience.adoc#section-5[Section 5: Call in the AI]
+*** xref:module-01/02-developer-experience.adoc#section-6[Section 6: Go live]
 
-* xref:02-details.adoc[Workshop details]
-
-* xref:03-module-01-developer-experience.adoc[Module 1: The developer experience]
-** xref:03-module-01-developer-experience.adoc#section-1[Section 1: Meet the platform]
-** xref:03-module-01-developer-experience.adoc#section-2[Section 2: Your mission]
-** xref:03-module-01-developer-experience.adoc#section-3[Section 3: Build the feature]
-** xref:03-module-01-developer-experience.adoc#section-4[Section 4: Ship it]
-** xref:03-module-01-developer-experience.adoc#section-5[Section 5: Call in the AI]
-** xref:03-module-01-developer-experience.adoc#section-6[Section 6: Go live]
-
-
-
-
-// * xref:module-03/intro/intro.1.adoc[Module 3: Application Foundations]
 * xref:module-03/index.adoc[Module 3: App Connectivity for AI]
-// ** xref:module-03/index.adoc[Home]
 ** xref:module-03/intro/intro.1.adoc[Introduction]
 *** xref:module-03/intro/intro.2.adoc[Development Environment]
 

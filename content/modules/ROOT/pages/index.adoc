@@ -1,47 +1,30 @@
-= OpenShift Dev Day
+= OpenShift Dev Days Roadshow
 include::partial$_attributes.adoc[]
 
-Welcome to OpenShift Dev Day -- a hands-on workshop where you experience the full developer journey on Red Hat OpenShift.
+Welcome to the OpenShift Dev Days Roadshow -- a collection of hands-on workshops where you experience modern application development and integration on Red Hat OpenShift.
 
-== What you'll learn
+== Available Modules
 
-In this workshop, you will:
+This roadshow consists of independent modules. Each module can be completed on its own, or you can work through multiple modules to gain a comprehensive understanding of OpenShift's capabilities.
 
-* Explore Red Hat Developer Hub as a self-service internal developer portal
-* Use the software catalog to discover applications, APIs, and documentation
-* Launch a preconfigured cloud development environment with Red Hat OpenShift Dev Spaces
-* Build a feature using an AI coding assistant
-* Push code through an automated CI/CD pipeline with OpenShift Pipelines
-* Deploy to production using GitOps with Red Hat OpenShift GitOps (Argo CD)
-* Debug and monitor applications from Developer Hub and the OpenShift Console
+[.tile]
+****
+xref:module-01/00-intro.adoc[Module 1: The Developer Experience]
 
-== Who this is for
+Experience the full developer journey on OpenShift -- from self-service onboarding through Developer Hub, cloud-based development with Dev Spaces, AI-assisted coding, automated CI/CD pipelines, to GitOps-driven production deployments.
 
-This workshop is designed for developers, platform engineers, and IT decision makers who want to understand the cohesive developer experience that OpenShift provides -- from code to production.
+**Duration**: ~90 minutes
+****
 
-**Experience level**: Beginner to intermediate. No prior OpenShift experience is required.
+[.tile]
+****
+xref:module-03/index.adoc[Module 3: Application Connectivity for AI]
 
-== Workshop environment
+Build AI data flows using Red Hat's integration technologies -- EDI ingest with Service Interconnect, event-driven messaging with Kafka and Matrix/Rocket.Chat, Agentic Apache Camel for AI customer support, and LLM governance with Connectivity Link.
 
-Everything you need is already provisioned. Your lab environment includes:
+**Duration**: Varies by lab
+****
 
-* An OpenShift cluster with Developer Hub, Dev Spaces, Pipelines, and GitOps preconfigured
-* A user account with access to all workshop resources
-* A sample application (Parasol Insurance) that you will extend with a new feature
+== Getting Started
 
-Your login credentials (use these for Developer Hub, GitLab, and all workshop services):
-
-* **Username**: `{user}`
-* **Password**: `{password}`
-
-TIP: Keep these credentials handy -- you will need them several times during the workshop. They are also shown on the xref:02-details.adoc[Workshop details] page.
-
-== Estimated time
-
-This workshop takes approximately **90 minutes** to complete.
-
-You can work at your own pace.
-
-== Let's get started
-
-Click on **Workshop overview** in the navigation to begin.
+Select a module above to begin. Each module includes its own introduction, environment details, and learning objectives.
