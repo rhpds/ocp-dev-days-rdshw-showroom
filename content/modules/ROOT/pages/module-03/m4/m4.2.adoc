@@ -29,12 +29,12 @@ include::../_shared/kaoto-intro.adoc[]
 
 Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main agentic flow.
 
-You may find the routes displayed vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+// You may find the routes displayed vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
 
-[.bordered]
-image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+// [.bordered]
+// image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
 
-{empty} +
+// {empty} +
 
 The file contains several routes. To focus on the main agentic flow:
 

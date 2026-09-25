@@ -201,7 +201,7 @@ If all goes well, both platforms should show the full exchange. You should see s
               4:11
             </div>
             <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
-              <span style="font-weight:700">{user-username}@rocketchat:</span> Of course! Could you share your order reference so we can look into it?
+              <span style="font-weight:700">{user-username}@rocketchat:</span> Of course! Could you share your policy reference so we can look into it?
             </div>
           </div>
         </div>

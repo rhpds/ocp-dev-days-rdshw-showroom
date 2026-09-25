@@ -153,17 +153,26 @@ flowchart LR
 +
 {empty} +
 
-=== Quick overview of Kaoto
+// === Quick overview of Kaoto
 
-include::../_shared/kaoto-intro.adoc[]
+// include::../_shared/kaoto-intro.adoc[]
 
-{empty} +
+// {empty} +
 
-You'll start working on the Kaoto canvas in the next sections.
+// You'll start working on the Kaoto canvas in the next sections.
 
-{empty} +
+// {empty} +
 
 === Open the ingestion flow in Kaoto
+
+[TIP]
+--
+.Unfold for a quick overview of Kaoto.
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
 
 In your editor's file explorer, click on the following file — Kaoto will automatically open it and render the ingestion route as a visual diagram.
 
@@ -174,16 +183,16 @@ In your editor's file explorer, click on the following file — Kaoto will autom
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
 --
 
-Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main ingestion flow.
+Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main ingestion flow. Do as follows:
 
-By default, Kaoto displays routes stacked vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+// By default, Kaoto displays routes stacked vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
 
-[.bordered]
-image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+// [.bordered]
+// image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
 
-{empty} +
+// {empty} +
 
-The file contains several routes. To focus on the main ingestion flow:
+// The file contains several routes. To focus on the main ingestion flow:
 
 . Click the *Routes* dropdown in the upper-left toolbar
 . Select `service-x12` from the list

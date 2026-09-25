@@ -9,21 +9,9 @@ include::partial$style.adoc[]
 
 Welcome to __App Connectivity for AI__. This module is designed to provide you with a comprehensive introduction to building AI data flows using Red Hat's powerful tools and technologies. Whether you're new to AI or an experienced developer, this workshop will guide you through the process of creating efficient and secure data flows that can power your AI applications.
 
-
 [TIP]
 --
-.How to approach this module
-[%collapsible]
-====
 For the best experience, we recommend following the module in order. Each section builds on the previous one, allowing you to gradually develop your skills and understanding of the concepts, but feel free to select specific sections that interest you the most.
-
-[.text-center]
-image::module-03/intro/tiles-progression.png[width=70%]
-
-Each section page includes a progress indicator and a time estimate so you can plan your session.
-
-If you have any questions during the labs, reach out to the workshop facilitators.
-====
 --
 
 Select a module below to get started.

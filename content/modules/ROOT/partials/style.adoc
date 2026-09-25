@@ -153,31 +153,35 @@ summary  {
   margin: 0 !important;
 }
 
-/* Task sidebar: fixed overlay below doc-sidebar */
+/* Task sidebar: fixed pill in the breadcrumb bar; dropdown opens downward */
 .task-sidebar {
-  position: fixed !important;
-  top: 12rem;
+  position: fixed;
+  top: 3.8rem;
   right: 1rem;
-  width: auto !important;
-  margin: 0 !important;
-  padding: 0;
-  box-sizing: border-box;
   z-index: 1000;
   font-size: 0.85em;
 }
-.task-sidebar .sidebarblock {
-  background-color: #f5f5f5;
+.task-sidebar details {
+  position: relative;
+}
+.task-sidebar details > summary {
+  font-weight: 600 !important;
+  font-size: 0.9em;
+  padding: 0.3rem 0.7rem;
+  background: #e1e1e1;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.task-sidebar-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #e1e1e1;
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
-  margin-bottom: 0.4rem;
-}
-.task-sidebar .sidebarblock .title {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-.task-sidebar .sidebarblock ul {
-  margin: 0;
-  padding-left: 1.2rem;
+  min-width: 220px;
+  z-index: 1001;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 /* Indent helper for admonitions after file listings */
@@ -255,6 +259,18 @@ details[open] .triangle::before {
       topLink.href = dataUri;
     }
   } catch(e) { /* cross-origin iframe — cannot access top */ }
+
+  // Set tab title from breadcrumb last item when Antora has no document title
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!document.title.startsWith('Untitled')) return;
+    var crumbs = document.querySelectorAll('nav.breadcrumbs li');
+    if (!crumbs.length) return;
+    var last = crumbs[crumbs.length - 1].textContent.trim();
+    if (!last) return;
+    var title = last + ' :: OpenShift Dev Day';
+    document.title = title;
+    try { if (window.top !== window.self) window.top.document.title = title; } catch(e) {}
+  });
 })();
 
 </script>

@@ -5,8 +5,6 @@ include::partial$style.adoc[]
 [id="matrix-chat"]
 == Matrix platform onboarding
 
-TIP: If you're unfamiliar with link:https://matrix.org/[_Matrix_,window="_blank"], it is an open standard and communication protocol for real-time decentralized communication. It works seamlessly between different service providers.
-
 {empty} +
 
 === Join your Matrix room.

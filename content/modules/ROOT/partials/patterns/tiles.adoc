@@ -268,7 +268,7 @@ window.addEventListener('DOMContentLoaded', function() {
   reset.querySelector('a').addEventListener('click', function(e) {
     e.preventDefault();
     Object.keys(localStorage).filter(function(k) {
-      return k.indexOf('verify:') === 0 || k.indexOf('visited:') === 0 || k.indexOf('resume:') === 0 || k.indexOf('module:') === 0;
+      return k.indexOf('verify:') === 0 || k.indexOf('visited:') === 0 || k.indexOf('resume:') === 0 || k.indexOf('module:') === 0 || k.indexOf('cp-done:') === 0;
     }).forEach(function(k) { localStorage.removeItem(k); });
     location.reload();
   });

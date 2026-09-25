@@ -13,7 +13,7 @@ NOTE: This exercise uses a single cluster to keep things focused, but Service In
 
 === Why can't you reach the database?
 
-The backend database is hosted in an isolated namespace (`shared-database`) with strict network policies — no direct access is allowed from other namespaces.
+The backend database is hosted in an isolated namespace (*shared-database*) with strict network policies — no direct access is allowed from other namespaces.
 
 [.mermaid]
 [subs="attributes"]
@@ -98,9 +98,9 @@ The connection will time out — the database is not directly accessible from yo
 
 === Bridging namespaces with Service Interconnect
 
-NOTE: {rhsi} is a supported offering built from the upstream https://skupper.io[Skupper.io,window=_blank] open-source project.
+// NOTE: {rhsi} is a supported offering built from the upstream https://skupper.io[Skupper.io,window=_blank] open-source project.
 
-{rhsi} solves this by creating encrypted application-level connections between namespaces — without requiring VPNs, firewall rules, or exposing services to the public network.
+{rhsi} (built from the open-source project https://skupper.io[Skupper.io,window=_blank]) solves this by creating encrypted application-level connections between namespaces — without requiring VPNs, firewall rules, or exposing services to the public network.
 
 Once configured, a local service is created in your namespace that transparently forwards traffic to the remote database:
 
@@ -158,7 +158,7 @@ flowchart LR
         subgraph yours [" "]
             Client[DB Client]
             SVC2((svc))
-            subgraph S2 ["Site(2)"]
+            subgraph S2 ["Site (App)"]
                 Listener((Listener))
                 Grant["🪪 AccessGrant"]
             end
@@ -171,7 +171,7 @@ flowchart LR
 
     subgraph sharedLabel [shared-database]
         subgraph shared [" "]
-            subgraph S1 ["Site(1)"]
+            subgraph S1 ["Site (DB)"]
                 Connector((Connector))
                 Token["🔑 AccessToken"]
             end
@@ -207,7 +207,7 @@ SVC2 | Service (auto-created) | When a Listener is created, Service Interconnect
 
 TIP: Hover over each component in the diagram to learn what it does.
 
-NOTE: The database lives in a secure, air-tight environment — no inbound ports are exposed. To keep it that way, the link is initiated *from* the database side *outward* to your site. This is why you create an AccessGrant on your side: it gives the database site permission to connect to you and establish a bidirectional communication link. Its environment never opens an entrypoint that could be exploited.
+The database lives in a secure, air-tight environment — no inbound ports are exposed. To keep it that way, the link is initiated *from* the database side *outward* to your site. This is why you create an AccessGrant on your side: it gives the database site permission to connect to you and establish a bidirectional communication link. Its environment never opens an entrypoint that could be exploited.
 
 {empty} +
 
@@ -272,7 +272,7 @@ flowchart LR
         subgraph yours2 [" "]
             Client[DB Client]
             SVC2((svc))
-            subgraph S2 ["✏️ Site(2)"]
+            subgraph S2 ["✏️ Site (App)"]
                 Listener(("✏️ Listener"))
                 Grant["✏️ AccessGrant"]
             end
@@ -285,7 +285,7 @@ flowchart LR
 
     subgraph sharedLabel2 [shared-database]
         subgraph shared2 [" "]
-            subgraph S1 ["✅ Site(1)"]
+            subgraph S1 ["✅ Site (DB)"]
                 Connector(("✅ Connector"))
                 Token["✏️ AccessToken"]
             end
@@ -332,7 +332,7 @@ You should see output similar to:
 {blank}
 
 ++++
-<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME                            STATUS   SITES IN NETWORK   MESSAGE
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: white">NAME                            STATUS   SITES IN NETWORK   MESSAGE
 site.skupper.io/database-site   Ready    1                  OK
 
 NAME                            ROUTING KEY   PORT   HOST   SELECTOR       STATUS    HAS MATCHING LISTENER   MESSAGE
@@ -348,11 +348,11 @@ These are the two pre-configured resources from the diagram. Here's what you nee
 [.mermaid]
 ----
 flowchart LR
-    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector</div>"]
+    Left["<div style='text-align:left'><b>✅ Configured</b><br/>• Site (DB)<br/>• Connector</div>"]
 
-    Progress["33% Complete<br/>████████░░░░░░░░░░░░░░░░░░"]
+    Progress["33% (pre-configured)<br/>████████░░░░░░░░░░░░░░░░░░"]
 
-    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+    Right["<div style='text-align:left'><b>✏️ Remaining</b><br/>• Site (App)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
 
     Left --- Progress --- Right
 
@@ -414,7 +414,7 @@ Your Site is ready. Here's your progress:
 [.mermaid]
 ----
 flowchart LR
-    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)</div>"]
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site (DB)<br/>• Connector<br/>• Site (App)</div>"]
 
     Progress["50% Complete<br/>█████████████░░░░░░░░░░░░░"]
 
@@ -431,7 +431,7 @@ flowchart LR
 
 ==== Step 2: Create an AccessGrant
 
-Before jumping in, remember that the link is initiated *from* Site(1) (database) *to* Site(2) (yours). Here's how the grant and token work together to make that happen:
+Before jumping in, remember that the link is initiated *from* Site (DB) (database) *to* Site (App) (yours). Here's how the grant and token work together to make that happen:
 
 {blank}
 
@@ -439,8 +439,8 @@ Before jumping in, remember that the link is initiated *from* Site(1) (database)
 ----
 sequenceDiagram
     actor A as Admin<br/>(You)
-    participant S2 as Site(2)
-    participant S1 as Site(1)
+    participant S2 as Site (App)
+    participant S1 as Site (DB)
 
     A-->>S2: Create AccessGrant
 
@@ -457,7 +457,7 @@ sequenceDiagram
     Note over S2,S1: 🔒 secure link established
 ----
 
-You create an AccessGrant on your Site(2) and an AccessToken on Site(1). The database site then redeems the token to establish a secure link back to you.
+You create an AccessGrant on your Site (App) and an AccessToken on Site (DB). The database site then redeems the token to establish a secure link back to you.
 
 {blank}
 
@@ -505,7 +505,7 @@ Your AccessGrant is ready. Here's your progress:
 [.mermaid]
 ----
 flowchart LR
-    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant</div>"]
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site (DB)<br/>• Connector<br/>• Site (App)<br/>• AccessGrant</div>"]
 
     Progress["67% Complete<br/>████████████████░░░░░░░░░░"]
 
@@ -548,8 +548,6 @@ ${CA}
 EOF
 ****
 
-IMPORTANT: The AccessToken name *must* follow the pattern `token-<your-username>`. Any other name will be rejected.
-
 After a few moments, a *Link* resource is automatically created in `shared-database`. Verify:
 
 {blank}
@@ -576,7 +574,7 @@ Almost there — one more resource to go:
 [.mermaid]
 ----
 flowchart LR
-    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken</div>"]
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site (DB)<br/>• Connector<br/>• Site (App)<br/>• AccessGrant<br/>• AccessToken</div>"]
 
     Progress["83% Complete<br/>█████████████████████░░░░░"]
 
@@ -683,7 +681,7 @@ All resources are in place:
 [.mermaid]
 ----
 flowchart LR
-    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site(1)<br/>• Connector<br/>• Site(2)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+    Left["<div style='text-align:left'><b>✅ Completed</b><br/>• Site (DB)<br/>• Connector<br/>• Site (App)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
 
     Progress["100% Complete<br/>██████████████████████████"]
 
@@ -796,7 +794,7 @@ flowchart LR
         subgraph yours3 [" "]
             Client[DB Client]
             SVC2((svc))
-            subgraph S2 ["✅ Site(2)"]
+            subgraph S2 ["✅ Site (App)"]
                 Listener((Listener))
                 Grant["🪪 AccessGrant"]
             end
@@ -809,7 +807,7 @@ flowchart LR
 
     subgraph sharedLabel3 [shared-database]
         subgraph shared3 [" "]
-            subgraph S1 ["✅ Site(1)"]
+            subgraph S1 ["✅ Site (DB)"]
                 Connector((Connector))
                 Token["🔑 AccessToken"]
             end

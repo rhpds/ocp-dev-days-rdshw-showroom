@@ -9,15 +9,6 @@ Use an AI agent to orchestrate backend actions based on natural language chat �
 
 {empty} +
 
-Recommended: +
---
-* For the best experience, complete the following modules first to follow the storyline:
-+
-image::module-03/m4/prereq.png[width=75%]
-
-{empty} +
---
-
 *The Business Need*
 
 When a customer reaches out about a policy application — whether to update details, change coverage, or resolve a discrepancy — support agents traditionally have to manually navigate multiple backend databases and file systems to address the request. This is slow, error-prone, and frustrating for both agents and customers. They need a faster, frictionless way to handle these cases.

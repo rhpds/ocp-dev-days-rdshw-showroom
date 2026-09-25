@@ -1,17 +1,9 @@
-[.doc-sidebar]
-.Doc Server
-****
-Checking...
-****
-
 [pass,subs=attributes]
 ++++
 <div class="task-sidebar">
 <details>
-  <summary style="cursor:pointer; font-weight:600; font-size:0.9em; padding:0.3rem 0.5rem; background:#e1e1e1; border-radius:4px 4px 0 0; list-style:none; text-align:right;">
-    Resources
-  </summary>
-  <div style="background:#e1e1e1; border-radius:0 0 4px 4px; padding:0.5rem 0.75rem; font-size:0.85em;">
+  <summary id="resources-summary">Resources</summary>
+  <div class="task-sidebar-dropdown">
     <p style="margin:0.3rem 0;"><strong>OpenShift Credentials</strong></p>
     <ul style="margin:0; padding-left:1.2rem;">
       <li>username: <code>{user-username}</code></li>

@@ -228,11 +228,18 @@ image::module-03/m3/kaoto-datamapper-steps.png[width=100%]
 
 --
 +
-{empty} +
-+
-This is the Data Mapper view — *Source* on the left (where data comes from) and *Target* on the right (where data is mapped to):
-+
-image::module-03/m1/kaoto-datamapper-overview.png[width=90%]
+[TIP]
+--
+.Overview of the data mapper UI.
+[%collapsible]
+====
+This is what the data mapper looks like — *Source* on the left (where data comes from) and *Target* on the right (where data is mapped to):
+
+{blank}
+
+image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+====
+--
 +
 {empty} +
 
@@ -286,9 +293,27 @@ room11
 .To paste the value:
 [caption=]
 ====
-Click kbd:[⠇] and select kbd:[Add selector expression], as shown below:
+Click kbd:[⠇] and select kbd:[Add value selector (value-of)], as shown below:
 
-image::module-03/m3/mapper-add-expression.jpg[width=70%]
+[.bordered]
+[#mapper-add-expression]
+image::module-03/m3/mapper-add-expression.png[width=50%]
+
+[.overlay]
+****
+[.target]
+mapper-add-expression
+
+[.arrows]
+{x: 96.5, y: 28, rot: -90, size: 1}
+{x: 94.0, y: 41, rot: -90, size: 1}
+
+[.numbers]
+{x: 120, y: 28, size: 2}
+{x: 120, y: 41, size: 2}
+****
+
+// image::module-03/m3/mapper-add-expression.jpg[width=70%]
 ====
 --
 +

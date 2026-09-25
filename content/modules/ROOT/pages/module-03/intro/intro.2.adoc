@@ -1,4 +1,4 @@
-// :imagesdir: ../assets/images/module-03
+:imagesdir: ../assets/images/module-03
 :page-time: 5
 include::partial$style.adoc[]
 
@@ -25,14 +25,14 @@ To access your development environment:
 . Click this link:{url-codeready}[Console, window="_blank"] link. +
 (Also accessible from the *Resources* panel on the right, under *Red Hat OpenShift Dev Spaces*).
 +
-{empty} +
+{blank}
 
 . You'll be first prompted to choose _OpenShift_ to log in. +
-Click the button `Log in with OpenShift`:
+Click the button *Log in with OpenShift*:
 +
 image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
 +
-{empty} +
+{blank}
 
 . Then, log in using your lab credentials:
 +
@@ -41,11 +41,11 @@ image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
 * Password: `{user-password}`
 --
 +
-image:module-03/intro/devspaces-login.jpg[width=50%]
+image:module-03/intro/devspaces-login.png[width=30%]
 +
-{empty} +
-+
-. Next, authorise access, click `Allow selected permissions`
+{blank}
+
+. Next, authorise access, click *Allow selected permissions*
 +
 image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
 +
@@ -53,7 +53,8 @@ image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
 +
 Once you are logged in, you'll see the _Dev Spaces_ dashboard. This lists available workspaces.
 +
-image::module-03/intro/devspaces-dashboard.png[Dev Spaces Dashboard, role="integr8ly-img-responsive"]
+[.bordered]
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces Dashboard]
 
 {empty} +
 
@@ -63,29 +64,49 @@ This workshop provides a single, pre-configured workspace with plugins, source c
 
 . Click the *Open* link for the workspace named `camel-lab`.
 +
-image::module-03/intro/devspaces-dashboard-open.png[Open Dev Spaces Workspace, role="integr8ly-img-responsive"]
+[.bordered]
+[#devspaces-dashboard-open]
+image::module-03/intro/devspaces-dashboard.png[Open Dev Spaces Workspace]
 +
-{blank}
+[.overlay]
+****
+[.target]
+devspaces-dashboard-open
+
+[.arrows]
+{x: 85.5, y: 88, rot: 0, size: 0.5}
+
+[.numbers]
+{x: 85.5, y: 115, size: 1.5}
+****
++
+// image::module-03/intro/devspaces-dashboard-open.png[Open Dev Spaces Workspace, role="integr8ly-img-responsive"]
+// +
+{empty} +
 +
 This will start an instance of the workspace. Please wait a few moments while it downloads the required container images and configuration setup.
 +
 {empty} +
 
-. When the IDE appears:
+. When the IDE appears, ensure you:
 +
---
-.. Ensure you click `Yes, I trust the authors` when the following message shows on your screen:
+[cols="8,^1,8", frame=none, grid=none]
+|===
+a|
+. Click *Trust Publisher & Install*
 +
-image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, role="integr8ly-img-responsive", width=40%]
-+
+image::module-03/intro/devspaces-trust-redhat.png[Trust Publisher Red Hat, width=80%]
+a|
 {empty} +
-+
-.. Also, ensure you click `Trust Publisher & Install`
-+
-image::module-03/intro/devspaces-trust-redhat.png[Trust Publisher Red Hat, width=40%]
-+
 {empty} +
---
+->
+
+a|
+[start=2]
+. Next, click *Trust Workspace & Install*
++
+image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, , width=90%]
+|===
 +
 NOTE: This IDE is based on _Microsoft VS Code_. It will look familiar if you have already used it.
 +
@@ -170,19 +191,36 @@ copy/paste test"
 +
 [NOTE]
 ====
-You'll be asked to share the clipboard and next to confirm the action.
+You'll be asked to share the clipboard and next to confirm the action. +
+[cols="6,1,8", frame=all, grid=none]
+|===
+a|
+. Click *Allow*
++
+image::module-03/intro/devspaces-share-clipboard.png[width=60%]
+a|
+{empty} +
+{empty} +
 
-Click `Allow` -> image:module-03/intro/devspaces-share-clipboard.png[width=18%] -> next, tick `[✓] Do not ask me again` -> `Paste` ->
-image:module-03/intro/devspaces-paste-confirm.png[width=30%] 
+->
+
+a|
+[start=2]
+. If asked, tick *[✓] Do not ask me again* and then click *Paste*
++
+image::module-03/intro/devspaces-paste-confirm.png[width=70%]
+|===
 ====
 +
 --
 WARNING: It's been reported that these key-combos not always work. Your machine may not respond to the above descriptions. Please try other key or mouse click alternatives, for example, right-click, or middle-click.
 --
++
+{blank}
 
 . If the paste action fails and you see _Dev Spaces_ showing the following notification:
 +
-image::module-03/intro/clipboard-notification.png[width=30%]
+image::module-03/intro/clipboard-notification.png[width=40%]
 +
 {blank}
 +
