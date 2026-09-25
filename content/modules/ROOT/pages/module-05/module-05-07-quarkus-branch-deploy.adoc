@@ -224,7 +224,23 @@ curl -sk "https://${ROUTE}/api/claims"
 curl -sk "https://${ROUTE}/api/inbox"
 ----
 
-. In the OpenShift console, open your project **Topology** (or **Workloads → Deployments**) and confirm `parasol-insurance` (and `parasol-db`) are running. Review the Deployment env vars and the Route host.
+. In the OpenShift console, open your project **Topology** (or **Workloads → Deployments**) and confirm the application is running.
++
+image::module-05-mta-dls/05-07-dls-07.jpg[OpenShift Topology showing parasol-insurance Quarkus deployment and Route,link=self,window=blank,title="OpenShift Topology"]
++
+You should see something similar to the topology above:
++
+* **`parasol-insurance`** — the Quarkus application (look for the **APPL Quarkus** badge). A blue ring around the node means the pod is healthy / running.
+* **`parasol-db`** — the PostgreSQL instance the `%prod` profile talks to. Topology may draw a connector from the app to the database.
+* Optionally you may still see a legacy **`parasol-insurance-eap`** workload in the same project from earlier demos; the one you just deployed is the Quarkus node.
++
+Select **`parasol-insurance`**, open the **Resources** side panel, and check:
++
+* **Pods** — at least one pod in **Running** state
+* **Services** — `parasol-insurance`
+* **Routes** — the public URL for the app (click it to open the Parasol UI in the browser, same as the `oc get route` host from the previous step)
++
+Also peek at the Deployment env vars and confirm they match what you applied from `openshift/deployment.yaml` (`POSTGRESQL_*` from Secret `parasol-db`).
 
 == Exercise 5: Review what changed in production config
 

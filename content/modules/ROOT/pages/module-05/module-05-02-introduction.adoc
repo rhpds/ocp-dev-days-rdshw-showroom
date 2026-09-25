@@ -15,7 +15,7 @@ Enterprises face several critical challenges when modernizing their application 
 * **Competing priorities** - Organizations must balance the urgency of modernization with limited resources, often prioritizing new features over improving existing applications.
 * **Scale and consistency** - Large enterprises may have hundreds of applications requiring similar changes, making manual migration impractical.
 
-Deveoper Lightspeed makes it easy to migrate applications using static analysis and generative AI with a simple 6 step methodology.
+Developer Lightspeed makes it easy to migrate applications using static analysis and generative AI with a simple 6 step methodology.
 
 image::module-05-mta-dls/05-02-dls-01.jpg[Developer Lightspeed workflow — checkout, configure targets, static analysis, request fix, generate patch, apply or reject,link=self,window=blank,width=800]
 
