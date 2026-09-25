@@ -1,4 +1,4 @@
-= Section 5: Stateless EJB to CDI (`ClaimService`)
+= Section 6: Stateless EJB to CDI (`ClaimService`)
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
@@ -31,9 +31,9 @@ This is a service-layer modernization — not a remote-interface or RMI-to-REST 
 
 == Exercise 1: Review analysis for ClaimService
 
-. In the Analysis panel search box type the class name `ClaimService`. Before we start, ensure that the `Agent Mode` toggle is set to `On`.
+. In the Analysis panel search box type the class name `ClaimService`. Before we start, ensure that the **Agent Mode** toggle is set to **On**.
 +
-image::module-05-mta-dls/shippingservice-analysis-results.jpg[ClaimService analysis results,link=self,window=blank,title="ClaimService"]
+image::module-05-mta-dls/05-06-dls-01.jpg[ClaimService analysis with Agent Mode on,link=self,window=blank,title="Agent Mode"]
 
 Lets review the issues reported (wording may vary slightly by ruleset version):
 
@@ -50,17 +50,13 @@ Lets review the issues reported (wording may vary slightly by ruleset version):
 
 . Now that we understand the Java EE to Quarkus migration for this local session bean, ask the LLM to generate curated fixes.
 +
-Developer Lightspeed can request a fix for a single issue, but it can also request a fix for the entire file. Click on the drop down menu as shown in the image below, and select the `Files` option. This will group all the issues together.
+With results grouped by **Files** and filtered to `ClaimService`, open the **AI** dropdown on the file and choose **Get solution for N incidents** (or **Get solution**).
 +
-image::module-05-mta-dls/shippingservice-analysis-results.jpg[ClaimService file selection,link=self,window=blank,title="ClaimService"]
+image::module-05-mta-dls/05-06-dls-02.jpg[ClaimService Get Solution for file incidents,link=self,window=blank,title="Get Solution"]
 
-. Next click on the `AI` dropdown as shown in the image below and click `Get Solution`. This will trigger a new tab that will now send the entire context to the LLM. The context includes the issue itself, but it also includes more details like examples, and what is expected as a fix. This approach helps engineer the context in a way which is more specific to the requirements. A chat-bot would usually be a free flow of questions and messages. Here the context is prepared by Developer Lightspeed based on the static code analysis, in order to get the best results without wasting time or tokens.
+. Results appear in the **MTA Resolution Details** tab. Review the generated patch — you should see `@Stateless` replaced with `@ApplicationScoped`, persistence wiring updated toward CDI (`@Inject`), and related `javax` → `jakarta` imports. Use **Review in Editor**, **Reject**, or **Accept**. If the agent asks whether to continue fixing more changes, choose **Yes** or **No** as you prefer.
 +
-image::module-05-mta-dls/shippingservice-get-solution.jpg[ClaimService Get Solution,link=self,window=blank,title="ClaimService"]
-
-. Just like in the previous lab the results start to appear in the MTA Resolution Details tab. You can note that the LLM provides additional information that is useful for developers, it describes the chain of thought, and finally sends back a git patch for us to review. At this moment we have 3 options, "Review", "Accept" and "Reject".
-+
-image::module-05-mta-dls/shippingservice-generated-results.jpg[ClaimService generated results,link=self,window=blank,title="ClaimService"]
+image::module-05-mta-dls/05-06-dls-03.jpg[ClaimService patch review and continue fixing,link=self,window=blank,title="Accept and continue"]
 
 Expect a shape similar to:
 
@@ -71,8 +67,8 @@ Expect a shape similar to:
 @Transactional
 public class ClaimService {
 
-    @PersistenceContext(unitName = "ParasolPU")
-    private EntityManager entityManager;
+    @Inject
+    EntityManager entityManager;
 
     public List<Claim> findAll() { /* ... */ }
 
@@ -80,15 +76,26 @@ public class ClaimService {
 }
 ----
 
-. At this point press the **Accept** button. And you should see a message in the `MTA Resolution Details` tab that may ask you to fix more related issues.
-+
-image::module-05-mta-dls/shippingservice-fix-more-issues.jpg[ClaimService fix more issues,link=self,window=blank,title="ClaimService"]
-
 == Exercise 3: Continue with agent-assisted fixes
 
-. We will now fix the remaining issues by clicking on the **Yes** button.
+. With **Agent Mode** on, the agent may keep fixing follow-on issues (for example `pom.xml` Quarkus dependencies, persistence configuration, or other dependents). Review each suggestion and **Accept**, **Reject**, or **Apply All** / **Stop** as you see fit.
 +
-image::module-05-mta-dls/dls-agents.jpg[ClaimService agent follow-up,link=self,window=blank,title="ClaimService"]
+image::module-05-mta-dls/05-06-dls-04.jpg[Agent follow-up on pom.xml and related fixes,link=self,window=blank,title="Agent follow-up"]
+
+. The agent loop looks like this: generate a fix, identify additional changes, let you accept or reject, then pull diagnostics from the IDE tools and optionally fix more issues.
++
+image::module-05-mta-dls/05-06-dls-05.jpg[Agent workflow — generate fix, diagnostics, accept or reject,link=self,window=blank,title="Agent workflow"]
++
+Walk through the loop with `ClaimService` as the concrete example:
++
+* **Generate fix (LLM)** — From the analysis incident (for example “replace `@Stateless` with a CDI scope”), Developer Lightspeed proposes a first patch: annotations, imports, and the obvious call-site updates in `ClaimService.java`.
+* **Identify additional changes (LLM)** — One edit often implies others. After dropping `@Stateless`, the agent may also rewrite `@PersistenceContext` to `@Inject`, update `javax.*` → `jakarta.*` imports, or touch callers such as `ClaimsResource` that still expect EJB-style wiring.
+* **Accept / Reject (you)** — You stay in control. Accept the patch if it looks right, reject it if the agent overreached, or review it in the editor before deciding. Nothing is applied permanently without your choice.
+* **Get diagnostics from tools (IDE)** — After a change lands, the agent asks the IDE for fresh signal: language-server errors, unresolved types, broken Maven coordinates, missing Quarkus extensions, and similar diagnostics. That is how it notices gaps the original MTA incident did not list.
+* **Fix more issues? (you + LLM)** — If diagnostics remain (for example no `quarkus-hibernate-orm` dependency in `pom.xml`, or no `application.properties` for datasource settings), the agent asks whether to continue. Choose **Yes** to let it generate the next patch; choose **No** / **Stop** to end the loop.
+* **Repeat** — Each accepted fix can surface new diagnostics, so the cycle continues until the workspace is clean enough for you — or until you stop it.
++
+In short: **MTA finds the migration problem → the LLM proposes a fix → you approve → IDE diagnostics reveal the next problem → optionally fix again.** That is why Agent Mode is powerful for ripple effects after an EJB → CDI change, and why you should still read every diff.
 
 Agents will look to fix potential issues once a fix was made.
 For example, after moving `EmailIntakeMDB` to Reactive Messaging or `ClaimService` to CDI, the agent may still need to adjust `pom.xml`, persistence configuration, or other dependents. The agent understands the context and the issues that arise from that fix. It uses tooling like the LSP server, build tools, compilation etc.

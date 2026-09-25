@@ -4,6 +4,8 @@ include::partial$_attributes.adoc[]
 
 Migration Toolkit for Applications has long been the industry-leading solution for assessing and analyzing applications for cloud migration. **Developer Lightspeed** (**DLS**) is MTA's **AI-powered code refactoring** feature—not a separate extension. It brings generative AI-assisted migration into the developer's IDE, transforming how organizations approach application modernization.
 
+
+
 == The challenge of application modernization
 
 Enterprises face several critical challenges when modernizing their application portfolios:
@@ -12,6 +14,10 @@ Enterprises face several critical challenges when modernizing their application 
 * **Complexity of legacy systems** - Legacy codebases often lack compatibility with modern platforms, have tightly coupled dependencies, and may be unfamiliar to current development teams.
 * **Competing priorities** - Organizations must balance the urgency of modernization with limited resources, often prioritizing new features over improving existing applications.
 * **Scale and consistency** - Large enterprises may have hundreds of applications requiring similar changes, making manual migration impractical.
+
+Deveoper Lightspeed makes it easy to migrate applications using static analysis and generative AI with a simple 6 step methodology.
+
+image::module-05-mta-dls/05-02-dls-01.jpg[Developer Lightspeed workflow — checkout, configure targets, static analysis, request fix, generate patch, apply or reject,link=self,window=blank,width=800]
 
 == How Developer Lightspeed transforms modernization
 

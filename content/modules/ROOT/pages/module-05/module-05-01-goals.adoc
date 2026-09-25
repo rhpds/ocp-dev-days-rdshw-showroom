@@ -2,8 +2,9 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-Experience end-to-end application modernization with **Red Hat Developer Lightspeed for MTA** (**DLS**) in **Red Hat OpenShift Dev Spaces**: use the **MTA extension** for static analysis and **Developer Lightspeed** (generative AI) to move the legacy **Java EE / EAP** **Parasol Insurance** application (`parasol-insurance-eap`) toward **Quarkus** and **Jakarta EE**, and understand how analysis, AI-assisted fixes, and the **Solution Server** fit together on the path to OpenShift.
+Experience end-to-end application modernization with **Red Hat Developer Lightspeed for MTA** (**DLS**) in **Red Hat OpenShift Dev Spaces**: use the **MTA extension** for static analysis and **Developer Lightspeed** (generative AI) to move the legacy **Java EE / EAP** **Parasol Insurance** application (`parasol-insurance-eap`) toward **Quarkus** and **Jakarta EE**, including **custom rules** for proprietary libraries such as the enterprise audit logging API.
 
+image::module-05-mta-dls/05-01-dls-01.jpg[Developer Lightspeed high-level concept — analyze legacy Java, migrate with LLMs, deploy modernized apps on OpenShift,link=self,window=blank,width=800]
 As enterprise organizations accelerate their cloud adoption journey, one of the most significant challenges they face is modernizing legacy Java applications to run on modern platforms like Red Hat OpenShift. The traditional approach to code refactoring is time-consuming, error-prone, and requires deep knowledge of both legacy and target technologies.
 
 The goal of this lab is to experience how **Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA)** revolutionizes application modernization by combining static code analysis with generative AI to accelerate the migration of a Java EE 8 / EAP 7 application to **Quarkus**.
@@ -14,5 +15,8 @@ By the end of this module, you will be able to:
 
 * Configure the MTA extension in Red Hat Dev Spaces, including Developer Lightspeed (AI-assisted migration)
 * Analyze `parasol-insurance-eap` and receive AI-powered code refactoring recommendations
-* Modernize `EmailIntakeMDB` (JMS MDB → Reactive Messaging) and `ClaimService` (`@Stateless` EJB → `@ApplicationScoped` + `@Transactional`)
+* Modernize `EmailIntakeMDB` (JMS MDB → Reactive Messaging)
+* Author and apply **custom MTA rules** for the proprietary `audit-logging-library` (v1 → v2)
+* Modernize `ClaimService` (`@Stateless` EJB → `@ApplicationScoped` + `@Transactional`)
+* Check out the completed **`quarkus`** branch, review the migrated code, and deploy it to OpenShift
 * Apply intelligent fixes and migrate the application toward Quarkus and Jakarta EE

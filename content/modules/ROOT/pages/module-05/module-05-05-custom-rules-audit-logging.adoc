@@ -1,0 +1,139 @@
+= Section 5: Custom rules for the audit logging library
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[.goal]
+.Goal
+[NOTE]
+====
+Learn why **custom Konveyor / MTA rules** matter for proprietary libraries, explore the **audit-logging** rules shipped with `parasol-insurance-eap`, attach them to an MTA analysis profile, and run analysis so you can see findings that **stock Quarkus rules cannot detect**.
+====
+
+Stock migration rulesets (for example the Quarkus target rules) know about Java EE, Jakarta, and common open-source frameworks. They do **not** know about Parasol's internal **`audit-logging-library`**. Without custom rules, MTA would happily migrate EJBs and MDBs while silently leaving a broken, outdated audit API in place — a compliance risk for an insurance platform.
+
+In this section you will treat custom rules as first-class migration knowledge: authored once by platform / architecture teams, then reused every time an application depends on that library.
+
+== Why Parasol needs custom rules
+
+Parasol Insurance depends on a shared enterprise library, `com.enterprise:audit-logging-library`, vendored under the project as a local Maven repository:
+
+* **v1 (`1.0.0`)** — synchronous, filesystem-oriented audit logging (builder-based `AuditEvent`, `FileSystemAuditLogger`, convenience methods such as `logSuccess` / `logFailure`)
+* **v2 (`2.0.0`)** — streaming-oriented API (`StreamableAuditLogger`, record-style `AuditEvent`, non-blocking `logEventAsync`)
+
+The JARs and POMs live under `lib/repository/`. The application currently declares **v1** in `pom.xml` via the `project-local` file repository — exactly the kind of private dependency that never appears on Maven Central and never ships in public Quarkus rules.
+
+[cols="2,2"]
+|===
+| v1 (what you have today) | v2 (migration target)
+
+| Synchronous file-based logging
+| Asynchronous / streaming logging
+
+| `AuditEvent.builder()` pattern
+| Direct `AuditEvent` construction (record-style API)
+
+| `FileSystemAuditLogger`
+| `StreamableAuditLogger`
+
+| `logEvent(...)`, `logSuccess(...)`, `logFailure(...)`
+| Prefer `logEventAsync(...)` with a full `AuditEvent`
+|===
+
+== Exercise 1: Explore the custom rules
+
+Open xref:module-05/module-05-logging.adoc[`logging.yaml`] to **download** or **copy** the content into `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (create the `rules/` directory if it is not already there).
+
+. Skim each `ruleID`, `when:` clause, and `message:` in `logging.yaml` — these are what the analyzer will report in the Analysis panel. The file defines **five** rules (`audit-logging-0001` … `audit-logging-0005`).
+
+=== What each rule detects
+
+[cols="1,3,2"]
+|===
+| Rule ID | Detects | Typical migration action
+
+| `audit-logging-0001`
+| Maven dependency on `com.enterprise:audit-logging-library` in the **1.x** range
+| Bump to `2.0.0` (and align Java level with the v2 library expectations)
+
+| `audit-logging-0002`
+| Calls to `AuditEvent.builder`
+| Replace the builder with direct `AuditEvent` construction
+
+| `audit-logging-0003`
+| References to `FileSystemAuditLogger`
+| Switch to `StreamableAuditLogger` for streaming / TCP-style audit sinks
+
+| `audit-logging-0004`
+| Synchronous `logEvent(...)` on the audit logger types
+| Prefer non-blocking `logEventAsync(...)`
+
+| `audit-logging-0005`
+| Legacy `logSuccess` / `logFailure` convenience methods
+| Build a full `AuditEvent` and log it asynchronously
+|===
+
+TIP: Custom rules use the same Konveyor / MTA rule language as public rulesets (`java.dependency`, `java.referenced`, categories, effort, labels). The difference is **ownership**: these rules encode Parasol's private library contract.
+
+. Also open `pom.xml` and find the dependency on `audit-logging-library` version `1.0.0`, and the `project-local` repository pointing at `lib/repository`. This is the concrete hook for rule `audit-logging-0001`.
+
+== Exercise 2: Attach the custom rules to an MTA profile
+
+Earlier you configured the MTA extension and saw that profiles can include custom rules (for example an `audit-logging` profile alongside `quarkus-profile`). Now make sure analysis actually loads **this** ruleset from disk.
+
+. Open the MTA Analysis View. Click the **gear** icon (1), then under **Select Profile** click **Edit in Profile Manager** (2).
++
+image::module-05-mta-dls/05-05-dls-01.jpg[Open Profile Manager from Get Ready to Analyze,link=self,window=blank,title="Edit in Profile Manager"]
+
+. Select the existing **`audit-logging`** profile, or create a new profile dedicated to this exercise (suggested name: `audit-logging`). You can also attach custom rules to the active **`quarkus-profile`** if you prefer a single profile for the rest of the lab.
+
+. In **Profile Settings**, set the migration target consistent with this workshop (Quarkus / the same target family used by `quarkus-profile`). Custom rules in this repo are labeled toward a Quarkus 3-style target.
+
+. Under **Custom Rules**, click **Upload Custom Rules...** and upload the xref:module-05/module-05-logging.adoc[`logging.yaml`] file you saved locally (or point the profile at the project's `rules/` directory that contains `logging.yaml`).
++
+image::module-05-mta-dls/05-05-dls-02.jpg[Upload Custom Rules in Profile Settings,link=self,window=blank,title="Custom Rules"]
+
+. Activate the profile so it is the one used for the next analysis run.
+
+IMPORTANT: If you only run `quarkus-profile` without the custom rules path or upload, you will still see Java EE → Quarkus findings (MDB, EJB, and so on), but you will **miss** the audit library incidents. Custom rules and stock rules complement each other.
+
+== Exercise 3: Run analysis and inspect custom findings
+
+. With the profile that includes your custom rules active, start analysis on `parasol-insurance-eap`.
+
+. When the Analysis panel populates, filter or search for findings related to **audit** / **`Audit`**. Expand incidents and confirm you can map them back to the rule IDs you read in `logging.yaml`. At minimum you should see a **dependency** finding for `audit-logging-library` **1.0.0** in `pom.xml` (rule `audit-logging-0001`).
+
+. For a finding such as replacing `FileSystemAuditLogger`, open the **AI** dropdown and choose **Get solution** (or **Get solution for N incidents**).
++
+image::module-05-mta-dls/05-05-dls-03.jpg[Audit findings and Get Solution,link=self,window=blank,title="Get Solution"]
+
+. Review the generated patch in **MTA Resolution Details**. Confirm the change (for example `FileSystemAuditLogger` → `StreamableAuditLogger`), then choose **Review in Editor**, **Reject**, or **Accept**.
++
+image::module-05-mta-dls/05-05-dls-04.jpg[Review and Accept ClaimsResource patch,link=self,window=blank,title="Accept patch"]
+
+. Next, search the Analysis panel for **`ClaimsResource`** and set **Group by: Files**. Open the **AI** menu and request a solution for the incidents on that file (rules `audit-logging-0002` … `0005` fire on call sites such as `AuditEvent.builder`, `logEvent`, and `logSuccess` / `logFailure`).
++
+image::module-05-mta-dls/05-05-dls-05.jpg[ClaimsResource file grouping and Get Solution,link=self,window=blank,title="ClaimsResource AI"]
+
+. Review the additional patches. For example, legacy `logSuccess(...)` should become construction of a full `AuditEvent` (and typically `logEventAsync`). Accept or reject after you understand the diff.
++
+image::module-05-mta-dls/05-05-dls-06.jpg[Review AuditEvent migration patch,link=self,window=blank,title="AuditEvent patch"]
+
+NOTE: Read each finding **message** carefully. Notice how the rule text is written for humans *and* for Developer Lightspeed: clear intent (“upgrade to 2.0.0”, “use `logEventAsync`”, and so on) without requiring the model to invent Parasol policy from scratch. Custom-library upgrades can imply Java level and API changes beyond a single version number — review diffs before accepting.
+
+== What we learnt
+
+* **Gap in stock rules:** Public Quarkus / Java EE rulesets do not understand proprietary libraries such as `audit-logging-library`.
+* **Custom rules structure:** Rule files such as `logging.yaml` use `when:` conditions and actionable `message:` text that MTA (and Developer Lightspeed) can act on.
+* **Five migration areas:** dependency bump, event construction, logger implementation, sync → async logging, and removal of convenience methods.
+* **Profile wiring:** MTA analysis only applies custom rules when the active profile points at the `rules/` path.
+* **Portfolio reuse:** The same `rules/` folder can be shared across every Parasol service that depends on the audit library — write once, analyze many times.
+
+== Verify
+
+. The `rules/` directory exists in `parasol-insurance-eap` and contains `logging.yaml` (copied or downloaded from this guide if needed).
+
+. You can explain in your own words what at least three of the five `audit-logging-****` rules detect.
+
+. An MTA profile is configured with the custom `rules/` path and has been used to run analysis.
+
+. You can identify the `audit-logging-0001` finding against the v1 dependency in `pom.xml`.
