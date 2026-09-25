@@ -230,7 +230,7 @@ image::module-05-mta-dls/05-07-dls-07.jpg[OpenShift Topology showing parasol-ins
 +
 You should see something similar to the topology above:
 +
-* **`parasol-insurance`** — the Quarkus application (look for the **APPL Quarkus** badge). A blue ring around the node means the pod is healthy / running.
+* **`parasol-insurance`** — the Quarkus application (look for the **Quarkus** application badge). A blue ring around the node means the pod is healthy / running.
 * **`parasol-db`** — the PostgreSQL instance the `%prod` profile talks to. Topology may draw a connector from the app to the database.
 * Optionally you may still see a legacy **`parasol-insurance-eap`** workload in the same project from earlier demos; the one you just deployed is the Quarkus node.
 +

@@ -1,7 +1,7 @@
 = logging.yaml
 include::partial$_attributes.adoc[]
 
-Custom MTA / Konveyor **rules** that detect `audit-logging-library` v1 usage and guide migration to v2. Save this file as `rules/logging.yaml` in `parasol-insurance-eap`.
+Custom MTA **rules** that detect `audit-logging-library` v1 usage and guide migration to v2. Save this file as `rules/logging.yaml` in `parasol-insurance-eap`.
 
 [.button]
 * link:{attachmentsdir}/module-05-rules/logging.yaml[Download logging.yaml,download=logging.yaml,window=_blank,role=button]

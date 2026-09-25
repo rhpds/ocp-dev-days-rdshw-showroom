@@ -6,7 +6,7 @@ include::partial$_attributes.adoc[]
 .Goal
 [NOTE]
 ====
-Learn why **custom Konveyor / MTA rules** matter for proprietary libraries, explore the **audit-logging** rules shipped with `parasol-insurance-eap`, attach them to an MTA analysis profile, and run analysis so you can see findings that **stock Quarkus rules cannot detect**.
+Learn why **custom MTA rules** matter for proprietary libraries, explore the **audit-logging** rules shipped with `parasol-insurance-eap`, attach them to an MTA analysis profile, and run analysis so you can see findings that **stock Quarkus rules cannot detect**.
 ====
 
 Stock migration rulesets (for example the Quarkus target rules) know about Java EE, Jakarta, and common open-source frameworks. They do **not** know about Parasol's internal **`audit-logging-library`**. Without custom rules, MTA would happily migrate EJBs and MDBs while silently leaving a broken, outdated audit API in place — a compliance risk for an insurance platform.
@@ -72,7 +72,7 @@ Open xref:module-05/module-05-logging.adoc[`logging.yaml`] to **download** or **
 | Build a full `AuditEvent` and log it asynchronously
 |===
 
-TIP: Custom rules use the same Konveyor / MTA rule language as public rulesets (`java.dependency`, `java.referenced`, categories, effort, labels). The difference is **ownership**: these rules encode Parasol's private library contract.
+TIP: Custom rules use the same MTA rule language as public rulesets (`java.dependency`, `java.referenced`, categories, effort, labels). The difference is **ownership**: these rules encode Parasol's private library contract.
 
 . Also open `pom.xml` and find the dependency on `audit-logging-library` version `1.0.0`, and the `project-local` repository pointing at `lib/repository`. This is the concrete hook for rule `audit-logging-0001`.
 
