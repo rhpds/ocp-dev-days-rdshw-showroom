@@ -1,0 +1,269 @@
+= Section 7: Review the Quarkus branch and deploy to OpenShift
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[.goal]
+.Goal
+[NOTE]
+====
+Switch `parasol-insurance-eap` to the **`quarkus`** branch — the completed EAP → Quarkus migration — review the modernized code against what you fixed in earlier sections, run the app locally if you like, then **build and deploy** it to OpenShift and verify the Parasol UI and APIs.
+====
+
+In the previous sections you used MTA analysis and Developer Lightspeed to migrate pieces of the **legacy** application (MDB messaging, custom audit rules, Stateless EJB). The repository also carries a **`quarkus`** branch where that modernization is already applied end to end. This lab closes the loop: inspect the target architecture, then ship it to the cluster.
+
+== Exercise 1: Check out the `quarkus` branch
+
+. In Dev Spaces, open a terminal so you can run the git commands. From the menu choose **Terminal → New Terminal**.
++
+image::module-05-mta-dls/05-07-dls-01.jpg[Open a new terminal in Dev Spaces,link=self,window=blank,title="New Terminal"]
+
+. Make sure you are in the `parasol-insurance-eap` project root (or use Source Control if you prefer the UI).
+
+. Fetch and check out the migrated branch:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+git fetch origin
+git reset --hard
+git checkout quarkus
+git pull origin quarkus
+----
+
+. Confirm you are on the right branch:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+git branch --show-current
+git log -2 --oneline
+----
++
+You should see `quarkus` as the current branch.
+
+TIP: If Dev Spaces prompts you to reload the window after the branch switch, accept the reload so the Java / Quarkus tooling picks up the new `pom.xml`.
+
+== Exercise 2: Review the migrated code
+
+Walk the same classes you touched earlier and compare them to the Quarkus implementations.
+
+=== Packaging and dependencies
+
+. Open `pom.xml` on the `quarkus` branch. Note the shift from an EAP / Java EE WAR toward Quarkus:
+* Packaging is **`jar`** (not `war`)
+* Dependencies come from the **Quarkus BOM** (`quarkus-rest`, `quarkus-hibernate-orm`, `quarkus-messaging`, `quarkus-scheduler`, JDBC drivers, and so on)
+* There is no `jboss-eap-javaee8` BOM or `javax.*` EJB / JMS API stack
+
+. Open `src/main/resources/application.properties`. Observe:
+* **Dev** profile uses in-memory **H2**
+* **`%prod`** profile uses **PostgreSQL** via `POSTGRESQL_*` environment variables (what OpenShift will inject)
+
+=== Messaging: `EmailIntakeMDB`
+
+. Open `src/main/java/com/parasol/mdb/EmailIntakeMDB.java`.
++
+Confirm the migration outcomes from Section 4:
+* `@ApplicationScoped` instead of `@MessageDriven`
+* `@Inject` instead of `@EJB`
+* `@Incoming("email-intake")` instead of JMS `MessageListener` / activation config
+* `jakarta.*` imports
+
+=== Business services: `ClaimService`
+
+. Open `src/main/java/com/parasol/ejb/ClaimService.java`.
++
+Confirm the migration outcomes from Section 6:
+* `@ApplicationScoped` + `@Transactional` instead of `@Stateless`
+* `@Inject EntityManager` instead of `@PersistenceContext`
+* No `javax.ejb` usage
+
+=== Scheduling: `EmailGeneratorBean`
+
+. Open `src/main/java/com/parasol/ejb/EmailGeneratorBean.java`.
++
+Note how the old EJB timer / JMS producer path became Quarkus-native:
+* `@Scheduled(...)` instead of `TimerService` / `@Timeout`
+* `@Channel("email-intake") Emitter<String>` instead of JMS `ConnectionFactory` / `Queue`
+* Still `@ApplicationScoped`, feeding the same `email-intake` channel the MDB consumes
+
+=== REST layer
+
+. Open `ClaimsResource` and `InboxResource`. Confirm CDI `@Inject` of services (no `@EJB`) and `jakarta.ws.rs` APIs.
+
+[cols="2,2,2"]
+|===
+| Concern | Legacy (`main`) | Quarkus branch
+
+| Packaging | WAR + EAP BOM | JAR + Quarkus BOM
+| APIs | `javax.*` | `jakarta.*`
+| Claims service | `@Stateless` EJB | `@ApplicationScoped` + `@Transactional`
+| Email intake | JMS `@MessageDriven` | `@Incoming("email-intake")`
+| Email generator | EJB timer + JMS | `@Scheduled` + `@Channel` Emitter
+| Datasource (prod) | `java:jboss/datasources/...` | Quarkus JDBC + env vars
+|===
+
+== Exercise 3: Run Quarkus locally (optional smoke test)
+
+Before deploying, you can smoke-test on the Dev Spaces / local JVM.
+
+. From the project root:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+mvn quarkus:dev
+----
+
+. When Quarkus starts listening on port **8080**, Dev Spaces shows a series of port-forward dialogs. Accept them in order so the app opens in your browser: **yes** (add a redirect) → **Open In New Tab** → **Open**.
++
+image::module-05-mta-dls/05-07-dls-02.jpg[Dev Spaces port redirect dialogs for Quarkus on 8080,link=self,window=blank,title="Open forwarded port"]
++
+NOTE: You may also see similar dialogs for port **5005** (the Quarkus remote-debug port). You can dismiss or ignore those for this exercise — we are only using the HTTP UI on **8080**, not attaching a debugger.
+
+. You should land on the Parasol **Dashboard**.
++
+image::module-05-mta-dls/05-07-dls-03.png[Parasol Quarkus dashboard,link=self,window=blank,width=700]
+
+. Open **Claims** and confirm seeded claims load from the API / UI.
++
+image::module-05-mta-dls/05-07-dls-04.png[Parasol Quarkus claims list,link=self,window=blank,width=700]
+
+. Open a claim detail (for example from the claims table) and confirm the page renders.
++
+image::module-05-mta-dls/05-07-dls-05.png[Parasol Quarkus claim detail,link=self,window=blank,width=700]
+
+. Open **Inbox**. The scheduled generator publishes sample emails onto the in-process `email-intake` channel. The first message can take a few minutes (scheduler delay), then new ones arrive about every 45 seconds. Until then the UI shows **Waiting for emails...**.
++
+image::module-05-mta-dls/05-07-dls-06.png[Parasol Quarkus inbox,link=self,window=blank,width=700]
+
+. Stop the Dev mode process with `Ctrl+C` when finished.
+
+== Exercise 4: Deploy to OpenShift
+
+Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a project/namespace is selected (`oc project`).
+
+=== Provision PostgreSQL
+
+. Create an ephemeral PostgreSQL instance for the demo:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+oc new-app --template=postgresql-ephemeral \
+  -p DATABASE_SERVICE_NAME=parasol-db \
+  -p POSTGRESQL_USER=parasol \
+  -p POSTGRESQL_PASSWORD=parasol \
+  -p POSTGRESQL_DATABASE=parasol
+----
+
+. Wait until the database is ready:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+oc rollout status deploymentconfig/parasol-db 2>/dev/null \
+  || oc rollout status deployment/parasol-db
+oc get pods -l name=parasol-db
+----
+
+=== Build the Quarkus application
+
+. Package the app locally (or in the Dev Spaces terminal):
++
+[.console-input]
+[source,bash,role="execute"]
+----
+mvn clean package -DskipTests
+----
++
+This produces `target/quarkus-app/`.
+
+. Assemble a binary build context and start an OpenShift Docker build:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+rm -rf /tmp/parasol-build
+mkdir -p /tmp/parasol-build
+cp src/main/docker/Dockerfile.jvm /tmp/parasol-build/Dockerfile
+cp -R target/quarkus-app /tmp/parasol-build/
+
+oc new-build --name=parasol-insurance --binary --strategy=docker -l app=parasol-insurance
+oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
+----
+
+=== Apply deployment manifests
+
+. Deploy the application (image namespace is substituted from your current project). The Deployment maps Secret `parasol-db` into the `POSTGRESQL_*` variables expected by the **`%prod`** profile:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+NS=$(oc project -q)
+sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+oc apply -f openshift/service.yaml
+oc apply -f openshift/route.yaml
+oc rollout status deployment/parasol-insurance
+----
+
+. Get the Route URL and open it in the browser:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+ROUTE=$(oc get route parasol-insurance -o jsonpath='{.spec.host}')
+echo "https://${ROUTE}/"
+----
+
+. Verify the APIs from the terminal:
++
+[.console-input]
+[source,bash,role="execute"]
+----
+curl -sk "https://${ROUTE}/api/claims"
+curl -sk "https://${ROUTE}/api/inbox"
+----
+
+. In the OpenShift console, open your project **Topology** (or **Workloads → Deployments**) and confirm the application is running.
++
+image::module-05-mta-dls/05-07-dls-07.jpg[OpenShift Topology showing parasol-insurance Quarkus deployment and Route,link=self,window=blank,title="OpenShift Topology"]
++
+You should see something similar to the topology above:
++
+* **`parasol-insurance`** — the Quarkus application (look for the **Quarkus** application badge). A blue ring around the node means the pod is healthy / running.
+* **`parasol-db`** — the PostgreSQL instance the `%prod` profile talks to. Topology may draw a connector from the app to the database.
+* Optionally you may still see a legacy **`parasol-insurance-eap`** workload in the same project from earlier demos; the one you just deployed is the Quarkus node.
++
+Select **`parasol-insurance`**, open the **Resources** side panel, and check:
++
+* **Pods** — at least one pod in **Running** state
+* **Services** — `parasol-insurance`
+* **Routes** — the public URL for the app (click it to open the Parasol UI in the browser, same as the `oc get route` host from the previous step)
++
+Also peek at the Deployment env vars and confirm they match what you applied from `openshift/deployment.yaml` (`POSTGRESQL_*` from Secret `parasol-db`).
+
+== Exercise 5: Review what changed in production config
+
+. Re-open `openshift/deployment.yaml` and relate it to `application.properties` `%prod` settings:
+* `POSTGRESQL_HOST=parasol-db`
+* Credentials from Secret `parasol-db`
+* HTTP probes on `/api/claims`
+
+. Contrast this with the legacy EAP approach (`java:jboss/datasources/ParasolDS`, `jboss-all.xml` JMS queue definitions). Quarkus moves runtime wiring into **application config + Kubernetes env**, which is easier to GitOps and promote across environments.
+
+== What we learnt
+
+* The **`quarkus`** branch is the completed migration target for the patterns you practiced with MTA / DLS.
+* Messaging, CDI services, scheduling, and REST all use Quarkus / MicroProfile idioms (`@Incoming`, `@Channel`, `@Scheduled`, `@ApplicationScoped`).
+* Local **`quarkus:dev`** (H2) is ideal for quick UI verification; **OpenShift** uses PostgreSQL via the `%prod` profile.
+* Container deploy is a standard binary build + Deployment / Service / Route — no EAP-specific subsystem XML required.
+
+== Verify
+
+. `git branch --show-current` prints `quarkus`.
+
+. You can point to the Quarkus versions of `EmailIntakeMDB` and `ClaimService` and explain how they differ from the legacy `main` branch.
+
+. `parasol-insurance` Deployment is Available and the Route serves the Parasol UI.
+
+. `GET /api/claims` on the Route returns claim JSON; the Inbox UI shows generated emails after the scheduler's initial delay.

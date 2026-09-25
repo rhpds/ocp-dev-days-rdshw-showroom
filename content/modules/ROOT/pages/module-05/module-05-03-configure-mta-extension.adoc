@@ -1,0 +1,123 @@
+= Section 3: Access Dev Spaces and configure the MTA extension
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[IMPORTANT]
+====
+In this lab, we will use the **Migration Toolkit for Applications** Visual Studio Code extension—the **MTA extension** in a Red Hat Dev Spaces environment that provides a VS Code-based GUI.
+
+**Developer Lightspeed** is not a separate extension. It is MTA's AI-powered code refactoring feature. The **MTA extension** is what is installed in the IDE; it includes both MTA static code analysis and Developer Lightspeed (generative AI).
+====
+
+[.goal]
+.Goal
+[NOTE]
+====
+Prepare the **OpenShift Dev Spaces** workspace and **MTA extension** for the rest of the lab: open the **parasol-insurance-eap** project, create a **migration profile** (source and target technologies), and connect **Developer Lightspeed** to the LLM via **GenAI** / **provider-settings.yaml** so you can analyze and modernize Parasol Insurance’s legacy EAP application with AI assistance.
+====
+
+We will start by setting up the development environment with AI capabilities to start modernizing Parasol Insurance's `parasol-insurance-eap` application.
+
+Prepare to launch Dev Spaces and configure the MTA extension, including Developer Lightspeed (AI) settings.
+
+== Exercise 1: Open Dev Spaces and log in
+
+. Switch to Red Hat OpenShift Dev Spaces by clicking the **OpenShift Dev Spaces** tab in the workshop interface.
+
+. Log in to Dev Spaces using the OpenShift credentials:
++
+NOTE: The initial page is the Keycloak SSO login page
++
+--
+Username:
+[source,subs="attributes",role="copypaste"]
+----
+{user}
+----
+Password:
+[source,subs="attributes",role="copypaste"]
+----
+{password}
+----
+--
+
+. After logging in, if prompted to __Authorize Access__
++
+* Click **Allow selected permissions** button
++
+image::module-05-mta-dls/05-03-dls-01.jpg[DevSpaces Login,link=self,window=blank,title="Logging In"]
++
+CAUTION: If a message indicates authentication is required again, click the **OpenShift Dev Spaces** tab to return to the workspace listing.
+
+. Open the user-{user}-workspace
++
+* After logging in the workspace listing opens and shows the user-{user}-workspace entry
+* Click on the **Open** link on the right side of workspace listing
++
+image::module-05-mta-dls/05-03-dls-02.jpg[Open Workspace,link=self,window=blank,title="Open Workspace"]
+
+. Wait for the workspace to initialize and open:
++
+The **parasol-insurance-eap** repository loads in Dev Spaces and the development environment is ready.
++
+The workspace opens in a new browser tab.
++
+* If prompted to trust the content and providers, confirm trust.
+* If an introductory layout panel appears, choose **Light** theme for best contrast later in the lab and **Mark Done**. Mark done will close the introductory panel and open the extensions installed panel by clicking on the extensions icon on the left side of the screen as shown in Step 2 in the image below.
++
+image::module-05-mta-dls/05-03-dls-03.png[VSCode Tab,link=self,window=blank,title="Mark done"]
+
+In some cases the extensions might take some time to install. If you see the reload window button then click on it. It will reload the browser tab automatically.
+
+image::module-05-mta-dls/05-03-dls-04.png[VSCode Tab,link=self,window=blank,title="Trust the Authors"]
+
+If you see the message "Trust the Authors" then click on the "Trust the Authors" button. This will trust the Red Hat Authors of the extensions and allow you to use the extensions. This is standard VS Code behaviour.
+
+== Exercise 2: Configure MTA profiles and GenAI provider
+
+image::module-05-mta-dls/05-03-dls-05.png[VSCode Tab,link=self,window=blank,title="Manage profiles"]
+
+Managing multiple profiles is a powerful feature of the MTA extension. It allows you to switch between different analysis profiles easily. You can create a new profile by clicking on the "New Profile" button as shown in Step 3 in the image below. We have already created two profiles — one with custom rules `audit-logging` and the other `quarkus-profile` — to migrate our application to Quarkus. You will explore the audit-logging custom rules in detail in xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Section 5: Custom rules (audit logging)]. Click on the `Manage Profiles` button to open the profiles management panel.
+
+image::module-05-mta-dls/05-03-dls-06.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
+
+Review the profiles and select the `quarkus-profile` profile by clicking on the profile name.
+
+image::module-05-mta-dls/05-03-dls-07.png[VSCode Tab,link=self,window=blank,title="Review profiles"]
+
+Click on the "Activate Profile" button to activate the profile. Once done, click on the right panel again to open the provider settings configuration. As shown in the image below.
+
+image::module-05-mta-dls/05-03-dls-08.png[VSCode Tab,link=self,window=blank,title="Gen-AI Provider Settings"]
+
+This should open the provider settings configuration. MTA uses the provider settings to connect to the LLM. Paste the following into **provider-settings.yaml**. The API key and base URL come from your lab environment (`{litellm_virtual_key}` and `{litellm_api_base_url}`).
+
+[.console-input]
+[source,yaml,subs="+attributes,macros+"]
+----
+models:
+  OpenShift: &active
+    environment:
+      OPENAI_API_KEY: "{litellm_virtual_key}"
+    provider: ChatOpenAI
+    args:
+      model: "qwen-235b"
+      configuration:
+        baseURL: "{litellm_api_base_url}"
+----
+
+image::module-05-mta-dls/05-03-dls-09.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
+
+== Verify
+
+Confirm the Dev Spaces environment and MTA extension (including Developer Lightspeed) are set up correctly.
+
+. Confirm MTA Extension is setup correctly
+* With the MTA extension icon selected and the MTA Analysis View tab active:
+* Click on the gear icon on the right side of the screen
+* The **Get Ready to Analyze** pane will open on the right hand side of the screen
+* There should be green check marks in all four of the message boxes and each should be listed as completed
+
+. Confirm the Dev Spaces workspace is pointing to the correct repository
+* Click on the file icon on the left side of the Dev Spaces environment
+* The File _EXPLORER_ lists the **parasol-insurance-eap** directory
+* Expand directories with the file explorer arrows if needed — you should see packages such as `com.parasol.mdb` (`EmailIntakeMDB`) and `com.parasol.ejb` (`ClaimService`)

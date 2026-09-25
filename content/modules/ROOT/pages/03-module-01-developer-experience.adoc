@@ -462,7 +462,7 @@ image::zoo-code-sidebar.png[AI coding assistant icon in the Dev Spaces left side
 +
 Notice the controls at the bottom of the chat panel. You can switch between personas -- **Architect** for design guidance, **Code** for implementation, **Ask** for general questions, and **Debug** for troubleshooting. You can also select from the AI models that the platform and security teams have approved for use -- no shadow AI here -- and configure what types of actions the assistant can auto-approve (such as file edits or terminal commands). For this exercise, file edits require your approval -- you will need to click **Save** after each edit the assistant proposes to keep the human in the loop. Once developers build confidence in the assistant, this can be switched to auto-approve for a faster workflow.
 
-. At the bottom of the chat panel, click the persona selector and choose **Code** -- since we are editing implementation code, not architecting major changes.
+. At the bottom of the chat panel, click the persona selector and choose **Code** -- since we are editing implementation code, not designing major changes.
 +
 image::zoo-code-persona.png[Selecting the Code persona in the AI assistant,link=self,window=blank,width=700]
 

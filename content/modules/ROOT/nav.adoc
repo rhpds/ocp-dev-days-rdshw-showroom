@@ -12,9 +12,6 @@
 ** xref:03-module-01-developer-experience.adoc#section-5[Section 5: Call in the AI]
 ** xref:03-module-01-developer-experience.adoc#section-6[Section 6: Go live]
 
-
-
-
 // * xref:module-03/intro/intro.1.adoc[Module 3: Application Foundations]
 * xref:module-03/index.adoc[Module 3: App Connectivity for AI]
 // ** xref:module-03/index.adoc[Home]
@@ -51,3 +48,13 @@
 *** xref:module-03/m5/m5.3.adoc[Testing Authentication]
 *** xref:module-03/m5/m5.4.adoc[Testing Token Rate Limiting]
 *** xref:module-03/m5/m5.5.adoc[Summary]
+
+* xref:module-05/module-05-01-goals.adoc[Module 5: AI-powered migration using MTA]
+** xref:module-05/module-05-01-goals.adoc[Section 1: Goals]
+** xref:module-05/module-05-02-introduction.adoc[Section 2: Introduction]
+** xref:module-05/module-05-03-configure-mta-extension.adoc[Section 3: Configure MTA extension]
+** xref:module-05/module-05-04-mdb-to-reactive-messaging.adoc[Section 4: MDB to Reactive Messaging]
+** xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Section 5: Custom rules (audit logging)]
+*** xref:module-05/module-05-logging.adoc[logging.yaml]
+** xref:module-05/module-05-06-stateless-ejb-to-cdi.adoc[Section 6: Stateless EJB to CDI]
+** xref:module-05/module-05-07-quarkus-branch-deploy.adoc[Section 7: Quarkus branch and OpenShift deploy]

@@ -1,0 +1,80 @@
+
+- ruleID: audit-logging-0001
+  description: Detects Maven dependency on v1.x of audit-logging-library and suggests upgrading to 2.x.x (Java 21+)
+  category: mandatory
+  effort: 1
+  when:
+    java.dependency:
+      name: com.enterprise.audit-logging-library
+      lowerbound: "1.0.0" 
+      upperbound: "1.9" 
+  message: The `audit-logging-library` version {{dependency.version}} is outdated. Please upgrade to 2.0.0. update java version to 21
+  labels:
+    - konveyor.io/source=openjdk8
+    - konveyor.io/target=quarkus3
+
+- ruleID: audit-logging-0002
+  description: Replace deprecated `AuditEvent.builder()` with direct Java 21 record instantiation
+  category: mandatory
+  effort: 3
+  when:
+    java.referenced:
+      pattern: com.enterprise.audit.logging.model.AuditEvent.builder
+      location: METHOD_CALL
+  message: The `AuditEvent.builder()` pattern is deprecated. Instantiate the `AuditEvent` record directly (e.g. `new AuditEvent(...)`).
+  labels:
+    - konveyor.io/source=openjdk8
+    - konveyor.io/target=quarkus3
+
+- ruleID: audit-logging-0003
+  description: Replace `FileSystemAuditLogger` instantiation with `StreamableAuditLogger` over TCP
+  category: mandatory
+  effort: 3
+  when:
+    java.referenced:
+      pattern: com.enterprise.audit.logging.service.FileSystemAuditLogger
+      location: IMPORT 
+  message: Direct instantiation of `FileSystemAuditLogger` is deprecated. Use `StreamableAuditLogger` configured for TCP streaming.
+  labels:
+    - konveyor.io/source=openjdk8
+    - konveyor.io/target=quarkus3
+
+- ruleID: audit-logging-0004
+  description: Use non-blocking `logEventAsync(event)` instead of synchronous `logEvent(event)`
+  category: mandatory
+  effort: 3
+  when:
+    or:
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.StreamableAuditLogger.logEvent
+        location: METHOD_CALL
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.FileSystemAuditLogger.logEvent
+        location: METHOD_CALL
+  message: The synchronous `logEvent(event)` method should be replaced. Use the non-blocking `logEventAsync(event)` for better performance.
+  labels:
+    - konveyor.io/source=openjdk8
+    - konveyor.io/target=quarkus3
+
+- ruleID: audit-logging-0005
+  description: Replace legacy `logSuccess` or `logFailure` methods with a full `AuditEvent` record
+  category: mandatory
+  effort: 3
+  when:
+    or:
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.StreamableAuditLogger.logSuccess
+        location: METHOD_CALL
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.FileSystemAuditLogger.logSuccess
+        location: METHOD_CALL
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.StreamableAuditLogger.logFailure
+        location: METHOD_CALL
+    - java.referenced:
+        pattern: com.enterprise.audit.logging.service.FileSystemAuditLogger.logFailure
+        location: METHOD_CALL
+  message: Legacy convenience methods (logSuccess, logFailure) are removed. Construct a full `AuditEvent` record and use logEventAsync instead.
+  labels:
+    - konveyor.io/source=openjdk8
+    - konveyor.io/target=quarkus3
