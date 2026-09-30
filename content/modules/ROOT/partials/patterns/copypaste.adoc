@@ -64,14 +64,27 @@ window.addEventListener('DOMContentLoaded', function() {
     return result;
   }
 
+  var COLOR_PENDING = '#FBEAD7';
+  var COLOR_DONE    = '#D6EFD8';
+
+  function cpStorageKey(index) {
+    return 'cp-done:' + window.location.pathname + ':' + index;
+  }
+
+  function cpMarkDone(wrapper, textarea, index) {
+    wrapper.style.borderColor = COLOR_DONE;
+    textarea.style.backgroundColor = COLOR_DONE;
+    localStorage.setItem(cpStorageKey(index), '1');
+  }
+
   // Copy textarea content to clipboard
-  function cpCopy(btn) {
-    var textarea = btn.previousElementSibling;
+  function cpCopy(btn, wrapper, textarea, index) {
     textarea.select();
     var text = textarea.textContent;
     navigator.clipboard.writeText(text + '\n')
       .then(function() { console.log('Copied to clipboard'); })
       .catch(function(err) { console.error('Failed to copy:', err); });
+    cpMarkDone(wrapper, textarea, index);
   }
 
   // Read docserver base URL from hidden div
@@ -89,7 +102,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // Transform all .copypaste sidebar blocks
   var blocks = document.querySelectorAll('.sidebarblock.copypaste');
-  blocks.forEach(function(sb) {
+  blocks.forEach(function(sb, index) {
     var content = sb.querySelector('.content');
     if (!content) return;
 
@@ -125,12 +138,15 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // Build replacement UI: textarea + copy button
+    var done = localStorage.getItem(cpStorageKey(index)) === '1';
+    var bgColor = done ? COLOR_DONE : COLOR_PENDING;
+
     var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'border: 1px solid #f0f0f0; border-bottom-color: #8a8d90; display: flex; align-items: flex-start;';
+    wrapper.style.cssText = 'border: 1px solid ' + bgColor + '; border-bottom-color: #8a8d90; display: flex; align-items: flex-start;';
 
     var textarea = document.createElement('textarea');
     textarea.readOnly = true;
-    textarea.style.cssText = 'border: none; background-color: #f0f0f0; width: 100%; resize: none; font-size: 14px; font-family: monospace; padding: 10px 15px; overflow: hidden;';
+    textarea.style.cssText = 'border: none; background-color: ' + bgColor + '; width: 100%; resize: none; font-size: 14px; font-family: monospace; padding: 10px 15px; overflow: hidden;';
     textarea.rows = 1;
     textarea.textContent = displayText;
 
@@ -138,7 +154,7 @@ window.addEventListener('DOMContentLoaded', function() {
     btn.className = 'cp-tooltip';
     btn.style.cssText = 'border: none; background-color: white; padding: 5px 15px; border-bottom: 1px solid transparent; transition: border-bottom-color 0.2s; cursor: pointer;';
     btn.innerHTML = copySvg + '<span class="cp-tooltiptext">Copy to clipboard</span>';
-    btn.addEventListener('click', function() { cpCopy(this); });
+    btn.addEventListener('click', function() { cpCopy(this, wrapper, textarea, index); });
 
     wrapper.appendChild(textarea);
     wrapper.appendChild(btn);
@@ -151,6 +167,7 @@ window.addEventListener('DOMContentLoaded', function() {
       textarea.style.height = 'auto';
       textarea.style.height = textarea.scrollHeight + 'px';
     }
+    window.addEventListener('resize', autoSize);
 
     if (pathValue) {
       // Dynamic: fetch from docserver then replace tokens

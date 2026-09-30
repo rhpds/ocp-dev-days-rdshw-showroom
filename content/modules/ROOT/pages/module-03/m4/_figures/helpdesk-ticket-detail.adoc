@@ -22,7 +22,7 @@
       <div style="font-size: 13px; color: #d32f2f;">{username} &lt;{username}@parasol.com&gt;</div>
       <div style="font-size: 12px; color: #999; margin-bottom: 10px;">Mar 28, 2026, 07:05am</div>
       <div style="font-size: 13px; color: #333; line-height: 1.5;">
-        The customer would like to remove the medical payments coverage. The item has been removed from the policy document, and the summary calculations have been updated accordingly. Please process the policy amendment and any applicable refund for the customer.
+        A policy amendment has been made to remove Roadside Assistance coverage from the policy document. Please process the amendment accordingly.
       </div>
       <div style="margin-top: 8px; display: flex; align-items: center; gap: 5px;">
         <span style="font-size: 16px;">&#x1F4C4;</span>

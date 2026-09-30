@@ -17,7 +17,7 @@ Customers send Policy Applications in EDI format to the platform. These applicat
 
 {empty} +
 
-*The Technical Solution*
+*The Technical Solution (To Build)*
 
 An Apache Camel integration exposes an API endpoint that receives incoming EDI policy applications. The flow transforms the EDI data into XML format, stores it in a backend Database via {rhsi}, and renders PDF policy documents that are uploaded to S3 object storage (OpenShift Data Foundation).
 

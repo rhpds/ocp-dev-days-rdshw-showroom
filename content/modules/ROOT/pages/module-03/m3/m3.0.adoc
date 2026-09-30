@@ -9,14 +9,6 @@ Build the integration flows that connect Matrix and Rocket.Chat through Apache K
 
 {empty} +
 
-Recommended: +
---
-* For the best experience, complete the following modules first to follow the storyline:
-+
-image::module-03/m3/prereq.png[width=70%]
-
-{empty} +
---
 
 === Quick reminder
 

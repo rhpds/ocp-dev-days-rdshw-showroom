@@ -1,5 +1,29 @@
-= Workshop overview
+= Module 1: The Developer Experience
 include::partial$_attributes.adoc[]
+
+== What you'll learn
+
+In this workshop, you will:
+
+* Explore Red Hat Developer Hub as a self-service internal developer portal
+* Use the software catalog to discover applications, APIs, and documentation
+* Launch a preconfigured cloud development environment with Red Hat OpenShift Dev Spaces
+* Build a feature using an AI coding assistant
+* Push code through an automated CI/CD pipeline with OpenShift Pipelines
+* Deploy to production using GitOps with Red Hat OpenShift GitOps (Argo CD)
+* Debug and monitor applications from Developer Hub and the OpenShift Console
+
+== Who this is for
+
+This workshop is designed for developers, platform engineers, and IT decision makers who want to understand the cohesive developer experience that OpenShift provides -- from code to production.
+
+**Experience level**: Beginner to intermediate. No prior OpenShift experience is required.
+
+== Estimated time
+
+This workshop takes approximately **90 minutes** to complete.
+
+You can work at your own pace.
 
 == Your role and mission
 
@@ -53,3 +77,7 @@ You should have:
 * Basic familiarity with web applications and APIs
 * Comfort using a web browser and a code editor
 * Willingness to learn -- no prior OpenShift or container experience required
+
+== Next steps
+
+Continue to the xref:module-01/01-environment.adoc[Environment Details] page to access your lab environment and review the workshop timeline.

@@ -9,19 +9,6 @@ Get familiar with the two messaging platforms used in this workshop — Matrix a
 
 {empty} +
 
-Recommended: +
---
-* For the best experience, complete the following modules first to follow the storyline:
-+
-image::module-03/m2/prereq.png[width=50%]
-
-{empty} +
---
-
-NOTE: Matrix and Rocket.Chat are messaging platforms similar to Slack, Telegram, or WhatsApp. This workshop uses them because they can be self-hosted on OpenShift, so no external accounts are needed.
-
-{empty} +
-
 === The messaging scenario
 
 Customers who have submitted Policy Applications may need to reach out to customer support — whether it's a complaint, a question about their coverage, or changes to an existing policy. On the other side, support agents are ready to assist them.
@@ -36,6 +23,8 @@ The interesting part is that each side uses a *different* messaging platform:
 .What are these platforms?
 [%collapsible]
 ====
+Matrix and Rocket.Chat are messaging platforms similar to Slack, Telegram, or WhatsApp. This workshop uses them because they can be self-hosted on OpenShift, so no external accounts are needed.
+
 *Matrix* is an open standard and communication protocol for real-time decentralized communication. It works seamlessly between different service providers.
 
 *Rocket.Chat* is an open-source communications platform with strict data protection standards. It enables real-time conversations between colleagues, other companies, or your customers across web, desktop, or mobile devices.

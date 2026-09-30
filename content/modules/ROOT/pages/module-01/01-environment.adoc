@@ -1,5 +1,32 @@
-= Workshop details
+= Environment Details
 include::partial$_attributes.adoc[]
+
+== Workshop Environment
+
+Everything you need is already provisioned. Your lab environment includes:
+
+* An OpenShift cluster with Developer Hub, Dev Spaces, Pipelines, and GitOps preconfigured
+* A user account with access to all workshop resources
+* A sample application (Parasol Insurance) that you will extend with a new feature
+
+Your login credentials (use these for Developer Hub, GitLab, and all workshop services):
+
+* **Username**: `{user}`
+* **Password**: `{password}`
+
+TIP: Keep these credentials handy -- you will need them several times during the workshop.
+
+== Environment Access
+
+Your lab environment includes:
+
+* **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
+* **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
+* **Dev Spaces**: {devspaces_url}[{devspaces_url}^]
+* **GitLab**: {gitlab_url}[{gitlab_url}^]
+* **Argo CD**: {argocd_url}[{argocd_url}^]
+
+NOTE: All URLs and credentials are also available in the right-hand panel of this lab interface. Use the tabs at the top to switch between the OpenShift Console, Terminal, and GitLab.
 
 == Timing
 
@@ -34,24 +61,7 @@ This workshop is designed for **90 minutes** of hands-on work.
 | Merge to main, create a release tag, approve the GitOps promotion, verify the feature in production
 |===
 
-== Environment access
-
-Your lab environment includes:
-
-* **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
-* **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
-* **Dev Spaces**: {devspaces_url}[{devspaces_url}^]
-* **GitLab**: {gitlab_url}[{gitlab_url}^]
-* **Argo CD**: {argocd_url}[{argocd_url}^]
-
-**Login credentials**:
-
-* Username: `{user}`
-* Password: `{password}`
-
-NOTE: All URLs and credentials are also available in the right-hand panel of this lab interface. Use the tabs at the top to switch between the OpenShift Console, Terminal, and GitLab.
-
-== Technology stack
+== Technology Stack
 
 This workshop uses the following Red Hat products and upstream projects:
 
@@ -66,3 +76,7 @@ This workshop uses the following Red Hat products and upstream projects:
 == Authors
 
 Red Hat Developer Experience Team
+
+== Next steps
+
+Continue to xref:module-01/02-developer-experience.adoc[The Developer Experience] to begin the hands-on labs.

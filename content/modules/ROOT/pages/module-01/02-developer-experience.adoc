@@ -1,22 +1,12 @@
-= Module 1: The developer experience
+= The Developer Experience
 include::partial$_attributes.adoc[]
-:imagesdir: ../assets/images
+:imagesdir: ../../assets/images
 
 It is your first day at Parasol Insurance. You have been assigned to the claims processing team and given access to the company's application platform. Your manager has asked you to add a new claims statistics API endpoint to the Parasol application -- a feature that will help the business track claim volumes and categories.
 
 You do not need to install anything. You do not need to file a ticket. Everything you need is already waiting for you on the platform.
 
 TIP: If the instructions panel loses its scroll position after toggling the layout view (Split / Instructions / Tabs), toggle the layout mode once more to restore it.
-
-== Learning objectives
-
-By the end of this module, you will be able to:
-
-* Navigate Developer Hub to discover applications, APIs, and documentation
-* Use self-service templates to create an isolated development environment
-* Write and test code in a cloud-based Dev Spaces IDE with AI assistance
-* Push code through an automated CI/CD pipeline and resolve quality gate failures
-* Verify a GitOps-driven deployment to production
 
 [#section-1]
 == Section 1: Meet the platform

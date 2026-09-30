@@ -9,15 +9,6 @@ Place a governance layer in front of the LLM endpoint using Connectivity Link. E
 
 {empty} +
 
-Recommended: +
---
-* For the best experience, complete the following modules first to follow the storyline:
-+
-image::module-03/m5/prereq.png[width=95%]
-
-{empty} +
---
-
 === The Scenario
 
 In the previous labs, you built an AI agent that resolves customer support issues through natural language. The agent queries the database, updates records, and regenerates policy documents, all from within the chat interface.

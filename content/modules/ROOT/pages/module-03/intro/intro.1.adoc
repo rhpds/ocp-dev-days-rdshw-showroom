@@ -7,6 +7,40 @@ include::partial$style.adoc[]
 
 You'll play the role of an integration developer at Parasol Insurance. Through the workshop labs you will build the integrations that ingest policy applications, bridge messaging systems for customer support, plug in AI to help agents resolve issues, and add governance on top, all with application integration and connectivity tools.
 
+[TIP]
+--
+.Expand the instructions to full screen
+[%collapsible]
+====
+For this module we recommend you expand the instructions frame to full screen. You can do so as follows:
+
+. Click the panel handle on the right edge
++
+[.bordered]
+[#showroom-expand-btn]
+image::module-03/intro/showroom-split-view.png[width=80%]
++
+[.overlay]
+****
+[.target]
+showroom-expand-btn
+
+[.arrows]
+{x: 98, y: 50, rot: 90, size: 1}
+
+[.numbers]
+{x: 78, y: 50, size: 1.5}
+****
++
+{blank}
+
+. Select the *Instructions* option
++
+image::module-03/intro/showroom-expand-options.png[width=50%]
+====
+
+--
+
 {empty} +
 
 === Application Connectivity Meets AI
@@ -21,7 +55,7 @@ You will work with all of these as you progress through the labs.
 
 === The Business Scenario
 
-Your company is Parasol Insurance. Customers submit policy applications; the system ingests them, transforms the data, stores it in a database, and generates policy documents. When a customer spots a problem with their policy, they contact support through an instant messaging platform. A support agent investigates, fixes the issue, and regenerates the policy document.
+Your company is Parasol Insurance. Customers submit policy applications; the system ingests them, transforms the data, stores it in a database, and generates policy documents. When a customer spots a problem with their policy, they contact support through an instant messaging platform. A human support agent investigates, fixes the issue, and regenerates the policy document.
 
 The challenge: the systems involved don't talk to each other. The database sits on separate infrastructure. The messaging platforms are disconnected. The support team handles every step manually, jumping between systems to fix issues. There's no AI in the loop, and no controls around AI even if there were.
 
