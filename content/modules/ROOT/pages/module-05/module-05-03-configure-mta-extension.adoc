@@ -13,12 +13,10 @@ In this lab, we will use the **Migration Toolkit for Applications** Visual Studi
 .Goal
 [NOTE]
 ====
-Prepare the **OpenShift Dev Spaces** workspace and **MTA extension** for the rest of the lab: open the **parasol-insurance-eap** project, create a **migration profile** (source and target technologies), and connect **Developer Lightspeed** to the LLM via **GenAI** / **provider-settings.yaml** so you can analyze and modernize Parasol Insurance’s legacy EAP application with AI assistance.
+Prepare the **OpenShift Dev Spaces** workspace (**mta-lab**) and **MTA extension** for the rest of the lab: open the **parasol-insurance-eap** project (cloned from your GitLab account), create a **migration profile** (source and target technologies), and confirm **Developer Lightspeed** can reach the lab LLM via **GenAI** / **provider-settings.yaml** so you can analyze and modernize Parasol Insurance’s legacy EAP application with AI assistance.
 ====
 
-We will start by setting up the development environment with AI capabilities to start modernizing Parasol Insurance's `parasol-insurance-eap` application.
-
-Prepare to launch Dev Spaces and configure the MTA extension, including Developer Lightspeed (AI) settings.
+We will start by opening the pre-provisioned development environment and configuring the MTA extension, including Developer Lightspeed (AI) settings, to modernize Parasol Insurance's `parasol-insurance-eap` application.
 
 == Exercise 1: Open Dev Spaces and log in
 
@@ -49,16 +47,16 @@ image::module-05-mta-dls/05-03-dls-01.jpg[DevSpaces Login,link=self,window=blank
 +
 CAUTION: If a message indicates authentication is required again, click the **OpenShift Dev Spaces** tab to return to the workspace listing.
 
-. Open the user-{user}-workspace
+. Open the **mta-lab** workspace
 +
-* After logging in the workspace listing opens and shows the user-{user}-workspace entry
-* Click on the **Open** link on the right side of workspace listing
+* After logging in, the workspace listing opens and shows the **mta-lab** entry (provisioned for your user)
+* Click on the **Open** link on the right side of the workspace listing
 +
 image::module-05-mta-dls/05-03-dls-02.jpg[Open Workspace,link=self,window=blank,title="Open Workspace"]
 
 . Wait for the workspace to initialize and open:
 +
-The **parasol-insurance-eap** repository loads in Dev Spaces and the development environment is ready.
+The **parasol-insurance-eap** repository (from your GitLab project) loads in Dev Spaces and the development environment is ready.
 +
 The workspace opens in a new browser tab.
 +
@@ -89,7 +87,11 @@ Click on the "Activate Profile" button to activate the profile. Once done, click
 
 image::module-05-mta-dls/05-03-dls-08.png[VSCode Tab,link=self,window=blank,title="Gen-AI Provider Settings"]
 
-This should open the provider settings configuration. MTA uses the provider settings to connect to the LLM. Paste the following into **provider-settings.yaml**. The API key and base URL come from your lab environment (`{litellm_virtual_key}` and `{litellm_api_base_url}`).
+This should open the provider settings configuration. MTA uses **provider-settings.yaml** to connect to the LLM.
+
+The lab workspace is pre-configured with provider settings and LiteLLM credentials. Confirm the **OpenShift** model is active and the base URL / API key fields are populated (they should already match your lab environment).
+
+If the file is empty or incomplete, paste the following (API key and base URL from your lab environment: `{litellm_virtual_key}` and `{litellm_api_base_url}`):
 
 [.console-input]
 [source,yaml,subs="+attributes,macros+"]
@@ -100,9 +102,10 @@ models:
       OPENAI_API_KEY: "{litellm_virtual_key}"
     provider: ChatOpenAI
     args:
-      model: "qwen-235b"
+      model: "qwen3-235b"
       configuration:
         baseURL: "{litellm_api_base_url}"
+active: *active
 ----
 
 image::module-05-mta-dls/05-03-dls-09.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
@@ -119,5 +122,5 @@ Confirm the Dev Spaces environment and MTA extension (including Developer Lights
 
 . Confirm the Dev Spaces workspace is pointing to the correct repository
 * Click on the file icon on the left side of the Dev Spaces environment
-* The File _EXPLORER_ lists the **parasol-insurance-eap** directory
+* The File _EXPLORER_ lists the **parasol-insurance-eap** directory (your GitLab copy, not a shared coolstore sample)
 * Expand directories with the file explorer arrows if needed — you should see packages such as `com.parasol.mdb` (`EmailIntakeMDB`) and `com.parasol.ejb` (`ClaimService`)
