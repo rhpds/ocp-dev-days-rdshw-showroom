@@ -1,0 +1,108 @@
+= Section 6: Stateless EJB to CDI (`ClaimService`)
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[.goal]
+.Goal
+[NOTE]
+====
+Use **Developer Lightspeed** to refactor `ClaimService` from a **`@Stateless` EJB** toward a Quarkus-friendly **`@ApplicationScoped`** CDI bean with **`@Transactional`**, work through **Get Solution** and **MTA Resolution Details**, and optionally use **agent**-assisted follow-up to address related build and configuration issues.
+====
+
+Enterprise JavaBeans (EJBs) were a common way to encapsulate business logic and container-managed transactions on EAP. They are not supported in Quarkus. In **parasol-insurance-eap**, `com.parasol.ejb.ClaimService` is a **local `@Stateless` session bean** (not a remote EJB) that uses JPA `EntityManager` to list and look up claims. The JAX-RS layer (`ClaimsResource`) already exposes HTTP; this exercise focuses on modernizing the **service bean itself**.
+
+In this lab we will transform `ClaimService` from `@Stateless` to `@ApplicationScoped` + `@Transactional` so transaction boundaries and CDI injection work the Quarkus way.
+
+== The paradigm shift: Container-managed EJB to CDI
+
+On EAP, `@Stateless` gave you a pooled bean, container-managed transactions, and `@EJB` / JNDI-friendly wiring. Quarkus does not run an EJB container. Instead you use:
+
+* **`@ApplicationScoped`** (or another CDI scope) for the bean lifecycle
+* **`@Transactional`** (Jakarta Transactions / Quarkus) for the transaction demarcation that `@Stateless` used to provide implicitly
+* **`@Inject`** / CDI for collaborators instead of `@EJB`
+
+This is a service-layer modernization — not a remote-interface or RMI-to-REST rewrite. `ClaimService` has no `@Remote` interface; clients already call it in-process from JAX-RS.
+
+== Benefits of going cloud-native
+
+* **Simpler programming model:** Drop the EJB lifecycle and keep a plain CDI bean.
+* **Explicit transactions:** `@Transactional` makes transaction boundaries visible in code.
+* **Framework fit:** Aligns with Quarkus / CDI / Hibernate patterns used in the modernized Parasol application.
+
+== Exercise 1: Review analysis for ClaimService
+
+. In the Analysis panel search box type the class name `ClaimService`. Before we start, ensure that the **Agent Mode** toggle is set to **On**.
++
+image::module-05-mta-dls/05-06-dls-01.jpg[ClaimService analysis with Agent Mode on,link=self,window=blank,title="Agent Mode"]
+
+Lets review the issues reported (wording may vary slightly by ruleset version):
+
+* `@Stateless` is not supported in Quarkus.
+  Enterprise Java Beans (EJBs) are not supported in Quarkus. CDI must be used. Replace `@Stateless` with a CDI scope annotation such as `@ApplicationScoped`.
+* Container-managed transactions need an explicit replacement.
+  Stateless session beans participate in container-managed transactions by default. On Quarkus, annotate the bean or business methods with `@Transactional` so claim queries still run in a transaction.
+* `javax.ejb` imports are not supported.
+  Remove `javax.ejb.Stateless` and use `jakarta.enterprise.context.ApplicationScoped` (and `jakarta.transaction.Transactional` as needed).
+* The package `javax` has been replaced by `jakarta`.
+  Update persistence imports (for example `javax.persistence.*` → `jakarta.persistence.*`) as the analyzer reports them.
+
+== Exercise 2: Generate and accept an AI solution
+
+. Now that we understand the Java EE to Quarkus migration for this local session bean, ask the LLM to generate curated fixes.
++
+With results grouped by **Files** and filtered to `ClaimService`, open the **AI** dropdown on the file and choose **Get solution for N incidents** (or **Get solution**).
++
+image::module-05-mta-dls/05-06-dls-02.jpg[ClaimService Get Solution for file incidents,link=self,window=blank,title="Get Solution"]
+
+. Results appear in the **MTA Resolution Details** tab. Review the generated patch — you should see `@Stateless` replaced with `@ApplicationScoped`, persistence wiring updated toward CDI (`@Inject`), and related `javax` → `jakarta` imports. Use **Review in Editor**, **Reject**, or **Accept**. If the agent asks whether to continue fixing more changes, choose **Yes** or **No** as you prefer.
++
+image::module-05-mta-dls/05-06-dls-03.jpg[ClaimService patch review and continue fixing,link=self,window=blank,title="Accept and continue"]
+
+Expect a shape similar to:
+
+[.console-input]
+[source,java,subs="+attributes,macros+"]
+----
+@ApplicationScoped
+@Transactional
+public class ClaimService {
+
+    @Inject
+    EntityManager entityManager;
+
+    public List<Claim> findAll() { /* ... */ }
+
+    public Claim findByClaimNumber(String claimNumber) { /* ... */ }
+}
+----
+
+== Exercise 3: Continue with agent-assisted fixes
+
+. With **Agent Mode** on, the agent may keep fixing follow-on issues (for example `pom.xml` Quarkus dependencies, persistence configuration, or other dependents). Review each suggestion and **Accept**, **Reject**, or **Apply All** / **Stop** as you see fit.
++
+image::module-05-mta-dls/05-06-dls-04.jpg[Agent follow-up on pom.xml and related fixes,link=self,window=blank,title="Agent follow-up"]
+
+. The agent loop looks like this: generate a fix, identify additional changes, let you accept or reject, then pull diagnostics from the IDE tools and optionally fix more issues.
++
+image::module-05-mta-dls/05-06-dls-05.jpg[Agent workflow — generate fix, diagnostics, accept or reject,link=self,window=blank,title="Agent workflow"]
++
+Walk through the loop with `ClaimService` as the concrete example:
++
+* **Generate fix (LLM)** — From the analysis incident (for example “replace `@Stateless` with a CDI scope”), Developer Lightspeed proposes a first patch: annotations, imports, and the obvious call-site updates in `ClaimService.java`.
+* **Identify additional changes (LLM)** — One edit often implies others. After dropping `@Stateless`, the agent may also rewrite `@PersistenceContext` to `@Inject`, update `javax.*` → `jakarta.*` imports, or touch callers such as `ClaimsResource` that still expect EJB-style wiring.
+* **Accept / Reject (you)** — You stay in control. Accept the patch if it looks right, reject it if the agent overreached, or review it in the editor before deciding. Nothing is applied permanently without your choice.
+* **Get diagnostics from tools (IDE)** — After a change lands, the agent asks the IDE for fresh signal: language-server errors, unresolved types, broken Maven coordinates, missing Quarkus extensions, and similar diagnostics. That is how it notices gaps the original MTA incident did not list.
+* **Fix more issues? (you + LLM)** — If diagnostics remain (for example no `quarkus-hibernate-orm` dependency in `pom.xml`, or no `application.properties` for datasource settings), the agent asks whether to continue. Choose **Yes** to let it generate the next patch; choose **No** / **Stop** to end the loop.
+* **Repeat** — Each accepted fix can surface new diagnostics, so the cycle continues until the workspace is clean enough for you — or until you stop it.
++
+In short: **MTA finds the migration problem → the LLM proposes a fix → you approve → IDE diagnostics reveal the next problem → optionally fix again.** That is why Agent Mode is powerful for ripple effects after an EJB → CDI change, and why you should still read every diff.
+
+Agents will look to fix potential issues once a fix was made.
+For example, after moving `EmailIntakeMDB` to Reactive Messaging or `ClaimService` to CDI, the agent may still need to adjust `pom.xml`, persistence configuration, or other dependents. The agent understands the context and the issues that arise from that fix. It uses tooling like the LSP server, build tools, compilation etc.
+
+Agent will also keep on fixing issues as it finds them, at each step it will ask if the user would like to fix potential issues found in the process. User can always quit at any stage.
+
+[IMPORTANT]
+====
+Please try out some of the fixes from the agents, and feel free to press **No** if you don't want to continue with the agent changes. You can also accept or reject fixes suggested by the agent as you see fit.
+====
