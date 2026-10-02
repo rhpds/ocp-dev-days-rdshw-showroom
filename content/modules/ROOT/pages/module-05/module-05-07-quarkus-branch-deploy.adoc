@@ -140,7 +140,7 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol Quarkus inbox,link=self,window
 
 == Exercise 4: Deploy to OpenShift
 
-Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a project/namespace is selected (`oc project`).
+Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a {user}-dev namespace is selected (`oc project`).
 
 === Provision PostgreSQL
 
@@ -199,7 +199,7 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 [.console-input]
 [source,bash,role="execute"]
 ----
-NS=$(oc project -q)
+oc project {user}-dev
 sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
 oc apply -f openshift/route.yaml
