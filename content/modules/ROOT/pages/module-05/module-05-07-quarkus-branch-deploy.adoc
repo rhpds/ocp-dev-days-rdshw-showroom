@@ -150,7 +150,7 @@ To start the deployment to OpenShift, lets first change to our project namespace
 oc project {user}-ai-mta
 ----
 
-We also need a database backed for our modernized applicaiton, for this we use PostgreSQL.
+We also need a database backend for our modernized application. For this we use PostgreSQL.
 
 === Provision PostgreSQL
 

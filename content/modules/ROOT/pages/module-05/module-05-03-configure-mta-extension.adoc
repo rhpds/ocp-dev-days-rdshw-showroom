@@ -122,5 +122,5 @@ Confirm the Dev Spaces environment and MTA extension (including Developer Lights
 
 . Confirm the Dev Spaces workspace is pointing to the correct repository
 * Click on the file icon on the left side of the Dev Spaces environment
-* The File _EXPLORER_ lists the **parasol-insurance-eap** directory (your GitLab copy, not a shared coolstore sample)
+* The File _EXPLORER_ lists the **parasol-insurance-eap** directory (your GitLab copy, not a shared sample)
 * Expand directories with the file explorer arrows if needed — you should see packages such as `com.parasol.mdb` (`EmailIntakeMDB`) and `com.parasol.ejb` (`ClaimService`)
