@@ -2,12 +2,13 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-[.goal]
-.Goal
-[NOTE]
-====
-Switch `parasol-insurance-eap` to the **`quarkus`** branch — the completed EAP → Quarkus migration — review the modernized code against what you fixed in earlier sections, run the app locally if you like, then **build and deploy** it to OpenShift and verify the Parasol UI and APIs.
-====
+== Goal
+
+Switch `parasol-insurance-eap` to the `quarkus` branch — the completed EAP → Quarkus migration — then:
+
+* Review the modernized code against what you fixed in earlier sections
+* Optionally run the app locally
+* Build and deploy it to OpenShift and verify the Parasol UI and APIs
 
 In the previous sections you used MTA analysis and Developer Lightspeed to migrate pieces of the **legacy** application (MDB messaging, custom audit rules, Stateless EJB). The repository also carries a **`quarkus`** branch where that modernization is already applied end to end. This lab closes the loop: inspect the target architecture, then ship it to the cluster.
 
@@ -17,12 +18,12 @@ In the previous sections you used MTA analysis and Developer Lightspeed to migra
 +
 image::module-05-mta-dls/05-07-dls-01.jpg[Open a new terminal in Dev Spaces,link=self,window=blank,title="New Terminal"]
 
-. Make sure you are in the `parasol-insurance-eap` project root (or use Source Control if you prefer the UI).
+. Make sure you are in the `parasol-insurance-eap` project root.
 
 . Fetch and check out the migrated branch:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 git fetch origin
 git reset --hard
@@ -33,7 +34,7 @@ git pull origin quarkus
 . Confirm you are on the right branch:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 git branch --show-current
 git log -2 --oneline
@@ -109,7 +110,7 @@ Before deploying, you can smoke-test on the Dev Spaces / local JVM.
 . From the project root:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 mvn quarkus:dev
 ----
@@ -145,7 +146,7 @@ Deploy from the `quarkus` branch using the manifests under `openshift/` and a cl
 To start the deployment to OpenShift, lets first change to our project namespace {user}-ai-mta
 
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 oc project {user}-ai-mta
 ----
@@ -157,7 +158,7 @@ We also need a database backend for our modernized application. For this we use 
 . Create an ephemeral PostgreSQL instance for the demo:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 oc new-app --template=postgresql-ephemeral \
   -p DATABASE_SERVICE_NAME=parasol-db \
@@ -169,7 +170,7 @@ oc new-app --template=postgresql-ephemeral \
 . Wait until the database is ready:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 oc rollout status deploymentconfig/parasol-db 2>/dev/null \
   || oc rollout status deployment/parasol-db
@@ -181,7 +182,7 @@ oc get pods -l name=parasol-db
 . Package the app locally (or in the Dev Spaces terminal):
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 mvn clean package -DskipTests
 ----
@@ -191,7 +192,7 @@ This produces `target/quarkus-app/`.
 . Assemble a binary build context and start an OpenShift Docker build:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 rm -rf /tmp/parasol-build
 mkdir -p /tmp/parasol-build
@@ -207,7 +208,7 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 . Deploy the application (image namespace is substituted from your current project). The Deployment maps Secret `parasol-db` into the `POSTGRESQL_*` variables expected by the **`%prod`** profile:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
@@ -218,7 +219,7 @@ oc rollout status deployment/parasol-insurance
 . Get the Route URL and open it in the browser:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 ROUTE=$(oc get route parasol-insurance -o jsonpath='{.spec.host}')
 echo "https://${ROUTE}/"
@@ -227,7 +228,7 @@ echo "https://${ROUTE}/"
 . Verify the APIs from the terminal:
 +
 [.console-input]
-[source,bash,role="execute"]
+[source,bash]
 ----
 curl -sk "https://${ROUTE}/api/claims"
 curl -sk "https://${ROUTE}/api/inbox"

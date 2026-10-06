@@ -2,12 +2,12 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-[.goal]
-.Goal
-[NOTE]
-====
-Use **Developer Lightspeed** to refactor `ClaimService` from a **`@Stateless` EJB** toward a Quarkus-friendly **`@ApplicationScoped`** CDI bean with **`@Transactional`**, work through **Get Solution** and **MTA Resolution Details**, and optionally use **agent**-assisted follow-up to address related build and configuration issues.
-====
+== Goal
+
+Use Developer Lightspeed to refactor `ClaimService` from a `@Stateless` EJB toward a Quarkus-friendly `@ApplicationScoped` CDI bean with `@Transactional`:
+
+* Work through Get Solution and MTA Resolution Details
+* Optionally use agent-assisted follow-up to address related build and configuration issues
 
 Enterprise JavaBeans (EJBs) were a common way to encapsulate business logic and container-managed transactions on EAP. They are not supported in Quarkus. In **parasol-insurance-eap**, `com.parasol.ejb.ClaimService` is a **local `@Stateless` session bean** (not a remote EJB) that uses JPA `EntityManager` to list and look up claims. The JAX-RS layer (`ClaimsResource`) already exposes HTTP; this exercise focuses on modernizing the **service bean itself**.
 
@@ -100,7 +100,7 @@ In short: **MTA finds the migration problem → the LLM proposes a fix → you a
 Agents will look to fix potential issues once a fix was made.
 For example, after moving `EmailIntakeMDB` to Reactive Messaging or `ClaimService` to CDI, the agent may still need to adjust `pom.xml`, persistence configuration, or other dependents. The agent understands the context and the issues that arise from that fix. It uses tooling like the LSP server, build tools, compilation etc.
 
-Agent will also keep on fixing issues as it finds them, at each step it will ask if the user would like to fix potential issues found in the process. User can always quit at any stage.
+The agent will also keep on fixing issues as it finds them, at each step it will ask if the user would like to fix potential issues found in the process. The user can quit at any stage.
 
 [IMPORTANT]
 ====

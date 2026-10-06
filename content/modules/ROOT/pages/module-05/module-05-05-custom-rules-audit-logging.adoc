@@ -2,14 +2,15 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-[.goal]
-.Goal
-[NOTE]
-====
-Learn why **custom MTA rules** matter for proprietary libraries, explore the **audit-logging** rules shipped with `parasol-insurance-eap`, attach them to an MTA analysis profile, and run analysis so you can see findings that **stock Quarkus rules cannot detect**.
-====
+== Goal
 
-Stock migration rulesets (for example the Quarkus target rules) know about Java EE, Jakarta, and common open-source frameworks. They do **not** know about Parasol's internal **`audit-logging-library`**. Without custom rules, MTA would happily migrate EJBs and MDBs while silently leaving a broken, outdated audit API in place — a compliance risk for an insurance platform.
+Learn why custom MTA rules matter for proprietary libraries:
+
+* Explore the audit-logging rules shipped with `parasol-insurance-eap`
+* Attach them to an MTA analysis profile
+* Run analysis so you can see findings that stock Quarkus rules cannot detect
+
+Stock migration rulesets (for example the Quarkus target rules) know about Java EE, Jakarta, and common open-source frameworks. They do not know about Parasol's internal `audit-logging-library`. Without custom rules, MTA would happily migrate EJBs and MDBs while silently leaving a broken, outdated audit API in place — a compliance risk for an insurance platform.
 
 In this section you will treat custom rules as first-class migration knowledge: authored once by platform / architecture teams, then reused every time an application depends on that library.
 
@@ -41,9 +42,9 @@ The JARs and POMs live under `lib/repository/`. The application currently declar
 
 == Exercise 1: Explore the custom rules
 
-Open xref:module-05/module-05-logging.adoc[`logging.yaml`] to **download** or **copy** the content into `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (create the `rules/` directory if it is not already there).
+Open xref:module-05/module-05-logging.adoc[logging.yaml] to **download** or **copy** the content into `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (create the `rules/` directory if it is not already there).
 
-. Skim each `ruleID`, `when:` clause, and `message:` in `logging.yaml` — these are what the analyzer will report in the Analysis panel. The file defines **five** rules (`audit-logging-0001` … `audit-logging-0005`).
+Skim each `ruleID`, `when:` clause, and `message:` in `logging.yaml` — these are what the analyzer will report in the Analysis panel. The file defines **five** rules (`audit-logging-0001` … `audit-logging-0005`).
 
 === What each rule detects
 
@@ -74,7 +75,7 @@ Open xref:module-05/module-05-logging.adoc[`logging.yaml`] to **download** or **
 
 TIP: Custom rules use the same MTA rule language as public rulesets (`java.dependency`, `java.referenced`, categories, effort, labels). The difference is **ownership**: these rules encode Parasol's private library contract.
 
-. Also open `pom.xml` and find the dependency on `audit-logging-library` version `1.0.0`, and the `project-local` repository pointing at `lib/repository`. This is the concrete hook for rule `audit-logging-0001`.
+Also open `pom.xml` and find the dependency on `audit-logging-library` version `1.0.0`, and the `project-local` repository pointing at `lib/repository`. This is the concrete hook for rule `audit-logging-0001`.
 
 == Exercise 2: Attach the custom rules to an MTA profile
 

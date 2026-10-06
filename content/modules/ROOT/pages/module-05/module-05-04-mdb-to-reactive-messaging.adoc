@@ -2,14 +2,14 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-[.goal]
-.Goal
-[NOTE]
-====
-Use **MTA** analysis and **Developer Lightspeed** to modernize the legacy **Message-Driven Bean** `EmailIntakeMDB` in **parasol-insurance-eap** from **Java EE / JMS**-style processing toward **Quarkus** with **SmallRye Reactive Messaging** (`@Incoming`, CDI), and review an AI-generated patch before accepting changes.
-====
+== Goal
 
-Modernizing legacy "Enterprise Java" (Java EE/Jakarta EE) applications is often a manual, error-prone process. This lab guide focuses on **Developer Lightspeed**—the AI feature of MTA, delivered through the MTA extension—which combines static code analysis with Large Language Models (LLMs) to automate the refactoring of legacy patterns into modern, cloud-native **Quarkus** code.
+Use MTA analysis and Developer Lightspeed to modernize the legacy Message-Driven Bean `EmailIntakeMDB` in `parasol-insurance-eap`:
+
+* Move from Java EE / JMS-style processing toward Quarkus with SmallRye Reactive Messaging (`@Incoming`, CDI)
+* Review an AI-generated patch before accepting changes
+
+Modernizing legacy "Enterprise Java" (Java EE/Jakarta EE) applications is often a manual, error-prone process. This lab guide focuses on Developer Lightspeed—the AI feature of MTA, delivered through the MTA extension—which combines static code analysis with Large Language Models (LLMs) to automate the refactoring of legacy patterns into modern, cloud-native Quarkus code.
 
 In Parasol Insurance's EAP application, inbound email JSON arrives on the JMS queue `java:/jms/queue/email-intake`. The class `com.parasol.mdb.EmailIntakeMDB` is a `@MessageDriven` bean that implements `MessageListener`, looks up the payload from a `TextMessage`, and forwards it to `EmailRoutingService` / `EmailStoreBean` via `@EJB` injection.
 
@@ -29,10 +29,12 @@ Legacy Java EE relies on **JMS (Java Message Service)**. While technically async
 
 == Exercise 1: Review analysis for EmailIntakeMDB
 
-. The first step is to review the Analysis from our previous lab.
+The first step is to review the Analysis from our previous lab.
 In the `Analysis panel` search box type the class name `EmailIntakeMDB`.
-+
+
 image::module-05-mta-dls/05-04-dls-01.jpg[EmailIntakeMDB analysis results,link=self,window=blank,title="EmailIntakeMDB"]
+
+NOTE: The findings below are informational. No action is required yet.
 
 Let's review the issues the static code analyzer has reported. The issues are reported in a list as shown in the image above. Click on the `>` icon to get more details. You should be able to see findings similar to the following.
 
