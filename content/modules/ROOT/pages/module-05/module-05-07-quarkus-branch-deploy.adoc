@@ -140,7 +140,17 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol Quarkus inbox,link=self,window
 
 == Exercise 4: Deploy to OpenShift
 
-Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a {user}-dev namespace is selected (`oc project`).
+Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a {user}-ai-mta namespace is selected (`oc project`).
+
+To start the deployment to OpenShift, lets first change to our project namespace {user}-ai-mta
+
+[.console-input]
+[source,bash,role="execute"]
+----
+oc project {user}-ai-mta
+----
+
+We also need a database backed for our modernized applicaiton, for this we use PostgreSQL.
 
 === Provision PostgreSQL
 
@@ -199,7 +209,6 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 [.console-input]
 [source,bash,role="execute"]
 ----
-oc project {user}-dev
 sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
 oc apply -f openshift/route.yaml
@@ -258,12 +267,12 @@ Also peek at the Deployment env vars and confirm they match what you applied fro
 * Local **`quarkus:dev`** (H2) is ideal for quick UI verification; **OpenShift** uses PostgreSQL via the `%prod` profile.
 * Container deploy is a standard binary build + Deployment / Service / Route — no EAP-specific subsystem XML required.
 
-== Verify
+== Summary
 
-. `git branch --show-current` prints `quarkus`.
+Red Hat Developer Lightspeed for Migration Toolkit for Applications is an add-on to Red Hat Migration Toolkit for Applications that intelligently automates source code refactoring within your IDE. For workflow efficiency, you can see explanations and recommended code changes throughout the code refactoring process before applying fixes with the click of a button.
 
-. You can point to the Quarkus versions of `EmailIntakeMDB` and `ClaimService` and explain how they differ from the legacy `main` branch.
+Unlike traditional coding assistants, Lightspeed for migration toolkit for applications is guided by MTA’s static code analysis and past migrations to suggest accurate code solutions from the start and also improve them over time. This helps developers refactor applications faster and predictably.
 
-. `parasol-insurance` Deployment is Available and the Route serves the Parasol UI.
+Optionally, you can also turn on “agent mode” to have built-in AI agents analyze your application to search and fix new issues that may arise after changing your code. This helps preserve functionality.
 
-. `GET /api/claims` on the Route returns claim JSON; the Inbox UI shows generated emails after the scheduler's initial delay.
+This add-on is included with a Red Hat Advanced Developer Suite subscription. For more information, visit https://www.redhat.com/en/products/advanced-developer-suite[Red Hat Advanced Developer Suite,window=_blank].
