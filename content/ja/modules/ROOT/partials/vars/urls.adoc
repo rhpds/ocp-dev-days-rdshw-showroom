@@ -1,0 +1,12 @@
+:m1: pass:quotes[[.label.added]#Module 1#]
+:m2: pass:q[[.label.changed]#Module 2#]
+:m3: pass:q[[.label.updated]#Module 2#]
+
+:url-element: https://element-matrix.{openshift_cluster_ingress_domain}
+:url-rocketchat: https://rocketchat-rocketchat.{openshift_cluster_ingress_domain}
+:url-codeready: https://devspaces.{openshift_cluster_ingress_domain}/
+:url-devconsole: https://console-openshift-console.{openshift_cluster_ingress_domain}/topology/ns/{username-url}-devspaces
+
+ifndef::url-docserver[]
+:url-docserver: https://docserver-showroom.{openshift_cluster_ingress_domain}
+endif::[]

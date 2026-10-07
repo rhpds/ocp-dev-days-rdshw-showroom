@@ -1,0 +1,3 @@
+:rhcl: Red Hat Connectivity Link
+:rhsi: Red Hat Service Interconnect
+:rhossm: Red Hat OpenShift Service Mesh

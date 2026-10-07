@@ -1,0 +1,146 @@
+/**
+ * Language switcher dropdown component styles
+ * Designed to integrate with Red Hat Showroom theme
+ */
+
+.language-switcher {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0;
+}
+
+/* Dropdown button */
+.language-switcher-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #333;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.language-switcher-button:hover {
+  background: #f5f5f5;
+  border-color: #999;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.language-switcher-button:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* Dropdown arrow */
+.dropdown-arrow {
+  font-size: 0.7rem;
+  margin-left: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+.language-switcher-button[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.language-switcher-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  z-index: 1000;
+}
+
+/* Dropdown options */
+.language-switcher-option {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #333;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.language-switcher-option:hover {
+  background: #f5f5f5;
+}
+
+.language-switcher-option.active {
+  background: #e8f4f8;
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.language-switcher-option:first-child {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.language-switcher-option:last-child {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+/* Integration with Showroom theme navbar */
+.navbar .language-switcher {
+  margin-left: auto;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .language-switcher-dropdown {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .language-switcher-button {
+    color: #e0e0e0;
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .language-switcher-button:hover {
+    background: #333;
+    border-color: #555;
+  }
+
+  .language-switcher-dropdown {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .language-switcher-option {
+    color: #e0e0e0;
+  }
+
+  .language-switcher-option:hover {
+    background: #333;
+  }
+
+  .language-switcher-option.active {
+    background: #1a3a4a;
+    color: #66b3ff;
+  }
+}

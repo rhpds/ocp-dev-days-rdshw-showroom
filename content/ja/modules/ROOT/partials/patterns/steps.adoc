@@ -1,0 +1,220 @@
+[subs=attributes]
+++++
+
+<style>
+.steps-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: #1a1a1a;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.steps-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.steps-bg svg {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+}
+.steps-content {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  width: 90%;
+}
+.steps-label {
+  font-size: 0.85rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.5rem;
+}
+.steps-overlay h1.steps-module {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: white;
+}
+.steps-total {
+  font-size: 0.95rem;
+  color: #aaa;
+  margin: 0 0 1.5rem;
+}
+.steps-list {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+.steps-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+}
+.steps-item:first-child {
+  border-top: 1px solid #333;
+}
+.steps-item-title {
+  color: #ddd;
+}
+.steps-item-time {
+  color: #888;
+  white-space: nowrap;
+  margin-left: 16px;
+}
+.steps-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: #3e8635;
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.steps-btn:hover {
+  background: #4a9e40;
+}
+.steps-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #444;
+  color: #ccc;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  padding: 0;
+}
+.steps-close:hover {
+  background: #666;
+  color: white;
+}
+</style>
+
+<div class="steps-overlay" id="steps-overlay">
+  <div class="steps-bg">{ico-redhat-dark}</div>
+  <div class="steps-content">
+    <button class="steps-close" id="steps-close" title="Back to dashboard">&times;</button>
+    <p class="steps-label">Tasks to complete</p>
+    <h1 class="steps-module" id="steps-module"></h1>
+    <p class="steps-total" id="steps-total"></p>
+    <div class="steps-list" id="steps-list"></div>
+    <a class="steps-btn" id="steps-start" href="#">Get Started</a>
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  var overlay = document.getElementById('steps-overlay');
+  if (!overlay) return;
+
+  var cards = document.querySelectorAll('.tile-card[data-module]');
+  if (!cards.length) return;
+
+  cards.forEach(function(card) {
+    var prefix = card.getAttribute('data-module');
+    if (!prefix) return;
+
+    // Skip cards that have a resume URL — navigate directly
+    var resumeUrl = localStorage.getItem('resume:' + prefix);
+    if (resumeUrl) return;
+
+    var anchor = card.querySelector('a');
+    if (!anchor) return;
+
+    anchor.addEventListener('click', function(e) {
+      // Re-check resume at click time (may have changed since page load)
+      if (localStorage.getItem('resume:' + prefix)) return;
+
+      e.preventDefault();
+
+      // Populate overlay
+      var moduleName = card.querySelector('.tile-header').textContent;
+      document.getElementById('steps-module').textContent = moduleName;
+
+      // Get first link (original, before resume override)
+      var firstLink = card.getAttribute('data-first-link');
+      document.getElementById('steps-start').setAttribute('href', firstLink);
+
+      // Collect page titles from all nav links matching the module prefix
+      // When the same href appears twice (parent * and child **), use the child's text
+      var pageTitles = [];
+      var seen = {};
+      var allNavLinks = document.querySelectorAll('a.nav-link');
+      for (var i = 0; i < allNavLinks.length; i++) {
+        var href = allNavLinks[i].getAttribute('href');
+        if (href && href.indexOf(prefix) !== -1) {
+          if (seen[href] !== undefined) {
+            pageTitles[seen[href]] = allNavLinks[i].textContent.trim();
+          } else {
+            seen[href] = pageTitles.length;
+            pageTitles.push(allNavLinks[i].textContent.trim());
+          }
+        }
+      }
+
+      // Get per-page times from data-times (set by tiles.adoc fetch)
+      var timesJson = card.getAttribute('data-times');
+      var times = timesJson ? JSON.parse(timesJson) : [];
+
+      // Build steps list
+      var listEl = document.getElementById('steps-list');
+      listEl.innerHTML = '';
+      var totalTime = 0;
+      for (var k = 0; k < pageTitles.length; k++) {
+        var t = times[k] || 1;
+        totalTime += t;
+        var item = document.createElement('div');
+        item.className = 'steps-item';
+        item.innerHTML =
+          '<span class="steps-item-title">' + pageTitles[k] + '</span>' +
+          '<span class="steps-item-time">' + t + ' min</span>';
+        listEl.appendChild(item);
+      }
+
+      // Update total time
+      document.getElementById('steps-total').textContent = totalTime + ' min total';
+
+      // Show overlay
+      overlay.style.display = 'flex';
+    });
+  });
+
+  // Close overlay: X button
+  document.getElementById('steps-close').addEventListener('click', function() {
+    overlay.style.display = 'none';
+  });
+
+  // Close overlay: click on background (outside content)
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      overlay.style.display = 'none';
+    }
+  });
+
+});
+</script>
+
+++++

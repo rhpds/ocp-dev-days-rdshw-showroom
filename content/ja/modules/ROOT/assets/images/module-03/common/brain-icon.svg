@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- left hemisphere - bumpy lobes -->
+  <path d="
+    M50 15
+    C44 10 36 10 30 16
+    C24 14 16 18 14 26
+    C10 30 8 38 12 44
+    C8 50 10 58 16 62
+    C14 68 20 72 28 72
+    C32 76 42 78 50 76
+    L50 15
+  " fill="#fce4e4" stroke="#EE0000" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- right hemisphere - bumpy lobes -->
+  <path d="
+    M50 15
+    C56 10 64 10 70 16
+    C76 14 84 18 86 26
+    C90 30 92 38 88 44
+    C92 50 90 58 84 62
+    C86 68 80 72 72 72
+    C68 76 58 78 50 76
+    L50 15
+  " fill="#fce4e4" stroke="#EE0000" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- center line -->
+  <line x1="50" y1="15" x2="50" y2="76" stroke="#EE0000" stroke-width="2"/>
+  <!-- neural circuit - left side connections -->
+  <circle cx="36" cy="28" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <circle cx="22" cy="44" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <circle cx="36" cy="60" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <!-- neural circuit - right side connections -->
+  <circle cx="64" cy="28" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <circle cx="78" cy="44" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <circle cx="64" cy="60" r="4.5" fill="#EE0000" opacity="0.7"/>
+  <!-- center nodes -->
+  <circle cx="50" cy="30" r="5" fill="#EE0000" opacity="0.85"/>
+  <circle cx="50" cy="48" r="5" fill="#EE0000" opacity="0.85"/>
+  <circle cx="50" cy="66" r="5" fill="#EE0000" opacity="0.85"/>
+  <!-- left connections -->
+  <line x1="36" y1="28" x2="50" y2="30" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="22" y1="44" x2="50" y2="48" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="36" y1="60" x2="50" y2="66" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="36" y1="28" x2="22" y2="44" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="22" y1="44" x2="36" y2="60" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <!-- right connections -->
+  <line x1="64" y1="28" x2="50" y2="30" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="78" y1="44" x2="50" y2="48" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="64" y1="60" x2="50" y2="66" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="64" y1="28" x2="78" y2="44" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <line x1="78" y1="44" x2="64" y2="60" stroke="#EE0000" stroke-width="2" opacity="0.6"/>
+  <!-- brain stem -->
+  <path d="M44 76 Q44 86 48 90 L52 90 Q56 86 56 76" fill="#fce4e4" stroke="#EE0000" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>
