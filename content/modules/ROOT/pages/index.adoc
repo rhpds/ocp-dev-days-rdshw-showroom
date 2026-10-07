@@ -25,6 +25,15 @@ Build AI data flows using Red Hat's integration technologies -- EDI ingest with 
 **Duration**: Varies by lab
 ****
 
+[.tile]
+****
+xref:module-05/module-05-01-goals.adoc[Module 5: AI-powered migration using MTA]
+
+Modernize a legacy Java EE / EAP application toward Quarkus with Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA) -- static analysis, AI-assisted refactoring, custom rules, and OpenShift deployment.
+
+**Duration**: ~30 minutes
+****
+
 == Getting Started
 
 Select a module above to begin. Each module includes its own introduction, environment details, and learning objectives.
