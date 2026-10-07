@@ -1,0 +1,30 @@
+= OpenShift Dev Days ロードショー
+include::partial$_attributes.adoc[]
+
+OpenShift Dev Days ロードショーへようこそ。Red Hat OpenShiftでのモダンアプリケーション開発と統合を体験できるハンズオンワークショップ集です。
+
+== 利用可能なモジュール
+
+このロードショーは独立したモジュールで構成されています。各モジュールは単独で完結できますし、複数のモジュールを通して学習することでOpenShiftの機能を包括的に理解することもできます。
+
+[.tile]
+****
+xref:module-01/00-intro.adoc[モジュール 1: 開発者エクスペリエンス]
+
+OpenShiftでの完全な開発者ジャーニーを体験 — Developer Hubによるセルフサービスオンボーディング、Dev Spacesによるクラウドベース開発、AI支援コーディング、自動化されたCI/CDパイプライン、GitOps駆動の本番デプロイメントまで。
+
+**所要時間**: 約90分
+****
+
+[.tile]
+****
+xref:module-03/index.adoc[モジュール 3: AI向けアプリケーション接続]
+
+Red Hatの統合技術を使用してAIデータフローを構築 — Service InterconnectによるEDIインジェスト、KafkaとMatrix/Rocket.Chatによるイベント駆動メッセージング、AIカスタマーサポート向けAgentic Apache Camel、Connectivity LinkによるLLMガバナンス。
+
+**所要時間**: ラボにより異なります
+****
+
+== はじめに
+
+上記のモジュールを選択して開始してください。各モジュールには独自の導入、環境詳細、学習目標が含まれています。

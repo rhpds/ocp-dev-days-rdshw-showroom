@@ -1,0 +1,21 @@
+// Shared attributes for OpenShift Dev Day
+// These map to Showroom runtime variables from RHDP provisioning
+
+// Environment URLs
+:console_url: {openshift_cluster_console_url}
+:api_url: {openshift_api_server_url}
+:subdomain: {openshift_cluster_ingress_domain}
+:devspaces_url: https://devspaces.{openshift_cluster_ingress_domain}
+:gitlab_url: https://gitlab-gitlab.{openshift_cluster_ingress_domain}
+:rhdh_url: https://backstage-developer-hub-rhdh.{openshift_cluster_ingress_domain}
+:argocd_url: https://openshift-gitops-server-openshift-gitops.{openshift_cluster_ingress_domain}
+:sonarqube_url: https://sonarqube-sonarqube.{openshift_cluster_ingress_domain}
+
+// User credentials
+:user: {user}
+:password: {password}
+
+// Namespaces
+:parasol_dev_ns: parasol-insurance-dev
+:parasol_build_ns: parasol-insurance-build
+:parasol_prod_ns: parasol-insurance-prod

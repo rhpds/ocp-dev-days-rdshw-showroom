@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- brain outline (scaled up) -->
+  <g transform="translate(2, 2) scale(4)">
+    <path fill="#fce4e4" stroke="#EE0000" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.625"
+      d="M4 16.5a3 3 0 0 0 3 3a2.5 2.5 0 0 0 5 0a2.5 2.5 0 1 0 5 0a3 3 0 0 0 2.567-4.554a3.001 3.001 0 0 0 0-5.893A3 3 0 0 0 17 4.5a2.5 2.5 0 1 0-5 0a2.5 2.5 0 0 0-5 0a3 3 0 0 0-2.567 4.553a3.001 3.001 0 0 0 0 5.893A3 3 0 0 0 4 16.5"/>
+  </g>
+  <!-- brain fold hooks (repositioned for larger brain) -->
+  <path d="M20 38 Q26 36, 28 40" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M80 38 Q74 36, 72 40" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 62 Q26 64, 28 60" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M80 62 Q74 64, 72 60" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M30 20 Q33 24, 37 23" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M70 20 Q67 24, 63 23" fill="none" stroke="#EE0000" stroke-width="2" stroke-linecap="round"/>
+  <!-- CPU chip box: 24x24 centered at (50,50) -->
+  <rect x="38" y="38" width="24" height="24" rx="2.5" fill="#fce4e4" stroke="#EE0000" stroke-width="2"/>
+  <!-- CPU pins — all 4px long, 3 per side at x/y = 44, 50, 56 -->
+  <line x1="44" y1="34" x2="44" y2="38" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="50" y1="34" x2="50" y2="38" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="56" y1="34" x2="56" y2="38" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="44" y1="62" x2="44" y2="66" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="50" y1="62" x2="50" y2="66" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="56" y1="62" x2="56" y2="66" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="34" y1="44" x2="38" y2="44" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="34" y1="50" x2="38" y2="50" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="34" y1="56" x2="38" y2="56" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="62" y1="44" x2="66" y2="44" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="62" y1="50" x2="66" y2="50" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="62" y1="56" x2="66" y2="56" stroke="#EE0000" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- AI letters (centered at 50,50) -->
+  <g transform="translate(29.3, 29.3) scale(1.8)">
+    <path fill="none" stroke="#EE0000" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8"
+      d="m7.5 14.5l1.842-5.526a.694.694 0 0 1 1.316 0L12.5 14.5m3-6v6m-7-2h3"/>
+  </g>
+</svg>

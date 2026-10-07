@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100" width="80" height="100">
+  <!-- page with folded corner -->
+  <path d="M5 5 L55 5 L75 25 L75 95 L5 95 Z" fill="#f5f5f5" stroke="#EE0000" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- fold -->
+  <path d="M55 5 L55 25 L75 25" fill="#e0e0e0" stroke="#EE0000" stroke-width="2" stroke-linejoin="round"/>
+  <!-- text lines -->
+  <line x1="16" y1="38" x2="62" y2="38" stroke="#EE0000" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="16" y1="50" x2="55" y2="50" stroke="#EE0000" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <line x1="16" y1="62" x2="58" y2="62" stroke="#EE0000" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <!-- checkbox squares -->
+  <rect x="16" y="74" width="8" height="8" rx="1.5" fill="none" stroke="#EE0000" stroke-width="1.5" opacity="0.6"/>
+  <rect x="30" y="74" width="8" height="8" rx="1.5" fill="none" stroke="#EE0000" stroke-width="1.5" opacity="0.6"/>
+  <!-- checkmark in first box -->
+  <polyline points="18,78 20,81 23,75" fill="none" stroke="#EE0000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+</svg>

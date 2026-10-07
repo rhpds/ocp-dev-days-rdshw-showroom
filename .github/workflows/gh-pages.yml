@@ -45,6 +45,24 @@ jobs:
           sed -i "/^output:/i\\    - require: '@antora/lunr-extension'\n      index_by_heading: true" site.yml
       - name: antora generate
         run: antora --fetch site.yml
+      - name: validate multilingual build
+        run: |
+          # Verify both versions built
+          test -f www/modules/en/index.html || { echo "English version not built"; exit 1; }
+          test -f www/modules/ja/index.html || { echo "Japanese version not built"; exit 1; }
+
+          # Count pages (should match)
+          EN_PAGES=$(find www/modules/en -name "*.html" | wc -l)
+          JA_PAGES=$(find www/modules/ja -name "*.html" | wc -l)
+
+          echo "English pages: $EN_PAGES"
+          echo "Japanese pages: $JA_PAGES"
+
+          # Verify images exist
+          test -d www/modules/en/_images || { echo "English images missing"; exit 1; }
+          test -d www/modules/ja/_images || { echo "Japanese images missing"; exit 1; }
+
+          echo "✓ Both language versions built successfully"
       - name: upload pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
