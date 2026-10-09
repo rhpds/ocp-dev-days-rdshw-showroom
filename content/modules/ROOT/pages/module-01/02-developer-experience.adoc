@@ -218,13 +218,15 @@ image::devspaces-workspace-loaded.png[Cloud development workspace with the Paras
 
 Before writing new code, start the application to see what you are working with.
 
-. Press kbd:[Ctrl+Shift+P] (or kbd:[Cmd+Shift+P] on Mac) to open the command palette.
+. Open the command palette with kbd:[Ctrl+Shift+P] (or kbd:[Cmd+Shift+P] on Mac). If an extension captures the shortcut, use **View** -> **Command Palette** from the menu instead.
 
 . Type and select **Tasks: Run Task**.
 
 . Select the **devfile** task group.
 
-. Select **Start Development Mode (Hot Reload + debug)**.
+. Select **2. Start Development mode (Hot reload + debug)**.
++
+TIP: If the `devfile` group or this task is missing, open **Terminal** -> **New Terminal**, change to the Parasol project directory containing `pom.xml` and `mvnw`, and run `./mvnw compile quarkus:dev -Dquarkus.analytics.disabled=true`. Keep the terminal running while you work. The task uses this same command.
 
 . Wait for the application to start. When Dev Spaces shows a popup notification to open the application, click to **Open In New Tab**.
 +
@@ -308,7 +310,7 @@ NOTE: This code works, but it has some shortcuts. You used `System.out.println` 
 
 . Save the file with kbd:[Ctrl+S] (or kbd:[Cmd+S] on Mac). Quarkus dev mode detects the change and reloads the application -- no manual build step required.
 +
-TIP: If the application does not reload automatically, check the terminal in Dev Spaces for compilation errors. You can also restart dev mode by pressing kbd:[Ctrl+Shift+P], selecting **Tasks: Run Task** -> **devfile** -> **Start Development Mode (Hot Reload + debug)**. If you see a port conflict, stop the existing task first.
+TIP: If the application does not reload automatically, check the Dev Spaces terminal for compilation errors. To restart dev mode, stop the running process with kbd:[Ctrl+C], then rerun **Tasks: Run Task** -> **devfile** -> **2. Start Development mode (Hot reload + debug)** or run `./mvnw compile quarkus:dev -Dquarkus.analytics.disabled=true` from the project directory. Stop the existing process first to avoid a port conflict.
 
 . In your browser, switch to the tab for the Parasol running application, remove the `dashboard.html` from the URL and add `/api/claims/stats` to the end of the URL in the browser's address bar.
 +
