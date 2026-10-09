@@ -15,6 +15,8 @@ Your first stop is Red Hat Developer Hub -- Parasol's internal developer portal.
 
 === Exercise 1: Explore Developer Hub
 
+Keep the workshop browser tab open so you can return to these instructions. Developer Hub is available in the right-hand panel of the showroom; some links or sign-in steps may open it in a separate browser tab. If that happens, switch back to the workshop tab when you need the instructions. If the workshop tab itself was replaced, use your browser's Back button to return to the showroom, then select the **Developer Hub** tab again.
+
 . Select the **Developer Hub** tab on the right, or open **Red Hat Developer Hub** at {rhdh_url}[{rhdh_url}^]
 
 . Log in with your credentials using the OIDC provider:
