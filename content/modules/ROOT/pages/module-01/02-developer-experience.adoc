@@ -48,32 +48,26 @@ image::rhdh-homepage.png[Red Hat Developer Hub home page,link=self,window=blank,
 === Exercise 2: Find the Parasol application in the software catalog
 
 . Click **Catalog** in the left sidebar.
-+
-image::rhdh-catalog-main.png[Software catalog showing all registered components,link=self,window=blank,width=700]
 
-. Use the **Kind** dropdown to filter for **System** entities.
+. Use the **Kind** dropdown to filter for **System** entities. Select **Owned** to find your system.
 
-. Find and click on **parasol-insurance**.
+. Find and click on **parasol-insurance-{user}**.
 +
-This is the Parasol Insurance application system. It groups all the components, APIs, and resources that make up the application.
+This is your Parasol Insurance application system. It groups your components and API.
 
 . Explore the system view:
 * Notice the components registered under this system
 * Look at the dependency relationships between components
-* Click on a component to see its detail page
+* Click your main **Parasol Insurance** component to see its detail page
 
 . On the component detail page, explore the tabs:
 * **Overview** -- ownership, lifecycle, and system information
 * **API** -- provided and consumed API definitions
 * **Relations** -- what this component depends on and what depends on it
-+
-image::rhdh-component-detail.png[Component detail page with Overview and CI/CD tabs,link=self,window=blank,width=700]
 
-. On the **API** tile, find the **parasol-insurance-api**. Click on it, then select the **Definition** tab.
+. On the **API** tile, find **parasol-insurance-api-{user}**. Click on it, then select the **Definition** tab.
 +
 The API documentation is rendered directly from the source repository. When the code changes, the docs stay current automatically -- no separate wiki to maintain.
-+
-image::rhdh-api-definition.png[API definition rendered from source in Developer Hub,link=self,window=blank,width=700]
 
 === Exercise 3: Ask the AI assistant
 
@@ -99,9 +93,9 @@ image::rhdh-lightspeed-response.png[Lightspeed AI assistant in Developer Hub,lin
 
 . Try another question:
 +
-[source,role="copypaste"]
+[source,subs="attributes",role="copypaste"]
 ----
-What components make up the parasol-insurance system?
+What components make up the parasol-insurance-{user} system?
 ----
 
 NOTE: Lightspeed responses may vary between attempts. If it does not find a specific entity on the first try, ask it to "list all APIs in the catalog" first, then re-ask your original question.
