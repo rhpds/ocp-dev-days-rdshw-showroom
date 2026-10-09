@@ -242,13 +242,13 @@ image::parasol-app-home.png[Parasol Insurance application dashboard,link=self,wi
 
 Now implement the feature. You will create a new REST endpoint that returns claims statistics (totals, breakdowns by category and status).
 
-. Back in Dev Spaces, click the **Explorer** icon in the left sidebar. In the file tree, expand `src` -> `main` -> `java` -> `com` -> `parasol`.
+. Back in Dev Spaces, click the **Explorer** icon in the left sidebar. Open the Parasol application project, then expand `src` -> `main` -> `java` -> `com` -> `parasol`. This is the folder that already contains `ClaimsResource.java`.
 
-. Right-click on the `parasol` directory and select **New File**. Name it `ClaimsStatsResource.java`.
+. Right-click on that `parasol` folder (beside `ClaimsResource.java`), select **New File**, type `ClaimsStatsResource.java`, and press kbd:[Enter].
 +
-The full path must be `src/main/java/com/parasol/ClaimsStatsResource.java`.
+Before pasting any code, check that the new file appears directly under `parasol`, next to `ClaimsResource.java`. Its relative path must be `src/main/java/com/parasol/ClaimsStatsResource.java`; the editor breadcrumb should end in `src > main > java > com > parasol > ClaimsStatsResource.java`.
 +
-WARNING: Make sure you create the file inside the `parasol` folder -- not in `com`, not in `java`, and not at the project root. Creating it in the wrong location will cause build and route failures later in the pipeline.
+WARNING: If the file appears anywhere else, move it into `src/main/java/com/parasol` before continuing. The `package com.parasol;` line in the code below must match the file's directory.
 +
 image::parasol-app-newfile.png[Parasol Insurance application dashboard,link=self,window=blank,width=700]
 
