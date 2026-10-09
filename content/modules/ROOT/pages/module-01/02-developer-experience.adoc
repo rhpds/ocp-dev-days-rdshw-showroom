@@ -309,19 +309,22 @@ TIP: If the application does not reload automatically, check the terminal in Dev
 
 . In your browser, switch to the tab for the Parasol running application, remove the `dashboard.html` from the URL and add `/api/claims/stats` to the end of the URL in the browser's address bar.
 +
-You should see JSON data with claim totals and breakdowns:
+You should see JSON data with a `total` and breakdowns in `by_status` and `by_category`. For example, the screenshot below shows eight claims; your counts may differ depending on the seeded data:
 +
 ----
 {
-  "total": 15,
-  "by_category": {
-    "auto": 5,
-    "home": 4,
-    "life": 6
-  },
+  "total": 8,
   "by_status": {
-    "open": 8,
-    "closed": 7
+    "In Process": 3,
+    "New": 2,
+    "Denied": 1,
+    "Processed": 2
+  },
+  "by_category": {
+    "Liability": 1,
+    "Single vehicle": 2,
+    "Property damage": 2,
+    "Multiple vehicle": 3
   }
 }
 ----
