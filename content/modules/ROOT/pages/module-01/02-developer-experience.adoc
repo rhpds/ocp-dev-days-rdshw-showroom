@@ -150,7 +150,7 @@ image::rhdh-template-results.png[Development environment provisioned with one cl
 
 . On the component page, click **View Source** to open the feature branch in GitLab.
 +
-You may be prompted to log in to GitLab. Use the same credentials:
+If GitLab prompts you to log in, use the same credentials shown below. If GitLab opens without a login prompt, you are already signed in; continue to the next step.
 +
 --
 Username:
