@@ -6,6 +6,8 @@ Track all actionable feedback from the EMEA train-the-trainer session as GitHub 
 
 Status on 2026-10-10: [parent tracker #33](https://github.com/rhpds/ocp-dev-days-rdshw-showroom/issues/33) and distinct feedback issues are open. Implementation is in progress. Do not mark an issue complete without recording its verification.
 
+No current Dev Day lab is available for live validation. The workshop owner plans to provision one in a subsequent session. Resume the live checks below when its `oc` context and a disposable tenant are available.
+
 The showroom draft PR has passing Antora build and documentation spell-check jobs as of the last pushed commit. The GitOps draft PR has no substantive CI job beyond a skipped draft review; Helm rendering was run locally. The two upstream catalog draft PRs report no CI checks. Keep the PRs draft until the live checks listed below are completed.
 
 ## Source and decisions
