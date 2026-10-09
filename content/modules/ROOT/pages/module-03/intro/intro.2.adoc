@@ -181,6 +181,8 @@ image::module-03/intro/copypaste.png[width=60%]
 - on Linux: kbd:[Ctrl+Shift+v]
 - on Mac: kbd:[⌘+v]
 +
+. Press kbd:[Enter] to run the command.
++
 . Try it with:
 +
 [.copypaste]

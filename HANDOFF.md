@@ -43,6 +43,11 @@ Status on 2026-10-10: [parent tracker #33](https://github.com/rhpds/ocp-dev-days
 | Zoo Code | Reproduce inability to read workspace source; inspect trust, mounts, extension, model/tool configuration, logs. | GitOps | [#50](https://github.com/rhpds/ocp-dev-days-rdshw-gitops/issues/50) |
 | Module 2 baseline | Keep images and `pom.xml` current so pipeline/TPA findings match the guide; coordinate upstream Parasol source changes. | GitOps | [#51](https://github.com/rhpds/ocp-dev-days-rdshw-gitops/issues/51) |
 
+## Investigation notes
+
+- [Showroom #38](https://github.com/rhpds/ocp-dev-days-rdshw-showroom/issues/38): Changed the shared copy control to copy `textarea.value` exactly, without appending a newline. Module 3 now tells attendees to press Enter after pasting terminal commands. The issue agent verified exact copied output for a command, Kaoto field, and chat prompt, and `git diff --check` passed. Full browser/Antora preview remains to be done before closing the issue.
+- [GitOps #49](https://github.com/rhpds/ocp-dev-days-rdshw-gitops/issues/49): The feature-branch scaffold lives in external `openshift-dev-days/rhdh-templates/templates/parasol-dev-environment`. Its template registers the catalog component after creating the Argo Application, while the Deployment references an image tagged `latest` that the first push PipelineRun builds. An unavailable image could explain the initial Degraded status, but the exact health message has not been reproduced. The GitOps repository's `tenant/parasol-insurance-tenant/templates/job-initial-build.yaml` builds baseline manifests through a different path. In a designated fresh tenant, capture timestamped Developer Hub and Argo health, Deployment/Pod events and image waiting reason, Maven PVC status, and PipelineRuns through the first successful run. Then fix the observed cause or clarify an expected transitional status in the upstream template/guide. The current cluster context is unrelated to this lab, so no live test was performed.
+
 ## Implementation sequence
 
 1. Use [parent #33](https://github.com/rhpds/ocp-dev-days-rdshw-showroom/issues/33) and its checklist to track the audited issues. Keep links and completion status current.
