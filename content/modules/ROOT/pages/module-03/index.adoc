@@ -27,7 +27,7 @@ Get familiar with the workshop goals, the technologies at play, the scenario, an
 ****
 xref:module-03/m1/m1.0.adoc[Lab 1 -- Ingest Service]
 
-Ingest EDI policy applications, transform and store them in a backend database, and generate PDF policy documents — with secure cross-cluster connectivity powered by Service Interconnect.
+Ingest EDI policy applications, transform and store them in a backend database, and generate PDF policy documents — with a secure cross-namespace connection powered by Service Interconnect.
 ****
 
 [.tile]

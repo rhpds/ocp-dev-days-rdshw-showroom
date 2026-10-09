@@ -62,11 +62,14 @@ The **parasol-insurance-eap** repository (from your GitLab project) loads in Dev
 The workspace opens in a new browser tab.
 +
 * If prompted to trust the publishers or the workspace, confirm trust. (Figure 3)
-* If an introductory layout panel appears, choose **Light** theme for best contrast later in the lab and **Mark Done**. Mark done will close the introductory panel and open the extensions installed panel by clicking on the extensions icon on the left side of the screen as shown in Step 2 in the image below. (Figure 4)
+* If an introductory layout panel appears, choose a readable theme and click **Mark Done**. Then click the Extensions icon in the left sidebar if you need to check installation progress.
 +
-image::module-05-mta-dls/05-03-dls-05.png[VSCode Tab,link=self,window=blank,title="Manage profiles"]
+image::module-05-mta-dls/05-03-dls-05.png[Trust publishers and workspace prompts,link=self,window=blank,title="Trust publishers and workspace"]
 +
-image::module-05-mta-dls/05-03-dls-03.png[VSCode Tab,link=self,window=blank,title="Mark done"]
+
+include::partial$ide-theme.adoc[]
+
+The MTA screenshots below were captured with a light IDE theme. The controls are in the same places with a dark IDE theme.
 
 In some cases the extensions might take some time to install. If you see the reload window button then click on it. It will reload the browser tab automatically.
 

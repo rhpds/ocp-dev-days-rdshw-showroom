@@ -80,8 +80,7 @@ window.addEventListener('DOMContentLoaded', function() {
   // Copy textarea content to clipboard
   function cpCopy(btn, wrapper, textarea, index) {
     textarea.select();
-    var text = textarea.textContent;
-    navigator.clipboard.writeText(text + '\n')
+    navigator.clipboard.writeText(textarea.value)
       .then(function() { console.log('Copied to clipboard'); })
       .catch(function(err) { console.error('Failed to copy:', err); });
     cpMarkDone(wrapper, textarea, index);

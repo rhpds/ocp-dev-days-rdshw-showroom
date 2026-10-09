@@ -7,13 +7,13 @@ include::partial$style.adoc[]
 
 
 
-Ingest data from customers, store it in a backend database, and generate PDF policy documents — all orchestrated by Apache Camel with secure cross-cluster connectivity powered by {rhsi}.
+Ingest data from customers, store it in a backend database, and generate PDF policy documents — all orchestrated by Apache Camel with a secure cross-namespace connection powered by {rhsi}.
 
 {empty} +
 
 *The Business Need*
 
-Customers send Policy Applications in EDI format to the platform. These applications need to be ingested, transformed, stored in a backend database, and rendered as PDF policy documents for archival. The database resides on a separate infrastructure and is not directly accessible from OpenShift — a secure connectivity solution is required.
+Customers send Policy Applications in EDI format to the platform. These applications need to be ingested, transformed, stored in a backend database, and rendered as PDF policy documents for archival. The database resides in an isolated namespace and is not directly accessible from your namespace — a secure service connection is required.
 
 {empty} +
 
@@ -21,7 +21,7 @@ Customers send Policy Applications in EDI format to the platform. These applicat
 
 An Apache Camel integration exposes an API endpoint that receives incoming EDI policy applications. The flow transforms the EDI data into XML format, stores it in a backend Database via {rhsi}, and renders PDF policy documents that are uploaded to S3 object storage (OpenShift Data Foundation).
 
-{rhsi} enables secure connectivity between the OpenShift cluster and the remote backend database without exposing the database to the public network.
+{rhsi} connects the integration to the database namespace on the same OpenShift cluster without exposing the database to the public network.
 
 {empty} +
 
@@ -41,7 +41,7 @@ flowchart LR
         Camel --> |"② PDF policy documents"|Storage
     end
 
-    subgraph RemoteEnvironment [Remote Environment]
+    subgraph RemoteEnvironment [Database namespace (same cluster)]
         ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
     end
 
