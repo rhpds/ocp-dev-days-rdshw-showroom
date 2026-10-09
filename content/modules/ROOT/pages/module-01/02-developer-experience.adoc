@@ -204,7 +204,7 @@ image::rhdh-devspaces-link.png[Link to open pre-configured Dev Spaces seen in Re
 .. **Trust publishers and install** -- click to install the recommended extensions including the AI coding assistant
 .. Dismiss any popups about MicroProfile or Dependency Analytics by clicking the **X**
 +
-WARNING: If you miss the "trust the authors" prompt, Dev Spaces opens in Restricted Mode and you will see a highlighted banner at the bottom of the window. Click the banner to confirm trust so extensions load properly.
+WARNING: If you miss the "trust the authors" prompt and Dev Spaces opens in Restricted Mode, click *Restricted Mode* in the status bar at the bottom of the IDE (or *Manage* in the Restricted Mode banner). In *Workspace Trust*, click *Trust* for the Parasol workspace, then accept any remaining extension installation prompts. Confirm that *Restricted Mode* is no longer shown so the extensions can load.
 +
 * The file explorer shows the complete project structure
 * The terminal has CLI tools pre-installed (`oc`, `mvn`, etc.)
