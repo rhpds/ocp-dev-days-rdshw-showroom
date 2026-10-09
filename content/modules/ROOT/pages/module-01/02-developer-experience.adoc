@@ -188,6 +188,8 @@ With your development environment ready, it is time to write code. You will use 
 +
 Alternatively, you can open Dev Spaces directly at {devspaces_url}[{devspaces_url}^] and create a workspace from your repository URL.
 +
+TIP: If Dev Spaces opens `camel-lab`, you are in the workspace for another module. Return to the **Parasol Insurance Dev** component for your feature branch in Developer Hub and use its **Open in Dev Spaces** link. If the Dev Spaces dashboard appears, select the workspace associated with your Parasol feature branch rather than `camel-lab`. Check that the file explorer shows the Parasol application before continuing.
++
 image::rhdh-devspaces-link.png[Link to open pre-configured Dev Spaces seen in Red Hat Developer Hub,link=self,window=blank,width=700]
 
 . The first time Dev Spaces opens, click **Log In With OpenShift**. You will see several authorization prompts. These are security gates that ensure the IDE only acts with your explicit consent:
