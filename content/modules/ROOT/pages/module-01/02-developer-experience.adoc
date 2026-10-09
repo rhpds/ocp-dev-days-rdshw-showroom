@@ -130,7 +130,7 @@ TIP: If Lightspeed is still covering the interface, close it by clicking the sma
 
 . Browse the available software templates. These are golden path templates maintained by the platform team.
 
-. Select the **Parasol Insurance Development Environment** template (or similarly named template).
+. Find the **Parasol Insurance Development Environment** template (or similarly named template) and click **Choose** on its card.
 
 . Fill in the template form:
 * **Branch name**: Enter a short name for your feature branch, for example: `claims-stats`
@@ -144,11 +144,11 @@ image::rhdh-template-values.png[Development environment provisioned with one cli
 * A CI/CD pipeline is configured for your branch
 * A new component is registered in the Developer Hub catalog
 
-. When provisioning completes, click **Open in Catalog** to see your new component.
+. When provisioning completes, click **Open in Catalog**. This opens the catalog entry for the development environment component associated with your branch (for example, **Parasol Insurance Dev (claims-stats)**).
 +
 image::rhdh-template-results.png[Development environment provisioned with one click,link=self,window=blank,width=700]
 
-. On the component page, click **View Source** to open the feature branch in GitLab.
+. On that component's detail page, stay on **Overview** and click **View Source** in the **About** card to open the feature branch in GitLab.
 +
 If GitLab prompts you to log in, use the same credentials shown below. If GitLab opens without a login prompt, you are already signed in; continue to the next step.
 +
