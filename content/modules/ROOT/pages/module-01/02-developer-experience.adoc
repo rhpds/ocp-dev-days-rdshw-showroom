@@ -214,6 +214,8 @@ WARNING: If you miss the "trust the authors" prompt and Dev Spaces opens in Rest
 +
 image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded,link=self,window=blank,width=700]
 
+include::partial$ide-theme.adoc[]
+
 === Exercise 2: Start the application in development mode
 
 Before writing new code, start the application to see what you are working with.

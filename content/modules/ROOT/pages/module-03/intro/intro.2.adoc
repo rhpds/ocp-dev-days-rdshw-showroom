@@ -111,6 +111,8 @@ image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, , wid
 TIP: If the trust prompt does not appear and the IDE opens in *Restricted Mode*, click *Restricted Mode* in the status bar at the bottom of the IDE (or *Manage* in the Restricted Mode banner). In the *Workspace Trust* dialog, click *Trust* for the `camel-lab` workspace. Then accept any remaining publisher or extension installation prompts. Confirm that *Restricted Mode* is no longer shown before continuing; otherwise, required extensions may stay disabled.
 +
 NOTE: This IDE is based on _Microsoft VS Code_. It will look familiar if you have already used it.
+
+include::partial$ide-theme.adoc[]
 +
 {empty} +
 
