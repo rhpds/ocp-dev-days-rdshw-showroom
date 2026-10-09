@@ -172,8 +172,9 @@ Take a look at the repository -- this is the branch where your changes will live
 You now have:
 
 * A feature branch (`claims-stats`) in the Parasol source repository
-* A CI/CD pipeline wired to your branch (this will be visible on the `CI` tab once we build it in the next section)
 * A catalog entry in Developer Hub tracking your development work
+
+The template has also configured a CI/CD pipeline for your branch. You will see its run on the `CI` tab after you push your code in Section 4.
 
 '''
 
