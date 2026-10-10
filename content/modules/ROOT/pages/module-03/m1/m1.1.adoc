@@ -206,6 +206,8 @@ The database lives in a secure, air-tight environment — no inbound ports are e
 
 Every Service Interconnect setup follows two stages: first you *establish the network* — the secure mesh that connects your environments — then you *expose services* through it. Once the network is in place, adding a new service is just a matter of pairing a Listener with a Connector — no network changes needed.
 
+The `skupper` CLI can also create sites, issue and redeem tokens, and create listeners. In this exercise, you apply the Kubernetes resources directly so you can see which namespace owns each resource and how the fields form the connection. The CLI and YAML use the same Service Interconnect resource model; the optional CLI status check after the exercise lets you inspect the result through both interfaces. See the https://skupper.io/docs/kube-cli/site-linking.html[Skupper CLI site-linking guide,window=_blank] for the alternative command workflow.
+
 {empty} +
 
 [.mermaid]
@@ -768,6 +770,19 @@ sql-count-output
 ****
 
 NOTE: The count is `1` because your lab environment comes with a sample entry already loaded in the database.
+
+==== Optional: inspect the same resources with the Skupper CLI
+
+If you have the Skupper v2 CLI installed in a terminal with access to this cluster, these read-only commands show the resources you just created:
+
+[source,bash,subs="attributes"]
+----
+skupper site status -n {username}-devspaces
+skupper link status -n shared-database
+skupper listener status postgres-listener -n {username}-devspaces
+----
+
+The first command should show your Site as `Ready`. The second shows the Link created when the database namespace redeemed your AccessToken. The third shows the Listener as `Ready`, with a matching Connector. These are the same states checked with `oc get` above; no additional resources are created. The https://skupper.io/commands/[Skupper CLI reference,window=_blank] lists the corresponding create commands.
 
 {empty} +
 

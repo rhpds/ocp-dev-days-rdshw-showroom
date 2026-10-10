@@ -47,7 +47,7 @@ image::module-03/intro/showroom-expand-options.png[width=50%]
 
 Integration and AI used to be separate concerns. You had your data flows on one side and your AI models on the other. That's changing. In this workshop they come together in a single platform.
 
-An integration engine handles the data flows: moving data between systems, applying transformations, and orchestrating multi-step processes. A connectivity layer provides secure access to databases that live outside your cluster. An event broker decouples messaging platforms into an event-driven architecture. An AI service puts a large language model at the disposal of your agentic integration flows. And a gateway sits in front of the LLM to enforce authentication and rate-limit token consumption.
+An integration engine handles the data flows: moving data between systems, applying transformations, and orchestrating multi-step processes. Service Interconnect provides a secure application-level connection to a database in another namespace. An event broker decouples messaging platforms into an event-driven architecture. An AI service puts a large language model at the disposal of your agentic integration flows. Connectivity Link applies authentication and token rate-limit policies to the Gateway API route in front of the LLM.
 
 You will work with all of these as you progress through the labs.
 
@@ -96,13 +96,13 @@ journey-diagram
 
 [.mermaid-hints-simple]
 ****
-A | ① Secure Data Ingestion | The customer portal sends policy applications in EDI format. A Camel flow transforms the EDI into XML and stores the data in a backend database. The database lives on separate infrastructure, so Service Interconnect provides a secure link without exposing anything to the public network. The flow also renders PDF policy documents and pushes them to S3 storage. +
+A | ① Secure Data Ingestion | The customer portal sends policy applications in EDI format. A Camel flow transforms the EDI into XML and stores the data in a backend database. In this lab the database is in another namespace on the same cluster, so Service Interconnect provides a secure service connection without exposing it to the public network. The flow also renders PDF policy documents and pushes them to S3 storage. +
 B | ② Multi-Channel Communication | A customer reviews their policy document and spots a mistake. They reach out to support, but customer and support team use different messaging platforms. +
 You connect both so that messages from one show up in the other. Agents can respond from their own portal without caring which platform the customer is on. +
 C | ③ AI-assisted Issue Resolution | The support agent needs to look up the policy, fix it in the database, and regenerate the policy document. Instead of doing it manually, the agent talks to an AI bot right inside their messaging portal. +
 The integration layer sends the request to an LLM, which decides what to do (query the database, update the record, regenerate the PDF) and reports back. The whole thing happens using natural language. +
 D | ④ Governing AI Consumption | Once AI is part of the workflow, you need controls. Who can call the LLM? How many tokens can it consume? +
-A gateway sits in front of the AI service and enforces authentication and token-based rate limits. Multiple tiers of service, each with its own token budget. When one tier runs out, the system falls back to the next.
+Connectivity Link policies on the Gateway API route in front of the AI service enforce authentication and token-based rate limits. Multiple tiers of service each have their own token budget. When one tier runs out, the system falls back to the next.
 ****
 TIP: Hover over each phase in the diagram to learn more.
 
@@ -175,7 +175,7 @@ flowchart LR
     style ConnectivityLink fill:none,stroke:none
 ----
 
-NOTE: Each lab includes its own detailed architecture diagram at a more granular level. This one just shows how the pieces fit together end to end.
+NOTE: Service Interconnect carries application traffic between the integration and database namespaces. Connectivity Link governs HTTP requests to the LLM through Gateway API policies. Each lab includes a more detailed architecture diagram.
 
 {empty} +
 
@@ -197,9 +197,9 @@ Below is the stack of technologies you will interact with along the workshop. Co
 
 * https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Persistent software-defined storage and essential data services integrated with and optimized for Red Hat OpenShift.
 
-* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: A secure and scalable solution for connecting applications across network boundaries, enabling seamless communication between services running in different environments.
+* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: Applies authentication, authorization, and rate-limit policies to APIs exposed through Kubernetes Gateway API. In Lab 5, it governs access and token consumption for the LLM endpoint.
 
-* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: A secure connectivity solution that allows applications running in OpenShift to access databases and other services that reside outside the cluster without exposing them to the public network.
+* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: Creates protected application-level connections between services across namespaces, clusters, and other environments. In Lab 1, it connects the integration to a database in another namespace on the same cluster.
 
 {empty} +
 

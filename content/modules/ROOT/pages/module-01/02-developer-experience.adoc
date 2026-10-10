@@ -15,6 +15,8 @@ Your first stop is Red Hat Developer Hub -- Parasol's internal developer portal.
 
 === Exercise 1: Explore Developer Hub
 
+Keep the workshop browser tab open so you can return to these instructions. Developer Hub is available in the right-hand panel of the showroom; some links or sign-in steps may open it in a separate browser tab. If that happens, switch back to the workshop tab when you need the instructions. If the workshop tab itself was replaced, use your browser's Back button to return to the showroom, then select the **Developer Hub** tab again.
+
 . Select the **Developer Hub** tab on the right, or open **Red Hat Developer Hub** at {rhdh_url}[{rhdh_url}^]
 
 . Log in with your credentials using the OIDC provider:
@@ -46,32 +48,26 @@ image::rhdh-homepage.png[Red Hat Developer Hub home page,link=self,window=blank,
 === Exercise 2: Find the Parasol application in the software catalog
 
 . Click **Catalog** in the left sidebar.
-+
-image::rhdh-catalog-main.png[Software catalog showing all registered components,link=self,window=blank,width=700]
 
-. Use the **Kind** dropdown to filter for **System** entities.
+. Use the **Kind** dropdown to filter for **System** entities. Select **Owned** to find your system.
 
-. Find and click on **parasol-insurance**.
+. Find and click on **parasol-insurance-{user}**.
 +
-This is the Parasol Insurance application system. It groups all the components, APIs, and resources that make up the application.
+This is your Parasol Insurance application system. It groups your components and API.
 
 . Explore the system view:
 * Notice the components registered under this system
 * Look at the dependency relationships between components
-* Click on a component to see its detail page
+* Click your main **Parasol Insurance** component to see its detail page
 
 . On the component detail page, explore the tabs:
 * **Overview** -- ownership, lifecycle, and system information
 * **API** -- provided and consumed API definitions
 * **Relations** -- what this component depends on and what depends on it
-+
-image::rhdh-component-detail.png[Component detail page with Overview and CI/CD tabs,link=self,window=blank,width=700]
 
-. On the **API** tile, find the **parasol-insurance-api**. Click on it, then select the **Definition** tab.
+. On the **API** tile, find **parasol-insurance-api-{user}**. Click on it, then select the **Definition** tab.
 +
 The API documentation is rendered directly from the source repository. When the code changes, the docs stay current automatically -- no separate wiki to maintain.
-+
-image::rhdh-api-definition.png[API definition rendered from source in Developer Hub,link=self,window=blank,width=700]
 
 === Exercise 3: Ask the AI assistant
 
@@ -97,9 +93,9 @@ image::rhdh-lightspeed-response.png[Lightspeed AI assistant in Developer Hub,lin
 
 . Try another question:
 +
-[source,role="copypaste"]
+[source,subs="attributes",role="copypaste"]
 ----
-What components make up the parasol-insurance system?
+What components make up the parasol-insurance-{user} system?
 ----
 
 NOTE: Lightspeed responses may vary between attempts. If it does not find a specific entity on the first try, ask it to "list all APIs in the catalog" first, then re-ask your original question.
@@ -130,7 +126,7 @@ TIP: If Lightspeed is still covering the interface, close it by clicking the sma
 
 . Browse the available software templates. These are golden path templates maintained by the platform team.
 
-. Select the **Parasol Insurance Development Environment** template (or similarly named template).
+. Find the **Parasol Insurance Development Environment** template (or similarly named template) and click **Choose** on its card.
 
 . Fill in the template form:
 * **Branch name**: Enter a short name for your feature branch, for example: `claims-stats`
@@ -144,13 +140,13 @@ image::rhdh-template-values.png[Development environment provisioned with one cli
 * A CI/CD pipeline is configured for your branch
 * A new component is registered in the Developer Hub catalog
 
-. When provisioning completes, click **Open in Catalog** to see your new component.
+. When provisioning completes, click **Open in Catalog**. This opens the catalog entry for the development environment component associated with your branch (for example, **Parasol Insurance Dev (claims-stats)**).
 +
 image::rhdh-template-results.png[Development environment provisioned with one click,link=self,window=blank,width=700]
 
-. On the component page, click **View Source** to open the feature branch in GitLab.
+. On that component's detail page, stay on **Overview** and click **View Source** in the **About** card to open the feature branch in GitLab.
 +
-You may be prompted to log in to GitLab. Use the same credentials:
+If GitLab prompts you to log in, use the same credentials shown below. If GitLab opens without a login prompt, you are already signed in; continue to the next step.
 +
 --
 Username:
@@ -172,8 +168,9 @@ Take a look at the repository -- this is the branch where your changes will live
 You now have:
 
 * A feature branch (`claims-stats`) in the Parasol source repository
-* A CI/CD pipeline wired to your branch (this will be visible on the `CI` tab once we build it in the next section)
 * A catalog entry in Developer Hub tracking your development work
+
+The template has also configured a CI/CD pipeline for your branch. You will see its run on the `CI` tab after you push your code in Section 4.
 
 '''
 
@@ -187,6 +184,8 @@ With your development environment ready, it is time to write code. You will use 
 . From your component overview page in Developer Hub, click the **Open in Dev Spaces** link to open a cloud workspace for your feature branch.
 +
 Alternatively, you can open Dev Spaces directly at {devspaces_url}[{devspaces_url}^] and create a workspace from your repository URL.
++
+TIP: If Dev Spaces opens `camel-lab`, you are in the workspace for another module. Return to the **Parasol Insurance Dev** component for your feature branch in Developer Hub and use its **Open in Dev Spaces** link. If the Dev Spaces dashboard appears, select the workspace associated with your Parasol feature branch rather than `camel-lab`. Check that the file explorer shows the Parasol application before continuing.
 +
 image::rhdh-devspaces-link.png[Link to open pre-configured Dev Spaces seen in Red Hat Developer Hub,link=self,window=blank,width=700]
 
@@ -202,7 +201,7 @@ image::rhdh-devspaces-link.png[Link to open pre-configured Dev Spaces seen in Re
 .. **Trust publishers and install** -- click to install the recommended extensions including the AI coding assistant
 .. Dismiss any popups about MicroProfile or Dependency Analytics by clicking the **X**
 +
-WARNING: If you miss the "trust the authors" prompt, Dev Spaces opens in Restricted Mode and you will see a highlighted banner at the bottom of the window. Click the banner to confirm trust so extensions load properly.
+WARNING: If you miss the "trust the authors" prompt and Dev Spaces opens in Restricted Mode, click *Restricted Mode* in the status bar at the bottom of the IDE (or *Manage* in the Restricted Mode banner). In *Workspace Trust*, click *Trust* for the Parasol workspace, then accept any remaining extension installation prompts. Confirm that *Restricted Mode* is no longer shown so the extensions can load.
 +
 * The file explorer shows the complete project structure
 * The terminal has CLI tools pre-installed (`oc`, `mvn`, etc.)
@@ -211,17 +210,21 @@ WARNING: If you miss the "trust the authors" prompt, Dev Spaces opens in Restric
 +
 image::devspaces-workspace-loaded.png[Cloud development workspace with the Parasol Insurance project fully loaded,link=self,window=blank,width=700]
 
+include::partial$ide-theme.adoc[]
+
 === Exercise 2: Start the application in development mode
 
 Before writing new code, start the application to see what you are working with.
 
-. Press kbd:[Ctrl+Shift+P] (or kbd:[Cmd+Shift+P] on Mac) to open the command palette.
+. Open the command palette with kbd:[Ctrl+Shift+P] (or kbd:[Cmd+Shift+P] on Mac). If an extension captures the shortcut, use **View** -> **Command Palette** from the menu instead.
 
 . Type and select **Tasks: Run Task**.
 
 . Select the **devfile** task group.
 
-. Select **Start Development Mode (Hot Reload + debug)**.
+. Select **2. Start Development mode (Hot reload + debug)**.
++
+TIP: If the `devfile` group or this task is missing, open **Terminal** -> **New Terminal**, change to the Parasol project directory containing `pom.xml` and `mvnw`, and run `./mvnw compile quarkus:dev -Dquarkus.analytics.disabled=true`. Keep the terminal running while you work. The task uses this same command.
 
 . Wait for the application to start. When Dev Spaces shows a popup notification to open the application, click to **Open In New Tab**.
 +
@@ -240,13 +243,13 @@ image::parasol-app-home.png[Parasol Insurance application dashboard,link=self,wi
 
 Now implement the feature. You will create a new REST endpoint that returns claims statistics (totals, breakdowns by category and status).
 
-. Back in Dev Spaces, click the **Explorer** icon in the left sidebar. In the file tree, expand `src` -> `main` -> `java` -> `com` -> `parasol`.
+. Back in Dev Spaces, click the **Explorer** icon in the left sidebar. Open the Parasol application project, then expand `src` -> `main` -> `java` -> `com` -> `parasol`. This is the folder that already contains `ClaimsResource.java`.
 
-. Right-click on the `parasol` directory and select **New File**. Name it `ClaimsStatsResource.java`.
+. Right-click on that `parasol` folder (beside `ClaimsResource.java`), select **New File**, type `ClaimsStatsResource.java`, and press kbd:[Enter].
 +
-The full path must be `src/main/java/com/parasol/ClaimsStatsResource.java`.
+Before pasting any code, check that the new file appears directly under `parasol`, next to `ClaimsResource.java`. Its relative path must be `src/main/java/com/parasol/ClaimsStatsResource.java`; the editor breadcrumb should end in `src > main > java > com > parasol > ClaimsStatsResource.java`.
 +
-WARNING: Make sure you create the file inside the `parasol` folder -- not in `com`, not in `java`, and not at the project root. Creating it in the wrong location will cause build and route failures later in the pipeline.
+WARNING: If the file appears anywhere else, move it into `src/main/java/com/parasol` before continuing. The `package com.parasol;` line in the code below must match the file's directory.
 +
 image::parasol-app-newfile.png[Parasol Insurance application dashboard,link=self,window=blank,width=700]
 
@@ -305,23 +308,26 @@ NOTE: This code works, but it has some shortcuts. You used `System.out.println` 
 
 . Save the file with kbd:[Ctrl+S] (or kbd:[Cmd+S] on Mac). Quarkus dev mode detects the change and reloads the application -- no manual build step required.
 +
-TIP: If the application does not reload automatically, check the terminal in Dev Spaces for compilation errors. You can also restart dev mode by pressing kbd:[Ctrl+Shift+P], selecting **Tasks: Run Task** -> **devfile** -> **Start Development Mode (Hot Reload + debug)**. If you see a port conflict, stop the existing task first.
+TIP: If the application does not reload automatically, check the Dev Spaces terminal for compilation errors. To restart dev mode, stop the running process with kbd:[Ctrl+C], then rerun **Tasks: Run Task** -> **devfile** -> **2. Start Development mode (Hot reload + debug)** or run `./mvnw compile quarkus:dev -Dquarkus.analytics.disabled=true` from the project directory. Stop the existing process first to avoid a port conflict.
 
 . In your browser, switch to the tab for the Parasol running application, remove the `dashboard.html` from the URL and add `/api/claims/stats` to the end of the URL in the browser's address bar.
 +
-You should see JSON data with claim totals and breakdowns:
+You should see JSON data with a `total` and breakdowns in `by_status` and `by_category`. For example, the screenshot below shows eight claims; your counts may differ depending on the seeded data:
 +
 ----
 {
-  "total": 15,
-  "by_category": {
-    "auto": 5,
-    "home": 4,
-    "life": 6
-  },
+  "total": 8,
   "by_status": {
-    "open": 8,
-    "closed": 7
+    "In Process": 3,
+    "New": 2,
+    "Denied": 1,
+    "Processed": 2
+  },
+  "by_category": {
+    "Liability": 1,
+    "Single vehicle": 2,
+    "Property damage": 2,
+    "Multiple vehicle": 3
   }
 }
 ----
