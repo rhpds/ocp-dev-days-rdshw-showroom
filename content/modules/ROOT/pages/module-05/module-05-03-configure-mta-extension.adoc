@@ -85,11 +85,22 @@ Click on the `Manage Profiles` button to open the profiles management panel.
 
 image::module-05-mta-dls/05-03-dls-06.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
 
-Review the profiles and select the `quarkus-profile` profile by clicking on the profile name.
+- Create a new profile `quarkus-profile`
+- Profile Name: `quarkus-profile``
+- Target Technologies: `quarkus``, `quarkus3+``, `jakarta-ee``
 
 image::module-05-mta-dls/05-03-dls-07.png[VSCode Tab,link=self,window=blank,title="Review profiles"]
 
-Click **Make Active** (labeled **Activate Profile** in some builds) to activate the profile. The screenshot above shows that control next to **Open Analysis**. Once the profile is active, open the GenAI provider settings from the MTA panel as shown in the next image.
+Since this is the first profile it will automatically be made active by the DLS extension. 
+
+Review that you have the correct details as listed above and close this tab.
+
+
+The screenshot above shows that control next to **Open Analysis** click it and follow the instructions below. 
+Open the GenAI provider settings from the MTA panel as shown in the next image.
+
+- *1* Click the settings `⚙︎` icon.
+- *2* Click `Configure GenAI Settings`
 
 image::module-05-mta-dls/05-03-dls-08.png[VSCode Tab,link=self,window=blank,title="Gen-AI Provider Settings"]
 
@@ -114,7 +125,12 @@ models:
 active: *active
 ----
 
-Confirm the active model, API key, and base URL match the values shown below (your lab substitutes the `{litellm_*}` attributes automatically). Use the numbered callouts in the screenshot: (1) open provider settings, (2) verify the active model block, (3) confirm the API key and base URL fields.
+Confirm that the settings have the following values to the following fields. 
+
+- `OPENAI_API_KEY` : this is the our LLM key to the model hosted on OpenShift AI
+- `model` : the name of the model we are using
+- `baseURL` : the url/route at which the model is listening to requests via the chat completions API.
+- `active` : Finally we want to ensure that this profile is active. MTA can be configured with multiple LLMs however only one LLM can be active at a time.
 
 image::module-05-mta-dls/05-03-dls-09.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
 
