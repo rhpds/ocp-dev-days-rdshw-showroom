@@ -75,6 +75,9 @@ image::module-05-mta-dls/05-04-dls-02.jpg[EmailIntakeMDB file selection,link=sel
 image::module-05-mta-dls/05-04-dls-03.jpg[EmailIntakeMDB Get Solution,link=self,window=blank,title="EmailIntakeMDB"]
 
 . The results start to appear in the `MTA Resolution Details` tab. You can note that the LLM provides additional information that is useful for developers, it describes the chain of thought, and finally sends back a git patch for us to review. At this moment we have 3 options, "Review", "Accept" and "Reject". Lets review by clicking `Review in Editor`, which should open up the editor window with details about the code. Notice that the `Red` highlight is for the code that has been removed and the `Green` highlight is for the code that has been added by Developer Lightspeed.
+
+TIP: Generations are closely linked to the analysis. This means every time a new generation is created and accepted the analysis re-runs. If you try to access the analysis panel during generations, it will not be active. This is by design.
+
 +
 image::module-05-mta-dls/05-04-dls-04.jpg[EmailIntakeMDB generated results,link=self,window=blank,title="EmailIntakeMDB"]
 
