@@ -125,9 +125,9 @@ models:
 active: *active
 ----
 
-Confirm that the settings have the following values to the following fields. 
+Confirm that the settings have the following values in the following fields. 
 
-- `OPENAI_API_KEY` : this is the our LLM key to the model hosted on OpenShift AI
+- `OPENAI_API_KEY` : this is the LLM key to the model hosted on OpenShift AI
 - `model` : the name of the model we are using
 - `baseURL` : the url/route at which the model is listening to requests via the chat completions API.
 - `active` : Finally we want to ensure that this profile is active. MTA can be configured with multiple LLMs however only one LLM can be active at a time.
