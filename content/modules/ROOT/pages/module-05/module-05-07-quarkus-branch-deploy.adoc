@@ -164,7 +164,8 @@ oc new-app --template=postgresql-ephemeral \
   -p DATABASE_SERVICE_NAME=parasol-db \
   -p POSTGRESQL_USER=parasol \
   -p POSTGRESQL_PASSWORD=parasol \
-  -p POSTGRESQL_DATABASE=parasol
+  -p POSTGRESQL_DATABASE=parasol \
+  -p POSTGRESQL_VERSION=12-el8
 ----
 
 . Wait until the database is ready:
