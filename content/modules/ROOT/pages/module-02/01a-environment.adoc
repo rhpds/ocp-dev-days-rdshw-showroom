@@ -1,0 +1,80 @@
+= Environment Details
+include::partial$_attributes.adoc[]
+
+== Workshop Environment
+
+Everything you need is already provisioned. Your lab environment includes:
+
+* An OpenShift cluster with Developer Hub, Dev Spaces, Pipelines, GitOps, and the full Sigstore stack preconfigured
+* A user account with access to all workshop resources
+* A sample application (Parasol Insurance -- Secured) that you will secure and promote through the hardened pipeline
+
+Your login credentials (use these for Developer Hub, GitLab, and all workshop services):
+
+* **Username**: `{user}`
+* **Password**: `{password}`
+
+TIP: Keep these credentials handy -- you will need them several times during the workshop.
+
+== Environment Access
+
+Your lab environment includes:
+
+* **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
+* **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
+* **Dev Spaces**: {devspaces_url}[{devspaces_url}^]
+* **GitLab**: {gitlab_url}[{gitlab_url}^]
+* **Argo CD**: {argocd_url}[{argocd_url}^]
+* **ACS Console**: {acs_url}[{acs_url}^]
+* **Trusted Profile Analyzer**: {tpa_url}[{tpa_url}^]
+
+NOTE: All URLs and credentials are also available in the right-hand panel of this lab interface. Use the tabs at the top to switch between the OpenShift Console, Terminal, and GitLab.
+
+== Timing
+
+This module is designed for **60-90 minutes** of hands-on work.
+
+[cols="2,1,3",options="header"]
+|===
+| Section | Duration | What you will do
+
+| Dealing with vulnerabilities early
+| 15 min
+| Explore the secured component, create a sandbox, use RHDA to find and fix dependency vulnerabilities
+
+| Signing your commits
+| 10 min
+| Sign a commit with Sigstore keyless signing and verify the signature in GitLab
+
+| Checking the sandbox pipeline
+| 15 min
+| Review pipeline security checks, signature verification, ACS scan results, and fix the base image
+
+| Moving to the next stages
+| 25 min
+| Create a merge request, promote via tag, resolve Conforma policy failure with a signed approval
+
+| Securing your namespaces
+| 10 min
+| Test Policy Controller enforcement by deploying unsigned and unapproved images
+|===
+
+== Technology Stack
+
+This module uses all the technologies from Module 1, plus the following security-focused additions:
+
+* **Red Hat Trusted Artifact Signer (RHTAS)** -- Sigstore-based signing infrastructure (Fulcio, Rekor, TUF)
+* **gitsign** -- Sigstore keyless commit signing, tied to developer identity via OIDC
+* **Tekton Chains** -- Automatic pipeline artifact signing and SLSA provenance attestation
+* **Conforma (Enterprise Contract)** -- Policy engine that validates signed attestations against Rego policies
+* **Sigstore Policy Controller** -- Kubernetes admission controller that verifies image signatures and attestations at deployment time
+* **Red Hat Advanced Cluster Security (ACS)** -- Image vulnerability scanning and security policy enforcement
+* **Red Hat Dependency Analytics (RHDA)** -- IDE extension for real-time dependency vulnerability analysis
+* **Trusted Profile Analyzer (TPA)** -- Vulnerability intelligence backend with Lightwell remediation data and SBOM management
+* **Quay** -- Container image registry with signature and attestation storage
+* **SonarQube** -- Static analysis and code quality scanning
+* **Parasol Insurance (Secured)** -- Hardened variant of the sample Quarkus application with full supply chain security
+
+== Next steps
+
+Continue to xref:module-02/01-vulnerabilities.adoc[Dealing with Vulnerabilities Early] to set up your secured development environment and start fixing vulnerabilities.

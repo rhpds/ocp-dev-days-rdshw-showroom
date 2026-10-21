@@ -1,7 +1,7 @@
-= OpenShift Dev Days Roadshow
+= OpenShift Dev Day Roadshow
 include::partial$_attributes.adoc[]
 
-Welcome to the OpenShift Dev Days Roadshow -- a collection of hands-on workshops where you experience modern application development and integration on Red Hat OpenShift.
+Welcome to the OpenShift Dev Day Roadshow -- a collection of hands-on workshops where you experience modern application development and integration on Red Hat OpenShift.
 
 == Available Modules
 
@@ -12,6 +12,15 @@ This roadshow consists of independent modules. Each module can be completed on i
 xref:module-01/00-intro.adoc[Module 1: The Developer Experience]
 
 Experience the full developer journey on OpenShift -- from self-service onboarding through Developer Hub, cloud-based development with Dev Spaces, AI-assisted coding, automated CI/CD pipelines, to GitOps-driven production deployments.
+
+**Duration**: ~90 minutes
+****
+
+[.tile]
+****
+xref:module-02/00-intro.adoc[Module 2: Secured Software Supply Chain]
+
+Build and deploy applications through a SLSA Level 3 compliant software supply chain -- vulnerability scanning with RHDA and ACS, keyless commit signing with Sigstore, pipeline attestations with Tekton Chains, policy validation with Conforma, signed release approvals, and deployment enforcement with Policy Controller.
 
 **Duration**: ~90 minutes
 ****
