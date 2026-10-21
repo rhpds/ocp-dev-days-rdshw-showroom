@@ -35,7 +35,7 @@ image::m02-rhdh-catalog-secured.png[Developer Hub catalog showing Parasol Insura
 
 . Find and click on **Parasol Insurance (Secured)**.
 +
-This is the version of the Parasol Insurance application that uses secured build pipelines. If you have done Module 1, you will recognise it as the same application.
+This is the version of the Parasol Insurance application that uses secured build pipelines. If you have done Module 1, you will recognize it as the same application.
 +
 image::m02-rhdh-secured-component.png[Parasol Insurance Secured component in Developer Hub,link=self,window=blank,width=700]
 +

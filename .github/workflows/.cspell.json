@@ -57,7 +57,20 @@
     "self-service",
     "SonarQube",
     "Tekton",
-    "YAML"
+    "YAML",
+    "CISO",
+    "Conforma",
+    "Fulcio",
+    "Gitsign",
+    "gitsign",
+    "Lightwell",
+    "preprod",
+    "Rekor",
+    "remediations",
+    "RHDA",
+    "RHTAS",
+    "Sigstore",
+    "syft"
   ],
   "ignoreWords": [
     "adoc",
