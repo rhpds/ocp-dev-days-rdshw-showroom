@@ -1,0 +1,53 @@
+= Module 2: Secured Software Supply Chain
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== What you'll learn
+
+In this module, you will:
+
+* Understand how security guardrails are embedded into every stage of the development lifecycle
+* Use Red Hat Dependency Analytics to identify and fix vulnerabilities before they reach a pipeline
+* Sign commits with your identity using Sigstore keyless signing
+* Observe how automated pipelines verify signatures, scan images, and enforce policies
+* Promote a release through merge request checks, Conforma/Enterprise Contract validation, and a signed approval process
+* See how the Sigstore Policy Controller prevents unauthorized deployments at the namespace level
+
+== Who this is for
+
+This module looks at the development and release process from a security perspective. It is designed for developers, security engineers, and platform engineers who want to understand how a traditional development workflow can be augmented with security guardrails at every stage -- from code to production.
+
+**Experience level**: Intermediate. Familiarity with Git, CI/CD pipelines, and container images is helpful.
+
+== Estimated time
+
+This module takes approximately **60-90 minutes** to complete.
+
+== Your role and mission
+
+You are a developer at **Parasol Insurance**. The development workflow you use daily -- coding, committing, building, deploying -- has been augmented with security guardrails by the platform team. Your job is to remediate application vulnerabilities and ship this change through the hardened process and learn about every security control.
+
+Parasol's CISO office has mandated that all production deployments must:
+
+* Be built from **signed commits** traceable to a verified developer identity
+* Pass **vulnerability scanning** and **policy checks** before promotion
+* Carry a **signed attestation** proving the build pipeline ran correctly
+* Receive **explicit approval** before reaching production
+* Be verified by an **admission controller** at deployment time
+
+
+
+== The secured development journey
+
+This module follows one continuous story:
+
+. **Meet the platform** -- Explore the secured components in Developer Hub and create an isolated sandbox
+. **Shift left on vulnerabilities** -- Use dependency analytics to find and fix vulnerabilities before they reach a pipeline
+. **Sign your commits** -- Use Sigstore keyless signing to tie every commit to your identity
+. **Sandbox pipeline** -- Watch automated checks verify your signature, scan your image, and enforce ACS policies
+. **Promote to production** -- Merge, build, validate with Conforma policies, approve the release, and deploy
+. **Namespace security** -- See how the Policy Controller prevents unauthorized images from running
+
+== Next steps
+
+Continue to the xref:module-02/01a-environment.adoc[Environment Details] page for access links and credentials, then proceed to xref:module-02/01-vulnerabilities.adoc[Dealing with Vulnerabilities Early].
