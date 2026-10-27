@@ -1,0 +1,45 @@
+source_language: en
+
+target_languages:
+  ja:
+    name: Japanese
+    native_name: 日本語
+    flag: "\U0001F1EF\U0001F1F5"
+    antora_display_version: 日本語
+
+# Files that should never be translated (relative to modules/ROOT/).
+# These are purely technical: CSS/JS passthrough, attribute definitions,
+# SVG icons, HTML figure templates. They are copied verbatim from en/.
+skip_patterns:
+  - "partials/**"
+  - "pages/module-*/_shared/**"
+  - "pages/module-*/_figures/**"
+  - "pages/module-*/m*/_figures/**"
+
+# Technical terms to preserve in English across all translations.
+preserve_terms:
+  - OpenShift
+  - Red Hat
+  - Kubernetes
+  - Argo CD
+  - GitOps
+  - Developer Hub
+  - Dev Spaces
+  - Lightspeed
+  - Parasol Insurance
+  - Parasol
+  - Kafka
+  - Apache Camel
+  - Kaoto
+  - Service Interconnect
+  - Connectivity Link
+  - Rocket.Chat
+  - Matrix
+  - Keycloak
+  - LiteLLM
+  - SonarQube
+  - Tekton
+  - Helm
+  - GitLab
+  - Showroom
+  - MaaS

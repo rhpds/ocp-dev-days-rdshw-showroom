@@ -1,0 +1,78 @@
+name: translate
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_language:
+        description: 'Target language code (e.g. ja, ko, es)'
+        required: true
+        type: string
+      model:
+        description: 'LLM model to use for translation'
+        required: false
+        default: 'translate/gpt-5.4-mini'
+        type: choice
+        options:
+          - translate/gpt-5.4-mini
+          - translate/gpt-5.4-nano
+          - translate/gpt-6-luna
+      specific_file:
+        description: 'Translate only this file (relative to modules/ROOT/, leave empty for all stale)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: translate-${{ github.event.inputs.target_language }}
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.6/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          npm install -g @opencode/cli@2.2.0
+
+      - name: run translation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+        run: |
+          ARGS="--lang ${{ inputs.target_language }} --model ${{ inputs.model }}"
+          if [ -n "${{ inputs.specific_file }}" ]; then
+            ARGS="$ARGS --file ${{ inputs.specific_file }}"
+          fi
+          ./scripts/translate.sh $ARGS
+
+      - name: create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "i18n(${{ inputs.target_language }}): update translations"
+          branch: i18n/update-${{ inputs.target_language }}-${{ github.run_number }}
+          title: "i18n(${{ inputs.target_language }}): update translations"
+          body: |
+            ## Translation Update
+
+            - **Target language**: `${{ inputs.target_language }}`
+            - **Model**: `${{ inputs.model }}`
+            - **Triggered by**: @${{ github.actor }}
+
+            ### Review checklist
+            - [ ] Spot-check translated prose for accuracy
+            - [ ] Verify AsciiDoc syntax is preserved (headings, xrefs, code blocks)
+            - [ ] Confirm technical terms are kept in English where appropriate
+            - [ ] Build locally with `antora site.yml` to verify rendering
+          labels: i18n

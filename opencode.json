@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "providers": {
+    "translate": {
+      "name": "Translation API",
+      "env": ["OPENAI_API_KEY"],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "{env:OPENAI_BASE_URL}"
+      },
+      "models": {
+        "gpt-5.4-mini": { "name": "GPT 5.4 Mini" },
+        "gpt-5.4-nano": { "name": "GPT 5.4 Nano" },
+        "gpt-6-luna": { "name": "GPT 6 Luna" }
+      }
+    }
+  },
+  "model": "translate/gpt-5.4-mini"
+}

@@ -17,10 +17,10 @@
   function detectCurrentLanguage() {
     const path = window.location.pathname
 
-    if (path.includes('/modules/en/')) return 'en'
-    if (path.includes('/modules/ja/')) return 'ja'
+    for (const lang of Object.keys(languages)) {
+      if (path.includes(`/modules/${lang}/`)) return lang
+    }
 
-    // Fallback to stored preference or default
     return localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG
   }
 
