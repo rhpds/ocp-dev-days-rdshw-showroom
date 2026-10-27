@@ -5,30 +5,19 @@
    * Inject language switcher into Showroom navbar
    */
   function injectLanguageSwitcher() {
-    // Find the navbar-end div specifically
-    const navbarEnd = document.querySelector('.navbar .navbar-end')
+    if (document.querySelector('.language-switcher')) return
 
-    if (!navbarEnd) {
-      console.warn('Could not find .navbar .navbar-end to inject language switcher')
-      return
-    }
+    var toolbar = document.querySelector('div.toolbar')
+    if (!toolbar) return
 
-    // Check if already injected
-    if (document.querySelector('.language-switcher')) {
-      console.info('Language switcher already exists')
-      return
-    }
+    var breadcrumbs = toolbar.querySelector('nav.breadcrumbs')
 
-    // Create switcher container
-    const switcher = document.createElement('div')
+    var switcher = document.createElement('div')
     switcher.className = 'language-switcher'
     switcher.setAttribute('role', 'navigation')
     switcher.setAttribute('aria-label', 'Language selection')
 
-    // Insert inside navbar-end
-    navbarEnd.appendChild(switcher)
-
-    console.info('Language switcher container injected into navbar-end')
+    toolbar.insertBefore(switcher, breadcrumbs)
   }
 
   // Wait for DOM to be fully loaded
