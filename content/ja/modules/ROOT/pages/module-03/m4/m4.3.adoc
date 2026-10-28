@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id='lab4-complete-flow']
-== フローの完了
+== フローを完成させる
 
 
 {empty} +

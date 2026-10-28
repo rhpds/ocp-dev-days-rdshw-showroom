@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="matrix-chat"]
-== Matrix プラットフォームの初期設定
+== Matrix プラットフォームのオンボーディング
 
 {empty} +
 
@@ -13,7 +13,7 @@ include::partial$style.adoc[]
 
 . _Matrix_ の Web クライアントを開く
 +
-下のリンクをクリックして、 _Matrix_ のログインページを開きます（新しいタブで開きます）。
+以下のリンクをクリックすると、 _Matrix_ のログインページが新しいタブで開きます。
 +
 --
 - link:{url-element}[Matrix のログインページ,window="_blank"]
@@ -58,29 +58,29 @@ REPLACE
 +
 {empty} +
 +
-. 次に、 **_"Sign in"_** をクリックします
+. 次に、 **_"Sign in"_** をクリックします。
 ====
 +
 {empty} +
 +
-本人確認を求められます。以下のように、パスワードを入力してください。
+本人確認を求められます。以下のように、パスワードを入力して確認します。
 +
 image::module-03/m2/matrix-login-confirm.jpg[width=60%]
 +
 {blank}
 +
- _"Continue"_ をクリックして確認します。
+ _"Continue"_ をクリックします。
 +
 {empty} +
 +
-最後に、 _Matrix_ の画面に、ルームへの参加招待が保留中であることが表示されます。 +
+最後に、 _Matrix_ の画面にルームへの招待が保留中であることが表示されます。 +
 以下の手順に従って招待を承認してください。
 +
 image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 +
 --
 . ルームをクリックします。
-. 次に、 _"Accept"_ をクリックします。
+. _"Accept"_ をクリックします。
 --
 
 {empty} +
@@ -88,7 +88,7 @@ image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 
 [.verification]
 ****
-Matrix ルームに正常に参加できましたか？
+Matrix ルームに参加できましたか？
 ****
 
 {empty} +

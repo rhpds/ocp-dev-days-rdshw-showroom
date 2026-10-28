@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id='lab4-ai-customer-support']
 == ラボ 4 - AI カスタマーサポート
 
-自然言語チャットに基づいてバックエンドのアクションをオーケストレーションするために AI エージェントを使用します — Agentic Apache Camel と Model-as-a-Service (MaaS) を活用しています。
+自然言語チャットを通じてバックエンドのアクションをオーケストレーションする AI エージェントを使用します。Agentic Apache Camel と Model-as-a-Service (MaaS) を活用しています。
 
 {empty} +
 

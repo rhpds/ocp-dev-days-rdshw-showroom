@@ -16,7 +16,7 @@ include::partial$_attributes.adoc[]
 
 == Parasol にカスタムルールが必要な理由
 
-Parasol Insurance は、共有エンタープライズライブラリー `com.enterprise:audit-logging-library` に依存しています。このライブラリーは、プロジェクト内のローカル Maven リポジトリーとしてベンダー提供されています。
+Parasol Insurance は、共有エンタープライズライブラリー `com.enterprise:audit-logging-library` に依存しています。このライブラリーは、プロジェクト内にローカル Maven リポジトリーとして取り込まれています。
 
 * **v1 (`1.0.0`)** — 同期型でファイルシステム指向の監査ロギング (`AuditEvent` のビルダーパターン、`FileSystemAuditLogger`、`logSuccess` / `logFailure` などの便利なメソッド)
 * **v2 (`2.0.0`)** — ストリーミング指向の API (`StreamableAuditLogger`、レコード形式の `AuditEvent`、ノンブロッキングの `logEventAsync`)

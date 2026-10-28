@@ -99,7 +99,7 @@ NOTE: このワークショップでは、わかりやすくするためにシ�
 
 2 つの API key secret はすでに *事前に作成* されています。どちらのポリシーもこれらの secret のラベルとアノテーションを参照するため、その構造を理解しておくことが重要です。
 
-**Silver tier user:**
+**Silver tier のユーザー:**
 [source,yaml,subs="attributes"]
 ----
 apiVersion: v1
@@ -137,9 +137,9 @@ type: Opaque
 
 // アーキテクチャとセットアップを理解したので、LLM エンドポイントを保護し、組織内の認証済みユーザーだけがアクセスできるようにします。`ai-proxy-route` HTTPRoute に適用される **AuthPolicy** を作成し、次の項目を強制します:
 
-// 1. **API Key Authentication** -- 有効な Bearer token（既知の secret と一致するもの）を含むリクエストだけを許可します。
-// 2. **Group-based Authorization** -- `lite` または `pro` グループに属するユーザーだけが API にアクセスできます。
-// 3. **Identity Extraction** -- secret のアノテーションからユーザーのグループとユーザー ID を抽出し、次のセクションで作成する TokenRateLimitPolicy で利用できるよう、下流に渡します。
+// 1. **API key による認証** -- 有効な Bearer token（既知の secret と一致するもの）を含むリクエストだけを許可します。
+// 2. **グループベースの認可** -- `lite` または `pro` グループに属するユーザーだけが API にアクセスできます。
+// 3. **ID の抽出** -- secret のアノテーションからユーザーのグループとユーザー ID を抽出し、次のセクションで作成する TokenRateLimitPolicy で利用できるよう、下流に渡します。
 
 === AuthPolicy を確認して適用する
 

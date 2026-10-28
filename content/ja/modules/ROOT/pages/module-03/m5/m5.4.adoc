@@ -37,7 +37,7 @@ flowchart LR
 
 すべての LLM リクエストは計算能力を消費し、より豊富な分析ほど多くの計算資源を必要とします。AI の採用が進むにつれて、コストとインフラ容量の管理は重要になります。レート制限ポリシーは、各サービス全体でのトークン使用量を制御するのに役立ちます。
 
-この演習では、Customer Profile Tool が穏やかな縮退戦略を伴って単純なレート制限を超えます。まず *Gold* 分析を試み、Gold 予算が使い切られたら *Silver* にフォールバックして、より低コストで有用なプロファイルを生成し続けます。両方が尽きた場合にのみ、リクエストは拒否されます。
+この演習では、Customer Profile Tool は単純なレート制限にとどまらず、段階的に分析レベルを下げる戦略を採用します。まず *Gold* 分析を試み、Gold 予算が使い切られたら *Silver* にフォールバックして、より低コストで有用なプロファイルを生成し続けます。両方の予算が尽きた場合にのみ、リクエストは拒否されます。
 
 [NOTE]
 ====
@@ -114,7 +114,7 @@ camel run * --local-kamelet-dir ../support/kamelets
 
 === TokenRateLimitPolicy を適用して確認する
 
-TokenRateLimitPolicy はゲートウェイレベルのリソースです。階層ごとのトークン予算を定義し、実行中のアプリケーションとは独立してゲートウェイにそれを強制させます。
+TokenRateLimitPolicy はゲートウェイレベルのリソースです。階層ごとのトークン予算を定義し、実行中のアプリケーションとは独立してゲートウェイに適用させます。
 
 . _DevSpaces_ で kbd:[+] アイコンをクリックして新しいターミナルタブを開きます（後でテストできるよう、_Camel_ が実行中の前のタブはそのまま残してください）。
 +
@@ -216,7 +216,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
 ====
 --
 +
-出力には、TokenRateLimitPolicy が存在し、正しい HTTPRoute を対象にし、強制状態になっていることが示されるはずです。例:
+出力には、TokenRateLimitPolicy が存在し、正しい HTTPRoute を対象にしており、Enforced 状態になっていることが示されるはずです。例:
 +
 {blank}
 +
@@ -237,7 +237,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
 ++++
 +
-ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を現在追跡しています。+
+ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を継続的に追跡しています。+
 フォールバック戦略を実際に見てみましょう。
 
 {empty} +
@@ -316,7 +316,7 @@ NOTE: トークン予算は永続的ではありません。時間ウィンド�
 Gold の予算がなくなったあとに Silver が表示され、最後に両方の予算が尽きたときに 429 エラーが出る、という流れを確認できましたか？
 
 [.success]
-階層化されたトークンレート制限と穏やかな縮退戦略を正常に適用できました。
+階層化されたトークンレート制限と、分析レベルを段階的に下げる戦略を正常に適用できました。
 
 [.fail]
 AuthPolicy と TokenRateLimitPolicy の両方が Enforced 状態であることを確認してください。トークン予算が更新されるまで待ってから、もう一度試してください。

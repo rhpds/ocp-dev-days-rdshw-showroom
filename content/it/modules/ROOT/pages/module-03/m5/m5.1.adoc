@@ -1,0 +1,192 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup-lab5"]
+== Configura la cartella di lavoro del lab
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+
+[.indent2]
+[IMPORTANT]
+--
+Se hai saltato i capitoli precedenti, espandi la sezione qui sotto per recuperare.
+
+[%collapsible]
+====
+
+* Abilita l'accesso al database
++
+======
+Questo capitolo richiede l'accesso a un database, ma per impostazione predefinita non è raggiungibile.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w50]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integrazione]
+        end
+    end
+
+    Camel -.-x|"❌ non raggiungibile"| SVC
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            %% SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style DB fill:none,stroke:none
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+
+Per abilitare l'accesso al database, esegui il seguente comando nel terminale di _Dev Spaces_:
+
+[.copypaste]
+****
+si-setup
+****
+
+Dovresti vedere tutte le risorse con stato `ready OK`:
+
+[subs="attributes"]
++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
+    <span style="color: #07BC7A">✓</span> Site                    ready  OK
+    <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
+    <span style="color: #07BC7A">✓</span> Listener                ready  OK
+
+Namespace: shared-database
+    <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
+    <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
++++
+
+L'output qui sopra indica che è stato stabilito un collegamento Service Interconnect tra il tuo namespace e quello del database.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w80]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integrazione]
+
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Camel --> SI1
+
+    SI1 -.-|"🔒 collegamento sicuro"| SI2
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    SI2 --> SVC
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style DB fill:none,stroke:none
+    style SI1 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SI2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+======
+====
+--
+
+{empty} +
+
+. Dal terminale in _Dev Spaces_:
+.. Se hai processi in esecuzione, fermali con kbd:[Ctrl+C].
+.. Esegui il seguente comando:
++
+{blank}
++
+[.copypaste]
+****
+step 9
+****
++
+[TIP]
+--
+.Esegui il comando qui sopra in qualsiasi momento per reimpostare l'esercizio.
+[%collapsible]
+====
+Il workshop include pratici script di supporto che ti consentono di passare a qualsiasi step o di reimpostare il lab a uno stato noto e funzionante:
+
+* `step N` — reimposta il lab all'inizio dello step N
+* `steps` — elenca tutti gli step disponibili nel lab
+* `start` o `restart` — torna all'inizio (equivalente a `step 1`)
+* `ff` — passa rapidamente allo step *successivo*
+* `rw` — torna allo step *precedente*
+====
+--
++
+{empty} +
+
+. Controlla la cartella del lab
++
+Dopo aver eseguito i comandi qui sopra, dai un'occhiata alla vista ad albero dell'editor per verificare che sia tutto a posto. Dovrebbe essere simile alla struttura delle cartelle vista nell'esercizio precedente.
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(input di esempio)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(prompt del modello)</small>] +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-main.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-tool-profile.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #b07219"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *PdfRenderer.java* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
+
+[.indent2]
+NOTE: Questa versione dell'esercizio non usa server MCP per semplificare l'esecuzione. Tutti gli strumenti sono integrati direttamente nel processo agentico Camel: sono definiti come normali route Camel che l'agent può individuare e chiamare.
+--
++
+{empty} +
+
+
+
+[.verification]
+****
+Vedi la struttura delle cartelle e i file previsti?
+
+[.success]
+Puoi continuare.
+
+[.fail]
+Assicurati che la sintassi dei comandi sia compatibile con il tuo ambiente e riprova.
+****
+
+{empty} +

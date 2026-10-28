@@ -7,21 +7,21 @@ include::partial$style.adoc[]
 
 
 
-顧客からデータを取り込み、バックエンドデータベースに保存し、PDF のポリシー文書を生成します。これらすべてを Apache Camel でオーケストレーションし、{rhsi} による安全なクラスター間接続を実現します。
+顧客データを取り込み、バックエンドデータベースに保存して、PDF の保険証券を生成します。これらすべてを Apache Camel でオーケストレーションし、{rhsi} を利用してクラスター間の安全な接続を実現します。
 
 {empty} +
 
 *ビジネスニーズ*
 
-顧客は EDI 形式の保険契約申請書をプラットフォームに送信します。これらの申請書は取り込まれ、変換され、バックエンドデータベースに保存された後、アーカイブ用の PDF ポリシー文書としてレンダリングされる必要があります。データベースは別のインフラストラクチャ上にあり、OpenShift から直接アクセスできないため、安全な接続ソリューションが必要です。
+顧客は EDI 形式の保険契約申込書をプラットフォームに送信します。申込書を取り込んで変換し、バックエンドデータベースに保存したうえで、アーカイブ用の PDF 保険証券として生成する必要があります。データベースは別のインフラストラクチャ上にあり、OpenShift から直接アクセスできないため、安全な接続ソリューションが必要です。
 
 {empty} +
 
 *構築する技術ソリューション*
 
-Apache Camel インテグレーションが API エンドポイントを公開し、受信した EDI 形式の保険契約申請書を受け取ります。フローでは EDI データを XML 形式に変換し、{rhsi} を介してバックエンドデータベースに保存するとともに、PDF のポリシー文書をレンダリングして S3 オブジェクトストレージ（OpenShift Data Foundation）にアップロードします。
+Apache Camel インテグレーションで API エンドポイントを公開し、EDI 形式の保険契約申込書を受信します。フローでは EDI データを XML 形式に変換して {rhsi} 経由でバックエンドデータベースに保存し、PDF 保険証券を生成して S3 オブジェクトストレージ（OpenShift Data Foundation）にアップロードします。
 
-{rhsi} により、データベースをパブリックネットワークに公開せずに、OpenShift クラスターとリモートのバックエンドデータベースとの間で安全な接続を確立できます。
+{rhsi} により、データベースをパブリックネットワークに公開することなく、OpenShift クラスターとリモートのバックエンドデータベース間に安全な接続を確立できます。
 
 {empty} +
 
@@ -38,14 +38,14 @@ flowchart LR
     subgraph LocalEnvironment [OpenShift]
         Portal
         Camel --> |"① XML データ"|ServiceInterconnect{{"Service\nInterconnect"}}
-        Camel --> |"② PDF のポリシー文書"|Storage
+        Camel --> |"② PDF 保険証券"|Storage
     end
 
     subgraph RemoteEnvironment [リモート環境]
         ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
     end
 
-    ServiceInterconnect --- |"🔒 セキュアリンク"| ServiceInterconnect2{{"Service\nInterconnect"}}
+    ServiceInterconnect --- |"🔒 セキュアな接続"| ServiceInterconnect2{{"Service\nInterconnect"}}
 
     Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel インテグレーション", pos: "b", h: 80, w: 80, constraint: "on" }
     Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
@@ -69,7 +69,7 @@ flowchart LR
 *このラボで行うこと:*
 
 . *接続を有効にする* — {rhsi} を設定して、バックエンドデータベースへの安全なリンクを確立します。
-. *フローを完成させる* — 保険契約申請書を取り込み、変換、保存、レンダリングする Camel インテグレーションを実装します。
+. *フローを完成させる* — 保険契約申込書を取り込み、変換、保存し、証券を生成する Camel インテグレーションを実装します。
 . *テストして検証する* — フローをローカルで実行し、結果を検証します。
 
 {empty} +

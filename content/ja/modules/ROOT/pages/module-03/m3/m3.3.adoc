@@ -3,9 +3,9 @@
 include::partial$style.adoc[]
 
 [id="enable-and-test"]
-== OpenShift で本番稼働させる
+== OpenShift で稼働させる
 
-「 _Kafka_ から _Rocket.Chat_ へ」のフローは完了しました。時間を節約するため、4 つすべてのフローが _OpenShift_ にデプロイされています。これから、それらをテストし、顧客とサポート担当者の会話をシミュレートします。
+_Kafka_ から _Rocket.Chat_ へのフローは完了しました。時間を節約するため、4 つすべてのフローが _OpenShift_ にデプロイされています。これから、それらをテストし、顧客とサポート担当者の会話をシミュレートします。
 
 下の図は、顧客とサポート担当者の間で双方向通信を可能にする 4 つのフローを示しています。
 
@@ -37,7 +37,7 @@ flowchart LR
 ** ユーザー名: `{user-username}`
 ** パスワード: `{user-password}`
 
-下の画像は、表示されるはずの内容を示しています。4 つの Apache Camel 統合フロー (`m2k`, `k2r`, `r2k`, `k2m`) が中央の _Kafka_ クラスターに接続されています。デプロイメントは現在レプリカ数がゼロにスケールダウンされており、まだ実行されていません。次に起動します。
+下の画像は、表示されるはずの内容を示しています。4 つの Camel 統合フロー (`m2k`, `k2r`, `r2k`, `k2m`) が中央の _Kafka_ クラスターに接続されています。デプロイメントは現在レプリカ数がゼロにスケールダウンされており、まだ実行されていません。次に起動します。
 
 TIP: レイアウトは異なる場合があります。ノードはドラッグ & ドロップで整理できます。
 
@@ -173,8 +173,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
             <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
               <g transform="translate(-11 -11) scale(0.09)">
                 <path stroke-width="30" d="m153.25 277.15c.47-46.35 37.79-81.6 81.6-81.6m0-42.3c46.35.47 81.6 37.79 81.6 81.6m42.3 0c-.47 46.35-37.79 81.6-81.6 81.6m0 42.3c-46.35 0-81.6-37.79-81.6-81.6"/>
-              </g>
-            </svg>
+              </svg>
           </div>
           <span class="icon-label">Matrix</span>
         </div>

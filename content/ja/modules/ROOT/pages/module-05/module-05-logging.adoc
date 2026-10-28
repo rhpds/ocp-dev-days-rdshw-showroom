@@ -6,7 +6,7 @@ include::partial$_attributes.adoc[]
 [.button]
 * link:{attachmentsdir}/module-05-rules/logging.yaml[Download logging.yaml,download=logging.yaml,window=_blank,role=button]
 
-TIP: 上のダウンロードリンクを使用するか、以下の YAML をローカルファイルにコピーして、ローカルコンピューター上の rules ディレクトリーにたとえば `rules/logging.yaml` として保存してください。
+TIP: 上のダウンロードリンクを使用するか、以下の YAML をコピーして、ローカルの rules ディレクトリーにたとえば `rules/logging.yaml` として保存してください。
 
 [.console-input]
 [source,yaml]

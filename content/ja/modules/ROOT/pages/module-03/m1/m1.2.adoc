@@ -31,7 +31,7 @@ flowchart LR
 
     ServiceInterconnect --- |"🔒 セキュアリンク"| ServiceInterconnect2{{"Service\nInterconnect"}}
 
-    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel Integration", pos: "b", h: 80, w: 80, constraint: "on" }
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel インテグレーション", pos: "b", h: 80, w: 80, constraint: "on" }
     Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
     Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
     Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }

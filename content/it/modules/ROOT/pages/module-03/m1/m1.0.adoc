@@ -1,0 +1,75 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='lab1-introduction']
+== Introduzione
+
+
+
+Acquisisci i dati dei clienti, salvali in un database backend e genera documenti di polizza PDF: il tutto orchestrato da Apache Camel con connettività sicura tra cluster fornita da {rhsi}.
+
+{empty} +
+
+*Esigenza aziendale*
+
+I clienti inviano alla piattaforma le richieste di polizza in formato EDI. Queste richieste devono essere acquisite, trasformate e salvate in un database backend, quindi convertite in documenti di polizza PDF per l'archiviazione. Il database risiede su un'infrastruttura separata e non è accessibile direttamente da OpenShift: è necessaria una soluzione di connettività sicura.
+
+{empty} +
+
+*La soluzione tecnica (da realizzare)*
+
+Un'integrazione Apache Camel espone un endpoint API che riceve le richieste di polizza EDI in ingresso. Il flusso trasforma i dati EDI in formato XML, li salva in un database backend tramite {rhsi} e genera documenti di polizza PDF, che vengono caricati nell'object storage S3 (OpenShift Data Foundation).
+
+{rhsi} consente una connettività sicura tra il cluster OpenShift e il database backend remoto senza esporre il database alla rete pubblica.
+
+{empty} +
+
+*Panoramica dell'architettura*
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+
+    Customer --> Portal -->|"messaggio EDI"| Camel
+
+    subgraph LocalEnvironment [OpenShift]
+        Portal
+        Camel --> |"① dati XML"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② documenti di polizza PDF"|Storage
+    end
+
+    subgraph RemoteEnvironment [Ambiente remoto]
+        ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
+    end
+
+    ServiceInterconnect --- |"🔒 collegamento sicuro"| ServiceInterconnect2{{"Service\nInterconnect"}}
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Integrazione Camel", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Portale", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style LocalEnvironment fill:#fce4e4,stroke:#EE0000
+    style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Portal fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style Database fill:none,stroke:none
+----
+
+{empty} +
+
+*Cosa farai in questo lab:*
+
+. *Abilitare la connettività* — Configura {rhsi} per stabilire un collegamento sicuro al database backend.
+. *Completare il flusso* — Implementa l'integrazione Camel che acquisisce e trasforma le richieste di polizza, le salva e genera i documenti.
+. *Testare e convalidare* — Esegui il flusso localmente e convalida i risultati.
+
+{empty} +

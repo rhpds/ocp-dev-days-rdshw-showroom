@@ -1,0 +1,467 @@
+:imagesdir: ../../assets/images
+:page-time: 8
+include::partial$style.adoc[]
+
+[id="kafka-to-rocketchat"]
+== Da Kafka a Rocket.Chat
+
+Per collegare _Matrix_ e _Rocket.Chat_ in entrambe le direzioni servono quattro flow (come spiegato nell'introduzione). Il percorso che trasporta i messaggi dei clienti all'agente di supporto richiede da solo due flow:
+
+* *Flow 1* — Da Matrix a Kafka _(preconfigurato)_
+* *Flow 2* — Da Kafka a Rocket.Chat ✏️ _(lo creerai tu)_
+
+NOTE: Tutti e quattro i flow seguono lo stesso schema: una volta creato il primo, gli altri sono quasi identici. Per mantenere breve il lab, creerai manualmente solo il flow 2; gli altri tre saranno resi disponibili e abilitati alla fine.
+
+[.mermaid]
+----
+flowchart LR
+    MX -->|"flusso 1"| K --> F2 --> RC
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    K@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    F2["✏️ flusso 2"]
+
+    style MX fill:none,stroke:none
+    style K fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style F2 fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#e65100,font-size:14px
+
+    linkStyle 0 stroke:#ccc,stroke-width:1px
+    linkStyle 1 stroke:#d32f2f,stroke-width:2px
+    linkStyle 2 stroke:#d32f2f,stroke-width:2px
+----
+
+Creerai il lato listener, ovvero il flow che acquisisce gli eventi da _Kafka_ e li invia a _Rocket.Chat_. Una volta configurato, ogni messaggio che arriva nel topic _Kafka_ raggiungerà automaticamente l'agente di supporto.
+
+{empty} +
+
+
+=== Aprire la route Camel
+
+Trova il seguente resource nell'albero delle directory:
+
+* `k2r.camel.yaml`
++
+Fai clic per aprirlo in _Kaoto_.
++
+[TIP]
+--
+.Non conosci Kaoto?
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+{empty} +
+
+Il flow è già pronto: devi solo completare tre aree:
+
+. Definire _Kafka_ come sistema sorgente
+. Definire un filtro per evitare gli eventi di loopback
+. Definire il mapping dei dati per trasformare gli eventi _Kafka_ nel formato richiesto da _Rocket.Chat_
+
+{blank}
+
+L'immagine qui sotto evidenzia le aree su cui concentrarsi:
+
+// image::m3/flow-k2r-todo.jpg[width=80%]
+
+{empty} +
+
+[#flow-k2r-todo-new]
+[.bordered]
+image::module-03/m3/flow-k2r-todo-new.png[width=90%]
+
+[.overlay]
+****
+[.target]
+flow-k2r-todo-new
+
+[.arrows]
+{x: 10, y: 72, rot: 0, size: 1, color: "red"}
+{x: 33, y: 26, rot: 220, size: 1, color: "red"}
+{x: 61.5, y: 68, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 10, y: 117, size: 1.2, color: "red"} +
+{x: 40.5, y: -8, size: 1.2, color: "red"} +
+{x: 61.5, y: 117, size: 1.2, color: "red"}
+****
+
+
+{empty} +
+{empty} +
+
+[NOTE]
+--
+*Che cos'è un evento di loopback?*
+
+Tutti i sistemi pubblicano e ascoltano da un unico topic _Kafka_. Questo significa che un messaggio inviato da _Rocket.Chat_ finisce nello stesso topic utilizzato da questo flow e potrebbe tornare al punto di partenza:
+
+[.mermaid]
+----
+flowchart LR
+    RC -->|"messaggio"| K -->|"❌ stesso evento"| RC
+
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+    K@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "topic Kafka", pos: "b", h: 100, w: 80, constraint: "on" }
+
+    style RC fill:none,stroke:none
+    style K fill:none,stroke:none
+
+    linkStyle 0 stroke:#66bb6a,stroke-width:2px
+    linkStyle 1 stroke:#d32f2f,stroke-width:2px,stroke-dasharray:5
+----
+
+Il filtro che definirai evita questo problema controllando il campo `source` di ogni evento e bloccando quelli provenienti da _Rocket.Chat_.
+--
+
+{empty} +
+
+=== Definire Kafka come sistema sorgente
+
+Il primo passaggio del flow consiste nel definire _Kafka_ come sorgente da cui arrivano gli eventi.
+
+NOTE: Il tuo namespace _OpenShift_ contiene già un cluster _Streams for Apache Kafka_ (_Kafka_) pronto all'uso.
+
+1. Passa il puntatore sullo step pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] e fai clic sul pulsante mobile {nbsp}{btn-replace}{nbsp} (sostituisci step).
+1. Digita `Kafka` in {ui-filter} per trovarlo, quindi seleziona il componente _Kafka_.
+1. Fai clic sullo step _Kafka_ per aprire il pannello di configurazione.
+1. Seleziona la scheda di configurazione `All`.
+1. Configura le seguenti 2 proprietà:
++
+(Usa {ui-filter} in alto per trovare rapidamente ciascuna proprietà)
++
+image::module-03/m3/kaoto-kafka-steps.png[width=100%]
++
+`Topic`:
++
+[.copypaste.value]
+****
+myroom
+****
++
+`Brokers`:
++
+[.copypaste.value]
+****
+my-cluster-kafka-bootstrap:9092
+****
++
+{empty} +
++
+TIP: Fai clic in un punto qualsiasi fuori dal pannello di configurazione per chiuderlo.
+
+{empty} +
+
+=== Definire il filtro
+
+Gli eventi che arrivano da _Kafka_ possono provenire da qualsiasi sistema sorgente. Senza un filtro, un messaggio inviato inizialmente da _Rocket.Chat_ passerebbe attraverso _Kafka_ e verrebbe reinviato a _Rocket.Chat_, creando un loop:
+
+  * _Rocket.Chat -> Kafka -> Rocket.Chat_ ⟵ loopback!
+
+{blank}
+
+Il filtro impedisce che accada controllando da dove proviene l'evento.
+
+[cols="3a,6a"]
+|===
+|
+[.bordered]
+[#kaoto-datamapper-configure]
+image::module-03/m3/kaoto-filter-config.png[width=100%]
+
+[.overlay]
+****
+[.target]
+kaoto-datamapper-configure
+
+[.numbers]
+{x: 43, y: 41, size: 4}
+{x: 80, y: 29, size: 4}
+{x: 80, y: 86, size: 4}
+****
+|
+
+1. Fai clic sulla barra pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Filter&nbsp;</code>]
+
+1. Verifica che sia selezionata la scheda `Required`. Dovresti vedere selezionato per impostazione predefinita il linguaggio di espressioni `JQ`.
++
+{blank}
++
+1. Copia e incolla la seguente espressione:
++
+{blank}
++
+[.copypaste.value]
+****
+pass:[.source \| test("rocketchat")]
+****
++
+NOTE: L'espressione estrae il campo `source` dall'evento _Kafka_ e verifica se proviene da _Rocket.Chat_. Gli eventi di _Rocket.Chat_ vengono filtrati per evitare i loopback.
+
+|===
+
+{empty} +
+
+=== Definire la trasformazione dei dati
+
+I dati in arrivo da _Kafka_ usano uno schema comune. Devi mapparli nel formato previsto da _Rocket.Chat_.
+
+{empty} +
+
+. Aggiungi uno step di trasformazione dei dati Kaoto alla route Camel
++
+--
+Da Kaoto:
+
+. Fai clic sul pulsante kbd:[+] all'interno dello step pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Map...&nbsp;</code>]
+. Digita `mapper` in {ui-filter} per trovare _Kaoto DataMapper_
+. Fai clic sul tile _Kaoto DataMapper_
+. Fai clic sul mapper per aprire il pannello di configurazione
+. Fai clic sul pulsante pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>]
++
+image::module-03/m3/kaoto-datamapper-steps.png[width=100%]
+
+--
++
+[TIP]
+--
+.Panoramica dell'interfaccia utente di data mapper.
+[%collapsible]
+====
+Ecco l'aspetto del data mapper: *Source* a sinistra (da dove provengono i dati) e *Target* a destra (dove vengono mappati i dati):
+
+{blank}
+
+image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+====
+--
++
+{empty} +
+
+. Definisci quindi gli input e gli output
++
+--
+Dall'editor DataMapper, definisci la sorgente (a sinistra) e il target (a destra):
+
+[cols="1a,1a", options="header"]
+|===
+| Source (pannello sinistro)
+| Target (pannello destro)
+
+|
+. In **Body**, fai clic su kbd:[{map-att}] (Attach schema)
+. Fai clic su pass:a[<span {btn-stl-blue-outline}>{map-upload} Upload schema file(s)</span>]
+. Inserisci `common` in {ui-filter}
+. Seleziona `support/schemas/*common.json*`, quindi fai clic su pass:[<code style="background-color: #4494E5; color: white;">OK</code>]
+. Fai clic su pass:a[<span {btn-stl-blue}>Attach</span>]
+
+|
+. Fai clic su kbd:[{map-att}] (Attach schema)
+. Fai clic su pass:a[<span {btn-stl-blue-outline}>{map-upload} Upload schema file(s)</span>]
+. Inserisci `rocket` in {ui-filter}
+. Seleziona `support/schemas/*rocketchat-out.json*`, quindi fai clic su pass:[<code style="background-color: #4494E5; color: white;">OK</code>]
+. Fai clic su pass:a[<span {btn-stl-blue}>Attach</span>]
+
+|===
+--
++
+{empty} +
+
+. Definisci le regole di mapping dei dati
++
+Copia e incolla (in *Target*) i valori seguenti per definire i campi indicati:
++
+... `string[@key = channel]`:
++
+[.copypaste.value]
+****
+[.path]
+/roomid
+
+[.default]
+room11
+
+"REPLACE"
+****
++
+--
+.Per incollare il valore:
+[caption=]
+====
+Fai clic su kbd:[⠇] e seleziona kbd:[Add value selector (value-of)], come mostrato qui sotto:
+
+[.bordered]
+[#mapper-add-expression]
+image::module-03/m3/mapper-add-expression.png[width=50%]
+
+[.overlay]
+****
+[.target]
+mapper-add-expression
+
+[.arrows]
+{x: 96.5, y: 28, rot: -90, size: 1}
+{x: 94.0, y: 41, rot: -90, size: 1}
+
+[.numbers]
+{x: 120, y: 28, size: 2}
+{x: 120, y: 41, size: 2}
+****
+
+// image::module-03/m3/mapper-add-expression.jpg[width=70%]
+====
+--
++
+{blank}
++
+... `string[@key = text]`:
++
+[.copypaste.value]
+****
++++concat("*",/fn:map/fn:string[@key='user'], "@", /fn:map/fn:string[@key='source'],":* ", /fn:map/fn:string[@key='text'])+++
+****
++
+Il mapping dovrebbe apparire simile a questo:
++
+[.bordered]
+image::module-03/m3/mapping-kafka-rocketchat.png[width=80%]
++
+{empty} +
+
+Per tornare all'area di lavoro, fai clic sulla scheda *Design*:
+
+image::module-03/common/kaoto-design-tab.png[width=50%]
+
+{empty} +
+
+Il flow completato dovrebbe essere simile a questo:
+
+[.bordered]
+image::module-03/m3/flow-k2r-complete.png[width=90%]
+
+{empty} +
+
+=== Testare il flow in locale
+
+Esegui il processo in background usando _Camel JBang_:
+
+{blank}
+
+[.copypaste]
+****
+labrun k2r --background
+****
+
+[TIP]
+--
+.Cosa fa questo comando?
+[%collapsible]
+====
+`labrun` è un helper del lab che esegue Camel JBang in background. Il comando qui sopra equivale a:
+
+* `camel run --name k2r` — esegue l'integrazione chiamata `k2r`
+* `--source-dir k2r` — carica i file della route dalla directory `k2r`
+* `--local-kamelet-dir ../support/kamelets` — carica Kamelet personalizzati (connector), incluso quello per Rocket.Chat
+* `--background` — esegue il processo in background, così puoi continuare a lavorare nel terminale
+====
+--
+
+{empty} +
+
+Verifica che il processo sia in esecuzione:
+
+{blank}
+
+[.copypaste]
+****
+camel get
+****
+
+{blank}
+
+Dovresti vedere il processo con stato `Running`:
+
++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">  PID   NAME  CAMEL   PLATFORM  PROFILE  READY  STATUS   RELOAD  AGE  ROUTE  MSG/S  TOTAL  FAIL  INFLIGHT  LAST  SINCE-LAST
+ 16763  k2r   4.18.0  Camel     dev       1/1   Running     0/0  16s    1/1   0.00      0     0         0             -/-/-</pre>
+ ++++
+
+{empty} +
+
+Prima di inviare un messaggio di test, assicurati che _Rocket.Chat_ sia aperto e che tu sia nella room assegnata. Se non hai ancora effettuato l'accesso, segui le istruzioni in xref:module-03/m2/m2.2.adoc[Onboarding della piattaforma Rocket.Chat,window=_blank].
+
+Quando è tutto pronto, invia un messaggio di test a _Kafka_:
+
+{blank}
+
+[.copypaste]
+****
++++camel cmd send k2r --body \
+'{
+  "user":   "test",
+  "source": "test",
+  "text":   "test message"
+}'+++
+****
+
+[TIP]
+--
+.Cosa fa questo comando?
+[%collapsible]
+====
+* `camel cmd send` — invia un messaggio a un processo Camel in esecuzione
+* `k2r` — il nome del processo di destinazione
+* `--body '{...}'` — un payload JSON che simula un evento Kafka. Sono necessari solo `user`, `source` e `text`: il canale di destinazione è hardcoded nel mapping
+====
+--
+
+{empty} +
+
+Apri la room _Rocket.Chat_ e verifica che sia arrivato il messaggio. Dovresti vedere qualcosa del genere:
+
+{empty} +
+
+:fig-avatar: U
+:fig-sender: {username}
+:fig-time: 3:42 PM
+:fig-msg: pass:[<b>test@test:</b> messaggio di test]
+include::_figures/rc-message.adoc[]
+
+{empty} +
+
+Dopo aver verificato il messaggio, arresta il processo in background:
+
+{blank}
+
+[.copypaste]
+****
+camel stop
+****
+
+[TIP]
+--
+.Cosa fa questo comando?
+[%collapsible]
+====
+* `camel stop` — arresta tutti i processi Camel in esecuzione avviati con _Camel JBang_
+* Puoi verificare che non sia in esecuzione nulla con `camel get`
+====
+--
+
+{empty} +
+
+[.verification]
+****
+Hai visto il messaggio di test nella room _Rocket.Chat_?
+
+[.success]
+Il flow funziona: la route da _Kafka_ a _Rocket.Chat_ riceve gli eventi e li invia a destinazione. Ora che il flow è stato convalidato in locale, è il momento di eseguirne il deploy su _OpenShift_.
+
+[.fail]
+Rivedi la definizione della route Camel e controlla se ci sono errori nel terminale.
+****

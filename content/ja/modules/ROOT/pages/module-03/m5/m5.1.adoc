@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab5"]
-== ラボ作業用フォルダーを準備する
+== Lab の作業フォルダーをセットアップする
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -12,7 +12,7 @@ include::../_shared/close-tabs.adoc[]
 [.indent2]
 [IMPORTANT]
 --
-前の章を飛ばした場合は、以下のセクションを展開して追いついてください。
+前の章をスキップした場合は、以下のセクションを展開して内容を確認してください。
 
 [%collapsible]
 ====
@@ -20,7 +20,7 @@ include::../_shared/close-tabs.adoc[]
 * データベースへのアクセスを有効にする
 +
 ======
-この章ではデータベースへのアクセスが必要ですが、デフォルトでは到達できません。
+この章ではデータベースへのアクセスが必要ですが、デフォルトでは接続できません。
 
 {blank}
 
@@ -35,7 +35,7 @@ flowchart LR
         end
     end
 
-    Camel -.-x|"❌ 到達不可"| SVC
+    Camel -.-x|"❌ 接続不可"| SVC
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -56,17 +56,17 @@ flowchart LR
     style SVC fill:#fce4e4,stroke:#EE0000,color:#333
 ----
 
-_Dev Spaces_ のターミナルで次のコマンドを実行して、データベースへのアクセスを有効にします。
+データベースへのアクセスを有効にするには、 _Dev Spaces_ のターミナルで次のコマンドを実行します。
 
 [.copypaste]
 ****
 si-setup
 ****
 
-すべてのリソースが `ready OK` と表示されるはずです。
+すべてのリソースで `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -75,9 +75,9 @@ si-setup
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-++++
++++
 
-上記の出力は、あなたの namespace とデータベースの namespace の間に Service Interconnect リンクが確立されたことを示しています。
+上記の出力は、自分の namespace とデータベースの namespace の間に Service Interconnect の link が確立されたことを示しています。
 
 {blank}
 
@@ -96,7 +96,7 @@ flowchart LR
 
     Camel --> SI1
 
-    SI1 -.-|"🔒 セキュアリンク"| SI2
+    SI1 -.-|"🔒 セキュアな link"| SI2
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -127,7 +127,7 @@ flowchart LR
 {empty} +
 
 . _Dev Spaces_ のターミナルで:
-.. 実行中のプロセスがあれば、kbd:[Ctrl+C] で停止します。
+.. 実行中のプロセスがある場合は、 kbd:[Ctrl+C] で停止します。
 .. 次のコマンドを実行します。
 +
 {blank}
@@ -139,31 +139,31 @@ step 9
 +
 [TIP]
 --
-.上のコマンドは、いつでも実行して演習をリセットできます。
+.演習をリセットするには、上記のコマンドをいつでも実行できます。
 [%collapsible]
 ====
-このワークショップには、任意のステップに移動したり、既知の正常な状態にラボをリセットしたりできる便利な補助スクリプトが含まれています。
+この workshop には便利な helper script が含まれており、任意の step に移動したり、lab を既知の正常な状態にリセットしたりできます。
 
-* `step N` — ラボを step N の開始位置にリセットする
-* `steps` — ラボで利用可能なすべてのステップを一覧表示する
-* `start` または `restart` — 最初からやり直す（ `step 1` と同等）
-* `ff` — *次の* ステップへ早送りする
-* `rw` — *前の* ステップへ巻き戻す
+* `step N` — lab を step N の最初にリセットします
+* `steps` — lab で利用可能なすべての step を一覧表示します
+* `start` または `restart` — 最初から開始します (`step 1` と同じ)
+* `ff` — *次の* step に進みます
+* `rw` — *前の* step に戻ります
 ====
 --
 +
 {empty} +
 
-. ラボフォルダーを確認する
+. lab フォルダーを確認する
 +
-上記のコマンドを実行したら、エディターのツリービューで状態を確認してください。前の演習で見たフォルダー構成と同様になっているはずです。
+上記のコマンドを実行したら、エディターのツリービューを見て、問題がないことを確認してください。前の演習で見たフォルダー構成と同じような構成になっているはずです。
 +
 --
 [.indent2]
 📁 workshop +
 &nbsp;&nbsp;📁 lab +
 &nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(モック入力)</small>] +
-&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(モデルプロンプト)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(モデルのプロンプト)</small>] +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-main.camel.yaml* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-tool-profile.camel.yaml* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
@@ -171,7 +171,7 @@ pass:[<mark style="padding-left: 1rem; background-color: white; color: #b07219">
 pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
 
 [.indent2]
-NOTE: この演習のこの版では、実行を簡略化するために MCP サーバーは使用しません。すべてのツールは Camel のエージェント処理に直接組み込まれており、通常の Camel ルートとして定義され、エージェントが検出して呼び出せます。
+NOTE: このバージョンの演習では、実行を簡単にするために MCP server を使用しません。すべてのツールは Camel agentic process に直接組み込まれており、agent が検出して呼び出せる通常の Camel route として定義されています。
 --
 +
 {empty} +
@@ -180,13 +180,13 @@ NOTE: この演習のこの版では、実行を簡略化するために MCP サ
 
 [.verification]
 ****
-期待どおりのフォルダー構成とファイルが表示されていますか？
+期待どおりのフォルダー構成とファイルが表示されていますか?
 
 [.success]
-先へ進む準備ができました。
+続行する準備ができました。
 
 [.fail]
-コマンドの構文が環境と互換性があることを確認してから、もう一度試してください。
+コマンドの構文が環境に合っていることを確認して、もう一度試してください。
 ****
 
 {empty} +

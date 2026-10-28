@@ -43,7 +43,7 @@ image::m02-rhdh-secured-component.png[Developer Hub の Parasol Insurance Secure
 +
 * **Topology** タブには、アプリケーションのデプロイメントとその関係を示すビジュアルマップが表示されます。
 * **CI** タブには、ビルド、セキュリティスキャン、昇格パイプラインなどのパイプライン実行が表示されます。このモジュールでは、このタブを頻繁に使用します。
-* **CD** タブには、preprod および secured-prod デプロイメントの ArgoCD 同期ステータスが表示されます。
+* **CD** タブには、preprod および secured-prod デプロイメントの Argo CD 同期ステータスが表示されます。
 +
 次の演習で開発用の完全に独立したサンドボックス環境を作成した後、これらのタブに戻ります。
 
@@ -222,7 +222,7 @@ image::m02-rhda-shield-button.png[RHDA レポートを開くステータスバ�
 <quarkus.platform.version>3.40.1</quarkus.platform.version>
 ----
 
-. 自動保存後、分析が完了するまで待ちます。脆弱性の数がわずかに減るはずです。
+. 自動保存後、分析が完了するまで待ちます。脆弱性の数が数件程度まで減るはずです。
 +
 image::m02-rhda-report-after-fix.png[フレームワークを最新バージョンに更新した後の RHDA レポート,link=self,window=blank,width=700]
 

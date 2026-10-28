@@ -52,7 +52,7 @@ pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><
 [.indent2]
 [NOTE]
 ====
- `application.properties` ファイルには、環境用の接続設定があらかじめ含まれているため、そのまま使用できます。接続設定ではなく、統合ロジックの構築に集中できます。
+この `application.properties` ファイルには、環境用の接続設定があらかじめ含まれているため、そのまま使用できます。接続設定ではなく、統合ロジックの構築に集中できます。
 
 .何が含まれていますか?
 [%collapsible]

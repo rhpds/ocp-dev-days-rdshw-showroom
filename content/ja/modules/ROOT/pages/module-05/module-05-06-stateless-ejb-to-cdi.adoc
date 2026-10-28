@@ -1,27 +1,27 @@
-= セクション 6: Stateless EJB から CDI へ (`ClaimService`)
+= セクション 6: Stateless EJB から CDI へ ( `ClaimService` )
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
 == 目標
 
-Developer Lightspeed を使って、`ClaimService` を `@Stateless` EJB から Quarkus に適した `@ApplicationScoped` CDI Bean + `@Transactional` へリファクタリングします。
+Developer Lightspeed を使って、 `ClaimService` を `@Stateless` EJB から Quarkus に適した `@ApplicationScoped` CDI Bean + `@Transactional` へリファクタリングします。
 
 * Get Solution と MTA Resolution Details を使いながら進める
 * 必要に応じてエージェント支援の後続対応で、関連するビルドや設定の問題を解消する
 
-Enterprise JavaBeans (EJBs) は、EAP 上でビジネスロジックとコンテナー管理トランザクションをカプセル化する一般的な方法でした。Quarkus ではサポートされていません。**parasol-insurance-eap** では、`com.parasol.ejb.ClaimService` は **ローカルの `@Stateless` セッション Bean** であり、リモート EJB ではありません。JPA の `EntityManager` を使って請求を一覧表示し、検索します。JAX-RS レイヤー (`ClaimsResource`) はすでに HTTP を公開しているため、この演習では **サービス Bean 自体のモダナイズ** に焦点を当てます。
+Enterprise JavaBeans (EJBs) は、EAP 上でビジネスロジックとコンテナー管理トランザクションをカプセル化する一般的な方法でした。Quarkus ではサポートされていません。 **parasol-insurance-eap** では、 `com.parasol.ejb.ClaimService` は **ローカルの `@Stateless` セッション Bean** であり、リモート EJB ではありません。JPA の `EntityManager` を使って請求を一覧表示し、検索します。JAX-RS レイヤー ( `ClaimsResource` ) はすでに HTTP を公開しているため、この演習では **サービス Bean 自体のモダナイズ** に焦点を当てます。
 
-このラボでは、`ClaimService` を `@Stateless` から `@ApplicationScoped` + `@Transactional` に変換し、トランザクション境界と CDI インジェクションを Quarkus のやり方で動作させます。
+このラボでは、 `ClaimService` を `@Stateless` から `@ApplicationScoped` + `@Transactional` に変換し、トランザクション境界と CDI インジェクションを Quarkus のやり方で動作させます。
 
 == パラダイムの転換: コンテナー管理 EJB から CDI へ
 
-EAP では、`@Stateless` によってプールされた Bean、コンテナー管理トランザクション、そして `@EJB` / JNDI に適した配線が得られました。Quarkus は EJB コンテナーを実行しません。代わりに次を使います。
+EAP では、 `@Stateless` によってプールされた Bean、コンテナー管理トランザクション、そして `@EJB` / JNDI に適した配線が得られました。Quarkus は EJB コンテナーを実行しません。代わりに次を使います。
 
-* **`@ApplicationScoped`**（または別の CDI スコープ）を Bean のライフサイクルに使う
-* **`@Transactional`**（Jakarta Transactions / Quarkus）を、`@Stateless` が暗黙的に提供していたトランザクション境界の明示に使う
-* **`@Inject`** / CDI を、`@EJB` の代わりに連携先へ使う
+* **`@ApplicationScoped`** （または別の CDI スコープ）を Bean のライフサイクルに使う
+* **`@Transactional`** （Jakarta Transactions / Quarkus）を、 `@Stateless` が暗黙的に提供していたトランザクション境界の明示に使う
+* **`@Inject`** / CDI を、 `@EJB` の代わりに連携先へ使う
 
-これはサービス層のモダナイズであり、リモートインターフェースや RMI から REST への書き換えではありません。`ClaimService` には `@Remote` インターフェースがなく、クライアントはすでに JAX-RS から同一プロセス内で呼び出しています。
+これはサービス層のモダナイズであり、リモートインターフェースや RMI から REST への書き換えではありません。 `ClaimService` には `@Remote` インターフェースがなく、クライアントはすでに JAX-RS から同一プロセス内で呼び出しています。
 
 == クラウドネイティブ化の利点
 
@@ -31,30 +31,30 @@ EAP では、`@Stateless` によってプールされた Bean、コンテナー�
 
 == 演習 1: ClaimService の分析結果を確認する
 
-. Analysis パネルの検索ボックスにクラス名 `ClaimService` を入力します。始める前に、**Agent Mode** トグルが **On** になっていることを確認してください。
+. Analysis パネルの検索ボックスにクラス名 `ClaimService` を入力します。始める前に、 **Agent Mode** トグルが **On** になっていることを確認してください。
 +
 image::module-05-mta-dls/05-06-dls-01.jpg[Agent Mode をオンにした ClaimService の分析,link=self,window=blank,title="Agent Mode"]
 
 報告された問題を確認しましょう（文言はルールセットのバージョンによって少し異なる場合があります）。
 
 * `@Stateless` は Quarkus ではサポートされていません。
-  Enterprise Java Beans (EJB) は Quarkus ではサポートされていません。CDI を使用する必要があります。`@Stateless` を `@ApplicationScoped` などの CDI スコープ注釈に置き換えます。
+  Enterprise Java Beans (EJB) は Quarkus ではサポートされていません。CDI を使用する必要があります。 `@Stateless` を `@ApplicationScoped` などの CDI スコープ注釈に置き換えます。
 * コンテナー管理トランザクションには明示的な代替が必要です。
   Stateless セッション Bean は、デフォルトでコンテナー管理トランザクションに参加します。Quarkus では、Bean またはビジネスメソッドに `@Transactional` を付けて、請求のクエリーが引き続きトランザクション内で実行されるようにします。
 * `javax.ejb` インポートはサポートされていません。
-  `javax.ejb.Stateless` を削除し、必要に応じて `jakarta.enterprise.context.ApplicationScoped`（および `jakarta.transaction.Transactional`）を使用します。
+  `javax.ejb.Stateless` を削除し、必要に応じて `jakarta.enterprise.context.ApplicationScoped` （および `jakarta.transaction.Transactional` ）を使用します。
 * `javax` パッケージは `jakarta` に置き換えられました。
-  分析ツールが指摘するように、永続化関連のインポート（たとえば `javax.persistence.*` → `jakarta.persistence.*`）を更新します。
+  分析ツールが指摘するように、永続化関連のインポート（たとえば `javax.persistence.*` → `jakarta.persistence.*` ）を更新します。
 
 == 演習 2: AI ソリューションを生成して受け入れる
 
 . ここまでで、このローカル Session Bean の Java EE から Quarkus への移行を理解できました。次に LLM に、整理された修正案を生成させます。
 +
-結果が **Files** でグループ化され、`ClaimService` に絞り込まれていることを確認したら、ファイルの **AI** ドロップダウンを開き、**Get solution for N incidents**（または **Get solution**）を選択します。
+結果が **Files** でグループ化され、 `ClaimService` に絞り込まれていることを確認したら、ファイルの **AI** ドロップダウンを開き、 **Get solution for N incidents** （または **Get solution** ）を選択します。
 +
 image::module-05-mta-dls/05-06-dls-02.jpg[ClaimService のファイル内インシデントに対する Get Solution,link=self,window=blank,title="Get Solution"]
 
-. 結果は **MTA Resolution Details** タブに表示されます。生成されたパッチを確認してください。`@Stateless` が `@ApplicationScoped` に置き換えられ、永続化の配線が CDI（`@Inject`）へ更新され、関連する `javax` → `jakarta` のインポートも変更されているはずです。**Review in Editor**、**Reject**、または **Accept** を使います。エージェントがさらに修正を続けるかを尋ねてきたら、必要に応じて **Yes** か **No** を選びます。
+. 結果は **MTA Resolution Details** タブに表示されます。生成されたパッチを確認してください。 `@Stateless` が `@ApplicationScoped` に置き換えられ、永続化の配線が CDI（ `@Inject` ）へ更新され、関連する `javax` → `jakarta` のインポートも変更されているはずです。 **Review in Editor** 、 **Reject** 、または **Accept** を使います。エージェントがさらに修正を続けるかを尋ねてきたら、必要に応じて **Yes** か **No** を選びます。
 +
 image::module-05-mta-dls/05-06-dls-03.jpg[ClaimService のパッチ確認と修正継続,link=self,window=blank,title="Accept and continue"]
 
@@ -78,7 +78,7 @@ public class ClaimService {
 
 == 演習 3: エージェント支援の修正を続ける
 
-. **Agent Mode** をオンにしていると、エージェントが後続の問題を修正し続けることがあります（たとえば `pom.xml` の Quarkus 依存関係、永続化設定、その他の依存先など）。各提案を確認し、必要に応じて **Accept**、**Reject**、**Apply All** / **Stop** を選びます。
+. **Agent Mode** をオンにしていると、エージェントが後続の問題を修正し続けることがあります（たとえば `pom.xml` の Quarkus 依存関係、永続化設定、その他の依存先など）。各提案を確認し、必要に応じて **Accept** 、 **Reject** 、 **Apply All** / **Stop** を選びます。
 +
 image::module-05-mta-dls/05-06-dls-04.jpg[pom.xml と関連修正に対するエージェントの後続対応,link=self,window=blank,title="Agent follow-up"]
 
@@ -88,17 +88,17 @@ image::module-05-mta-dls/05-06-dls-05.jpg[エージェントのワークフロ�
 +
 `ClaimService` を具体例として、このループを見ていきます。
 +
-* **修正を生成する（LLM）** — 分析インシデントから（たとえば「 `@Stateless` を CDI スコープに置き換える 」）、Developer Lightspeed は最初のパッチを提案します。注釈、インポート、`ClaimService.java` にある明らかな呼び出し元の更新です。
-* **追加変更を特定する（LLM）** — 1 つの編集が別の編集を必要とすることはよくあります。`@Stateless` を外した後、エージェントは `@PersistenceContext` を `@Inject` に書き換えたり、`javax.*` → `jakarta.*` のインポートを更新したり、EJB 形式の配線を前提にしている `ClaimsResource` のような呼び出し元に手を入れたりすることがあります。
+* **修正を生成する（LLM）** — 分析インシデントから（たとえば「 `@Stateless` を CDI スコープに置き換える 」）、Developer Lightspeed は最初のパッチを提案します。注釈、インポート、 `ClaimService.java` にある明らかな呼び出し元の更新です。
+* **追加変更を特定する（LLM）** — 1 つの編集が別の編集を必要とすることはよくあります。 `@Stateless` を外した後、エージェントは `@PersistenceContext` を `@Inject` に書き換えたり、 `javax.*` → `jakarta.*` のインポートを更新したり、EJB 形式の配線を前提にしている `ClaimsResource` のような呼び出し元に手を入れたりすることがあります。
 * **受け入れる / 拒否する（あなた）** — 最終判断はあなたが行います。パッチが適切なら受け入れ、踏み込みすぎているなら拒否し、決める前にエディターで確認することもできます。あなたが選択しない限り、何も恒久的には適用されません。
 * **ツールから診断を取得する（IDE）** — 変更が反映された後、エージェントは IDE に最新のシグナルを求めます。言語サーバーのエラー、未解決型、壊れた Maven 座標、足りない Quarkus 拡張などの診断です。これにより、元の MTA インシデントには記載されていなかった抜け漏れを見つけます。
-* **さらに修正するか?（あなた + LLM）** — 診断が残っている場合（たとえば `pom.xml` に `quarkus-hibernate-orm` 依存関係がない、または datasource 設定用の `application.properties` がないなど）、エージェントは続行するかを尋ねます。**Yes** を選ぶと次のパッチを生成し、**No** / **Stop** を選ぶとループを終了します。
+* **さらに修正するか?（あなた + LLM）** — 診断が残っている場合（たとえば `pom.xml` に `quarkus-hibernate-orm` 依存関係がない、または datasource 設定用の `application.properties` がないなど）、エージェントは続行するかを尋ねます。 **Yes** を選ぶと次のパッチを生成し、 **No** / **Stop** を選ぶとループを終了します。
 * **繰り返す** — 受け入れた修正ごとに新しい診断が表面化する可能性があるため、ワークスペースが十分にきれいになるまで、またはあなたが止めるまで、このサイクルは続きます。
 +
-要するに、**MTA が移行問題を見つける → LLM が修正を提案する → あなたが承認する → IDE の診断で次の問題が明らかになる → 必要ならもう一度修正する** という流れです。これが、EJB → CDI の変更後に連鎖的に起こる影響に対して Agent Mode が強力である理由であり、すべての diff を自分で読むべき理由でもあります。
+要するに、 **MTA が移行問題を見つける → LLM が修正を提案する → あなたが承認する → IDE の診断で次の問題が明らかになる → 必要ならもう一度修正する** という流れです。これが、EJB → CDI の変更後に連鎖的に起こる影響に対して Agent Mode が強力である理由であり、すべての diff を自分で読むべき理由でもあります。
 
 エージェントは、修正が行われた後に潜在的な問題を修正しようとします。
-たとえば、`EmailIntakeMDB` を Reactive Messaging に、または `ClaimService` を CDI に移行した後でも、エージェントは `pom.xml`、永続化設定、その他の依存先を調整する必要があるかもしれません。エージェントはその文脈と、その修正から生じる問題を理解しています。LSP サーバー、ビルドツール、コンパイルなどのツールを使います。
+たとえば、 `EmailIntakeMDB` を Reactive Messaging に、または `ClaimService` を CDI に移行した後でも、エージェントは `pom.xml` 、永続化設定、その他の依存先を調整する必要があるかもしれません。エージェントはその文脈と、その修正から生じる問題を理解しています。LSP サーバー、ビルドツール、コンパイルなどのツールを使います。
 
 エージェントは見つけた問題をその都度修正し続けます。各ステップで、プロセス中に見つかった潜在的な問題を修正したいかどうかを尋ねます。ユーザーはどの段階でも終了できます。
 

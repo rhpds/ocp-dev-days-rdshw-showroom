@@ -5,36 +5,36 @@ include::partial$style.adoc[]
 [id='dev-environment']
 == 開発環境
 
-以下の手順では、このワークショップ全体でアプリケーションをデプロイする開発環境とクラスターについて説明します。
+以下の手順では、このワークショップを通じてアプリケーションを deploy する開発環境と cluster を紹介します。
 
 === 概要
 
-オープンソースの Eclipse Che プロジェクトを基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes とコンテナーを使用して、開発チームや IT チームの誰もが一貫性があり、安全で、設定不要の開発環境を利用できるようにします。ノートパソコン上の統合開発環境と同じくらい高速で、使い慣れた操作感を提供します。
+オープンソースの Eclipse Che を基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes と container を使用して、開発チームや IT チームのメンバーに一貫性があり、安全で、設定不要の開発環境を提供します。ノート PC 上の統合開発環境と同じくらい、すばやく使い慣れた操作感で利用できます。
 
 [.text-center]
 image::module-03/intro/devspaces-ide-developer.png[width=70%]
 
-OpenShift Dev Spaces は OpenShift サブスクリプションに含まれており、Operator Hub で利用できます。開発チームには、より高速で信頼性の高い作業基盤を提供し、運用チームには一元的な管理と安心感をもたらします。
+OpenShift Dev Spaces は OpenShift サブスクリプションに含まれており、Operator Hub から利用できます。開発チームには、より迅速で信頼性の高い作業基盤を提供し、運用チームには一元管理による安心感をもたらします。
 
 {empty} +
 
 === OpenShift Dev Spaces にログインする
 
-開発環境にアクセスするには:
+開発環境にアクセスするには、次の手順を実行します。
 
-. この link:{url-codeready}[Console, window="_blank"] リンクをクリックします。 +
-(右側の *Resources* パネルの *Red Hat OpenShift Dev Spaces* からもアクセスできます)。
+. 次のリンクをクリックします:{url-codeready}[Console, window="_blank"] link。 +
+（右側の *Resources* パネルにある *Red Hat OpenShift Dev Spaces* からもアクセスできます）。
 +
 {blank}
 
-. 最初に _OpenShift_ を選んでログインするよう求められます。 +
-ボタン *Log in with OpenShift* をクリックします:
+. 最初に、ログイン方法として _OpenShift_ を選択する画面が表示されます。 +
+*Log in with OpenShift* ボタンをクリックします。
 +
 image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
 +
 {blank}
 
-. 次に、ラボの認証情報を使用してログインします:
+. 次に、ラボの認証情報を使ってログインします。
 +
 --
 * Username: `{user-username}`
@@ -45,28 +45,28 @@ image:module-03/intro/devspaces-login.png[width=30%]
 +
 {blank}
 
-. 次に、アクセスを承認するために *Allow selected permissions* をクリックします
+. 次に、アクセスを許可するため、*Allow selected permissions* をクリックします。
 +
 image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
 +
 {empty} +
 +
-ログインすると、 _Dev Spaces_ ダッシュボードが表示されます。ここには利用可能なワークスペースが一覧表示されます。
+ログインすると、_Dev Spaces_ dashboard が表示されます。ここには、利用可能な workspace が一覧表示されます。
 +
 [.bordered]
-image::module-03/intro/devspaces-dashboard.png[Dev Spaces ダッシュボード]
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces dashboard]
 
 {empty} +
 
-=== Dev Spaces ワークスペースにアクセスする
+=== Dev Spaces Workspace にアクセスする
 
-このワークショップでは、プラグイン、ソースコード、さらにさまざまな Command-Line Interface (CLI) ツールがインストールされたコンテナーイメージまで含めた、事前設定済みの単一ワークスペースを提供します。
+このワークショップでは、plugin、ソースコード、およびさまざまな Command-Line Interface (CLI) ツールがインストール済みの container image が含まれる、事前設定済みの workspace を 1 つ使用します。
 
-. `camel-lab` という名前のワークスペースの *Open* リンクをクリックします。
+. `camel-lab` という名前の workspace の *Open* リンクをクリックします。
 +
 [.bordered]
 [#devspaces-dashboard-open]
-image::module-03/intro/devspaces-dashboard.png[Dev Spaces ワークスペースを開く]
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces Workspace を開く]
 +
 [.overlay]
 ****
@@ -80,22 +80,22 @@ devspaces-dashboard-open
 {x: 85.5, y: 115, size: 1.5}
 ****
 +
-// image::module-03/intro/devspaces-dashboard-open.png[Dev Spaces ワークスペースを開く, role="integr8ly-img-responsive"]
+// image::module-03/intro/devspaces-dashboard-open.png[Dev Spaces Workspace を開く, role="integr8ly-img-responsive"]
 // +
 {empty} +
 +
-これでワークスペースのインスタンスが起動します。必要なコンテナーイメージと設定がダウンロードされるまで、しばらくお待ちください。
+workspace の instance が起動します。必要な container image と設定がダウンロードされるまで、しばらくお待ちください。
 +
 {empty} +
 
-. IDE が表示されたら、次の操作を確認してください:
+. IDE が表示されたら、次の操作を行います。
 +
 [cols="8,^1,8", frame=none, grid=none]
 |===
 a|
-. *Trust Publisher & Install* をクリックします
+. *Trust Publisher & Install* をクリックします。
 +
-image::module-03/intro/devspaces-trust-redhat.png[発行元 Red Hat を信頼, width=80%]
+image::module-03/intro/devspaces-trust-redhat.png[Red Hat の発行元を信頼, width=80%]
 a|
 {empty} +
 {empty} +
@@ -103,30 +103,30 @@ a|
 
 a|
 [start=2]
-. 次に、 *Trust Workspace & Install* をクリックします
+. 次に、*Trust Workspace & Install* をクリックします。
 +
-image::module-03/intro/devspaces-trust-authors.png[ワークショッププロジェクトを信頼, , width=90%]
+image::module-03/intro/devspaces-trust-authors.png[Workshop Project を信頼, , width=90%]
 |===
 +
 [TIP]
 ======
-.上の通知を見逃しましたか?
+.上記の通知を見逃しましたか？
 [%collapsible]
 ====
-その場合、最も簡単な解決策はブラウザータブ (ワークスペースのタブ) を閉じてから、手順 1 を繰り返して再度開くことです。 +
-すると通知が再び表示されます。
+その場合は、ブラウザーのタブ（workspace のタブ）を閉じてから、手順 1 を繰り返して開き直すのが最も簡単です。 +
+通知が再び表示されます。
 ======
 +
-NOTE: この IDE は _Microsoft VS Code_ を基にしています。すでに使ったことがあれば、なじみやすいはずです。
+NOTE: この IDE は _Microsoft VS Code_ をベースにしています。すでに使用したことがあれば、見慣れた画面でしょう。
 +
 {empty} +
 
 
 
-. エディター内のすべてのタブを閉じます。
+. エディター内のタブをすべて閉じます。
 +
 --
-エディターの右上隅にあるメニューを見つけ、次のようにクリックします:
+エディターの右上隅にあるメニューを探し、次のように操作します。
 
 [.indent2]
 [#close-tabs-img]
@@ -148,49 +148,49 @@ close-tabs-img
 
 {blank}
 
-1. kbd:[...] ボタンをクリックします +
+1. kbd:[...] ボタンをクリックします。 +
 1. kbd:[Close All] を選択します。
 --
 +
 {empty} +
 
-// . `Get Started...` タブを、 pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>] をクリックして閉じます。 +
-// Explorer には、作業する *workshop* フォルダーが表示されます。
+// . pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>] をクリックして、`Get Started...` タブを閉じます。 +
+// Explorer には、作業に使用する *workshop* folder が表示されます。
 // +
-// image::intro/devspaces-get-started.png[Dev Spaces の「Get Started」画面, role="integr8ly-img-responsive"]
+// image::intro/devspaces-get-started.png[Dev Spaces の Get Started 画面, role="integr8ly-img-responsive"]
 // +
-// NOTE: この IDE は _Microsoft VS Code_ を基にしています。すでに使ったことがあれば、なじみやすいはずです。
+// NOTE: この IDE は _Microsoft VS Code_ をベースにしています。すでに使用したことがあれば、見慣れた画面でしょう。
 // +
-// 追加のタブが開くことがあります。その場合はすべて閉じてください:
+// 余分なタブが開く場合があります。すべて閉じてください。
 // +
 // image::intro/close-tabs.jpg[width=30%]
 // +
 // {empty} +
 
 
-=== ターミナルを開く
+=== Terminal を開く
 
-_Dev Spaces_ で、以下の手順に従ってターミナルを開きます:
+_Dev Spaces_ で、以下の手順に従って Terminal を開きます。
 
 image::module-03/intro/toggle-terminal.png[width=40%]
 
 {empty} +
 
-=== コマンドのコピー/貼り付け
+=== コマンドのコピーと貼り付け
 
-ラボ全体を通してコマンド操作を行います。 +
-ラボの手順で実行するコマンドが示されたら、図のとおりに次の手順を実行してください:
+ラボ全体を通じて、コマンドを実行します。 +
+ラボの手順に実行するコマンドが記載されている場合は、以下に示す手順を実行します。
 
 image::module-03/intro/copypaste.png[width=60%]
 
 {blank}
 
-. *Copy to clipboard* ボタンをクリックします
-. コマンドをターミナルに貼り付けます:
+. _Copy to clipboard_ ボタンをクリックします。
+. コマンドを Terminal に貼り付けます。
 - Linux の場合: kbd:[Ctrl+Shift+v]
 - Mac の場合: kbd:[⌘+v]
 +
-. 次のコマンドで試してみます:
+. 次のコマンドで試してみましょう。
 +
 [.copypaste]
 ****
@@ -200,11 +200,11 @@ copy/paste test"
 +
 [NOTE]
 ====
-クリップボードの共有を求められ、その後に操作の確認を求められます。 +
+クリップボードの共有を求められた後、操作の確認を求められます。 +
 [cols="6,1,8", frame=all, grid=none]
 |===
 a|
-. *Allow* をクリックします
+. *Allow* をクリックします。
 +
 image::module-03/intro/devspaces-share-clipboard.png[width=60%]
 a|
@@ -215,41 +215,41 @@ a|
 
 a|
 [start=2]
-. 求められた場合は *[✓] Do not ask me again* にチェックを入れ、次に *Paste* をクリックします
+. 求められた場合は、*[✓] Do not ask me again* にチェックを入れてから、*Paste* をクリックします。
 +
 image::module-03/intro/devspaces-paste-confirm.png[width=70%]
 |===
 ====
 +
 --
-WARNING: これらのキーの組み合わせは、常に機能するとは限らないことが報告されています。お使いのマシンでは、上記の説明どおりに反応しない場合があります。右クリックや中クリックなど、別のキー操作やマウス操作を試してください。
+WARNING: これらのキー操作が常に機能するとは限らないという報告があります。お使いのマシンでは、上記の操作に反応しないことがあります。その場合は、右クリックや中央クリックなど、別のキー操作またはマウス操作を試してください。
 --
 +
 {blank}
 
-. 貼り付けに失敗し、 _Dev Spaces_ に次の通知が表示された場合:
+. 貼り付けに失敗し、_Dev Spaces_ に次の通知が表示された場合:
 +
 image::module-03/intro/clipboard-notification.png[width=40%]
 +
 {blank}
 +
-ブラウザーの設定でクリップボード権限を有効にする場所を見つけてください。下の画像は _Chrome_ での有効化方法を示しています:
+Web ブラウザーの設定で、クリップボードの権限を有効にする場所を探してください。以下の画像は、_Chrome_ で有効にする方法を示しています。
 +
 image::module-03/intro/clipboard-settings.png[width=100%]
 
 {empty} +
 
 
-// === より良い学習のためのヒント
+// === 学習効果を高めるヒント
 
-// 画面が横長、または複数モニターの構成であれば、下の画像のように、 _Dev Spaces_ の表示をラボ手順の横に並べてブラウザータブを整理することをおすすめします:
+// ワイド画面または複数モニターの環境では、以下の画像のように、_Dev Spaces_ の画面とラボの手順をブラウザーのタブで並べて表示することをおすすめします。
 
 // [.text-center]
 // image::intro/better-learning.png[width=80%]
 
 // {empty} +
 
-// これで準備はすべて整い、開始できる状態になりました。
+// これで準備は完了です。さっそく始めましょう。
 
 // {empty} +
 
@@ -259,11 +259,11 @@ image::module-03/intro/clipboard-settings.png[width=100%]
 
 [.verification]
 ****
-ターミナルが表示され、コピー/貼り付け操作は成功しましたか?
+Terminal が表示され、コピーと貼り付けが機能しましたか？
 
 [.success]
-これで作業を始める準備ができました!
+これで作業を始める準備ができました。
 
 [.fail]
-上記のコマンドに従っていることを確認してください。もう一度やり直してください。
+上記のコマンドに従っていることを確認し、もう一度試してください。
 ****

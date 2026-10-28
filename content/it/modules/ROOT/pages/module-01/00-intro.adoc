@@ -1,0 +1,83 @@
+= Modulo 1: L'esperienza degli sviluppatori
+include::partial$_attributes.adoc[]
+
+== Cosa imparerai
+
+In questo workshop:
+
+* Esplorerai Red Hat Developer Hub come portale interno self-service per sviluppatori
+* Userai il catalogo software per individuare applicazioni, API e documentazione
+* Avvierai un ambiente di sviluppo cloud preconfigurato con Red Hat OpenShift Dev Spaces
+* Realizzerai una funzionalità con un assistente AI per la programmazione
+* Invierai il codice attraverso una pipeline CI/CD automatizzata con OpenShift Pipelines
+* Farai il deploy in produzione usando GitOps con Red Hat OpenShift GitOps (Argo CD)
+* Eseguirai il debug e monitorerai le applicazioni da Developer Hub e dalla OpenShift Console
+
+== A chi è rivolto
+
+Questo workshop è pensato per sviluppatori, platform engineer e responsabili IT che vogliono comprendere l'esperienza coesa per gli sviluppatori offerta da OpenShift -- dal codice alla produzione.
+
+**Livello di esperienza**: da principiante a intermedio. Non è richiesta alcuna esperienza precedente con OpenShift.
+
+== Durata stimata
+
+Per completare questo workshop sono necessari circa **90 minuti**.
+
+Puoi procedere al tuo ritmo.
+
+== Il tuo ruolo e la tua missione
+
+Sei un nuovo sviluppatore presso **Parasol Insurance**.
+
+Parasol sta crescendo rapidamente. Nuove linee di prodotti, nuovi team, nuovi sviluppatori -- ma il team della piattaforma non riesce a stare al passo. Ogni nuovo team ha bisogno di una configurazione CI/CD personalizzata, del provisioning del proprio namespace e di un processo di onboarding che dura settimane. Gli sviluppatori passano più tempo ad aprire ticket e ad aspettare l'accesso che a scrivere codice. Gli ambienti locali si guastano o si disallineano spesso, causando una perdita di produttività. I contractor che vengono inseriti occasionalmente impiegano molto tempo per trovare informazioni pertinenti e best practice.
+
+Ti suona familiare?
+
+Il team di platform engineering di Parasol sta lavorando a una soluzione: una piattaforma applicativa coesa basata su Red Hat OpenShift che offre strumenti per sviluppatori, CI/CD, deploy gestiti con GitOps e un portale interno self-service per sviluppatori -- tutto in un unico posto.
+
+**Oggi è il tuo primo giorno.** Ti è stato dato accesso alla piattaforma e assegnato il tuo primo task. Al termine di questo workshop, avrai portato una funzionalità in produzione senza aprire neanche un ticket.
+
+== Cosa realizzerai
+
+Al termine di questo workshop, avrai acquisito esperienza pratica con:
+
+* **Red Hat Developer Hub** -- Navigare nel catalogo software, individuare API e documentazione e usare l'assistente AI per ottenere risposte sulla piattaforma
+* **Template self-service** -- Creare un ambiente di sviluppo isolato con una propria pipeline CI/CD usando un template golden path
+* **Red Hat OpenShift Dev Spaces** -- Scrivere codice in un IDE cloud preconfigurato con un assistente AI per la programmazione, senza installare nulla in locale
+* **OpenShift Pipelines** -- Inviare codice e seguire una pipeline CI/CD automatizzata che compila, testa e analizza le modifiche
+* **OpenShift GitOps** -- Vedere Argo CD eseguire automaticamente il deploy delle modifiche in produzione
+* **OpenShift Console** -- Usare la console web per approfondire il debug e il monitoraggio delle applicazioni
+
+== Il percorso dello sviluppatore
+
+Questo workshop segue un'unica storia continua:
+
+. **Incontra la piattaforma** -- Accedi a Developer Hub, esplora il catalogo software e orientati
+. **La tua missione** -- Trova il task che ti è stato assegnato e configura il tuo ambiente di sviluppo
+. **Realizza la funzionalità** -- Apri Dev Spaces, scrivi codice e testalo in locale
+. **Consegnala** -- Invia il codice attraverso la pipeline CI/CD e supera un quality gate
+. **Chiama in aiuto l'AI** -- Usa un assistente AI agentico per correggere il codice, inviarlo di nuovo e superare la pipeline
+. **Vai live** -- Fai il merge delle modifiche, crea una release e verifica la funzionalità in produzione
+
+Nessun passaggio da uno strumento scollegato all'altro. Un flusso continuo dall'idea alla produzione.
+
+== Destinatari
+
+Questo workshop è pensato per:
+
+* Sviluppatori software che vogliono workflow di sviluppo più rapidi e coerenti
+* Responsabili IT che valutano le funzionalità delle piattaforme applicative
+* Platform engineer che vogliono comprendere l'esperienza per gli sviluppatori che stanno rendendo possibile
+* Chiunque sia interessato a fare esperienza pratica con gli strumenti per sviluppatori di OpenShift
+
+== Prerequisiti
+
+Dovresti avere:
+
+* Familiarità di base con applicazioni web e API
+* Dimestichezza nell'uso di un browser web e di un editor di codice
+* Voglia di imparare -- non è richiesta alcuna esperienza precedente con OpenShift o i container
+
+== Prossimi passi
+
+Continua alla pagina xref:module-01/01-environment.adoc[Dettagli dell'ambiente] per accedere al tuo ambiente di lab e consultare la timeline del workshop.

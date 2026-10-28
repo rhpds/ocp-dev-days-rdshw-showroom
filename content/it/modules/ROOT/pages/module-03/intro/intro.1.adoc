@@ -1,0 +1,204 @@
+:imagesdir: ../../assets/images/module-03
+:page-time: 2
+include::partial$style.adoc[]
+
+[id="workshop-journey"]
+== Il percorso del workshop
+
+Interpreterai il ruolo di uno sviluppatore di integrazioni presso Parasol Insurance. Nei laboratori del workshop realizzerai le integrazioni che acquisiscono le richieste di polizza, collegano i sistemi di messaggistica per l'assistenza clienti, integrano l'AI per aiutare gli operatori a risolvere i problemi e aggiungono un livello di governance, il tutto con strumenti di integrazione applicativa e connettività.
+
+[TIP]
+--
+.Espandi le istruzioni a schermo intero
+[%collapsible]
+====
+Per questo modulo consigliamo di espandere il riquadro delle istruzioni a schermo intero. Puoi farlo nel modo seguente:
+
+. Fai clic sulla maniglia del pannello sul bordo destro
++
+[.bordered]
+[#showroom-expand-btn]
+image::module-03/intro/showroom-split-view.png[width=80%]
++
+[.overlay]
+****
+[.target]
+showroom-expand-btn
+
+[.arrows]
+{x: 98, y: 50, rot: 90, size: 1}
+
+[.numbers]
+{x: 78, y: 50, size: 1.5}
+****
++
+{blank}
+
+. Seleziona l'opzione *Instructions*
++
+image::module-03/intro/showroom-expand-options.png[width=50%]
+====
+
+--
+
+{empty} +
+
+=== La connettività applicativa incontra l'IA
+
+In passato, integrazione e IA erano ambiti distinti. Da una parte c'erano i flussi di dati, dall'altra i modelli di IA. Ora le cose stanno cambiando. In questo workshop, questi elementi convergono in un'unica piattaforma.
+
+Un motore di integrazione gestisce i flussi di dati: li sposta tra i sistemi, applica trasformazioni e orchestra processi articolati in più fasi. Un livello di connettività offre accesso sicuro ai database che si trovano al di fuori del cluster. Un broker di eventi disaccoppia le piattaforme di messaggistica in un'architettura basata sugli eventi. Un servizio di IA mette un modello linguistico di grandi dimensioni a disposizione dei flussi di integrazione agentici. Infine, un gateway si interpone davanti all'LLM per applicare l'autenticazione e limitare la velocità di consumo dei token.
+
+Durante i laboratori lavorerai con tutti questi componenti.
+
+{empty} +
+
+=== Lo scenario aziendale
+
+La tua azienda è Parasol Insurance. I clienti inviano richieste di polizza; il sistema le acquisisce, trasforma i dati, li archivia in un database e genera i documenti delle polizze. Quando un cliente rileva un problema nella propria polizza, contatta l'assistenza tramite una piattaforma di messaggistica istantanea. Un operatore umano esamina il caso, corregge il problema e genera nuovamente il documento della polizza.
+
+La sfida: i sistemi coinvolti non comunicano tra loro. Il database si trova su un'infrastruttura separata. Le piattaforme di messaggistica sono scollegate. Il team di assistenza gestisce manualmente ogni passaggio, spostandosi da un sistema all'altro per risolvere i problemi. Non c'è IA nel flusso e, anche se ci fosse, mancherebbero i controlli per gestirla.
+
+Ogni laboratorio di questo workshop affronta una di queste lacune.
+
+{empty} +
+
+=== Cosa realizzerai
+
+I laboratori seguono un racconto. Ogni fase risolve un problema e prepara quella successiva.
+
+{blank}
+
+[#journey-diagram.mermaid]
+----
+flowchart LR
+    A["Acquisisci le richieste\ndi polizza"] -->|"il cliente nota\nun problema"| B["Comunicazione\nmulticanale"]
+    B -->|"l'operatore ha bisogno\ndi aiuto per risolvere"| C["Assistenza\ncon IA"]
+    C -->|"il consumo di IA deve\nessere controllato"| D["Gestisci il consumo\ndi IA"]
+
+    style A fill:#e8f5e9,stroke:#66bb6a,color:#000
+    style B fill:#e3f2fd,stroke:#42a5f5,color:#000
+    style C fill:#fff3e0,stroke:#fb8c00,color:#000
+    style D fill:#fce4ec,stroke:#ef5350,color:#000
+----
+
+[.overlay]
+****
+[.target]
+journey-diagram
+
+[.numbers]
+{x: 8.6, y: 96} +
+{x: 38, y: 96} +
+{x: 66, y: 96} +
+{x: 92, y: 96}
+****
+
+[.mermaid-hints-simple]
+****
+A | ① Acquisizione sicura dei dati | Il portale clienti invia le richieste di polizza in formato EDI. Un flusso Camel trasforma EDI in XML e archivia i dati in un database backend. Il database si trova su un'infrastruttura separata, quindi Service Interconnect fornisce un collegamento sicuro senza esporre nulla alla rete pubblica. Il flusso genera anche i documenti PDF delle polizze e li invia allo storage S3. +
+B | ② Comunicazione multicanale | Un cliente consulta il documento della propria polizza e nota un errore. Contatta l'assistenza, ma il cliente e il team di supporto utilizzano piattaforme di messaggistica diverse. +
+Le colleghi in modo che i messaggi inviati su una piattaforma compaiano anche sull'altra. Gli operatori possono rispondere dal proprio portale senza doversi preoccupare della piattaforma usata dal cliente. +
+C | ③ Risoluzione dei problemi assistita dall'IA | L'operatore deve consultare la polizza, correggerla nel database e generare nuovamente il documento. Invece di svolgere queste operazioni manualmente, interagisce con un bot di IA direttamente nel proprio portale di messaggistica. +
+Il livello di integrazione invia la richiesta a un LLM, che decide cosa fare (consultare il database, aggiornare il record, rigenerare il PDF) e restituisce una risposta. Tutto avviene in linguaggio naturale. +
+D | ④ Governance del consumo di IA | Quando l'IA entra a far parte del flusso di lavoro, servono dei controlli. Chi può chiamare l'LLM? Quanti token può consumare? +
+Un gateway si interpone davanti al servizio AI e applica l'autenticazione e limiti di frequenza basati sui token. Sono disponibili più livelli di servizio, ciascuno con il proprio budget di token. Quando il budget di un livello si esaurisce, il sistema passa a quello successivo.
+****
+SUGGERIMENTO: Passa il puntatore su ciascuna fase del diagramma per saperne di più.
+
+{empty} +
+
+=== Panoramica generale
+
+Il diagramma seguente mostra una vista d'insieme dell'architettura e illustra i diversi componenti e le loro interazioni.
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+
+    chatInner ~~~ Customer
+    chatInner ~~~ SupportAgent
+
+    Customer --> Portal -->|"messaggio EDI"| Camel
+
+    Camel --> ServiceInterconnect{{"Service\nInterconnect"}} --> Database
+
+    Camel --- spacer1[" "]
+
+    SupportAgent --- spacer2[" "] --> AgenticCamel <--> ConnectivityLink --> LLM
+
+    AgenticCamel --- spacer1[" "] --> Storage
+    AgenticCamel --> ServiceInterconnect
+
+    subgraph chatOuter ["Piattaforma di assistenza clienti"]
+        subgraph chatInner [" "]
+        direction LR
+        ChatCustomer --- |Camel| Kafka --- |Camel| ChatAgent
+        end
+    end
+
+    chatOuter ~~~ SupportAgent
+    chatOuter ~~~ Customer
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Integrazione Camel", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Portale", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    SupportAgent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Operatore di supporto", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "MaaS / LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    AgenticCamel@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Camel agentico", pos: "b", h: 80, w: 80, constraint: "on" }
+    ConnectivityLink@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+    ChatCustomer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
+    ChatAgent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Operatore di supporto", pos: "b", h: 80, w: 80, constraint: "on" }
+    Kafka@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 80, w: 80, constraint: "on" }
+
+
+    style ChatCustomer fill:none,stroke:none
+    style ChatAgent fill:none,stroke:none
+    style Kafka fill:none,stroke:none
+    style chatOuter fill:none,stroke:none
+    style chatInner fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Portal fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style spacer1 fill:none,stroke:none,width:1px,height:1px
+    style spacer2 fill:none,stroke:none,width:1px,height:1px
+    style SupportAgent fill:none,stroke:none
+    style LLM fill:none,stroke:none
+    style Database fill:none,stroke:none
+    style AgenticCamel fill:none,stroke:none
+    style ConnectivityLink fill:none,stroke:none
+----
+
+NOTE: Ogni laboratorio include il proprio diagramma architetturale dettagliato, con un livello di dettaglio maggiore. Questo mostra solo come i vari componenti si integrano dall'inizio alla fine.
+
+{empty} +
+
+=== Stack tecnologico completo
+
+Di seguito è riportato lo stack delle tecnologie che utilizzerai durante il workshop. Nel loro insieme, queste tecnologie consentono di realizzare soluzioni di integrazione agili e scalabili, orchestrare senza interruzioni flussi di lavoro containerizzati, mantenere la persistenza dei dati tra le pipeline e distribuire rapidamente microservizi basati sugli eventi. In questo modo è possibile modernizzare le architetture cloud ibride con una complessità minima.
+
+* https://www.redhat.com/en/products/application-foundations[Red Hat Application Foundations,window=_blank]: un insieme di componenti progettati per aiutare a creare, distribuire e gestire applicazioni. Tra gli altri, include i prodotti seguenti, che utilizzerai durante il workshop:
+
+** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: un toolkit versatile per semplificare l'integrazione applicativa, che rende più semplici e standardizza le pratiche di connessione tra sistemi diversi e funziona sia con gli ambienti di runtime Quarkus sia con quelli Spring Boot.
+
+** https://developers.redhat.com/products/streams-for-apache-kafka[Red Hat Streams for Apache Kafka,window=_blank]: basato sul progetto Apache Kafka, Streams for Apache Kafka offre una dorsale distribuita che consente a microservizi e altre applicazioni di condividere dati con throughput molto elevato e latenza estremamente ridotta.
++
+{blank}
+
+* https://developers.redhat.com/products/openshift-dev-spaces[Red Hat OpenShift Dev Spaces,window=_blank]: una soluzione di sviluppo collaborativa nativa per Kubernetes, che offre workspace OpenShift e un IDE accessibile dal browser per sviluppare rapidamente applicazioni cloud.
+
+* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: una piattaforma unificata per lo sviluppo di applicazioni che consente di crearle, modernizzarle e distribuirle su larga scala nell'infrastruttura cloud ibrida che preferisci.
+
+* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: storage persistente definito dal software e servizi dati essenziali, integrati e ottimizzati per Red Hat OpenShift.
+
+* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: una soluzione sicura e scalabile per connettere applicazioni oltre i confini della rete e abilitare la comunicazione senza interruzioni tra servizi eseguiti in ambienti diversi.
+
+* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: una soluzione di connettività sicura che consente alle applicazioni eseguite su OpenShift di accedere a database e altri servizi esterni al cluster senza esporli alla rete pubblica.
+
+{empty} +

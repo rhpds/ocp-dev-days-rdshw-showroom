@@ -18,7 +18,7 @@ include::../_shared/close-tabs.adoc[]
 満たす必要がある要件は次のとおりです。
 
 . *データベースへのアクセス*
-. *Kafka と Matrix の統合*（お客様向けメッセージングプラットフォーム）
+. *Kafka と Matrix の統合* （お客様向けメッセージングプラットフォーム）
 
 {blank}
 
@@ -63,7 +63,7 @@ flowchart LR
     style SVC fill:#fce4e4,stroke:#EE0000,color:#333
 ----
 
-データベースへのアクセスを有効にするには、_Dev Spaces_ のターミナルで次のコマンドを実行します。
+データベースへのアクセスを有効にするには、 _Dev Spaces_ のターミナルで次のコマンドを実行します。
 
 [.copypaste]
 ****
@@ -199,7 +199,7 @@ step 7
 
 * `step N` — ラボを step N の開始時点にリセットする
 * `steps` — ラボで利用可能なすべてのステップを一覧表示する
-* `start` または `restart` — 最初の状態に戻る（`step 1` と同等）
+* `start` または `restart` — 最初の状態に戻る（ `step 1` と同等）
 * `ff` — *次の* ステップへ早送りする
 * `rw` — *前の* ステップへ巻き戻す
 ====

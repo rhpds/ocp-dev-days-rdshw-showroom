@@ -1,0 +1,18 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+
+== Riepilogo
+
+
+
+Congratulazioni! Hai completato la fase finale del workshop, aggiungendo un livello di governance per gestire il consumo di AI a livelli nell'analisi dei profili dei clienti.
+
+=== Punti chiave
+
+* **_Connectivity Link_ policies si applicano alle risorse _Gateway API_** (HTTPRoutes, Gateways) -- non è necessario modificare l'agente AI né il codice dell'applicazione.
+* **Le policies si combinano tra loro** -- AuthPolicy estrae le informazioni sull'identità che TokenRateLimitPolicy usa per definire i budget di token per livello, abilitando la strategia di fallback Gold/Silver.
+* **Il rate limiting basato sui token** è progettato appositamente per i workload AI/LLM e consente di controllare i costi in base al consumo effettivo di token, anziché al semplice numero di richieste.
+* **Tutto è dichiarativo e nativo di _Kubernetes_** -- le policies sono risorse YAML gestite con `oc`, quindi è facile versionarle, revisionarle e automatizzarle.
+* **Gli strumenti di integrazione forniscono le basi per l'AI** -- Come hai visto in tutti i moduli, strumenti di connettività solidi come _Apache Camel_, _Kafka_, Service Interconnect e _Connectivity Link_ forniscono le basi essenziali e sicure necessarie per integrare con successo l'AI nei workflow aziendali quotidiani.

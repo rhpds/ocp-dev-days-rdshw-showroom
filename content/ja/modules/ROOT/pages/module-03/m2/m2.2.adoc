@@ -13,7 +13,7 @@ include::partial$style.adoc[]
 
 . _Rocket.Chat_ の Web クライアントを開きます:
 +
-以下のリンクをクリックして、_Rocket.Chat_ の Login ページを開きます（新しいタブで開きます）。
+以下のリンクをクリックして、 _Rocket.Chat_ の Login ページを開きます（新しいタブで開きます）。
 +
 --
 - link:{url-rocketchat}[Rocket.Chat Login ページ,window="_blank"]
@@ -21,7 +21,7 @@ include::partial$style.adoc[]
 +
 {empty} +
 
-. 以下のように、認証情報の入力を求められます:
+. 次のように、認証情報の入力を求められます:
 +
 image::module-03/m2/rchat-login-credentials.png[width=50%]
 +
@@ -57,7 +57,7 @@ REPLACE
 +
 {empty} +
 
-. ログインすると、_Rocket.Chat_ のホームページが表示され、画面左側のパネルにルームが一覧表示されます。以下を参照してください:
+. ログインすると、 _Rocket.Chat_ のホームページが表示され、画面左側のパネルにルームが一覧表示されます。以下の画像を参照してください:
 +
 image::module-03/m2/rchat-room.png[width=60%]
 

@@ -1,0 +1,59 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='lab3-introduction']
+== Introduzione
+
+Crea gli integration flow che collegano Matrix e Rocket.Chat tramite Apache Kafka, realizzando un’architettura disaccoppiata ed event-driven, pronta ad accogliere nuovi sistemi.
+
+{empty} +
+
+
+=== Un rapido promemoria
+
+I clienti contattano l’assistenza per le loro richieste di polizza tramite *Matrix*, mentre gli operatori rispondono da *Rocket.Chat*. L’obiettivo è collegare le due piattaforme, così che i messaggi possano fluire senza interruzioni da una all’altra.
+
+{empty} +
+
+=== Perché Kafka nel mezzo?
+
+Anziché collegare direttamente Matrix e Rocket.Chat, inseriamo *Kafka* tra le due piattaforme come backbone di streaming. In questo modo le piattaforme sono disaccoppiate: nessuna delle due deve conoscere l’altra. Ogni sistema si limita a pubblicare e consumare messaggi tramite Kafka.
+
+Perché è importante? Perché rende l’architettura aperta. Qualsiasi nuovo sistema — uno strumento di helpdesk, un servizio di notifiche o un agente AI — può collegarsi agli stessi topic Kafka senza modificare gli integration flow esistenti.
+
+{blank}
+
+[.text-center]
+image::module-03/m3/data-flow.png[width=90%]
+
+{empty} +
+
+=== Un modello dati comune
+
+Per far funzionare tutto in modo pulito, adottiamo un *modello dati standard* come linguaggio comune su Kafka. Invece di tradurre direttamente tra formati specifici delle piattaforme (Matrix e Rocket.Chat), ogni flow trasforma i dati in due passaggi:
+
+* *In ingresso*: formato specifico della piattaforma → modello dati standard (verso Kafka)
+* *In uscita*: modello dati standard → formato specifico della piattaforma (da Kafka)
+
+Questo significa che ogni sistema si integra con *un’unica* interfaccia comune, anziché integrarsi individualmente con tutti gli altri sistemi.
+
+{blank}
+
+[.text-center]
+image::module-03/m3/standard-data-model.png[width=90%]
+
+{empty} +
+
+=== Quattro flow, un solo pattern
+
+Per collegare Matrix e Rocket.Chat in entrambe le direzioni tramite Kafka, servono quattro flow distinti:
+
+* Matrix → Kafka
+* Kafka → Rocket.Chat
+* Rocket.Chat → Kafka
+* Kafka → Matrix
+
+TIP: Potrebbe sembrare più lavoro rispetto a una connessione diretta, ma il pattern è lo stesso per tutti e quattro i flow. In questo lab ci concentreremo sulla creazione di *uno* di essi: gli altri seguono lo stesso approccio e verranno abilitati alla fine.
+
+{empty} +

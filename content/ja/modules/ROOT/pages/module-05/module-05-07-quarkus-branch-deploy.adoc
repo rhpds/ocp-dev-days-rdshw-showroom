@@ -115,7 +115,7 @@ TIP: ブランチ切り替え後に Dev Spaces からウィンドウの再読み
 mvn quarkus:dev
 ----
 
-. Quarkus がポート **8080** で待ち受けを開始すると、Dev Spaces に一連のポート転送ダイアログが表示されます。アプリをブラウザーで開くため、順に受け入れてください。**yes**（redirect を追加）→ **Open In New Tab** → **Open**。
+. Quarkus がポート **8080** で待ち受けを開始すると、Dev Spaces に一連のポート転送ダイアログが表示されます。アプリをブラウザーで開くため、順に受け入れてください。**yes** （redirect を追加） → **Open In New Tab** → **Open** を選択します。
 +
 image::module-05-mta-dls/05-07-dls-02.jpg[8080 上の Quarkus に対する Dev Spaces のポート転送ダイアログ,link=self,window=blank,title="Open forwarded port"]
 +
@@ -235,7 +235,7 @@ curl -sk "https://${ROUTE}/api/claims"
 curl -sk "https://${ROUTE}/api/inbox"
 ----
 
-. OpenShift コンソールで、プロジェクトの **Topology**（または **Workloads → Deployments**）を開き、アプリケーションが動作していることを確認します。
+. OpenShift コンソールで、プロジェクトの **Topology** （または **Workloads → Deployments**）を開き、アプリケーションが動作していることを確認します。
 +
 image::module-05-mta-dls/05-07-dls-07.jpg[parasol-insurance の Quarkus デプロイと Route を示す OpenShift Topology,link=self,window=blank,title="OpenShift Topology"]
 +

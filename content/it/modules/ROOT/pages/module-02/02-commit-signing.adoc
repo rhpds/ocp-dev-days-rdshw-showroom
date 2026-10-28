@@ -1,0 +1,117 @@
+= Firma dei commit
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+Ogni commit racconta una storia -- ma come fai a sapere se è vera? Gli autori dei commit possono essere falsificati con un singolo comando `git config`. L'accesso al repository può essere compromesso. Le chiavi SSH o GPG possono essere smarrite, rubate o condivise. La firma tradizionale del codice si basa su coppie di chiavi di lunga durata che gli sviluppatori devono gestire, ruotare e proteggere -- e molti semplicemente non lo fanno.
+
+La **firma senza chiavi di Sigstore**, insieme a **Red Hat Trusted Artifact Signer (RHTAS)**, distribuito come componente dell'infrastruttura del cluster, risolve il problema associando la firma alla *identità* dello sviluppatore anziché a una coppia di chiavi. Quando firmi un commit, esegui l'autenticazione tramite il provider di identità della tua organizzazione (nel nostro caso, Keycloak SSO). Fulcio (l'autorità di certificazione di RHTAS) emette un certificato di breve durata, la firma viene registrata nel registro di trasparenza di Rekor e il certificato scade nel giro di pochi minuti. Non ci sono chiavi da gestire, smarrire o ruotare.
+
+In questa sezione eseguirai il commit della correzione della vulnerabilità appena apportata e la firmerai con la tua identità.
+
+[#section-1]
+== Sezione 1: esegui il commit e firmalo
+
+=== Esercizio 1: esegui il commit delle modifiche
+
+. In Dev Spaces, apri il pannello **Source Control** (l'icona del branch nella barra laterale a sinistra oppure premi `Ctrl+Shift+G`).
+
+. Nell'elenco delle modifiche dovrebbe apparire il file `pom.xml` modificato.
+
+. Inserisci un messaggio di commit descrittivo:
++
+[source,role="copypaste"]
+----
+Cleared most of the application vulnerabilities
+----
+
+. Fai clic sul pulsante **Commit** (l'icona con il segno di spunta).
++
+image::m02-devspaces-commit.png[Commit delle modifiche nel pannello Source Control,link=self,window=blank,width=700]
+
+. Non abbiamo preparato correttamente le modifiche per lo staging, quindi esegui direttamente il commit facendo clic su **Yes**.
++
+image::m02-devspaces-stage-commit.png[Richiesta di staging e commit,link=self,window=blank,width=400]
+
+. VSCode chiede di aprire il sito web di Keycloak SSO. Fai clic su **Open**.
++
+image::m02-devspaces-open-keycloak.png[Richiesta di VSCode di aprire il sito web di Keycloak SSO,link=self,window=blank,width=700]
++
+Si aprirà una scheda o una finestra popup del browser con un codice di conferma. Questo è il flusso di accesso OIDC di Sigstore.
+
+. Copia il codice di conferma facendo clic sull'icona di copia.
++
+image::m02-gitsign-login-prompt.png[Codice di conferma da Keycloak SSO,link=self,window=blank,width=400]
+
+. Incollalo nel terminale **gitsign login** e premi **Return**.
++
+NOTE: Questo è un terminale Linux; a seconda del browser e della configurazione, potrebbe essere necessario incollare con kbd:[Ctrl+Shift+V] anziché con kbd:[Ctrl+V].
++
+image::m02-gitsign-code-paste.png[Incollare il codice di verifica nel terminale gitsign,link=self,window=blank,width=700]
++
+Ora il commit è firmato con la tua identità.
+
+. Fai clic su **Sync Changes** (o sull'icona push) per inviare il commit firmato a GitLab.
++
+image::m02-devspaces-sync-changes.png[Pulsante Sync Changes nel pannello Source Control,link=self,window=blank,width=300]
+
+. Torna al Sandbox Component in Developer Hub, quindi fai clic su **View Source** nella pagina del componente (oppure vai a {gitlab_url}[{gitlab_url}^]) e individua il commit. Accanto dovrebbe essere visibile un badge della firma (non verificato).
++
+image::m02-rhdh-view-source.png[Collegamento View Source nella pagina del componente sandbox,link=self,window=blank,width=700]
++
+Fai clic sul badge per visualizzare i dettagli del certificato -- nota che **Certificate Issuer** riporta `CN=CISO-office,O=Parasol`. **Certificate Subject** è vuoto perché al momento GitLab non comprende la struttura delle firme Sigstore/RHTAS, in cui l'identità del firmatario è memorizzata in un altro campo della firma (Subject Alternative Name). GitLab inoltre non è ancora in grado di verificare le firme Sigstore, perché la chiave pubblica è memorizzata nel database di trasparenza e cambia con ogni nuovo certificato effimero.
++
+image::m02-gitlab-signed-commit.png[Commit firmato in GitLab con i dettagli del certificato,link=self,window=blank,width=700]
+
+=== Perché è importante?
+
+* **Responsabilità**: ogni commit è associato crittograficamente a un'identità verificata -- non solo a un nome nella configurazione di git
+* **Rilevamento delle manomissioni**: se qualcuno modifica un commit firmato, la firma non è più valida
+* **Nessuna gestione delle chiavi**: gli sviluppatori non devono generare, conservare o ruotare le chiavi di firma
+* **Trasparenza**: ogni firma viene registrata in un registro di trasparenza pubblico (Rekor), creando una traccia verificabile
+* **Verifica nella pipeline**: le fasi successive della pipeline verificheranno che i commit siano stati firmati prima della build
+
+=== Come è stato fatto?
+
+Per mantenere l'esercizio leggibile, abbiamo aggiunto i dettagli qui sotto. Espandi per scoprire come è stata configurata la firma.
+
+.**Apri per visualizzare i dettagli dell'implementazione**
+[%collapsible]
+====
+Git è stato configurato per usare **gitsign** come programma di firma. La configurazione viene eseguita automaticamente all'avvio del workspace di Dev Spaces, tramite il comando `postStart` del devfile:
+
+[source,bash]
+----
+git config --global gpg.format x509
+git config --global gpg.x509.program gitsign
+git config --global commit.gpgsign true
+git config --global gitsign.fulcio "https://fulcio-server-trusted-artifact-signer.{subdomain}"
+git config --global gitsign.rekor "https://rekor-server-trusted-artifact-signer.{subdomain}"
+git config --global gitsign.issuer "https://sso.{subdomain}/realms/sso"
+----
+
+Il **flusso di firma senza chiavi di Sigstore** funziona come segue:
+
+. Lo sviluppatore crea un commit
+. Gitsign reindirizza al provider OIDC (Keycloak) per l'autenticazione
+. Dopo l'autenticazione, gitsign richiede a **Fulcio** un certificato di breve durata (l'autorità di certificazione)
+. Fulcio emette un certificato che include l'indirizzo email dello sviluppatore come Subject Alternative Name
+. Gitsign firma il commit con questo certificato
+. La firma viene registrata in **Rekor** (il registro di trasparenza) per garantirne la verificabilità
+. Il certificato scade nel giro di pochi minuti -- ma la voce in Rekor dimostra che la firma era valida al momento della firma
+
+Poiché Dev Spaces viene eseguito in un container senza un browser locale, il daemon **gitsign-credential-cache** gestisce il flusso OIDC mostrando un codice di verifica che lo sviluppatore incolla in un terminale. In un IDE locale, gitsign aprirebbe direttamente il browser.
+====
+
+=== Verifica
+
+A questo punto dovresti avere:
+
+* Eseguito il commit della modifica a pom.xml con un commit firmato
+* Eseguito il push del commit su GitLab
+* Verificato che il badge della firma sia visibile in GitLab
+
+'''
+
+== Passaggi successivi
+
+Prosegui con xref:module-02/03-sandbox-pipeline.adoc[Verifica della pipeline Sandbox] per scoprire come la pipeline verifica la tua firma e analizza la tua immagine.

@@ -243,7 +243,7 @@ ff
 ****
 +
 これにより、クラスターシークレットから取得した有効な値で `application.properties` の Gold と Silver の API キーが設定されます。
-
++
 [TIP]
 --
 .ラボのナビゲーションコマンド

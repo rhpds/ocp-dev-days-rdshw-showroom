@@ -4,7 +4,7 @@ include::partial$_attributes.adoc[]
 
 [IMPORTANT]
 ====
-このラボでは、VS Code ベースの GUI を提供する Red Hat Dev Spaces 環境で、**Migration Toolkit for Applications** の Visual Studio Code 拡張機能（**MTA extension**）を使用します。
+このラボでは、VS Code ベースの GUI を提供する Red Hat Dev Spaces 環境で、 **Migration Toolkit for Applications** の Visual Studio Code 拡張機能（ **MTA extension** ）を使用します。
 
 **Developer Lightspeed** は独立した拡張機能ではありません。これは MTA の AI 搭載コードリファクタリング機能です。IDE にインストールされるのは **MTA extension** で、MTA の静的コード分析と Developer Lightspeed（生成 AI）の両方が含まれています。
 ====
@@ -40,7 +40,7 @@ Password:
 ----
 --
 
-. ログイン後、__Authorize Access__ のプロンプトが表示された場合
+. ログイン後、 __Authorize Access__ のプロンプトが表示された場合
 +
 * **Allow selected permissions** ボタンをクリックします
 +
@@ -62,51 +62,51 @@ GitLab プロジェクトの **parasol-insurance-eap** リポジトリーが Dev
 ワークスペースは新しいブラウザータブで開きます。
 +
 * 発行元またはワークスペースを信頼するよう求められたら、信頼を確認します。（図 3）
-* 初期レイアウトパネルが表示されたら、ラボ後半で見やすくなるよう **Light** テーマを選択し、**Mark Done** をクリックします。これにより初期レイアウトパネルが閉じます。次に、下の画像の Step 2 に示すように、画面左側の拡張機能アイコンをクリックして、インストール済み拡張機能のパネルを開きます。（図 4）
+* 初期レイアウトのパネルが表示されたら、ラボ後半で見やすくなるよう **Light** テーマを選択し、 **Mark Done** をクリックします。初期レイアウトのパネルが閉じます。続いて、下の画像の Step 2 に示すように、画面左側の拡張機能アイコンをクリックして、インストール済み拡張機能のパネルを開きます。（図 4）
 +
-image::module-05-mta-dls/05-03-dls-05.png[VSCode の tab,link=self,window=blank,title="Manage profiles"]
+image::module-05-mta-dls/05-03-dls-05.png[VS Code のタブ,link=self,window=blank,title="Manage profiles"]
 +
-image::module-05-mta-dls/05-03-dls-03.png[VSCode の tab,link=self,window=blank,title="Mark done"]
+image::module-05-mta-dls/05-03-dls-03.png[VS Code のタブ,link=self,window=blank,title="Mark done"]
 
-拡張機能のインストールに時間がかかる場合があります。reload window button が表示されたらクリックしてください。ブラウザータブが自動的に再読み込みされます。
+拡張機能のインストールに時間がかかる場合があります。 **Reload Window** ボタンが表示されたらクリックしてください。ブラウザータブが自動的に再読み込みされます。
 
-image::module-05-mta-dls/05-03-dls-04.png[VSCode の tab,link=self,window=blank,title="Trust the Authors"]
+image::module-05-mta-dls/05-03-dls-04.png[VS Code のタブ,link=self,window=blank,title="Trust the Authors"]
 
 
 == 演習 2: MTA プロファイルと GenAI provider を設定する
 
-すばらしいです！演習 2 に進みました。これで分析プロファイルを設定するための環境も整いました。
+すばらしいです！演習 2 に進みました。これで分析プロファイルを設定する環境が整いました。
 
-複数のプロファイルを管理できることは、MTA extension の強力な機能です。異なる分析プロファイルを簡単に切り替えられます。下の画像の Step 3 に示すように **New Profile** ボタンをクリックして、新しいプロファイルを作成できます。
+複数のプロファイルを管理できることは、MTA extension の強力な機能です。異なる分析プロファイルを簡単に切り替えられます。下の画像の Step 3 に示すように **New Profile** ボタンをクリックして、新しいプロファイルを作成します。
 
 まず、最初のプロファイルである `quarkus-profile` を作成し、アプリケーションを Quarkus に移行します。xref:module-05/module-05-05-custom-rules-audit-logging.adoc[セクション 5: カスタムルール（監査ログ）] では、監査ログ用のカスタムルールを確認します。
 
 `Manage Profiles` ボタンをクリックして、プロファイル管理パネルを開きます。
 
-image::module-05-mta-dls/05-03-dls-06.png[VSCode の tab,link=self,window=blank,title="VSCode Tab"]
+image::module-05-mta-dls/05-03-dls-06.png[VS Code のタブ,link=self,window=blank,title="VSCode Tab"]
 
 - 新しいプロファイル `quarkus-profile` を作成します
 - Profile Name: `quarkus-profile``
 - Target Technologies: `quarkus``, `quarkus3+``, `jakarta-ee``
 
-image::module-05-mta-dls/05-03-dls-07.png[VSCode の tab,link=self,window=blank,title="Review profiles"]
+image::module-05-mta-dls/05-03-dls-07.png[VS Code のタブ,link=self,window=blank,title="Review profiles"]
 
 これが最初のプロファイルなので、DLS extension によって自動的に有効になります。
 
 上記の詳細が正しいことを確認して、このタブを閉じます。
 
 
-上のスクリーンショットでは、**Open Analysis** の横にあるコントロールを確認できます。そこをクリックし、以下の手順に従ってください。
+上のスクリーンショットで、 **Open Analysis** の横にあるコントロールをクリックし、以下の手順に従ってください。
 次の画像に示すように、MTA パネルから GenAI provider の設定を開きます。
 
 - *1* 設定 `⚙︎` アイコンをクリックします。
 - *2* `Configure GenAI Settings` をクリックします
 
-image::module-05-mta-dls/05-03-dls-08.png[VSCode の tab,link=self,window=blank,title="Gen-AI Provider Settings"]
+image::module-05-mta-dls/05-03-dls-08.png[VS Code のタブ,link=self,window=blank,title="Gen-AI Provider Settings"]
 
 provider の設定画面が開きます。MTA は **provider-settings.yaml** を使用して LLM に接続します。
 
-ラボのワークスペースには provider の設定と LiteLLM の認証情報が事前に設定されています。**OpenShift** model が有効で、base URL / API key の各フィールドに値が入力されていることを確認してください（すでにラボ環境に合った値になっているはずです）。
+ラボのワークスペースには provider の設定と LiteLLM の認証情報が事前に設定されています。 **OpenShift** model が有効で、base URL / API key の各フィールドに値が入力されていることを確認してください（すでにラボ環境に合った値になっているはずです）。
 
 TIP: このラボでは、provider の設定は通常あらかじめ入力されています。下の YAML は、ファイルが空、または不完全な場合（たとえばワークスペースのリセット後）にのみ使用してください。これは復旧手順であり、通常想定される問題ではありません。
 
@@ -132,13 +132,13 @@ active: *active
 - `baseURL` : chat completions API 経由のリクエストを model が受け付ける URL/route です。
 - `active` : 最後に、このプロファイルが有効であることを確認します。MTA では複数の LLM を設定できますが、一度に有効にできる LLM は 1 つだけです。
 
-image::module-05-mta-dls/05-03-dls-09.png[VSCode の tab,link=self,window=blank,title="VSCode Tab"]
+image::module-05-mta-dls/05-03-dls-09.png[VS Code のタブ,link=self,window=blank,title="VSCode Tab"]
 
 == 確認
 
 Dev Spaces 環境と MTA extension（Developer Lightspeed を含む）が正しく設定されていることを確認します。
 
-. MTA Extension が正しく設定されていることを確認します
+. MTA extension が正しく設定されていることを確認します
 * MTA extension アイコンを選択し、MTA Analysis View タブをアクティブにします:
 * 画面右側にある歯車アイコンをクリックします
 * **Get Ready to Analyze** ペインが画面右側に開きます
