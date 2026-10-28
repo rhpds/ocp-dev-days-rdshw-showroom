@@ -1,0 +1,25 @@
+[subs=attributes]
+++++
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const summary = document.getElementById('resources-summary');
+  if (!summary) return;
+
+  const dot = (color) =>
+    '<span style="width:10px;height:10px;border-radius:50%;background:' + color + ';display:inline-block;vertical-align:middle;margin-left:6px;margin-top:-2px"></span>';
+
+  var dsHeaders = {};
+  document.cookie.split(';').forEach(function(c) {
+    var parts = c.trim().split('=');
+    if (parts[0] === 'username') {
+      dsHeaders['user'] = decodeURIComponent(parts[1]);
+    }
+  });
+
+  fetch('{url-docserver}/status', { headers: dsHeaders })
+    .then(r => r.text())
+    .then(() => { summary.innerHTML = 'Resources ' + dot('#3e8635'); })
+    .catch(() => { summary.innerHTML = 'Resources ' + dot('red'); });
+});
+</script>
+++++

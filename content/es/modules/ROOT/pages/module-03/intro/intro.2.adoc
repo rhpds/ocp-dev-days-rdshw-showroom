@@ -1,0 +1,269 @@
+:imagesdir: ../assets/images/module-03
+:page-time: 5
+include::partial$style.adoc[]
+
+[id='dev-environment']
+== Entorno de desarrollo
+
+Las siguientes instrucciones te presentan tu entorno de desarrollo y el clúster donde implementarás tus aplicaciones durante este taller.
+
+=== Descripción general
+
+Basado en el proyecto de código abierto Eclipse Che, Red Hat OpenShift Dev Spaces utiliza Kubernetes y contenedores para ofrecer a cualquier integrante del equipo de desarrollo o de TI un entorno de desarrollo uniforme, seguro y sin configuración. La experiencia es tan rápida y familiar como la de un entorno de desarrollo integrado en tu computadora portátil.
+
+[.text-center]
+image::module-03/intro/devspaces-ide-developer.png[width=70%]
+
+OpenShift Dev Spaces está incluido en tu suscripción de OpenShift y está disponible en Operator Hub. Ofrece a los equipos de desarrollo una base más rápida y confiable para trabajar, y brinda al equipo de operaciones control centralizado y tranquilidad.
+
+{empty} +
+
+=== Iniciar sesión en OpenShift Dev Spaces
+
+Para acceder a tu entorno de desarrollo:
+
+. Haz clic en este enlace:{url-codeready}[Console, window="_blank"]. +
+(También puedes acceder desde el panel *Resources* de la derecha, en *Red Hat OpenShift Dev Spaces*).
++
+{blank}
+
+. Primero se te pedirá que elijas _OpenShift_ para iniciar sesión. +
+Haz clic en el botón *Log in with OpenShift*:
++
+image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
++
+{blank}
+
+. Luego, inicia sesión con tus credenciales del laboratorio:
++
+--
+* Usuario: `{user-username}`
+* Contraseña: `{user-password}`
+--
++
+image:module-03/intro/devspaces-login.png[width=30%]
++
+{blank}
+
+. A continuación, autoriza el acceso haciendo clic en *Allow selected permissions*.
++
+image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
++
+{empty} +
++
+Una vez que hayas iniciado sesión, verás el panel de _Dev Spaces_. Allí se enumeran los espacios de trabajo disponibles.
++
+[.bordered]
+image::module-03/intro/devspaces-dashboard.png[Panel de Dev Spaces]
+
+{empty} +
+
+=== Acceder a tu espacio de trabajo de Dev Spaces
+
+Este taller proporciona un único espacio de trabajo preconfigurado con complementos, código fuente e incluso imágenes de contenedor que incluyen varias herramientas de interfaz de línea de comandos (CLI).
+
+. Haz clic en el enlace *Open* del espacio de trabajo llamado `camel-lab`.
++
+[.bordered]
+[#devspaces-dashboard-open]
+image::module-03/intro/devspaces-dashboard.png[Abrir el espacio de trabajo de Dev Spaces]
++
+[.overlay]
+****
+[.target]
+devspaces-dashboard-open
+
+[.arrows]
+{x: 85.5, y: 88, rot: 0, size: 0.5}
+
+[.numbers]
+{x: 85.5, y: 115, size: 1.5}
+****
++
+// image::module-03/intro/devspaces-dashboard-open.png[Abrir el espacio de trabajo de Dev Spaces, role="integr8ly-img-responsive"]
+// +
+{empty} +
++
+Esto iniciará una instancia del espacio de trabajo. Espera unos momentos mientras se descargan las imágenes de contenedor necesarias y se configura el entorno.
++
+{empty} +
+
+. Cuando aparezca el IDE, asegúrate de hacer lo siguiente:
++
+[cols="8,^1,8", frame=none, grid=none]
+|===
+a|
+. Click *Trust Publisher & Install*
++
+image::module-03/intro/devspaces-trust-redhat.png[Confiar en el publicador Red Hat, width=80%]
+a|
+{empty} +
+{empty} +
+->
+
+a|
+[start=2]
+. A continuación, haz clic en *Trust Workspace & Install*.
++
+image::module-03/intro/devspaces-trust-authors.png[Confiar en el proyecto del taller, , width=90%]
+|===
++
+[TIP]
+======
+.¿No viste alguna de las notificaciones anteriores?
+[%collapsible]
+====
+Si es así, la solución más sencilla es cerrar la pestaña del navegador (la pestaña del espacio de trabajo) y volver a abrirla repitiendo el paso 1. +
+Entonces, volverán a aparecer las notificaciones.
+======
++
+NOTE: Este IDE está basado en _Microsoft VS Code_. Te resultará familiar si ya lo has usado.
++
+{empty} +
+
+
+
+. Cierra todas las pestañas del editor.
++
+--
+Busca el menú en la esquina superior derecha del editor y haz clic como se indica a continuación:
+
+[.indent2]
+[#close-tabs-img]
+image::module-03/common/dev-close-tabs.png[width=50%]
+
+[.overlay]
+****
+[.target]
+close-tabs-img
+
+[.arrows]
+{x: 97, y: 30, rot: 270, size: 2}
+{x: 97, y: 68, rot: 270, size: 2}
+
+[.numbers]
+{x: 138, y: 30, size: 3}
+{x: 138, y: 68, size: 3}
+****
+
+{blank}
+
+1. Haz clic en el botón kbd:[...] +
+1. Selecciona kbd:[Close All].
+--
++
+{empty} +
+
+// . Cierra la pestaña `Get Started...` haciendo clic en pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>]. +
+// El explorador muestra la carpeta *workshop* en la que trabajarás.
+// +
+// image::intro/devspaces-get-started.png[Pantalla de inicio de Dev Spaces, role="integr8ly-img-responsive"]
+// +
+// NOTE: Este IDE está basado en _Microsoft VS Code_. Te resultará familiar si ya lo has usado.
+// +
+// Es posible que se abran pestañas adicionales; ciérralas todas:
+// +
+// image::intro/close-tabs.jpg[width=30%]
+// +
+// {empty} +
+
+
+=== Abrir una terminal
+
+Desde _Dev Spaces_, abre una terminal siguiendo los pasos que se ilustran a continuación:
+
+image::module-03/intro/toggle-terminal.png[width=40%]
+
+{empty} +
+
+=== Copiar y pegar comandos
+
+Usarás comandos durante todo el laboratorio. +
+Cuando las instrucciones del laboratorio incluyan un comando para ejecutar, sigue los pasos que se describen a continuación, como se muestra:
+
+image::module-03/intro/copypaste.png[width=60%]
+
+{blank}
+
+. Haz clic en el botón _Copy to clipboard_.
+. Pega el comando en la terminal:
+- en Linux: kbd:[Ctrl+Shift+v]
+- en Mac: kbd:[⌘+v]
++
+. Pruébalo con:
++
+[.copypaste]
+****
+echo "this is a multiline \
+copy/paste test"
+****
++
+[NOTE]
+====
+Se te pedirá que compartas el portapapeles y, luego, que confirmes la acción. +
+[cols="6,1,8", frame=all, grid=none]
+|===
+a|
+. Haz clic en *Allow*.
++
+image::module-03/intro/devspaces-share-clipboard.png[width=60%]
+a|
+{empty} +
+{empty} +
+
+->
+
+a|
+[start=2]
+. Si se te solicita, marca *[✓] Do not ask me again* y luego haz clic en *Paste*.
++
+image::module-03/intro/devspaces-paste-confirm.png[width=70%]
+|===
+====
++
+--
+WARNING: Se ha informado que estas combinaciones de teclas no siempre funcionan. Es posible que tu equipo no responda a las indicaciones anteriores. Prueba otras combinaciones de teclas o alternativas con el mouse, como hacer clic con el botón derecho o con el botón central.
+--
++
+{blank}
+
+. Si falla la acción de pegar y ves que _Dev Spaces_ muestra la siguiente notificación:
++
+image::module-03/intro/clipboard-notification.png[width=40%]
++
+{blank}
++
+Busca en la configuración de tu navegador web dónde habilitar los permisos del portapapeles. La siguiente imagen muestra cómo habilitarlos en _Chrome_:
++
+image::module-03/intro/clipboard-settings.png[width=100%]
+
+{empty} +
+
+
+// === Consejos para aprender mejor
+
+// Si tienes una pantalla ancha o varios monitores, te recomendamos organizar las pestañas del navegador para ver _Dev Spaces_ junto a las instrucciones del laboratorio, como en la imagen siguiente:
+
+// [.text-center]
+// image::intro/better-learning.png[width=80%]
+
+// {empty} +
+
+// Ya tienes todo listo para comenzar.
+
+// {empty} +
+
+
+
+
+
+[.verification]
+****
+¿Apareció la terminal y funcionó la acción de copiar y pegar?
+
+[.success]
+¡Ya estás listo para empezar a trabajar!
+
+[.fail]
+Asegúrate de seguir los comandos anteriores. Inténtalo de nuevo.
+****

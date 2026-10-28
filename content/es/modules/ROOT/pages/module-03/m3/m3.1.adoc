@@ -1,0 +1,84 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup"]
+== Configurar la carpeta de trabajo del laboratorio
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+. Desde tu terminal en _Dev Spaces_:
+.. Si hay procesos en ejecución, detenlos con kbd:[Ctrl+C].
+.. Ejecuta el siguiente comando: +
+(cierra primero las pestañas abiertas de archivos Camel; es posible que no se actualicen automáticamente después de ejecutar este comando)
++
+{blank}
++
+[.copypaste]
+****
+step 4
+****
++
+[TIP]
+--
+Ejecuta el comando anterior en cualquier momento para restablecer el ejercicio.
+
+.Comandos de ayuda
+[%collapsible]
+====
+* `step N` — restablece el laboratorio al comienzo del paso N
+* `steps` — muestra todos los pasos disponibles del laboratorio
+* `start` o `restart` — vuelve al comienzo (equivalente a `step 1`)
+* `ff` — avanza rápidamente al siguiente paso
+* `rw` — vuelve al paso anterior
+====
+--
++
+{empty} +
+
+. Revisa la carpeta del laboratorio
++
+Después de ejecutar los comandos anteriores, revisa la vista de árbol de tu editor para confirmar que todo se vea correcto. Debería ser similar a lo siguiente:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 pass:[<b>k2r</b> <small style="color: #999">(Kafka a Rocket.Chat)</small>] +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>⚙</b>&nbsp;</mark>] *application.properties* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *k2r.camel.yaml* +
+
+[.indent2]
+[NOTE]
+====
+El archivo `application.properties` contiene ajustes de conexión preconfigurados para tu entorno; está listo para usarse. Así puedes centrarte en desarrollar la lógica de integración en lugar de configurar las conexiones.
+
+.¿Qué contiene?
+[%collapsible]
+=====
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat credentials</span>
+<span style="color: #a6e22e">rocketchat.token</span>=<span style="color: #e6db74">&lt;your-token&gt;</span>
+<span style="color: #a6e22e">rocketchat.userid</span>=<span style="color: #e6db74">&lt;your-userid&gt;</span></pre>
+++++
+=====
+====
+
+--
++
+{empty} +
+
+[.verification]
+****
+¿Ves la misma estructura de carpetas y los mismos archivos?
+
+[.success]
+Ya puedes continuar.
+
+[.fail]
+Asegúrate de que la sintaxis de los comandos sea compatible con tu entorno y vuelve a intentarlo.
+****
+
+
+{empty} +

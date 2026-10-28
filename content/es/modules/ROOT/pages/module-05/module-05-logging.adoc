@@ -1,0 +1,17 @@
+= logging.yaml
+include::partial$_attributes.adoc[]
+
+Reglas personalizadas de MTA que detectan el uso de `audit-logging-library` v1 y guían la migración a la v2. Guarda este archivo como `rules/logging.yaml` en `parasol-insurance-eap`.
+
+[.button]
+* link:{attachmentsdir}/module-05-rules/logging.yaml[Descargar logging.yaml,download=logging.yaml,window=_blank,role=button]
+
+TIP: Usa el enlace de descarga anterior o copia el YAML de abajo en un archivo local y guárdalo en un directorio de reglas de tu equipo, por ejemplo, `rules/logging.yaml`.
+
+[.console-input]
+[source,yaml]
+----
+include::example$module-05-rules/logging.yaml[]
+----
+
+Volver a xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Sección 5: Reglas personalizadas (registro de auditoría)].

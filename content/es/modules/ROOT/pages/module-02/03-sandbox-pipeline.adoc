@@ -1,0 +1,208 @@
+= Revisión del pipeline del entorno de pruebas
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+Se ha enviado tu commit firmado y el pipeline del entorno de pruebas está en ejecución. En esta sección, explorarás qué hace el pipeline, revisarás sus comprobaciones de seguridad y entenderás por qué está diseñado para *informar* en lugar de *bloquear*.
+
+[#section-1]
+== Sección 1: Comprender el pipeline del entorno de pruebas
+
+=== Ejercicio 1: Ver el pipeline en Developer Hub
+
+. Ve al componente del entorno de pruebas en Developer Hub y haz clic en la pestaña **CI**.
+
+. Deberías ver una ejecución del pipeline en curso (o que se completó recientemente). Haz clic en ella para ver los detalles.
++
+image::m02-rhdh-sandbox-pipeline-running.png[Pipeline del entorno de pruebas con detalles de las tareas en Developer Hub,link=self,window=blank,width=700]
+
+. El pipeline del entorno de pruebas ejecuta estos pasos:
+* **clone-source** -- clona tu rama de funcionalidad
+* **verify-commit-signature** -- comprueba si el commit está firmado
+* **maven-build** -- compila la aplicación
+* **sonar-scan** -- ejecuta el análisis de calidad de código de SonarQube
+* **build-and-push** -- compila la imagen de contenedor y la envía al registro
+* **acs-image-scan** -- analiza la imagen para detectar vulnerabilidades conocidas
+* **acs-image-check** -- comprueba la imagen con respecto a las políticas de seguridad de ACS
+* **report-to-commit** -- publica los resultados en GitLab como comentario del commit
+
+IMPORTANT: El pipeline del entorno de pruebas está diseñado para **nunca bloquear** al desarrollador. Se ejecutan todas las comprobaciones de seguridad, pero los errores se notifican solo a título informativo; no detienen la compilación. Así, los desarrolladores pueden iterar rápidamente y, al mismo tiempo, ver exactamente qué fallaría en el pipeline de producción.
+
+[#section-2]
+== Sección 2: Comprobaciones de seguridad en el entorno de pruebas
+
+=== Ejercicio 1: Revisar la verificación de la firma del commit
+
+. En los detalles del pipeline, haz clic en la tarea **verify-commit-signature**.
+
+. Revisa el resultado del registro. Si firmaste tu commit, deberías ver:
++
+----
+✅ Good signature — {user}@demo.redhat.com (issuer: https://sso.{subdomain}/realms/sso)
+----
++
+image::m02-pipeline-verify-signature.png[Registro del pipeline que muestra que la verificación de la firma del commit se realizó correctamente,link=self,window=blank,width=700]
+
+=== Ejercicio 2: Revisar los resultados del pipeline en RHDH
+
+. De vuelta en la página de CI (ejecución del pipeline) de Developer Hub, consulta los resultados haciendo clic en el icono **Output** de la derecha:
++
+image::m02-rhdh-pipeline-output-icon.png[Icono para ver los resultados de la ejecución del pipeline,link=self,window=blank,width=700]
+
+. La página muestra los análisis de ACS (Advanced Cluster Security) y las comprobaciones de políticas que se ejecutaron como tareas del pipeline:
++
+image::m02-pipeline-acs-tasks.png[Tareas de análisis de imagen y comprobación de imagen de ACS en el pipeline,link=self,window=blank,width=400]
++
+La pestaña **Image Scan** muestra todas las CVE detectadas en la imagen de contenedor, organizadas por gravedad:
++
+image::m02-rhdh-acs-image-scan.png[Resultados de Image Scan de ACS que muestran las CVE por gravedad,link=self,window=blank,width=700]
++
+La pestaña **Image Check** muestra las infracciones de las políticas de ACS. Observa la columna **Breaks build**: las políticas marcadas como "yes" bloquearían la compilación en el pipeline protegido, mientras que las marcadas como "no" son solo informativas:
++
+image::m02-rhdh-acs-image-check.png[Resultados de Image Check de ACS que muestran las infracciones de las políticas,link=self,window=blank,width=700]
+
+=== Ejercicio 3: Comprobar los resultados en GitLab
+
+. Abre GitLab y ve a tu commit.
+
+. Deberías ver un comentario del pipeline que contiene el informe de seguridad completo:
++
+* 🧪 **Resultados de compilación del entorno de pruebas**
+* Estado de **Commit Signature**: ✅ o ⛔
+* **ACS Policy Check**: ✅ o ❌, con los detalles de las políticas
+* **ACS Image Scan**: 🔍, con la cantidad de vulnerabilidades por gravedad
++
+Puedes expandir los detalles del informe en el comentario del commit:
++
+image::m02-gitlab-commit-report.png[Informe de seguridad del pipeline publicado como comentario del commit en GitLab,link=self,window=blank,width=700]
+
+Observa el icono ❌ junto a la comprobación de políticas: fuera de tu entorno de pruebas, esta compilación no se aprobará.
+
+.**Opcional: Probar un commit sin firmar**
+[%collapsible]
+====
+Para ver qué ocurre con un commit sin firmar:
+
+. Ve a GitLab y abre tu rama del entorno de pruebas. **¡Asegúrate de estar en tu rama, no en `main`!**
++
+image::m02-gitlab-branch-selector.png[Asegúrate de estar en la rama del entorno de pruebas,link=self,window=blank,width=400]
+
+. Edita directamente en GitLab el archivo `README.md` y agrega una línea de texto.
+
+. Confirma el cambio directamente desde la interfaz web de GitLab. Este commit **no** se firmará porque GitLab CE no firma los commits.
+
+. Observa la ejecución del pipeline. El paso `verify-commit-signature` informará:
++
+----
+⚠️  WARNING! UNSIGNED COMMIT DETECTED!
+----
++
+El pipeline se completará de todas formas (el entorno de pruebas no aplica esta restricción), pero el comentario del commit en GitLab mostrará:
++
+----
+⛔ UNSIGNED COMMIT — as per company policy, unsigned code will not be promoted beyond developer sandboxes
+----
+
+Esto demuestra que, aunque los desarrolladores pueden iterar libremente en el entorno de pruebas, el sistema registra e informa del estado de la firma en cada paso.
+====
+
+[#section-3]
+== Sección 3: Corregir la imagen base vulnerable
+
+=== Ejercicio 1: Comprender las infracciones de las políticas de ACS
+
+Firmaste tu commit, la aplicación se compiló correctamente y corregimos la mayoría de las vulnerabilidades de nuestra aplicación (con ayuda de Dependency Analytics y de la actualización de la versión del framework quarkus). Sin embargo, la comprobación de políticas de ACS ha detectado infracciones y __todavía tenemos un gran número de vulnerabilidades en la imagen de nuestra aplicación__. Estas infracciones provienen de la **imagen base** del contenedor, no del código de tu aplicación.
+
+. Revisa los resultados de la comprobación de políticas de ACS en el comentario del commit de GitLab. Es posible que veas infracciones como las siguientes:
+* `Parasol: Curl in Image`
+* `Parasol: Red Hat Package Manager in Image`
+* `Parasol: Fixable Severity at least Important`
++
+image::m02-gitlab-acs-violations.png[Infracciones de las políticas de ACS en el informe del commit,link=self,window=blank,width=400]
+
+. El equipo de seguridad de Parasol define estas políticas. Señalan las imágenes que contienen herramientas que crean un vector de ataque (como `curl` o `dnf`), o que tienen vulnerabilidades de gravedad alta que se pueden corregir en la imagen base.
+
+NOTE: Para este taller, "gravedades corregibles de nivel importante o superior" se ha definido como una política que no bloquea la compilación. En realidad, debería ser una política básica: todo lo que se pueda corregir debe corregirse. De hecho, esta política está habilitada de forma predeterminada en las instalaciones nuevas de ACS.
+
+=== Ejercicio 2: Cambiar a una imagen base reforzada
+
+. Vuelve a Dev Spaces y abre el archivo `Containerfile` en la raíz del proyecto.
++
+image::m02-devspaces-containerfile.png[Containerfile abierto en Dev Spaces, con la instrucción FROM visible,link=self,window=blank,width=700]
+
+. Busca la instrucción `FROM` y observa la imagen base actual. Es posible que use una imagen de entorno de ejecución estándar.
+
+. Sustitúyela por una imagen base mínima y reforzada. Cambia la línea `FROM` por:
++
+[source,dockerfile,role="copypaste"]
+----
+FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.20
+----
++
+image::m02-devspaces-containerfile-changed.png[Containerfile con una imagen base reforzada,link=self,window=blank,width=700]
++
+TIP: Las imágenes reforzadas son imágenes base mínimas que eliminan paquetes innecesarios (como gestores de paquetes y herramientas de red), lo que reduce significativamente la superficie de ataque. Además, se revisan y actualizan continuamente para mantener un contenido de CVE casi nulo.
+
+. Confirma el cambio con un mensaje descriptivo:
++
+[source,role="copypaste"]
+----
+Switch to hardened base image to resolve ACS policy violations
+----
+
+. Firma el commit (pega el código de verificación como antes) y envíalo.
+
+. Espera a que el pipeline del entorno de pruebas compile la nueva imagen.
+
+. Comprueba los resultados del pipeline en Developer Hub: la cantidad de vulnerabilidades debería ser mucho menor y las infracciones de las políticas de ACS deberían estar resueltas.
++
+image::m02-rhdh-pipeline-after-fix.png[Resultados del pipeline que muestran menos vulnerabilidades tras corregir la imagen base,link=self,window=blank,width=700]
++
+image::m02-rhdh-acs-check-after-fix.png[Image Check de ACS que muestra cero infracciones de políticas bloqueantes después de la corrección,link=self,window=blank,width=700]
++
+image::m02-gitlab-commit-report-after-fix.png[Informe del commit en GitLab que muestra que la comprobación de políticas de ACS se aprobó después de la corrección,link=self,window=blank,width=700]
+
+=== ¿Cómo se hizo?
+
+Para que el ejercicio sea fácil de leer, agregamos los detalles a continuación. Expande esta sección para ver cómo se hizo.
+
+.**Abrir para ver los detalles de implementación**
+[%collapsible]
+====
+**Red Hat Advanced Cluster Security (ACS)** proporciona análisis de imágenes y aplicación de políticas para imágenes de contenedor. Estas son sus principales capacidades para nuestro caso de uso:
+
+* **Análisis de imágenes** -- identifica vulnerabilidades conocidas (CVE) en todas las capas de una imagen de contenedor
+* **Aplicación de políticas** -- define reglas sobre lo que es aceptable en una imagen (sin gestores de paquetes, sin CVE corregibles de gravedad alta, etc.)
+* **Políticas como código** -- las políticas de seguridad se definen como recursos personalizados `SecurityPolicy` en un repositorio Git y se implementan mediante ArgoCD
+
+TIP: ACS ofrece más capacidades. Nos centramos en el pequeño subconjunto que usamos en nuestro caso de uso: evaluar flujos de red, crear y simular políticas de red, definir líneas de base para el comportamiento aceptable de los contenedores y responder a sus incumplimientos, aplicar diversas políticas de ejecución, generar informes de cumplimiento del clúster según controles del sector como CIS y NIST, y controles personalizados, entre muchas otras.
+
+
+Las políticas que se usan en este entorno están almacenadas en el repositorio `acs-policies` de GitLab, dentro de la categoría **Parasol Secured Build Gate**. Puedes verlas en la consola de ACS:
+
+. Abre la {acs_url}[consola de ACS^] y haz clic en **Log in**. Como ya te has autenticado con Keycloak, no tienes que volver a introducir tus credenciales.
++
+image::m02-acs-login.png[Inicio de sesión de ACS con SSO de Keycloak,link=self,window=blank,width=500]
+. Ve a **Platform Configuration** → **Policy Management**
++
+image::m02-acs-policy-management.png[Navegación a Policy Management de ACS,link=self,window=blank,width=700]
+. Filtra por categoría: **Parasol Secured Build Gate**
++
+image::m02-acs-parasol-policies.png[Políticas de ACS filtradas por la categoría Parasol Secured Build Gate,link=self,window=blank,width=700]
+
+Las tareas del pipeline `acs-image-scan` y `acs-image-check` usan la CLI `roxctl` para interactuar con la API central de ACS. Le pasan la marca `--categories="Parasol Secured Build Gate"` para evaluar únicamente las políticas personalizadas de Parasol.
+====
+
+=== Verificar
+
+A estas alturas, deberías haber:
+
+* Revisado los pasos del pipeline del entorno de pruebas y sus comprobaciones de seguridad
+* Visto la verificación de la firma del commit en el registro del pipeline
+* Revisado el informe de seguridad en GitLab
+* Cambiado a una imagen base reforzada y verificado que las infracciones de ACS están resueltas
+
+'''
+
+== Próximos pasos
+
+Continúa con xref:module-02/04-promotion.adoc[Avanzar a las siguientes etapas] para integrar tus cambios y promoverlos a través del pipeline protegido.

@@ -2,6 +2,21 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+insert_after_line() {
+  local lineno="$1" text="$2" file="$3"
+  { head -n "$lineno" "$file"; printf '%s\n' "$text"; tail -n +"$((lineno + 1))" "$file"; } > "$file.tmp" && mv "$file.tmp" "$file"
+}
+
+insert_before_match() {
+  local pattern="$1" text="$2" file="$3"
+  awk -v p="$pattern" -v t="$text" '$0 ~ p{print t} 1' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+}
+
+insert_after_match() {
+  local pattern="$1" text="$2" file="$3"
+  awk -v p="$pattern" -v t="$text" '1; $0 ~ p{print t}' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+}
 CONFIG_FILE="$REPO_ROOT/i18n/config.yaml"
 
 # Defaults
@@ -147,9 +162,8 @@ for site_file in site.yml local-site.yml; do
     # Find the "branches:" line that follows
     BRANCHES_LINE=$(tail -n +"$LAST_START_PATH_LINE" "$filepath" | grep -n "branches:" | head -1 | cut -d: -f1)
     INSERT_AFTER=$((LAST_START_PATH_LINE + BRANCHES_LINE - 1))
-    sed -i "${INSERT_AFTER}a\\
-    - url: .\\
-      start_path: content/$LANG\\
+    insert_after_line "$INSERT_AFTER" "    - url: .
+      start_path: content/$LANG
       branches: HEAD" "$filepath"
   fi
 done
@@ -163,12 +177,15 @@ SWITCHER_FILE="$REPO_ROOT/supplemental-ui/js/language-switcher.js"
 if grep -q "'$LANG':" "$SWITCHER_FILE" || grep -q "\"$LANG\":" "$SWITCHER_FILE"; then
   echo "    language-switcher.js already has '$LANG', skipping"
 else
-  # Insert new language entry before the closing brace of the languages object
-  # Find the line with the last language entry (ends with },) and add after it
-  sed -i "/^  }/i\\    $LANG: { label: '$NATIVE_NAME', flag: '$FLAG' }," "$SWITCHER_FILE"
-
-  # Fix trailing comma on the previous last entry if needed
-  # The sed above inserts before the closing }, so we need the previous line to have a comma
+  # Find the last language entry line (e.g. "    ja: { label: ...") and insert after it
+  LAST_LANG_LINE=$(grep -n "label:.*flag:" "$SWITCHER_FILE" | tail -1 | cut -d: -f1)
+  if [[ -n "$LAST_LANG_LINE" ]]; then
+    # Ensure the previous last entry has a trailing comma
+    if ! sed -n "${LAST_LANG_LINE}p" "$SWITCHER_FILE" | grep -q ',$'; then
+      awk -v n="$LAST_LANG_LINE" 'NR==n{sub(/}[[:space:]]*$/, "},"); sub(/\x27[[:space:]]*$/, "\x27,")} 1' "$SWITCHER_FILE" > "$SWITCHER_FILE.tmp" && mv "$SWITCHER_FILE.tmp" "$SWITCHER_FILE"
+    fi
+    insert_after_line "$LAST_LANG_LINE" "    $LANG: { label: '$NATIVE_NAME', flag: '$FLAG' }," "$SWITCHER_FILE"
+  fi
 fi
 
 # ── 6. patch gh-pages.yml ────────────────────────────────────────────────────
@@ -181,10 +198,10 @@ if grep -q "modules/$LANG/index.html" "$GH_PAGES_FILE"; then
   echo "    gh-pages.yml already validates '$LANG', skipping"
 else
   # Add validation check after the Japanese validation
-  sed -i "/test -f www\/modules\/ja\/index.html/a\\          test -f www/modules/$LANG/index.html || { echo \"$NAME version not built\"; exit 1; }" "$GH_PAGES_FILE"
+  insert_after_match "test -f www/modules/ja/index.html" "          test -f www/modules/$LANG/index.html || { echo \"$NAME version not built\"; exit 1; }" "$GH_PAGES_FILE"
 
   # Add image validation
-  sed -i "/test -d www\/modules\/ja\/_images/a\\          test -d www/modules/$LANG/_images || { echo \"$NAME images missing\"; exit 1; }" "$GH_PAGES_FILE"
+  insert_after_match "test -d www/modules/ja/_images" "          test -d www/modules/$LANG/_images || { echo \"$NAME images missing\"; exit 1; }" "$GH_PAGES_FILE"
 fi
 
 # ── 7. run initial translation ───────────────────────────────────────────────

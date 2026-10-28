@@ -1,0 +1,88 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id='lab4-ai-customer-support']
+== Laboratorio 4 - Atención al cliente con IA
+
+Usa un agente de IA para orquestar acciones en el backend a partir de conversaciones en lenguaje natural, con Agentic Apache Camel y Model-as-a-Service (MaaS).
+
+{empty} +
+
+*La necesidad del negocio*
+
+Cuando un cliente se comunica para consultar sobre una solicitud de póliza — ya sea para actualizar datos, cambiar la cobertura o resolver una discrepancia —, tradicionalmente los agentes de soporte deben navegar manualmente por varias bases de datos y sistemas de archivos del backend para atender la solicitud. Este proceso es lento, propenso a errores y frustrante tanto para los agentes como para los clientes. Necesitan una forma más rápida y sencilla de gestionar estos casos.
+
+{empty} +
+
+*La solución técnica*
+
+Los agentes de soporte interactúan con un bot de IA directamente en su ventana de Rocket.Chat mediante lenguaje natural. Gracias a Agentic Apache Camel y Model-as-a-Service (MaaS), la IA actúa como un asistente inteligente: interpreta la solicitud del agente, decide de forma autónoma qué herramientas utilizar, actualiza la base de datos y vuelve a generar el documento de póliza corregido en el almacenamiento S3. Esto reduce drásticamente el tiempo de resolución y elimina las tareas manuales de «silla giratoria» para los equipos de soporte.
+
+{empty} +
+
+*Cómo funciona*
+
+[.mermaid]
+----
+flowchart LR
+
+    Agent -->|① mensaje| RC <-->|② reenvío| INTLabel
+
+    INTLabel -- ⑤ respuesta--> RC
+
+    RC -- ⑥ respuesta --> Agent
+
+    INTLabel <--> |"③ razonamiento"| MaaSLabel
+    INTLabel --> |"④ llamadas a herramientas\n(MCP)"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Integración agéntica\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• Razonamiento de IA<br>• Uso de herramientas<br>• Integraciones</div></div>\n]
+
+    subgraph ToolsLabel ["MCP y sistemas de backend&nbsp;&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph MaaSLabel [" "]
+        MaaS
+    end
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente de soporte", pos: "b", h: 80, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 80, w: 80, constraint: "on" }
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "Modelo de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Base de datos", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "Mesa de ayuda", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style MaaS fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style MaaSLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+
+El agente de IA sigue un ciclo de razonamiento: consulta al LLM a través de MaaS, que decide qué acciones realizar. Luego, Camel ejecuta las herramientas adecuadas mediante *MCP* (actualiza la base de datos y vuelve a generar un documento PDF de la póliza en S3), devuelve los resultados al LLM y envía la respuesta final al agente de soporte en Rocket.Chat.
+
+[NOTE]
+====
+*¿Qué es MCP?* Model Context Protocol (MCP) es un estándar abierto que permite a los agentes de IA interactuar con sistemas externos — bases de datos, API, almacenamiento de archivos y otros — mediante un conjunto uniforme de herramientas. En este laboratorio, Apache Camel implementa un servidor MCP que expone acciones del backend (por ejemplo, actualizar la base de datos o cargar archivos en S3) como herramientas invocables. El modelo de IA decide qué herramientas utilizar según la solicitud del usuario en lenguaje natural.
+====
+
+{empty} +
+
+*Lo que harás en este laboratorio:*
+
+. *Configurar el entorno* — Prepara la carpeta de trabajo y configura el agente de IA.
+. *Desarrollar el agente* — Habilita progresivamente el agente de IA, desde las rutas básicas hasta equiparlo con todas las herramientas.
+. *Completar el flujo* — Termina la integración que conecta Rocket.Chat, el agente de IA, la base de datos y el almacenamiento S3.
+. *Probar el flujo* — Simula una interacción entre cliente y agente, y valida los resultados.
+
+{empty} +

@@ -1,0 +1,926 @@
+:imagesdir: ../../assets/images
+:page-time: 8
+include::partial$style.adoc[]
+
+[id='lab3-service-interconnect']
+== Habilitar la conectividad con la base de datos
+
+El flujo de integración necesita acceder a la base de datos, pero todavía no puede alcanzarla. Averigüemos por qué y habilitemos la conexión.
+
+NOTE: Este ejercicio utiliza un solo clúster para centrarse en lo esencial, pero Service Interconnect está diseñado para mucho más de lo que puede manejar una política de red: mallas multisite que abarcan clústeres, regiones y proveedores de nube. Al final se incluye un breve ejemplo del mundo real que muestra este contexto más amplio.
+
+{empty} +
+
+=== ¿Por qué no puedes acceder a la base de datos?
+
+La base de datos de backend está alojada en un espacio de nombres aislado (*shared-database*) con políticas de red estrictas: no se permite el acceso directo desde otros espacios de nombres.
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[Cliente de BD]
+        end
+    end
+
+    Client -.-x|"❌ inaccesible"| SVC
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+Pruébalo: ejecuta una consulta sencilla en la base de datos (desde la terminal de _Dev Spaces_):
+
+{blank}
+
+// [.copypaste]
+// ****
+// curl postgres.shared-database.svc:5432 \
+// -v --connect-timeout 3
+// ****
+
+// [TIP]
+// --
+// .¿Qué hace este comando?
+// [%collapsible]
+// ====
+// * `postgres.shared-database.svc:5432` — servicio de destino, espacio de nombres y puerto de PostgreSQL
+// * `-v` — modo detallado; muestra el intento de conexión
+// * `--connect-timeout 3` — cancela el intento después de 3 segundos en lugar de quedarse esperando
+// ====
+// --
+
+[.copypaste]
+****
+sql postgres.shared-database.svc:5432 \
+"SELECT count(*) FROM policies"
+****
+
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `sql` — script auxiliar del laboratorio que se conecta a una base de datos PostgreSQL y ejecuta una consulta
+* `postgres.shared-database.svc:5432` — dirección de la base de datos: servicio, espacio de nombres y puerto
+* `"SELECT count(*) FROM policies"` — cuenta el número de registros de la base de datos
+====
+--
+
+La conexión agotará el tiempo de espera: no se puede acceder directamente a la base de datos desde tu espacio de nombres:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres.shared-database.svc:5432 (timeout: 5s)...</span>
+
+<span style="color: #f4796d">ERROR: Cannot connect to postgres.shared-database.svc:5432</span></pre>
+++++
+
+{empty} +
+
+=== Conectar espacios de nombres con Service Interconnect
+
+{rhsi} (desarrollado a partir del proyecto de código abierto https://skupper.io[Skupper.io,window=_blank]) resuelve este problema creando conexiones cifradas a nivel de aplicación entre espacios de nombres, sin necesidad de VPN, reglas de firewall ni exponer servicios a la red pública.
+
+Una vez configurado, se crea un servicio local en tu espacio de nombres que reenvía de forma transparente el tráfico a la base de datos remota:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[Cliente de BD]
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Client --> SI1
+
+    SI1 -.-|"🔒 enlace seguro"| SI2
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    SI2 --> SVC
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+Desde la perspectiva de tu aplicación, la base de datos aparecerá como un servicio local; no se necesita ninguna configuración especial.
+
+{empty} +
+
+//NOTE: En este ejercicio conectarás dos espacios de nombres del mismo clúster; se trata de una configuración deliberadamente sencilla para centrarnos en los conceptos básicos. Quizá te preguntes por qué hace falta Service Interconnect para algo que podría resolverse con una simple política de red. La respuesta es la escala: Service Interconnect está diseñado para redes multisite cuyos servicios abarcan varios clústeres, regiones y proveedores de nube, con muchas conexiones que comparten la misma malla segura. Lo que aprendas aquí se aplica directamente a esos escenarios reales. Al final del ejercicio veremos un breve ejemplo.
+
+//{empty} +
+
+=== Cómo funciona internamente
+
+Service Interconnect utiliza un conjunto de recursos para establecer y administrar la conexión. Este es el desglose del diagrama anterior:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[Cliente de BD]
+            SVC2((svc))
+            subgraph S2 ["Site (Aplicación)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 enlace seguro"| S1
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            subgraph S1 ["Site (BD)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S1 fill:#e8eaf6,stroke:#7986cb
+    style Grant fill:#fff,stroke:#7986cb
+    style Listener fill:#fff,stroke:#7986cb
+    style Token fill:#fff,stroke:#7986cb
+    style Connector fill:#fff,stroke:#7986cb
+    style DB fill:#336,color:#fff
+----
+
+[.mermaid-hints-simple]
+****
+S2 | Site | La base de la red de Skupper. Cada espacio de nombres participante ejecuta un Site. Los Sites se descubren entre sí mediante AccessGrants y AccessTokens. +
+S1 | Site | La base de la red de Skupper. Cada espacio de nombres participante ejecuta un Site. Los Sites se descubren entre sí mediante AccessGrants y AccessTokens. +
+Grant | AccessGrant | Se crea en el lado receptor. Genera credenciales que permiten que un Site remoto se conecte. Es como una invitación para unirse a la red. +
+Token | AccessToken | Se crea en el lado que inicia la conexión usando los datos del grant. Establece el enlace cifrado entre dos Sites. +
+Listener | Listener | Expone localmente un servicio remoto en tu espacio de nombres. Coincide con un Connector del otro lado mediante la clave de enrutamiento, para que el servicio remoto aparezca como local. +
+Connector | Connector | Conecta un servicio local a la red de Skupper. Publica el servicio para que los Listeners coincidentes de otros espacios de nombres puedan acceder a él. +
+SVC2 | Service (creado automáticamente) | Al crear un Listener, Service Interconnect crea automáticamente un servicio local de Kubernetes. Tu aplicación se conecta a este servicio como si la base de datos fuera local.
+****
+
+TIP: Pasa el cursor sobre cada componente del diagrama para saber qué hace.
+
+La base de datos se encuentra en un entorno seguro y aislado: no hay puertos de entrada expuestos. Para mantenerlo así, el enlace se inicia *desde* el lado de la base de datos *hacia afuera*, en dirección a tu Site. Por eso creas un AccessGrant de tu lado: le da permiso al Site de la base de datos para conectarse contigo y establecer un enlace de comunicación bidireccional. Su entorno nunca abre un punto de entrada que pudiera ser objeto de un ataque.
+
+{empty} +
+
+=== Lo que harás
+
+Toda configuración de Service Interconnect consta de dos etapas: primero *estableces la red*, la malla segura que conecta tus entornos, y luego *expones servicios* a través de ella. Una vez establecida la red, para agregar un servicio nuevo solo tienes que emparejar un Listener con un Connector; no es necesario modificar la red.
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+    subgraph netLabel ["① Establecer la red"]
+        subgraph net [" "]
+            direction LR
+            S1@{ shape: processes, label: "Sites" } -.-|"🔒 enlace seguros"| S2@{ shape: processes, label: "Sites" }
+        end
+    end
+
+    subgraph svcLabel ["② Exponer servicios"]
+        subgraph svc [" "]
+            direction LR
+            LA@{ shape: processes, label: "Listeners" } --- CA@{ shape: processes, label: "Connectors" }
+        end
+    end
+
+    netLabel ~~~ svcLabel
+
+    style netLabel fill:none,stroke:none
+    style svcLabel fill:none,stroke:none
+    style net fill:#e8eaf6,stroke:#7986cb
+    style svc fill:#e8f5e9,stroke:#66bb6a
+    style S1 fill:#fff,stroke:#7986cb
+    style S2 fill:#fff,stroke:#7986cb
+    style LA fill:#fff,stroke:#66bb6a
+    style CA fill:#fff,stroke:#66bb6a
+----
+
+En este ejercicio, esto se traduce en lo siguiente:
+
+*Establecer la red*: crear el enlace seguro entre los espacios de nombres:
+
+[start=0]
+. Ya existe un *Site* en el espacio de nombres `shared-database` _(preconfigurado)_.
+. Crear un *Site* en tu espacio de nombres con `linkAccess` habilitado.
+. Generar un *AccessGrant* para que el espacio de nombres de la base de datos pueda conectarse contigo.
+. Crear un *AccessToken* en el espacio de nombres de la base de datos para establecer el enlace.
+
+*Exponer el servicio de base de datos*: hacer que la base de datos remota esté disponible localmente (en `{username}-devspaces`):
+
+[start=4]
+. Un *Connector* ya conecta la red de Skupper con PostgreSQL en el puerto `5432` _(preconfigurado)_.
+. Crear un *Listener* para exponer la base de datos remota como un servicio local.
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel2 ["{username}-devspaces"]
+        subgraph yours2 [" "]
+            Client[Cliente de BD]
+            SVC2((svc))
+            subgraph S2 ["✏️ Site (Aplicación)"]
+                Listener(("✏️ Listener"))
+                Grant["✏️ AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 enlace seguro"| S1
+
+    subgraph sharedLabel2 [shared-database]
+        subgraph shared2 [" "]
+            subgraph S1 ["✅ Site (BD)"]
+                Connector(("✅ Connector"))
+                Token["✏️ AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel2 fill:none,stroke:none
+    style sharedLabel2 fill:none,stroke:none
+    style S2 fill:#ffe0b2,stroke:#fb8c00
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Listener fill:#fff3e0,stroke:#fb8c00
+    style Grant fill:#fff3e0,stroke:#fb8c00
+    style Token fill:#fff3e0,stroke:#fb8c00
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+[.indent2]
+✅ Ya configurado por el equipo de la plataforma +
+✏️ Tus tareas
+
+{empty} +
+
+=== Paso 0: Explorar el lado del servidor (opcional)
+
+Tienes acceso de solo lectura al espacio de nombres `shared-database`. Dedica un momento a inspeccionar lo que configuró el equipo de la plataforma.
+
+Consulta los recursos de Skupper:
+
+{blank}
+
+[.copypaste]
+****
+oc get site,connector -n shared-database
+****
+
+Deberías ver un resultado similar a este:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: white">NAME                            STATUS   SITES IN NETWORK   MESSAGE
+site.skupper.io/database-site   Ready    1                  OK
+
+NAME                            ROUTING KEY   PORT   HOST   SELECTOR       STATUS    HAS MATCHING LISTENER   MESSAGE
+connector.skupper.io/postgres   postgres      5432          app=postgres   Pending                           No matching listeners</pre>
+++++
+
+Observa que el estado del Connector es `Pending` y muestra `No matching listeners`; es lo esperado. Crearás el Listener coincidente más adelante en este ejercicio.
+
+Estos son los dos recursos preconfigurados del diagrama. Esto es lo que debes completar:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Configurado</b><br/>• Site (BD)<br/>• Connector</div>"]
+
+    Progress["33% (preconfigurado)<br/>████████░░░░░░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Pendiente</b><br/>• Site (Aplicación)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== Establecer la red
+
+El primer paso es configurar la red segura entre tu espacio de nombres y el de la base de datos. Para ello, debes crear un Site, un AccessGrant y un AccessToken; juntos, establecerán un enlace cifrado entre ambos entornos.
+
+{empty} +
+
+==== Paso 1: Crear un Site en tu espacio de nombres
+
+Crea un Site con `linkAccess` habilitado. Así, tu espacio de nombres será un *Site de escucha* que puede aceptar conexiones entrantes desde la base de datos.
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Site
+metadata:
+  name: {username}-site
+  namespace: {username}-devspaces
+spec:
+  linkAccess: route
+EOF
+****
+
+Comprueba que el Site esté listo:
+
+{blank}
+
+[.copypaste]
+****
+oc get site {username}-site -n {username}-devspaces
+****
+
+Espera hasta que la columna `STATUS` muestre `Ready`:
+
+{blank}
+
+[subs=attributes]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME         STATUS   SITES IN NETWORK   MESSAGE
+{username}-site   Ready    1                  OK</pre>
+++++
+
+Tu Site está listo. Este es tu progreso:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completado</b><br/>• Site (BD)<br/>• Connector<br/>• Site (Aplicación)</div>"]
+
+    Progress["50% completado<br/>█████████████░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Pendiente</b><br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== Paso 2: Crear un AccessGrant
+
+Antes de empezar, recuerda que el enlace se inicia *desde* el Site (BD) (base de datos) *hacia* el Site (Aplicación) (el tuyo). Así es como el grant y el token trabajan juntos para lograrlo:
+
+{blank}
+
+[.mermaid]
+----
+sequenceDiagram
+    actor A as Administrador<br/>(Tú)
+    participant S2 as Site (Aplicación)
+    participant S1 as Site (BD)
+
+    A-->>S2: Crear AccessGrant
+
+    Note over S2: AccessGrant
+
+    A-->>S1: Crear AccessToken
+
+    Note over S1: AccessToken
+
+    S1-->>S2: Canjear token
+    S2-->>S1: Transferir detalles del enlace
+    S1->>S2: Crear enlace
+
+    Note over S2,S1: 🔒 enlace seguro established
+----
+
+Creas un AccessGrant en tu Site (Aplicación) y un AccessToken en el Site (BD). A continuación, el Site de la base de datos canjea el token para establecer un enlace seguro contigo.
+
+{blank}
+
+Ahora, crea el AccessGrant:
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessGrant
+metadata:
+  name: grant-{username}
+  namespace: {username}-devspaces
+spec:
+  redemptionsAllowed: 1
+  expirationWindow: 168h
+EOF
+****
+
+Espera a que el AccessGrant esté listo y recupera sus detalles:
+
+{blank}
+
+[.copypaste]
+****
+oc get accessgrant grant-{username} -n {username}-devspaces
+****
+
+Espera hasta que la columna `STATUS` muestre `Ready`:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            REDEMPTIONS ALLOWED   REDEMPTIONS MADE   EXPIRATION             STATUS   MESSAGE
+grant-userN     1                                        2026-03-27T11:29:08Z   Ready    OK</pre>
+++++
+
+Tu AccessGrant está listo. Este es tu progreso:
+
+{blank}
+
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completado</b><br/>• Site (BD)<br/>• Connector<br/>• Site (Aplicación)<br/>• AccessGrant</div>"]
+
+    Progress["67% completado<br/>████████████████░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Pendiente</b><br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== Paso 3: Crear un AccessToken en el espacio de nombres de la base de datos
+
+Ahora crea un AccessToken en el espacio de nombres `shared-database` para establecer el enlace desde la base de datos hasta tu espacio de nombres. El token debe llamarse `token-{username}`.
+
+Extrae los detalles del grant y crea el AccessToken:
+
+{blank}
+
+[.copypaste]
+****
+URL=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.url}')
+CODE=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.code}')
+CA=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.ca}' | sed 's/^/    /')
+
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessToken
+metadata:
+  name: token-{username}
+  namespace: shared-database
+spec:
+  url: "${URL}"
+  code: "${CODE}"
+  ca: |
+${CA}
+EOF
+****
+
+Al cabo de unos instantes, se creará automáticamente un recurso *Link* en `shared-database`. Verifica que se haya creado:
+
+{blank}
+
+[.copypaste]
+****
+oc get link token-{username} -n shared-database
+****
+
+Espera hasta que el estado del enlace muestre `Ready`:
+
+{blank}
+
+[subs="attributes"]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            STATUS   REMOTE SITE    MESSAGE
+token-{username}     Ready    {username}-site     OK</pre>
+++++
+
+Ya casi terminas: falta un recurso más:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completado</b><br/>• Site (BD)<br/>• Connector<br/>• Site (Aplicación)<br/>• AccessGrant<br/>• AccessToken</div>"]
+
+    Progress["83% completado<br/>█████████████████████░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ Pendiente</b><br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== Exponer el servicio de base de datos
+
+La red ya está configurada: tu espacio de nombres y el de la base de datos están conectados mediante un enlace cifrado. Sin embargo, tener una red no basta para acceder a la base de datos. Debes indicarle a Service Interconnect *qué servicio* debe exponer en tu espacio de nombres.
+
+Aquí es donde entran en juego los Listeners y los Connectors. El Connector del lado de la base de datos ya está configurado (lo viste en el paso 0). Ahora debes crear un Listener coincidente de tu lado.
+
+{empty} +
+
+==== Paso 4: Crear un Listener para exponer la base de datos localmente
+
+El Listener crea un servicio local en tu espacio de nombres que reenvía el tráfico a la base de datos PostgreSQL remota a través del enlace cifrado.
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: postgres-listener
+  namespace: {username}-devspaces
+spec:
+  routingKey: postgres
+  host: postgres
+  port: 5432
+EOF
+****
+
+IMPORTANT: `routingKey` debe coincidir con el valor configurado en el Connector del espacio de nombres `shared-database`. El equipo de la plataforma lo estableció como `postgres`.
+
+Comprueba que el Listener esté listo:
+
+{blank}
+
+[.copypaste]
+****
+oc get listener postgres-listener -n {username}-devspaces
+****
+
+Deberías ver un resultado similar a este:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME                ROUTING KEY   PORT   HOST       STATUS   HAS MATCHING CONNECTOR   MESSAGE
+postgres-listener   postgres      5432   postgres   Ready    true                     OK</pre>
+++++
+
+Al crear un Listener, Service Interconnect expone automáticamente el servicio de backend como un servicio local en tu entorno:
+
+{blank}
+
+[.mermaid]
+----
+flowchart RL
+
+    subgraph S2 [" "]
+        Listener((Listener))
+    end
+    Listener -.->|crea| SVC2((svc))
+
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+----
+
+Comprueba que el servicio `postgres` esté disponible:
+
+{blank}
+
+[.copypaste]
+****
+oc get svc postgres -n {username}-devspaces
+****
+
+Deberías ver el servicio disponible localmente:
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+postgres   ClusterIP   172.31.121.30   &lt;none&gt;        5432/TCP   21s</pre>
+++++
+
+Todos los recursos están configurados:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ Completado</b><br/>• Site (BD)<br/>• Connector<br/>• Site (Aplicación)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Progress["100% completado<br/>██████████████████████████"]
+
+    Left --- Progress
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#e8f5e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+----
+
+{empty} +
+
+==== Paso 5: Verificar la conexión
+
+// Now let's verify the connection works. The database credentials are already configured in `application.properties`. Query the database using Camel's `cmd` tool:
+
+// {blank}
+
+// [.copypaste]
+// ****
+// camel cmd send \
+// --uri "sql:SELECT count(*) FROM invoices" \
+// --properties application.properties \
+// --reply
+// ****
+
+// [TIP]
+// --
+// .¿Qué hace este comando?
+// [%collapsible]
+// ====
+// * `camel cmd send` — envía un mensaje a un endpoint de Camel desde la línea de comandos
+// * `--uri "sql:SELECT count(*) FROM invoices"` — ejecuta una consulta SQL en la base de datos configurada
+// * `--properties application.properties` — carga la configuración de conexión a la base de datos
+// * `--reply` — espera la respuesta y la muestra
+// ====
+// --
+
+// Deberías ver un resultado similar a este:
+
+// {blank}
+
+// ++++
+// <pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #818181">2026-03-23 10:14:08.939  <span style="color:#A649A6">11530</span> ---   <span style="color:#10A9CD">sql://SELECT%20count(*)%20FROM%20invoice</span> : <span style="color:#0FBC7A">Reply received</span> <span style="color:#0FBC7A">(success)</span> <span style="color:#fff">(304ms)</span>
+//  <span style="color:#fff">Endpoint</span>  <span style="color:#fff">sql://SELECT%20count(*)%20FROM%20invoices</span>
+//  <span style="color:#fff">Exchange</span>  (DefaultExchange)  <span style="color:#6F416E">InOut</span>   <span style="color:#fff">E3D444D7E02ADCD-0000000000000000</span>
+//  <span style="color:#fff">Message</span>   (DefaultMessage)
+//  <span style="color:#fff">Header</span>    (Integer)             <span style="color:#fff">CamelSqlRowCount  1</span>
+//  <span style="color:#fff">Body</span>      (ArrayList) (size: 1 bytes: 11)
+//  <span style="background-color: yellow; color: black">[{count=1}]</span></pre>
+// ++++
+
+Ahora verifiquemos que la conexión funciona. Ejecuta la misma consulta que antes, pero esta vez dirígela al servicio local; gracias a _Service Interconnect_, ahora se puede acceder a la base de datos desde tu espacio de nombres:
+
+{blank}
+
+[.copypaste]
+****
+sql postgres:5432 \
+"SELECT count(*) FROM policies"
+****
+
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `sql` — script auxiliar del laboratorio que se conecta a una base de datos PostgreSQL y ejecuta una consulta
+* `postgres:5432` — servicio de base de datos expuesto localmente por _Service Interconnect_
+* `"SELECT count(*) FROM policies"` — cuenta el número de registros de la base de datos
+====
+--
+
+Deberías ver un resultado similar a este:
+
+{blank}
+
+++++
+<pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres:5432 (timeout: 5s)...</span>
+<span style="color: #0FBC7A">count</span>
+<span style="color: #0FBC7A">-----</span>
+<span style="color: #0FBC7A">1</span>
+
+<span style="color: #0FBC7A">(1 row(s))</span></pre>
+++++
+
+[.overlay]
+****
+[.target]
+sql-count-output
+
+[.arrows]
+{x: 9, y: 88, rot: -45, size: .8, color: "red"}
+****
+
+NOTE: El recuento es `1` porque el entorno del laboratorio ya incluye un registro de ejemplo cargado en la base de datos.
+
+{empty} +
+
+=== Resumen
+
+Este es el panorama completo de lo que has creado:
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel3 ["{username}-devspaces"]
+        subgraph yours3 [" "]
+            Client[Cliente de BD]
+            SVC2((svc))
+            subgraph S2 ["✅ Site (Aplicación)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 enlace seguro"| S1
+
+    subgraph sharedLabel3 [shared-database]
+        subgraph shared3 [" "]
+            subgraph S1 ["✅ Site (BD)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel3 fill:none,stroke:none
+    style sharedLabel3 fill:none,stroke:none
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Grant fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Token fill:#e8f5e9,stroke:#66bb6a
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+Has completado correctamente lo siguiente:
+
+* *Establecimiento de la red*: creaste un Site y un AccessGrant en tu espacio de nombres, y un AccessToken en el espacio de nombres de la base de datos para formar un enlace cifrado.
+* *Exposición del servicio*: creaste un Listener que permite acceder localmente a la base de datos remota a través de la red.
+* *Verificación de la conectividad*: utilizaste un script para consultar la base de datos a través del enlace cifrado.
+
+La base de datos se encuentra en un entorno seguro y aislado: la conexión se inició *desde* el lado de la base de datos *hacia* el tuyo mediante un enlace cifrado de Skupper. No se requieren cambios en las políticas de red, VPN ni permisos elevados.
+
+El enlace que estableciste permanecerá activo. Lo necesitarás en el próximo ejercicio para implementar el flujo de datos completo: incorporar solicitudes de pólizas, almacenarlas en la base de datos y generar documentos de póliza en PDF.
+
+{empty} +
+
+=== Más allá de este ejercicio: Service Interconnect a escala
+
+En este laboratorio conectaste dos espacios de nombres del mismo clúster: una configuración sencilla para demostrar los conceptos. En el mundo real, Service Interconnect demuestra su valor al conectar servicios en varios clústeres, regiones y proveedores de nube, todos ellos dentro de la misma malla segura.
+
+Imagina una empresa minorista con tiendas en distintas regiones, cada una con servicios basados en IA. Los sitios edge recopilan datos de entrenamiento y ejecutan inferencias con modelos implementados localmente. Los centros de datos locales redundantes se encargan del trabajo pesado: entrenan modelos nuevos de IA y aprendizaje automático y envían las versiones actualizadas a las tiendas. Los hubs regionales agregan el tráfico de los sitios edge cercanos antes de reenviarlo al núcleo.
+
+{blank}
+
+[.text-center]
+[.mermaid]
+----
+flowchart LR
+    subgraph left [" "]
+        direction TB
+        subgraph E1L ["London"]
+            E1["Datos de IA →\nModelo de IA ←"]
+        end
+        subgraph E2L ["Berlin"]
+            E2["Datos de IA →\nModelo de IA ←"]
+        end
+    end
+
+    HL((Centro\nFrankfurt))
+
+    subgraph coreLabel [" "]
+        direction TB
+        subgraph DC1 ["Centro de datos 1"]
+            AI1(Entrenamiento de modelos de IA)
+        end
+        subgraph DC2 ["Centro de datos 2"]
+            AI2(Entrenamiento de modelos de IA)
+        end
+    end
+
+    HR((Centro\nSingapur))
+
+    subgraph right [" "]
+        direction TB
+        subgraph E3L ["Tokyo"]
+            E3["← Datos de IA\n→ Modelo de IA"]
+        end
+        subgraph E4L ["Sydney"]
+            E4["← Datos de IA\n→ Modelo de IA"]
+        end
+    end
+
+    E1 -.-|"🔒 N enlaces"| HL
+    E2 -.-|"🔒 N enlaces"| HL
+    HL -.-|"🔒 N enlaces"| AI1
+    HL -.-|"🔒 N enlaces"| AI2
+    AI1 -.-|"🔒 N enlaces"| HR
+    AI2 -.-|"🔒 N enlaces"| HR
+    HR -.-|"🔒 N enlaces"| E3
+    HR -.-|"🔒 N enlaces"| E4
+
+    style left fill:none,stroke:none
+    style right fill:none,stroke:none
+    style E1L fill:none,stroke:none
+    style E2L fill:none,stroke:none
+    style E3L fill:none,stroke:none
+    style E4L fill:none,stroke:none
+    style coreLabel fill:none,stroke:none
+    style DC1 fill:#e8eaf6,stroke:#7986cb
+    style DC2 fill:#e8eaf6,stroke:#7986cb
+    style AI1 fill:#fff,stroke:#7986cb
+    style AI2 fill:#fff,stroke:#7986cb
+    style HL fill:#e8eaf6,stroke:#7986cb
+    style HR fill:#e8eaf6,stroke:#7986cb
+    style E1 fill:#f5f5f5,stroke:#ccc
+    style E2 fill:#f5f5f5,stroke:#ccc
+    style E3 fill:#f5f5f5,stroke:#ccc
+    style E4 fill:#f5f5f5,stroke:#ccc
+----
+
+Cada sitio edge envía datos de entrenamiento al núcleo y recibe los modelos actualizados. Varios enlaces entre sitios ofrecen enrutamiento redundante: si una ruta falla, el tráfico fluye por otra. Los hubs añaden otra capa de resiliencia: si el hub de Frankfurt deja de funcionar, los sitios edge pueden redirigir el tráfico a través de Singapur. Los centros de datos redundantes garantizan que el flujo de trabajo de IA siga disponible incluso durante tareas de mantenimiento o interrupciones.
+
+Aquí se aplica el mismo patrón de dos etapas que acabas de aprender: los Sites y los enlaces forman la red, mientras que los Listeners y los Connectors exponen los servicios específicos en cada extremo. La diferencia está en la escala: en lugar de dos espacios de nombres en un clúster, abarca varias regiones, hubs y centros de datos. Sin embargo, los componentes básicos son idénticos.
+
+{empty} +
+
+[.verification]
+****
+¿El resultado del comando mostró `[{count=1}]`, lo que confirma que la consulta a la base de datos se realizó correctamente?
+
+[.success]
+¡Buen trabajo! La conectividad con la base de datos está lista. Continúa con el siguiente ejercicio.
+
+[.fail]
+Revisa tus recursos de Service Interconnect y asegúrate de que el estado del enlace sea `Ready` antes de volver a ejecutar el comando.
+****

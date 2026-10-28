@@ -1,0 +1,278 @@
+= Cómo abordar las vulnerabilidades desde el principio
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+El enfoque tradicional de la seguridad consiste en analizar al final del proceso, o peor aún, después del despliegue. Para entonces, corregir las vulnerabilidades implica volver a hacer trabajo, sufrir retrasos y aplicar parches de emergencia. Un enfoque mejor es **desplazar la seguridad a la izquierda**: proporcionar a los desarrolladores las herramientas necesarias para identificar y corregir las vulnerabilidades lo antes posible, mientras todavía están escribiendo código.
+
+En esta sección, configurarás tu entorno de desarrollo seguro y luego usarás Red Hat Dependency Analytics para encontrar y corregir vulnerabilidades en las dependencias de la aplicación, incluso antes de enviar un commit.
+
+NOTA: Este módulo no cubre todas las capacidades de Red Hat Developer Hub ni cómo ayuda a los desarrolladores en su trabajo diario. Para conocer la experiencia del desarrollador, consulta xref:module-01/00-intro.adoc[Módulo 1: La experiencia del desarrollador]. Aquí nos centraremos en las barreras de seguridad que se agregan al proceso de desarrollo.
+
+[#section-1]
+== Sección 1: Comprender los componentes
+
+=== Ejercicio 1: Explorar el componente de la aplicación en Developer Hub
+
+. Abre **Red Hat Developer Hub** en {rhdh_url}[{rhdh_url}^] e inicia sesión con tus credenciales:
++
+--
+Nombre de usuario:
+[source,subs="attributes",role="copypaste"]
+----
+{user}
+----
+Contraseña:
+[source,subs="attributes",role="copypaste"]
+----
+{password}
+----
+--
+
+. Haz clic en **Catalog** en la barra lateral izquierda.
++
+image::m02-rhdh-catalog-secured.png[Catálogo de Developer Hub con el componente Parasol Insurance Secured,link=self,window=blank,width=700]
+
+
+. Busca y haz clic en **Parasol Insurance (Secured)**.
++
+Esta es la versión de la aplicación Parasol Insurance que utiliza procesos de compilación seguros. Si completaste el Módulo 1, la reconocerás como la misma aplicación.
++
+image::m02-rhdh-secured-component.png[Componente Parasol Insurance Secured en Developer Hub,link=self,window=blank,width=700]
++
+Dedica un momento a explorar la página del componente:
++
+* La pestaña **Topology** muestra un mapa visual de los despliegues de la aplicación y sus relaciones.
+* La pestaña **CI** muestra las ejecuciones de los procesos: compilaciones, análisis de seguridad y procesos de promoción. Usarás esta pestaña con frecuencia durante este módulo.
+* La pestaña **CD** muestra el estado de sincronización de ArgoCD para los despliegues de preprod y secured-prod.
++
+Volveremos a estas pestañas más adelante, después de crear un entorno aislado e independiente para el desarrollo en el próximo ejercicio.
+
+=== Ejercicio 2: Crear un entorno de pruebas seguro
+
+Al igual que en el Módulo 1, crearás un entorno de desarrollo aislado, pero esta vez usarás la plantilla *segura*, que incluye comprobaciones de seguridad adicionales en el proceso.
+
+. Haz clic en el botón **Self-Service** (el icono **+**) en la parte superior de la página.
++
+image::m02-rhdh-self-service-button.png[Botón Self-Service en Developer Hub,link=self,window=blank,width=700]
+
+. Selecciona la plantilla **Secured Parasol Insurance Development Environment**.
++
+image::m02-rhdh-secured-template.png[Plantilla de entorno de desarrollo seguro,link=self,window=blank,width=700]
+
+. Escribe un nombre de rama para tu entorno de pruebas, por ejemplo: `sec-fix`
++
+CONSEJO: Procura que el nombre de la rama sea corto. Se usará en los nombres de los espacios de nombres y en las rutas de OpenShift.
+
+. Haz clic en **Review** y luego en **Create**; observa el aprovisionamiento:
+* Se crea una rama de funcionalidad en el repositorio de código fuente seguro.
+* Se crea un espacio de nombres de pruebas con su propio proceso de CI/CD.
+* Se registra un componente nuevo en Developer Hub.
+* Se activa automáticamente una compilación inicial.
+
+. Cuando termine el aprovisionamiento, haz clic en **Open in Catalog** para ver el nuevo componente de pruebas.
++
+image::m02-rhdh-provisioning-complete.png[Aprovisionamiento completado con el botón Open in Catalog,link=self,window=blank,width=700]
++
+También puedes encontrarlo en el catálogo con el nombre **Parasol Insurance Secured Dev (your-branch-name)**. Este es tu entorno de desarrollo de pruebas aislado.
++
+image::m02-rhdh-catalog-sandbox.png[Componente de pruebas en el catálogo de Developer Hub,link=self,window=blank,width=700]
+
+. Ábrelo y haz clic en la pestaña **CI** para verificar que se haya iniciado el proceso de compilación inicial.
++
+image::m02-rhdh-sandbox-initial-build.png[Compilación inicial del entorno de pruebas en ejecución en Developer Hub,link=self,window=blank,width=700]
++
+NOTA: Esta captura de pantalla muestra una ejecución del proceso que ya finalizó correctamente; no tienes que esperar a que termine. Sigamos.
+
+=== Verificación
+
+En este punto, deberías haber:
+
+* Explorado el componente Parasol Insurance (Secured) en Developer Hub.
+* Creado un entorno de pruebas seguro con su propio proceso.
+* Verificado que se haya activado una compilación inicial.
+
+'''
+
+[#section-2]
+== Sección 2: Red Hat Dependency Analytics
+
+Red Hat Dependency Analytics (RHDA) es una extensión para IDE que analiza las dependencias de tu aplicación en tiempo real. Identifica vulnerabilidades conocidas, ofrece recomendaciones para corregirlas y se integra con Trusted Profile Analyzer (TPA) de Red Hat para proporcionar datos de vulnerabilidades enriquecidos, incluidas las correcciones retroportadas de Lightwell que no están disponibles en las bases de datos públicas.
+
+=== Ejercicio 1: Abrir Dev Spaces e iniciar un análisis
+
+. En la página de tu componente de pruebas en Developer Hub (haz clic en la pestaña **Overview**), haz clic en el enlace **Dev Spaces** para abrir un entorno de desarrollo en la nube.
++
+image::m02-rhdh-devspaces-link.png[Enlace de Dev Spaces en la página del componente de pruebas,link=self,window=blank,width=700]
+
+. El espacio de trabajo tardará un momento en iniciarse. Cuando se te solicite, acepta las indicaciones de seguridad y confía en el espacio de trabajo.
++
+CONSEJO: Si aparece una ventana emergente que pregunta si confías en los autores, haz clic en **Yes, I trust the authors**.
++
+.**Detalles -- Secuencia de inicio**
+[%collapsible]
+====
+El inicio de Dev Spaces consta de varios pasos. Sigue las capturas de pantalla a continuación:
+
+. Inicia sesión con OpenShift.
++
+image::m02-devspaces-login.png[Iniciar sesión con OpenShift,link=self,window=blank,width=400]
+
+. Otorga los permisos.
++
+image::m02-devspaces-authorize.png[Autorizar el acceso de Dev Spaces,link=self,window=blank,width=400]
+
+. Confía en los autores (y, si quieres, permite también otros repositorios).
++
+image::m02-devspaces-trust-authors.png[Confiar en los autores de este repositorio,link=self,window=blank,width=700]
+
+. Si se te solicita, inicia sesión en GitLab con `{user}` / `{password}`.
++
+image::m02-devspaces-gitlab-login.png[Solicitud de inicio de sesión en GitLab,link=self,window=blank,width=400]
+
+. Autoriza DevSpaces.
++
+image::m02-devspaces-authorize-gitlab.png[Autorizar a DevSpaces para acceder a GitLab,link=self,window=blank,width=400]
+
+. Confía en los editores de las extensiones.
++
+image::m02-devspaces-trust-publishers.png[Confiar en los editores e instalar,link=self,window=blank,width=400]
+
+. Confía en el espacio de trabajo.
++
+image::m02-devspaces-trust-workspace.png[Confiar en el espacio de trabajo e instalar,link=self,window=blank,width=400]
+
+. Permite que el espacio de trabajo ejecute el asistente gitsign (gitsign login).
++
+image::m02-devspaces-gitsign-task.png[Permitir la ejecución de la tarea de inicio de sesión de gitsign,link=self,window=blank,width=400]
++
+Si no viste la solicitud de la tarea, ve a **Burger Menu** en la parte superior izquierda, selecciona **Terminal** -> **Run Task...**
++
+image::m02-devspaces-run-task.png[Menú Terminal con la opción Run Task,link=self,window=blank,width=400]
++
+Luego ejecuta **gitsign login**.
++
+image::m02-devspaces-gitsign-select.png[Seleccionar la tarea gitsign login,link=self,window=blank,width=700]
+====
+
+. Espera a que se estabilice el entorno de Java: verás indicadores de progreso en la barra de estado inferior mientras se cargan las extensiones. Puedes ordenar el IDE cerrando todos los paneles "Welcome" y el panel de chat de la derecha. Observa el mensaje **Java: Ready** en la parte inferior.
++
+image::m02-devspaces-java-ready.png[IDE de Dev Spaces con el estado Java Ready,link=self,window=blank,width=700]
+
+. En el explorador de archivos, haz clic en **pom.xml** para abrirlo.
++
+image::m02-devspaces-open-pom.png[Abrir pom.xml en el explorador de archivos,link=self,window=blank,width=700]
+
+. Espera unos segundos (la inicialización tarda un poco la primera vez). Red Hat Dependency Analytics empezará a analizar el archivo automáticamente. Verás lo siguiente:
+
+* Una notificación en la barra de estado inferior que indica que el análisis está en curso.
++
+image::m02-rhda-analysis-progress.png[Análisis de RHDA en curso en la barra de estado,link=self,window=blank,width=700]
++
+* Entradas de dependencias resaltadas con subrayados de colores que indican la gravedad de las vulnerabilidades, y una ventana emergente con el informe.
++
+image::m02-rhda-pom-analysis.png[RHDA analiza pom.xml y resalta las vulnerabilidades; se muestra una ventana emergente con el informe,link=self,window=blank,width=700]
+
+. Cuando termine el análisis, haz clic en la notificación **RHDA Report** para abrir el informe completo. También puedes hacer clic en el icono de gráfico circular de la parte superior derecha.
++
+image::m02-rhda-pie-chart.png[Icono de gráfico circular para abrir el informe de RHDA,link=self,window=blank,width=300]
++
+El informe muestra lo siguiente:
++
+--
+* Vulnerabilidades directas y transitivas organizadas por gravedad.
+* Recomendaciones de corrección de Lightwell (correcciones retroportadas y reemplazos directos), si están disponibles o son aplicables.
+* Recomendaciones de corrección upstream (actualizaciones de versión).
+--
++
+image::m02-rhda-report.png[Informe de vulnerabilidades de RHDA con correcciones de Lightwell,link=self,window=blank,width=700]
+
+=== Ejercicio 2: Corregir las vulnerabilidades del framework
+
+. Vuelve a `pom.xml` y observa las líneas onduladas rojas en las dependencias vulnerables.
+
+. Pasa el cursor sobre una dependencia resaltada y haz clic en **Quick Fix** cuando aparezca la bombilla.
++
+image::m02-rhda-quickfix-hover.png[Al pasar el cursor sobre una dependencia vulnerable, aparece la opción Quick Fix,link=self,window=blank,width=500]
++
+image::m02-rhda-quickfix.png[Sugerencias de Quick Fix para una dependencia vulnerable,link=self,window=blank,width=500]
++
+IMPORTANTE: Para las dependencias de un framework (como Quarkus), aplicar una corrección rápida a una sola dependencia puede provocar incompatibilidades de versiones con el resto del framework. En su lugar, actualiza la versión de todo el framework, como se muestra a continuación.
+
+. Busca la versión de la plataforma Quarkus en `pom.xml` (busca `quarkus.platform.version`) y actualízala a una versión más reciente. 3.20.5 era la versión más reciente que corregía la **vulnerabilidad directa**:
++
+[source,xml,role="copypaste"]
+----
+<quarkus.platform.version>3.20.5</quarkus.platform.version>
+----
+
+. VSCode guarda el archivo automáticamente. RHDA volverá a analizarlo de forma automática. Revisa el informe: las vulnerabilidades directas del framework deberían haber desaparecido y las demás deberían haberse reducido.
+
+. Como no se encontraron **vulnerabilidades directas**, no aparecerá ninguna advertencia. Puedes hacer clic en el botón del escudo en la barra de estado o en el gráfico circular de la parte superior derecha.
++
+image::m02-rhda-shield-button.png[Botón del escudo en la barra de estado para abrir el informe de RHDA,link=self,window=blank,width=700]
+
+. Observa también que desaparecieron las líneas onduladas alrededor de la dependencia `quarkus-rest`.
+
+
+
+. Ahora actualiza a la versión más reciente del framework:
++
+[source,xml,role="copypaste"]
+----
+<quarkus.platform.version>3.40.1</quarkus.platform.version>
+----
+
+. Después de que se guarde automáticamente el archivo, espera a que termine el análisis. El recuento de vulnerabilidades debería reducirse a solo unas pocas.
++
+image::m02-rhda-report-after-fix.png[Informe de RHDA después de actualizar a la versión más reciente del framework,link=self,window=blank,width=700]
+
+=== ¿Por qué es importante?
+
+Proporcionar a los desarrolladores información sobre las vulnerabilidades lo antes posible, mientras todavía están escribiendo código, les permite tomar decisiones fundamentadas. Pueden:
+
+* Elegir actualizar la versión de un framework antes de que se ejecute un proceso.
+* Comprender la diferencia entre una corrección retroportada de Lightwell (una solución directa que no cambia la versión de la dependencia) y una corrección upstream (una actualización de versión que puede introducir cambios incompatibles).
+* Priorizar las vulnerabilidades que deben corregirse según su gravedad y posibilidad de explotación.
+
+Esta es la esencia de la **seguridad integrada desde el principio**: el desarrollador cuenta con la información y las herramientas para actuar, en lugar de descubrir los problemas horas después al fallar CI/CD.
+
+=== ¿Cómo se hizo?
+
+Para que el ejercicio sea fácil de leer, agregamos los detalles a continuación. Expande la sección para saber cómo se hizo.
+
+.**Abrir para ver los detalles de la implementación**
+[%collapsible]
+====
+Red Hat Dependency Analytics consulta un servicio de backend llamado **{tpa_url}[Trusted Profile Analyzer (TPA)^]**. En este entorno, TPA está desplegado en el clúster e incorpora datos de vulnerabilidades de varias fuentes:
+
+* **CVE List v5** -- la base de datos de vulnerabilidades estándar de la industria.
+* **GitHub Security Advisories (GHSA)** -- informes de vulnerabilidades de la comunidad de código abierto.
+* **Lightwell** -- el servicio comercial de inteligencia sobre vulnerabilidades de Red Hat, que proporciona correcciones retroportadas y reemplazos directos no disponibles en las bases de datos públicas.
+
+RHDA es una extensión de VS Code (e IntelliJ) que se configuró mediante los ajustes del espacio de trabajo para usar la instancia de TPA de este clúster:
+
+[source,json]
+----
+"redHatDependencyAnalytics.backendUrl": "https://rhda.{subdomain}"
+----
+
+Cuando abres un `pom.xml` (o `package.json`, `go.mod`, etc.), RHDA envía el árbol de dependencias al backend, que lo compara con los datos de vulnerabilidades incorporados y devuelve resultados enriquecidos, incluidas las correcciones de Lightwell.
+
+También puedes abrir Trusted Profile Analyzer directamente desde el informe de Dependency Analytics:
+
+image::m02-rhda-tpa-link.png[Botón Take me there para abrir TPA desde el informe de RHDA,link=self,window=blank,width=700]
+====
+
+=== Verificación
+
+En este punto, deberías poder:
+
+* Abrir pom.xml y ver cómo RHDA resalta las dependencias vulnerables.
+* Abrir el informe de RHDA con el desglose por gravedad y las correcciones recomendadas.
+* Actualizar la versión del framework y ver cómo disminuyen las vulnerabilidades.
+
+'''
+
+== Próximos pasos
+
+Continúa con xref:module-02/02-commit-signing.adoc[Firmar tus commits] para confirmar la corrección de la vulnerabilidad y firmarla con tu identidad.

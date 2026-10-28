@@ -12,6 +12,9 @@ content:
     - url: .
       start_path: content/ja
       branches: HEAD
+    - url: .
+      start_path: content/es
+      branches: HEAD
 
 ui:
   bundle:

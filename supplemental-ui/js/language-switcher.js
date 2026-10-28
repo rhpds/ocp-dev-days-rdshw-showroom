@@ -7,7 +7,8 @@
   // Language configuration
   const languages = {
     en: { label: 'English', flag: '🇺🇸' },
-    ja: { label: '日本語', flag: '🇯🇵' }
+    ja: { label: '日本語', flag: '🇯🇵' },
+    es: { label: 'Español', flag: '🇪🇸' },
   }
 
   /**

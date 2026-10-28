@@ -1,0 +1,168 @@
+= Protección de sus espacios de nombres
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+El pipeline protegido garantiza que solo se *compilen* imágenes correctamente firmadas, analizadas y aprobadas. Pero ¿qué impide que alguien omita por completo el pipeline e implemente directamente una imagen sin firmar con `oc` o `kubectl`? Ahí es donde entra en juego **Sigstore Policy Controller**.
+
+Policy Controller es un controlador de admisión de Kubernetes que intercepta las solicitudes de creación de pods y verifica las firmas y atestaciones de las imágenes de contenedor *antes* de permitir que se ejecute el pod. En el espacio de nombres de producción protegido de Parasol, deben cumplirse tres políticas:
+
+* La imagen debe estar **firmada** (por Tekton Chains o Red Hat)
+* La imagen debe incluir **pruebas de un commit firmado** en su atestación SLSA
+* La imagen debe tener una atestación de **aprobación de lanzamiento firmada**
+
+[#section-1]
+== Sección 1: Prueba de la aplicación de políticas
+
+=== Ejercicio 1: Intente implementar una imagen sin firmar
+
+. Abra Dev Spaces (cualquier espacio de trabajo; solo necesita una terminal). En Dev Spaces, haga clic en **New Terminal**:
++
+image::m02-devspaces-new-terminal.png[Apertura de una terminal nueva en Dev Spaces,link=self,window=blank,width=700]
+
+. En la terminal, intente implementar una imagen sin firmar en el espacio de nombres de producción protegido:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod
+----
+
+. El webhook de admisión **rechaza** la implementación. La salida es extensa; fíltrela para ver solo las políticas que se incumplieron:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-image-signature-required
+failed policy: parasol-signed-commit-required
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unsigned.png[Terminal que muestra el incumplimiento de las tres políticas para una imagen sin firmar,link=self,window=blank,width=700]
+
+No se cumplió ninguna de las tres políticas: la imagen de nginx no está firmada por Chains ni por Red Hat, no tiene una atestación SLSA ni cuenta con una aprobación.
+
+=== Ejercicio 2: Intente implementar una imagen firmada, pero no aprobada
+
+. Ahora intente implementar la imagen temporal que se compiló durante la comprobación del MR (firmada por Chains, pero no aprobada):
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod
+----
+
+. Esta implementación también es **rechazada**. Vuelva a filtrar la salida:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unapproved.png[Terminal que muestra que solo se incumplió la política de aprobación para una imagen firmada, pero no aprobada,link=self,window=blank,width=700]
++
+La comprobación de la firma de la imagen se supera (Chains la firmó), pero se incumple la política de aprobación del lanzamiento: la imagen de la comprobación del MR nunca se aprobó para producción.
+
+=== Ejercicio 3: Compruebe que la implementación legítima funciona
+
+. Confirme que la implementación de producción (la implementada mediante el pipeline tag-promote) está en ejecución:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc get pods -n {user}-secured-prod
+----
++
+Debería ver los pods `parasol-insurance` y `parasol-db` ejecutándose con normalidad; estas imágenes cumplieron las tres políticas.
+
+. Limpie las implementaciones de prueba fallidas:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc delete deployment test-unsigned test-no-approval -n {user}-secured-prod 2>/dev/null
+----
+
+=== ¿Por qué es importante?
+
+Los pipelines son un control de seguridad fundamental, pero se pueden omitir: alguien con acceso al espacio de nombres podría usar `oc apply` para implementar cualquier imagen. Policy Controller cierra esta brecha:
+
+* Opera en la **capa de admisión de Kubernetes**, por debajo del pipeline
+* Verifica las firmas y las atestaciones en el **momento de la implementación**, no durante la compilación
+* Se aplica a **toda creación de pods**, independientemente de cómo se haya iniciado la implementación (ArgoCD, `oc`, Helm, YAML manual, etc.)
+* Proporciona **defensa en profundidad**: incluso si el pipeline se ve comprometido, no se pueden ejecutar imágenes sin firmar a las que les falten las atestaciones requeridas (ni los valores que estas contienen)
+
+=== ¿Cómo se hizo?
+
+Para que el ejercicio sea fácil de seguir, añadimos los detalles a continuación. Expanda la sección para ver cómo se hizo.
+
+.**Abrir para ver los detalles de implementación**
+[%collapsible]
+====
+**Sigstore Policy Controller** se instala mediante el operador RHTAS y se configura a través de recursos personalizados `ClusterImagePolicy`.
+
+Se aplican tres políticas a cada imagen implementada en el espacio de nombres `{user}-secured-prod`:
+
+[cols="1,2",options="header"]
+|===
+| Política | Qué comprueba
+
+| `parasol-image-signature-required`
+| La imagen debe estar firmada por Tekton Chains (sin clave, mediante Fulcio/Rekor) o por Red Hat (clave pública release3)
+
+| `parasol-signed-commit-required`
+| La atestación de procedencia SLSA debe contener una tarea `verify-commit-signature` con `SIGNATURE_STATUS: SIGNED`
+
+| `parasol-release-approval-required`
+| Debe existir una atestación personalizada (`parasol-insurance.com/releases/v1`) con `release.approved: true`, firmada por una identidad `*@demo.redhat.com`
+|===
+
+Cada política tiene **dos autoridades** (lógica OR):
+
+* **Tekton Chains / identidad de usuario**: verifica las firmas de la infraestructura Sigstore del clúster (Fulcio + Rekor)
+* **Firmada por Red Hat**: verifica las firmas mediante la clave pública release3 de Red Hat, lo que permite que las imágenes base de Red Hat (como la base de datos PostgreSQL) pasen sin firmas de Chains
+
+La etiqueta hace que el espacio de nombres quede sujeto a la aplicación de las políticas:
+
+[source,yaml]
+----
+metadata:
+  labels:
+    policy.rhtas.com/include: "true"
+----
+
+Solo los espacios de nombres que tienen esta etiqueta están sujetos a las políticas. Los espacios de nombres de compilación, los espacios de nombres de sandbox y los entornos que no son de producción no tienen la etiqueta y no se ven afectados.
+====
+
+=== Verificación
+
+En este punto, debería haber:
+
+* Intentado implementar una imagen sin firmar y comprobado que las tres políticas la rechazaron
+* Intentado implementar una imagen firmada, pero no aprobada, y comprobado que la política de aprobación la rechazó
+* Confirmado que la implementación legítima de producción está en ejecución
+* Comprendido cómo Policy Controller proporciona defensa en profundidad más allá de los pipelines
+
+'''
+
+== ¡Felicitaciones!
+
+Ha completado el módulo de cadena de suministro de software protegida. Ha recorrido todo el proceso, desde la detección de vulnerabilidades hasta la implementación en producción, con protecciones de seguridad en cada etapa:
+
+[cols="1,2",options="header"]
+|===
+| Etapa | Control de seguridad
+
+| **Código** | Red Hat Dependency Analytics identifica vulnerabilidades en el IDE
+| **Commit** | La firma sin clave de Sigstore vincula cada commit con una identidad verificada
+| **Compilación de sandbox** | El análisis de ACS y la comprobación de políticas proporcionan información temprana (con carácter informativo)
+| **Merge request** | Se exige la verificación de firmas; las políticas de ACS bloquean la fusión si se incumplen
+| **Compilación posterior a la fusión** | Tekton Chains firma la imagen y genera atestaciones SLSA
+| **Promoción de etiqueta** | Conforma valida toda la cadena de atestaciones; el SBOM se carga en TPA
+| **Aprobación** | Se requiere la autorización humana firmada antes de pasar a producción
+| **Implementación** | Policy Controller verifica las firmas y las atestaciones en el momento de la admisión
+|===
+
+Cada evidencia está firmada criptográficamente, almacenada en un registro de transparencia y se puede verificar de forma independiente. Esta cadena de suministro de software cumple con **SLSA Level 3**.

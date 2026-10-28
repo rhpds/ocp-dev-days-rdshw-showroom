@@ -1,0 +1,82 @@
+:imagesdir: ../assets/images
+include::partial$style.adoc[]
+
+++++
+<style>.pagination, .nav-footer { display: none !important; }</style>
+++++
+
+== Conectividad de aplicaciones para IA
+
+Te damos la bienvenida a __Conectividad de aplicaciones para IA__. Este módulo está diseñado para ofrecerte una introducción completa a la creación de flujos de datos de IA mediante las potentes herramientas y tecnologías de Red Hat. Tanto si eres nuevo en el campo de la IA como si eres un desarrollador con experiencia, este taller te guiará en el proceso de creación de flujos de datos eficientes y seguros que pueden impulsar tus aplicaciones de IA.
+
+[TIP]
+--
+Para disfrutar de la mejor experiencia, te recomendamos seguir el módulo en orden. Cada sección se basa en la anterior, lo que te permite desarrollar gradualmente tus habilidades y comprensión de los conceptos, pero puedes elegir las secciones que más te interesen.
+--
+
+Selecciona un módulo a continuación para comenzar.
+
+[.tile]
+****
+xref:module-03/intro/intro.1.adoc[Introducción]
+
+Familiarízate con los objetivos del taller, las tecnologías que se utilizan y el escenario, y configura tu entorno de desarrollo.
+****
+
+[.tile]
+****
+xref:module-03/m1/m1.0.adoc[Laboratorio 1 -- Servicio de ingesta]
+
+Ingiere aplicaciones de pólizas EDI, transfórmalas y guárdalas en una base de datos de backend, y genera documentos de pólizas en PDF, con conectividad segura entre clústeres mediante Service Interconnect.
+****
+
+[.tile]
+****
+xref:module-03/m2/m2.0.adoc[Laboratorio 2 -- Acceso a mensajería]
+
+Incorpórate a las plataformas Matrix y Rocket.Chat, y explora el primer flujo de integración que conecta ambos sistemas de mensajería.
+****
+
+[.tile]
+****
+xref:module-03/m3/m3.0.adoc[Laboratorio 3 -- Centro multicanal]
+
+Desacopla la arquitectura de mensajería utilizando Kafka como columna vertebral, adopta un modelo de datos estándar e implementa la solución completa basada en eventos en OpenShift.
+****
+
+[.tile]
+****
+xref:module-03/m4/m4.0.adoc[Laboratorio 4 -- Atención al cliente con IA]
+
+Crea un agente de soporte con tecnología de IA que resuelva problemas de pólizas mediante lenguaje natural en Rocket.Chat, coordinado por Agentic Apache Camel y MaaS.
+****
+
+[.tile]
+****
+xref:module-03/m5/m5.0.adoc[Laboratorio 5 -- Gobernanza de LLM]
+
+Protege y administra el acceso a LLM con Red Hat Connectivity Link: aplica la autenticación mediante claves de API y la limitación de velocidad basada en tokens para cada nivel de usuario.
+****
+
+[TIP]
+--
+Para navegar entre los módulos, utiliza el panel del lado izquierdo. Si no está visible, haz clic en el icono de menú de la esquina superior izquierda para abrirlo.
+
+{blank}
+
+.Muéstrame cómo
+[%collapsible]
+====
+Haz clic en el icono de menú (arriba a la izquierda) para abrir el panel de navegación:
+
+[.bordered]
+image::module-03/index/showroom-nav-header.png[Icono de menú en la esquina superior izquierda, width=50%]
+
+{blank}
+
+Luego, selecciona el módulo que quieras iniciar:
+
+[.bordered]
+image::module-03/index/showroom-left-nav.png[Panel de navegación izquierdo con módulos, width=50%]
+====
+--

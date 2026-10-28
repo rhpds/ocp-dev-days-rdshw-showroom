@@ -1,0 +1,71 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="rocketchat-chat"]
+== Incorporación a la plataforma Rocket.Chat
+
+{empty} +
+
+=== Únete a tu sala de Rocket.Chat.
+
+{blank}
+
+. Abre el cliente web de _Rocket.Chat_:
++
+Haz clic en el siguiente enlace para abrir la página Login de _Rocket.Chat_ (se abrirá en una pestaña nueva).
++
+--
+- link:{url-rocketchat}[Rocket.Chat Login page,window="_blank"]
+--
++
+{empty} +
+
+. Se te pedirá que introduzcas tus credenciales, como se muestra a continuación:
++
+image::module-03/m2/rchat-login-credentials.png[width=50%]
++
+{blank}
++
+====
+. Introduce lo siguiente:
++
+* **Email or username**
++
+[.copypaste.value]
+****
+{user-username}
+****
++
+* **Password**
++
+[.copypaste.value]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
++
+{empty} +
++
+. A continuación, haz clic en **_"Login"_**
+====
++
+{empty} +
+
+. Cuando inicies sesión, verás tu página de inicio en _Rocket.Chat_ y tu sala aparecerá en el panel izquierdo de la pantalla, como se muestra a continuación:
++
+image::module-03/m2/rchat-room.png[width=60%]
+
+{empty} +
+
+[.verification]
+****
+¿Pudiste unirte correctamente a la sala de _Rocket.Chat_?
+****
+
+{empty} +

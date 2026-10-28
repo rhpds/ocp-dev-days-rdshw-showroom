@@ -1,0 +1,280 @@
+= Sección 7: Revisar la rama quarkus e implementarla en OpenShift
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== Objetivo
+
+Cambia `parasol-insurance-eap` a la rama `quarkus` —la migración completa de EAP a Quarkus— y luego:
+
+* Revisa el código modernizado y compáralo con lo que corregiste en las secciones anteriores.
+* Si quieres, ejecuta la aplicación localmente.
+* Compílala e impleméntala en OpenShift y verifica la interfaz de Parasol y las API.
+
+En las secciones anteriores usaste el análisis de MTA y Developer Lightspeed para migrar partes de la aplicación **heredada** (mensajería MDB, reglas de auditoría personalizadas y EJB Stateless). El repositorio también incluye una rama **`quarkus`** en la que esa modernización ya se aplicó de principio a fin. Este laboratorio completa el proceso: inspecciona la arquitectura de destino y luego impleméntala en el clúster.
+
+== Ejercicio 1: Cambiar a la rama `quarkus`
+
+. En Dev Spaces, abre una terminal para ejecutar los comandos de git. En el menú, selecciona **Terminal → New Terminal**.
++
+image::module-05-mta-dls/05-07-dls-01.jpg[Abrir una terminal nueva en Dev Spaces,link=self,window=blank,title="New Terminal"]
+
+. Asegúrate de estar en el directorio raíz del proyecto `parasol-insurance-eap`.
+
+. Obtén la rama migrada y cámbiate a ella:
++
+[.console-input]
+[source,bash]
+----
+git fetch origin
+git reset --hard
+git checkout quarkus
+git pull origin quarkus
+----
+
+. Confirma que estás en la rama correcta:
++
+[.console-input]
+[source,bash]
+----
+git branch --show-current
+git log -2 --oneline
+----
++
+Deberías ver `quarkus` como la rama actual.
+
+TIP: Si Dev Spaces te pide volver a cargar la ventana después de cambiar de rama, acepta para que las herramientas de Java / Quarkus detecten el nuevo `pom.xml`.
+
+== Ejercicio 2: Revisar el código migrado
+
+Revisa las mismas clases que modificaste antes y compáralas con las implementaciones de Quarkus.
+
+=== Empaquetado y dependencias
+
+. Abre `pom.xml` en la rama `quarkus`. Observa el cambio de un WAR de EAP / Java EE a Quarkus:
+* El empaquetado es **`jar`** (no `war`).
+* Las dependencias provienen del **BOM de Quarkus** (`quarkus-rest`, `quarkus-hibernate-orm`, `quarkus-messaging`, `quarkus-scheduler`, controladores JDBC, etc.).
+* Ya no se usa el BOM `jboss-eap-javaee8` ni la pila de API EJB / JMS de `javax.*`.
+
+. Abre `src/main/resources/application.properties`. Observa lo siguiente:
+* El perfil **Dev** usa **H2** en memoria.
+* El perfil **`%prod`** usa **PostgreSQL** mediante variables de entorno `POSTGRESQL_*` (que OpenShift inyectará).
+
+=== Mensajería: `EmailIntakeMDB`
+
+. Open `src/main/java/com/parasol/mdb/EmailIntakeMDB.java`.
++
+Confirma los resultados de la migración de la sección 4:
+* `@ApplicationScoped` instead of `@MessageDriven`
+* `@Inject` instead of `@EJB`
+* `@Incoming("email-intake")` instead of JMS `MessageListener` / activation config
+* `jakarta.*` imports
+
+=== Servicios de negocio: `ClaimService`
+
+. Open `src/main/java/com/parasol/ejb/ClaimService.java`.
++
+Confirma los resultados de la migración de la sección 6:
+* `@ApplicationScoped` + `@Transactional` instead of `@Stateless`
+* `@Inject EntityManager` instead of `@PersistenceContext`
+* No `javax.ejb` usage
+
+=== Programación: `EmailGeneratorBean`
+
+. Open `src/main/java/com/parasol/ejb/EmailGeneratorBean.java`.
++
+Observa cómo la antigua ruta del temporizador EJB / productor JMS se convirtió en una solución nativa de Quarkus:
+* `@Scheduled(...)` instead of `TimerService` / `@Timeout`
+* `@Channel("email-intake") Emitter<String>` instead of JMS `ConnectionFactory` / `Queue`
+* Still `@ApplicationScoped`, feeding the same `email-intake` channel the MDB consumes
+
+=== Capa REST
+
+. Abre `ClaimsResource` y `InboxResource`. Confirma que los servicios se inyectan mediante CDI `@Inject` (sin `@EJB`) y que se usan las API de `jakarta.ws.rs`.
+
+[cols="2,2,2"]
+|===
+| Aspecto | Heredado (`main`) | Rama Quarkus
+
+| Empaquetado | WAR + BOM de EAP | JAR + BOM de Quarkus
+| API | `javax.*` | `jakarta.*`
+| Servicio de reclamos | EJB `@Stateless` | `@ApplicationScoped` + `@Transactional`
+| Recepción de correo | JMS `@MessageDriven` | `@Incoming("email-intake")`
+| Generador de correo | Temporizador EJB + JMS | `@Scheduled` + emisor `@Channel`
+| Fuente de datos (prod) | `java:jboss/datasources/...` | JDBC de Quarkus + variables de entorno
+|===
+
+== Ejercicio 3: Ejecutar Quarkus localmente (prueba de humo opcional)
+
+Antes de implementarla, puedes hacer una prueba de humo en Dev Spaces / la JVM local.
+
+. Desde el directorio raíz del proyecto:
++
+[.console-input]
+[source,bash]
+----
+mvn quarkus:dev
+----
+
+. Cuando Quarkus empiece a escuchar en el puerto **8080**, Dev Spaces mostrará una serie de cuadros de diálogo para redirigir el puerto. Acéptalos en este orden para abrir la aplicación en el navegador: **yes** (agregar una redirección) → **Open In New Tab** → **Open**.
++
+image::module-05-mta-dls/05-07-dls-02.jpg[Cuadros de diálogo de redirección de puertos de Dev Spaces para Quarkus en 8080,link=self,window=blank,title="Open forwarded port"]
++
+NOTE: También podrían aparecer cuadros de diálogo similares para el puerto **5005** (el puerto de depuración remota de Quarkus). Puedes cerrarlos o ignorarlos en este ejercicio: solo usaremos la interfaz HTTP en **8080**, sin conectar un depurador.
+
+. Deberías llegar al **Dashboard** de Parasol.
++
+image::module-05-mta-dls/05-07-dls-03.png[Panel de control de Parasol en Quarkus,link=self,window=blank,width=700]
+
+. Abre **Claims** y confirma que se carguen los reclamos de ejemplo desde la API / interfaz.
++
+image::module-05-mta-dls/05-07-dls-04.png[Lista de reclamos de Parasol en Quarkus,link=self,window=blank,width=700]
+
+. Abre los detalles de un reclamo (por ejemplo, desde la tabla de reclamos) y confirma que se muestre la página.
++
+image::module-05-mta-dls/05-07-dls-05.png[Detalles de un reclamo de Parasol en Quarkus,link=self,window=blank,width=700]
+
+. Abre **Inbox**. El generador programado publica correos de ejemplo en el canal `email-intake` dentro del proceso. El primer mensaje puede tardar unos minutos (por la demora del programador); después, llegan mensajes nuevos cada 45 segundos aproximadamente. Mientras tanto, la interfaz muestra **Waiting for emails...**.
++
+image::module-05-mta-dls/05-07-dls-06.png[Bandeja de entrada de Parasol en Quarkus,link=self,window=blank,width=700]
+
+. Cuando termines, detén el proceso del modo de desarrollo con `Ctrl+C`.
+
+== Ejercicio 4: Implementar en OpenShift
+
+Implementa desde la rama `quarkus` con los manifiestos de `openshift/` y una compilación binaria de Docker en el clúster. Estos pasos presuponen que `oc` tiene una sesión iniciada y que está seleccionado un espacio de nombres {user}-ai-mta (`oc project`).
+
+Para empezar la implementación en OpenShift, primero cambia al espacio de nombres del proyecto {user}-ai-mta.
+
+[.console-input]
+[source,bash]
+----
+oc project {user}-ai-mta
+----
+
+También necesitamos una base de datos para nuestra aplicación modernizada. Para ello, usaremos PostgreSQL.
+
+=== Aprovisionar PostgreSQL
+
+. Crea una instancia efímera de PostgreSQL para la demostración:
++
+[.console-input]
+[source,bash]
+----
+oc new-app --template=postgresql-ephemeral \
+  -p DATABASE_SERVICE_NAME=parasol-db \
+  -p POSTGRESQL_USER=parasol \
+  -p POSTGRESQL_PASSWORD=parasol \
+  -p POSTGRESQL_DATABASE=parasol \
+  -p POSTGRESQL_VERSION=12-el8
+----
+
+. Espera hasta que la base de datos esté lista:
++
+[.console-input]
+[source,bash]
+----
+oc rollout status deploymentconfig/parasol-db 2>/dev/null \
+  || oc rollout status deployment/parasol-db
+oc get pods -l name=parasol-db
+----
+
+=== Compilar la aplicación Quarkus
+
+. Empaqueta la aplicación localmente (o en la terminal de Dev Spaces):
++
+[.console-input]
+[source,bash]
+----
+mvn clean package -DskipTests
+----
++
+Esto genera `target/quarkus-app/`.
+
+. Prepara un contexto de compilación binaria e inicia una compilación de Docker en OpenShift:
++
+[.console-input]
+[source,bash]
+----
+rm -rf /tmp/parasol-build
+mkdir -p /tmp/parasol-build
+cp src/main/docker/Dockerfile.jvm /tmp/parasol-build/Dockerfile
+cp -R target/quarkus-app /tmp/parasol-build/
+
+oc new-build --name=parasol-insurance --binary --strategy=docker -l app=parasol-insurance
+oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
+----
+
+=== Aplicar los manifiestos de implementación
+
+. Implementa la aplicación (el espacio de nombres de la imagen se sustituye por el del proyecto actual). El Deployment asigna el Secret `parasol-db` a las variables `POSTGRESQL_*` que espera el perfil **`%prod`**:
++
+[.console-input]
+[source,bash]
+----
+sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+oc apply -f openshift/service.yaml
+oc apply -f openshift/route.yaml
+oc rollout status deployment/parasol-insurance
+----
+
+. Obtén la URL de Route y ábrela en el navegador:
++
+[.console-input]
+[source,bash]
+----
+ROUTE=$(oc get route parasol-insurance -o jsonpath='{.spec.host}')
+echo "https://${ROUTE}/"
+----
+
+. Verifica las API desde la terminal:
++
+[.console-input]
+[source,bash]
+----
+curl -sk "https://${ROUTE}/api/claims"
+curl -sk "https://${ROUTE}/api/inbox"
+----
+
+. En la consola de OpenShift, abre **Topology** (o **Workloads → Deployments**) del proyecto y confirma que la aplicación esté en ejecución.
++
+image::module-05-mta-dls/05-07-dls-07.jpg[Topología de OpenShift que muestra la implementación de Quarkus parasol-insurance y Route,link=self,window=blank,title="OpenShift Topology"]
++
+Deberías ver algo similar a la topología anterior:
++
+* **`parasol-insurance`** — la aplicación Quarkus (busca la insignia de aplicación **Quarkus**). Un anillo azul alrededor del nodo indica que el pod está en buen estado / ejecución.
+* **`parasol-db`** — la instancia de PostgreSQL con la que se comunica el perfil `%prod`. Topology podría dibujar un conector entre la aplicación y la base de datos.
+* Es posible que también veas una carga de trabajo heredada **`parasol-insurance-eap`** de demostraciones anteriores en el mismo proyecto; el nodo que acabas de implementar es el de Quarkus.
++
+Selecciona **`parasol-insurance`**, abre el panel lateral **Resources** y comprueba lo siguiente:
++
+* **Pods** — al menos un pod en estado **Running**.
+* **Services** — `parasol-insurance`.
+* **Routes** — la URL pública de la aplicación (haz clic para abrir la interfaz de Parasol en el navegador; es el mismo host que obtuviste con `oc get route` en el paso anterior).
++
+También revisa las variables de entorno de Deployment y confirma que coincidan con lo aplicado desde `openshift/deployment.yaml` (`POSTGRESQL_*` del Secret `parasol-db`).
+
+== Ejercicio 5: Revisar los cambios en la configuración de producción
+
+. Vuelve a abrir `openshift/deployment.yaml` y relaciónalo con los ajustes `%prod` de `application.properties`:
+* `POSTGRESQL_HOST=parasol-db`
+* Credentials from Secret `parasol-db`
+* HTTP probes on `/api/claims`
+
+. Compáralo con el enfoque heredado de EAP (`java:jboss/datasources/ParasolDS` y las definiciones de colas JMS de `jboss-all.xml`). Quarkus traslada la configuración del entorno de ejecución a **la configuración de la aplicación + el entorno de Kubernetes**, lo que facilita usar GitOps y promover cambios entre entornos.
+
+== Lo que aprendimos
+
+* La rama **`quarkus`** es el destino de migración completo para los patrones que practicaste con MTA / DLS.
+* La mensajería, los servicios CDI, la programación y REST usan los modismos de Quarkus / MicroProfile (`@Incoming`, `@Channel`, `@Scheduled`, `@ApplicationScoped`).
+* **`quarkus:dev`** local (H2) es ideal para verificar rápidamente la interfaz; **OpenShift** usa PostgreSQL mediante el perfil `%prod`.
+* La implementación del contenedor sigue el proceso estándar de compilación binaria + Deployment / Service / Route; no se necesita XML de subsistema específico de EAP.
+
+== Resumen
+
+Red Hat Developer Lightspeed for Migration Toolkit for Applications es un complemento de Red Hat Migration Toolkit for Applications que automatiza de forma inteligente la refactorización del código fuente en tu IDE. Para agilizar el flujo de trabajo, puedes consultar explicaciones y cambios de código recomendados durante todo el proceso de refactorización antes de aplicar las correcciones con un solo clic.
+
+A diferencia de los asistentes de programación tradicionales, Lightspeed for Migration Toolkit for Applications se guía por el análisis estático de código de MTA y las migraciones anteriores para sugerir soluciones de código precisas desde el principio y mejorarlas con el tiempo. Esto ayuda a los desarrolladores a refactorizar aplicaciones de forma más rápida y predecible.
+
+Si quieres, también puedes activar el «modo de agente» para que los agentes de IA integrados analicen tu aplicación, busquen y corrijan nuevos problemas que puedan surgir después de modificar el código. Esto ayuda a conservar la funcionalidad.
+
+Este complemento está incluido en una suscripción a Red Hat Advanced Developer Suite. Para obtener más información, visita https://www.redhat.com/en/products/advanced-developer-suite[Red Hat Advanced Developer Suite,window=_blank].

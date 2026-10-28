@@ -1,0 +1,150 @@
+= Sección 3: Acceder a Dev Spaces y configurar la extensión MTA
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[IMPORTANT]
+====
+En este laboratorio, usaremos la extensión **Migration Toolkit for Applications** para Visual Studio Code —la **extensión MTA**— en un entorno de Red Hat Dev Spaces que proporciona una interfaz gráfica basada en VS Code.
+
+**Developer Lightspeed** no es una extensión independiente. Es la función de refactorización de código con IA de MTA. Lo que se instala en el IDE es la **extensión MTA**; incluye tanto el análisis estático de código de MTA como Developer Lightspeed (IA generativa).
+====
+
+== Objetivo
+
+Prepare el espacio de trabajo de OpenShift Dev Spaces ( `mta-lab` ) y la extensión MTA para el resto del laboratorio:
+
+* Abra el proyecto `parasol-insurance-eap` (clonado desde su cuenta de GitLab)
+* Cree un perfil de migración (tecnologías de origen y destino)
+* Confirme que Developer Lightspeed puede acceder al LLM del laboratorio mediante GenAI / `provider-settings.yaml`
+
+Comenzaremos abriendo el entorno de desarrollo aprovisionado previamente y configurando la extensión MTA, incluidos los ajustes de Developer Lightspeed (IA), para modernizar la aplicación `parasol-insurance-eap` de Parasol Insurance.
+
+== Ejercicio 1: Abrir Dev Spaces e iniciar sesión
+
+. Cambie a Red Hat OpenShift Dev Spaces haciendo clic en la pestaña **OpenShift Dev Spaces** de la interfaz del taller.
+
+. Inicie sesión en Dev Spaces con las credenciales de OpenShift:
++
+NOTE: La página inicial es la página de inicio de sesión único (SSO) de Keycloak
++
+--
+Nombre de usuario:
+[source,subs="attributes",role="copypaste"]
+----
+{user}
+----
+Contraseña:
+[source,subs="attributes",role="copypaste"]
+----
+{password}
+----
+--
+
+. Después de iniciar sesión, si se le solicita __Authorize Access__
++
+* Haga clic en el botón **Allow selected permissions**
++
+image::module-05-mta-dls/05-03-dls-01.jpg[Inicio de sesión en DevSpaces,link=self,window=blank,title="Logging In"]
++
+CAUTION: Si un mensaje indica que debe volver a autenticarse, cambie a la pestaña **OpenShift Dev Spaces** en la interfaz del taller (no haga clic en el icono de actualización del navegador). Esto le llevará a la lista de espacios de trabajo para que pueda volver a abrir **mta-lab**.
+
+. Abra el espacio de trabajo **mta-lab**
++
+* Después de iniciar sesión, se abrirá la lista de espacios de trabajo y aparecerá la entrada **mta-lab** (aprovisionada para su usuario)
+* Haga clic en el enlace **Open**, a la derecha de la lista de espacios de trabajo
++
+image::module-05-mta-dls/05-03-dls-02.jpg[Abrir espacio de trabajo,link=self,window=blank,title="Open Workspace"]
+
+. Espere a que el espacio de trabajo se inicialice y se abra:
++
+El repositorio **parasol-insurance-eap** (de su proyecto de GitLab) se carga en Dev Spaces y el entorno de desarrollo queda listo.
++
+El espacio de trabajo se abre en una pestaña nueva del navegador.
++
+* Si se le solicita confiar en los editores o en el espacio de trabajo, confirme la confianza. (Figura 3)
+* Si aparece un panel introductorio de diseño, elija el tema **Light** para obtener el mejor contraste más adelante en el laboratorio y haga clic en **Mark Done**. Al hacerlo, se cerrará el panel introductorio. A continuación, abra el panel de extensiones instaladas haciendo clic en el icono de extensiones, en el lado izquierdo de la pantalla, como se muestra en el paso 2 de la imagen siguiente. (Figura 4)
++
+image::module-05-mta-dls/05-03-dls-05.png[Pestaña de VSCode,link=self,window=blank,title="Manage profiles"]
++
+image::module-05-mta-dls/05-03-dls-03.png[Pestaña de VSCode,link=self,window=blank,title="Mark done"]
+
+En algunos casos, las extensiones pueden tardar en instalarse. Si ve el botón para volver a cargar la ventana, haga clic en él. La pestaña del navegador se volverá a cargar automáticamente.
+
+image::module-05-mta-dls/05-03-dls-04.png[Pestaña de VSCode,link=self,window=blank,title="Trust the Authors"]
+
+
+== Ejercicio 2: Configurar perfiles de MTA y el proveedor de GenAI
+
+¡Excelente! Ha llegado al ejercicio 2. Esto también significa que ya tenemos un entorno funcional para configurar nuestros perfiles de análisis.
+
+La administración de varios perfiles es una función potente de la extensión MTA. Permite cambiar fácilmente entre distintos perfiles de análisis. Puede crear un perfil nuevo haciendo clic en el botón "New Profile", como se muestra en el paso 3 de la imagen siguiente.
+
+Comenzaremos creando nuestro primer perfil, `quarkus-profile` , para migrar la aplicación a Quarkus. En xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Sección 5: Reglas personalizadas (registro de auditoría)] exploraremos las reglas personalizadas de registro de auditoría.
+
+Haga clic en el botón `Manage Profiles` para abrir el panel de administración de perfiles.
+
+image::module-05-mta-dls/05-03-dls-06.png[Pestaña de VSCode,link=self,window=blank,title="VSCode Tab"]
+
+- Cree un perfil nuevo `quarkus-profile`
+- Nombre del perfil: `quarkus-profile``
+- Tecnologías de destino: `quarkus``, `quarkus3+``, `jakarta-ee``
+
+image::module-05-mta-dls/05-03-dls-07.png[Pestaña de VSCode,link=self,window=blank,title="Review profiles"]
+
+Como este es el primer perfil, la extensión DLS lo activará automáticamente.
+
+Compruebe que los datos sean correctos, tal como se indica arriba, y cierre esta pestaña.
+
+
+En la captura de pantalla anterior, busque el control que aparece junto a **Open Analysis**, haga clic en él y siga las instrucciones que aparecen a continuación.
+Abra los ajustes del proveedor de GenAI desde el panel de MTA, como se muestra en la imagen siguiente.
+
+- *1* Haga clic en el icono de ajustes `⚙︎`.
+- *2* Haga clic en `Configure GenAI Settings`
+
+image::module-05-mta-dls/05-03-dls-08.png[Pestaña de VSCode,link=self,window=blank,title="Gen-AI Provider Settings"]
+
+Esto debería abrir la configuración de los ajustes del proveedor. MTA usa **provider-settings.yaml** para conectarse al LLM.
+
+El espacio de trabajo del laboratorio viene preconfigurado con los ajustes del proveedor y las credenciales de LiteLLM. Confirme que el modelo **OpenShift** esté activo y que los campos de URL base y clave de API estén rellenados (ya deberían corresponder a su entorno de laboratorio).
+
+TIP: Los ajustes del proveedor normalmente ya están rellenados para este laboratorio. Use el YAML siguiente solo si el archivo está vacío o incompleto (por ejemplo, después de restablecer un espacio de trabajo); este es un paso de recuperación, no un error previsto.
+
+[.console-input]
+[source,yaml,subs="+attributes,macros+"]
+----
+models:
+  OpenShift: &active
+    environment:
+      OPENAI_API_KEY: "{litellm_virtual_key}"
+    provider: ChatOpenAI
+    args:
+      model: "qwen3-235b"
+      configuration:
+        baseURL: "{litellm_api_base_url}"
+active: *active
+----
+
+Confirme que los ajustes tengan los siguientes valores en los campos correspondientes.
+
+- `OPENAI_API_KEY` : es la clave del LLM para el modelo alojado en OpenShift AI
+- `model` : el nombre del modelo que estamos usando
+- `baseURL` : la URL o ruta en la que el modelo escucha las solicitudes a través de la API de finalización de chat.
+- `active` : por último, queremos asegurarnos de que este perfil esté activo. MTA se puede configurar con varios LLM, pero solo uno puede estar activo a la vez.
+
+image::module-05-mta-dls/05-03-dls-09.png[Pestaña de VSCode,link=self,window=blank,title="VSCode Tab"]
+
+== Verificar
+
+Confirme que el entorno de Dev Spaces y la extensión MTA (incluido Developer Lightspeed) estén configurados correctamente.
+
+. Confirme que la extensión MTA esté configurada correctamente
+* Con el icono de la extensión MTA seleccionado y la pestaña MTA Analysis View activa:
+* Haga clic en el icono de engranaje situado en el lado derecho de la pantalla
+* Se abrirá el panel **Get Ready to Analyze** en el lado derecho de la pantalla
+* Los cuatro cuadros de mensajes deben tener marcas de verificación verdes y aparecer como completados
+
+. Confirme que el espacio de trabajo de Dev Spaces apunte al repositorio correcto
+* Haga clic en el icono de archivo situado en el lado izquierdo del entorno de Dev Spaces
+* El _EXPLORER_ de archivos muestra el directorio **parasol-insurance-eap** (su copia de GitLab, no una muestra compartida)
+* Si es necesario, expanda los directorios con las flechas del explorador de archivos; debería ver paquetes como `com.parasol.mdb` ( `EmailIntakeMDB` ) y `com.parasol.ejb` ( `ClaimService` )
