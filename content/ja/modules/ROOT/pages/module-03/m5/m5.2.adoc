@@ -2,36 +2,36 @@
 :page-time: 5
 include::partial$style.adoc[]
 
-== Authentication
+== 認証
 
 
-=== Components Provisioned for This Phase
+=== このフェーズで提供されるコンポーネント
 
-The following resources have been set up for you so you can focus on the policy configuration:
+以下のリソースは、ポリシー設定に集中できるよう、あらかじめセットアップされています。
 
 [cols="1,2", options="header"]
 |===
-| Resource | Purpose
+| リソース | 目的
 
 | **GatewayClass, Gateway, HTTPRoute**
-| The _Gateway API_ stack that routes traffic from the chat interface to the LLM API. The LLM API could be an internal or external endpoint -- the gateway abstracts this away and provides a consistent point to apply policies.
+| チャットインターフェースから LLM API へトラフィックをルーティングする _Gateway API_ スタック。LLM API は内部エンドポイントでも外部エンドポイントでもかまいません -- ゲートウェイはこの違いを抽象化し、一貫したポリシー適用ポイントを提供します。
 
 | **Kuadrant Operator & System**
-| The _Connectivity Link_ operator, installed in the `kuadrant-system` namespace.
+| `kuadrant-system` namespace にインストールされた _Connectivity Link_ operator。
 
 | **User Secrets**
-| API key secrets for two tiers: `silver` and `gold`. Details below.
+| 2 つの tier、`silver` と `gold` 用の API key secret。詳細は以下を参照してください。
 |===
 
 {empty} +
 
-=== Verify Your Environment
+=== 環境を確認する
 
-Confirm everything is ready before starting the labs:
+ラボを開始する前に、すべての準備が整っていることを確認します。
 
 {blank}
 
-. From the terminal in your Dev Spaces IDE, run the following command to check that gateway is up and running:
+. Dev Spaces IDE の terminal で、次のコマンドを実行して gateway が稼働していることを確認します。
 +
 {blank}
 +
@@ -42,19 +42,19 @@ oc get gateway internal-ai-gateway -n ai-gateway
 +
 {empty} +
 
-. You should see output confirming the gateway exists and is in a ready state, similar to:
+. gateway が存在し、ready state にあることを示す出力が表示されるはずです。次のような内容になります。
 +
 {blank}
 +
-++++
++++
 <pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre; overflow-x: auto; font-family: monospace; font-size: 13px; color: white">NAME                  CLASS               ADDRESS                                                              PROGRAMMED   AGE
 internal-ai-gateway   openshift-default   internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local   True         14h</pre>
-++++
++++
 {empty} +
 
-. A dedicated HTTPRoute named `ai-proxy-route` has been created in your namespace `{user-username}-devspaces`, targeting the LLM API. This is the Gateway API resource you'll attach authentication and rate limiting policies to.
+. `ai-proxy-route` という専用の HTTPRoute が、LLM API を target として `{user-username}-devspaces` namespace に作成されています。これは、認証と rate limiting policy を関連付ける Gateway API resource です。
 +
-Run the following command to verify it is present:
+次のコマンドを実行して、存在を確認してください。
 +
 {blank}
 +
@@ -63,15 +63,15 @@ Run the following command to verify it is present:
 oc describe httproute -n {user-username}-devspaces | grep -E "Name:|Backend|Hostnames"
 ****
 +
-This command lists the HTTPRoute details including the backend reference to the LLM API and the gateway it is attached to (which is the `internal-ai-gateway` that you verified earlier). 
+このコマンドは、LLM API への backend reference と、それが attach されている gateway（先ほど確認した `internal-ai-gateway`）を含む HTTPRoute の詳細を一覧表示します。
 +
 {empty} +
 
-. Look for output confirming the HTTPRoute exists and is correctly configured, similar to:
+. HTTPRoute が存在し、正しく設定されていることを示す出力が表示されるはずです。次のような内容になります。
 +
 {blank}
 +
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         ai-proxy-route
     <span style="color: #F14C4B;font-weight:bold">Name:</span>       internal-ai-gateway
     <span style="color: #F14C4B;font-weight:bold">Backend </span>Refs:
@@ -80,24 +80,24 @@ This command lists the HTTPRoute details including the backend reference to the 
     Controller<span style="color: #F14C4B;font-weight:bold"> Name:</span>         openshift.io/gateway-controller/v1
       <span style="color: #F14C4B;font-weight:bold">Name:</span>       internal-ai-gateway
 
-++++
++++
 
 {empty} +
 
-NOTE: You should see both the `internal-ai-gateway` Gateway and `ai-proxy-route` HTTPRoute in the output. If either is missing, contact the workshop facilitator.
+NOTE: 出力には `internal-ai-gateway` Gateway と `ai-proxy-route` HTTPRoute の両方が表示されるはずです。どちらかが見つからない場合は、workshop facilitator に連絡してください。
 
 {empty} +
 
-=== Auth Policy Powered by Connectivity Link
-Now that you understand the concepts and the intended architecture, it's time to lock down the LLM endpoint. In this exercise you will create an **AuthPolicy** that is applied to the HTTPRoute (`ai-proxy-route`)  and enforces a key-based authentication scheme. This will ensure that only authorized users with a valid API key can access the LLM, and it will extract identity information that we can use for rate limiting in the next step.
+=== Connectivity Link による Auth Policy
+ここまでで概念と想定アーキテクチャを理解したので、次は LLM endpoint を保護します。この演習では、HTTPRoute（`ai-proxy-route`）に適用される **AuthPolicy** を作成し、key-based authentication scheme を強制します。これにより、有効な API key を持つ認可済みユーザーだけが LLM にアクセスできるようになります。また、次のステップで rate limiting に使用する identity information も抽出します。
 
-NOTE: We are using simple API key authentication for this workshop to keep things straightforward and simple, but _Connectivity Link_ supports a wide range of authentication methods, including JWT, OAuth2 and more.
+NOTE: この workshop では、わかりやすさを優先してシンプルな API key authentication を使用しますが、_Connectivity Link_ は JWT、OAuth2 など、幅広い authentication method をサポートしています。
 
 {empty} +
 
-=== Understanding the User Secrets
+=== User Secret を理解する
 
-Two API key secrets have already been *pre-created*. Understanding their structure is important because both policies reference the labels and annotations on these secrets.
+2 つの API key secret は、すでに *事前作成済み* です。両方の policy がこれらの secret 上の label と annotation を参照するため、その構造を理解することが重要です。
 
 **Silver tier user:**
 [source,yaml,subs="attributes"]
@@ -118,32 +118,32 @@ stringData:
 type: Opaque
 ----
 
-Key fields in this secret:
+この secret の主要フィールド:
 
-* `authorino.kuadrant.io/managed-by: authorino` -- Marks this secret as managed by _Authorino_ (the auth engine behind _Connectivity Link_).
-* `app: my-llm-{username}` -- Label selector -- the AuthPolicy uses this to discover valid API keys.
-* `kuadrant.io/groups: silver` -- Group membership (Silver tier) -- determines which rate limit tier applies.
-* `secret.kuadrant.io/user-id: {user-username}` -- Unique user ID -- used as a counter key for per-user rate limiting.
+* `authorino.kuadrant.io/managed-by: authorino` -- この secret が _Authorino_（_Connectivity Link_ の背後にある auth engine）によって管理されていることを示します。
+* `app: my-llm-{username}` -- label selector -- AuthPolicy はこれを使用して有効な API key を検出します。
+* `kuadrant.io/groups: silver` -- group membership（Silver tier）-- どの rate limit tier が適用されるかを決定します。
+* `secret.kuadrant.io/user-id: {user-username}` -- 一意の user ID -- per-user rate limiting の counter key として使用されます。
 
 {empty} +
 
-The **Gold tier** secret follows the same structure but with:
+**Gold tier** の secret も同じ構造ですが、次の値になります。
 
 * `kuadrant.io/groups: gold`
 
 {empty} +
 
-// == Securing the LLM with Authentication
+// == Authentication で LLM を保護する
 
-// Now that you understand the architecture and the setup, it's time to lock down the LLM endpoint so that only authorized users in the organization can access it. You will create an **AuthPolicy** that is applied to the `ai-proxy-route` HTTPRoute and enforces:
+// アーキテクチャとセットアップを理解したので、今度は LLM endpoint を保護し、組織内の認可済みユーザーだけがアクセスできるようにします。`ai-proxy-route` HTTPRoute に適用される **AuthPolicy** を作成し、次の内容を強制します:
 
-// 1. **API Key Authentication** -- Only requests with a valid Bearer token (matching a known secret) are allowed.
-// 2. **Group-based Authorization** -- Only users belonging to the `lite` or `pro` groups can access the API.
-// 3. **Identity Extraction** -- The user's group and user ID are extracted from the secret's annotations and passed downstream for use by the TokenRateLimitPolicy that we will create in the next section.
+// 1. **API Key Authentication** -- 有効な Bearer token（既知の secret と一致するもの）を含むリクエストだけを許可します。
+// 2. **Group-based Authorization** -- `lite` または `pro` group に属するユーザーだけが API にアクセスできます。
+// 3. **Identity Extraction** -- ユーザーの group と user ID を secret の annotation から抽出し、次のセクションで作成する TokenRateLimitPolicy で使えるように downstream に渡します。
 
-=== Review and Apply the AuthPolicy
+=== AuthPolicy を確認して適用する
 
-Examine the AuthPolicy and *apply* it by pasting the following command in your terminal:
+AuthPolicy を確認し、次のコマンドを terminal に貼り付けて *適用* してください。
 
 [.copypaste]
 ****
@@ -212,23 +212,23 @@ spec:
 EOF
 ****
 
-Key fields in this policy:
+この policy の主要フィールド:
 
-* `namespace: {user-username}-devspaces` -- The policy is created in your namespace.
-* `name: ai-proxy-route` -- Targets the `ai-proxy-route` HTTPRoute -- any request matching this route must pass authentication.
-* `app: my-llm-{user-username}` -- Looks for _Kubernetes_ Secrets with this label to find valid API keys.
-* `prefix: Bearer` -- Expects the API key in the `Authorization` header.
-* `kuadrant\.io/groups` -- Extracts the group annotation from the matched secret and exposes it as `groups` in the response filter.
-* `secret\.kuadrant\.io/user-id` -- Extracts the user ID annotation and exposes it as `userid`.
-* `rego` -- OPA (Open Policy Agent) rule that only allows users whose group is `gold` or `silver`.
+* `namespace: {user-username}-devspaces` -- policy はあなたの namespace に作成されます。
+* `name: ai-proxy-route` -- `ai-proxy-route` HTTPRoute を target にします -- この route に一致するすべての request は認証を通過する必要があります。
+* `app: my-llm-{user-username}` -- 有効な API key を見つけるために、この label を持つ _Kubernetes_ Secret を探します。
+* `prefix: Bearer` -- `Authorization` header に API key があることを前提とします。
+* `kuadrant\.io/groups` -- 一致した secret から group annotation を抽出し、response filter で `groups` として公開します。
+* `secret\.kuadrant\.io/user-id` -- user ID annotation を抽出し、`userid` として公開します。
+* `rego` -- group が `gold` または `silver` のユーザーのみを許可する OPA（Open Policy Agent）rule です。
 
 {empty} +
 
-=== Verify the AuthPolicy
+=== AuthPolicy を確認する
 
 {blank}
 
-. From the devspaces terminal, run the following command to check that the AuthPolicy was created successfully:
+. devspaces terminal で、次のコマンドを実行して AuthPolicy が正常に作成されたことを確認します。
 +
 {blank}
 +
@@ -238,11 +238,11 @@ oc describe authpolicy -n {user-username}-devspaces | grep -v "Content" | grep -
 ****
 +
 {blank}
-. You should see output confirming the AuthPolicy exists, is targeting the correct HTTPRoute, and is in an enforced state, similar to:
+. AuthPolicy が存在し、正しい HTTPRoute を target にしており、強制適用状態にあることを示す出力が表示されるはずです。次のような内容になります。
 +
 {blank}
 +
-++++
++++
 <pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #F14C4B;font-weight:bold">Name:</span>         ai-proxy-auth
   <span style="color: #F14C4B;font-weight:bold">Target Ref:</span>
     <span style="color: #F14C4B;font-weight:bold">Name:</span>   ai-proxy-route
@@ -251,16 +251,16 @@ oc describe authpolicy -n {user-username}-devspaces | grep -v "Content" | grep -
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
     <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
-++++
++++
 {empty} +
 
 [.verification]
 ****
-Does the `ai-proxy-auth` AuthPolicy show status **True** and Type **Enforced** ?
+`ai-proxy-auth` AuthPolicy に **True** の status と **Enforced** の Type が表示されていますか？
 
 [.success]
-The AuthPolicy is enforced. Proceed to test authentication.
+AuthPolicy は enforced されています。認証テストへ進んでください。
 
 [.fail]
-Check that you pasted the correct YAML and that the namespace is set to `{user-username}-devspaces`.
+正しい YAML を貼り付けたこと、および namespace が `{user-username}-devspaces` に設定されていることを確認してください。
 ****

@@ -3,11 +3,11 @@
 include::partial$style.adoc[]
 
 [id="enable-and-test"]
-== Go live on OpenShift
+== OpenShift で本番稼働させる
 
-You've completed the _Kafka_ to _Rocket.Chat_ flow. To save time, all four flows have been deployed on _OpenShift_ — you'll now have the chance to test them out and simulate a conversation between customers and support agents.
+_Kafka_ から _Rocket.Chat_ へのフローは完了しました。時間を節約するため、4 つすべてのフローが _OpenShift_ にデプロイされています。これから、それらをテストし、顧客とサポート担当者の会話をシミュレートします。
 
-The diagram below shows the four flows enabling bidirectional communication between customer and support agent:
+下の図は、顧客とサポート担当者の間で双方向通信を可能にする 4 つのフローを示しています。
 
 [.mermaid.mermaid-w40]
 ----
@@ -31,24 +31,24 @@ flowchart LR
 
 {empty} +
 
-You can see the four pre-deployed flows in the _OpenShift_ Developer Console by opening the *Topology* view:
+_OpenShift_ Developer Console の *Topology* ビューを開くと、事前にデプロイされた 4 つのフローを確認できます。
 
-* {url-devconsole}[Open the Topology view^]
-** Username: `{user-username}`
-** Password: `{user-password}`
+* {url-devconsole}[Topology ビューを開く^]
+** ユーザー名: `{user-username}`
+** パスワード: `{user-password}`
 
-The image below shows what you should find — the four Camel integrations (`m2k`, `k2r`, `r2k`, `k2m`) connected to the central _Kafka_ cluster. Notice the deployments are currently scaled down to zero — they're not running yet. That's what you'll do next.
+下の画像は、見つかるはずの内容を示しています。4 つの Camel integration (`m2k`, `k2r`, `r2k`, `k2m`) が中央の _Kafka_ クラスターに接続されています。デプロイメントは現在ゼロまでスケールダウンしており、まだ実行されていません。次にそれを行います。
 
-TIP: Your layout may look different — you can drag and drop the nodes to organise them.
+TIP: レイアウトは異なる場合があります。ノードはドラッグ & ドロップで整理できます。
 
 [.bordered]
 image::module-03/m3/openshift-topology-flows.png[width=60%]
 
 {empty} +
 
-=== Start the flows
+=== フローを開始する
 
-From your _Dev Spaces_ terminal, scale up all four deployments to start the flows:
+_Dev Spaces_ のターミナルから、4 つすべてのデプロイメントをスケールアップしてフローを開始します。
 
 {blank}
 
@@ -59,59 +59,59 @@ oc scale deployment m2k r2k k2m k2r --replicas=1
 
 [TIP]
 --
-.What does this command do?
+.このコマンドは何をしますか？
 [%collapsible]
 ====
-* `oc scale deployment` — adjusts the number of running replicas for one or more deployments
-* `m2k r2k k2m k2r` — the four Camel integration flows
-* `--replicas=1` — scales each deployment to one replica, starting them up
+* `oc scale deployment` — 1 つまたは複数のデプロイメントで実行中のレプリカ数を調整します
+* `m2k r2k k2m k2r` — 4 つの Camel integration フロー
+* `--replicas=1` — 各デプロイメントを 1 レプリカまでスケールし、起動します
 ====
 --
 
-Once all pods are up and running, the Topology view should show blue rings around each deployment:
+すべての Pod が起動して実行されると、Topology ビューには各デプロイメントの周りに青いリングが表示されるはずです。
 
 [.bordered]
 image::module-03/m3/openshift-topology-running.png[width=60%]
 
 {empty} +
 
-=== Test end-to-end
+=== エンドツーエンドでテストする
 
-Now that all flows are running, it's time to simulate a conversation between customer and support agent. Make sure both platforms are open:
+すべてのフローが稼働したので、顧客とサポート担当者の会話をシミュレートする時間です。両方のプラットフォームが開いていることを確認してください。
 
-* xref:module-03/m2/m2.1.adoc[Matrix platform onboarding,window=_blank] — the customer side
-* xref:module-03/m2/m2.2.adoc[Rocket.Chat platform onboarding,window=_blank] — the support agent side
+* xref:module-03/m2/m2.1.adoc[Matrix プラットフォームのオンボーディング,window=_blank] — 顧客側
+* xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] — サポート担当者側
 
 {empty} +
 
-Let's simulate a brief exchange between a customer and a support agent(you will impersonate both personas).
+顧客とサポート担当者の短いやり取りをシミュレートしましょう（両方の役をあなたが演じます）。
 
-. *Customer sends a message* — go to your _Matrix_ room and type:
+. *顧客がメッセージを送信する* — _Matrix_ のルームに移動して、次のように入力します:
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Hi, I need some help with a policy application I submitted recently.
 ****
 +
 {blank}
 
-. *Agent responds* — go to your _Rocket.Chat_ room, you should see the customer's message. Reply with:
+. *担当者が応答する* — _Rocket.Chat_ のルームに移動すると、顧客のメッセージが表示されているはずです。次のように返信します:
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Of course! Could you share your policy reference so we can look into it?
 ****
 
 {empty} +
 
-If all goes well, both platforms should show the full exchange. You should see something similar to:
+うまくいけば、両方のプラットフォームにやり取り全体が表示されます。以下のような見え方になるはずです。
 
 [subs=attributes]
-++++
++++
 <div class="matrix-flow-wrapper">
   <style>
     .matrix-flow-wrapper {
@@ -218,6 +218,7 @@ If all goes well, both platforms should show the full exchange. You should see s
               <svg style="z-index: 10" width="45" height="45" viewBox="0 0 24 24" fill="white">
                 <g transform="translate(-2 -2) scale(.9)">
                 <path d="M 7.5488281 5 C 6.2638281 5 5.055 5.3086094 4 5.8496094 C 5.422467 6.9694938 6.4322525 8.5274703 6.8359375 10.300781 C 5.0652471 11.854193 4 13.838545 4 16 C 4 18.1 5.0028438 20.110797 6.8398438 21.716797 C 6.5498438 22.966797 5.9480312 24.134047 5.0820312 25.123047 L 4.0136719 26.345703 L 5.5859375 26.751953 C 6.2259375 26.917953 6.8868281 27 7.5488281 27 C 9.7768281 27 11.841828 26.197516 13.423828 24.728516 C 14.425828 24.908516 15.458 25 16.5 25 C 23.393 25 29 20.962 29 16 C 29 11.038 23.393 7 16.5 7 C 15.440923 7 14.418235 7.1058017 13.435547 7.2851562 C 11.913547 5.8774278 9.8442485 5 7.5488281 5 z M 16.5 9 C 22.29 9 27 12.14 27 16 C 27 19.86 22.29 23 16.5 23 C 15.412 23 14.338594 22.888969 13.308594 22.667969 L 12.757812 22.548828 L 12.371094 22.957031 C 11.147094 24.252031 9.469625 24.976 7.640625 25 C 8.290625 23.917 8.727875 22.724516 8.921875 21.478516 L 9.0136719 20.896484 L 8.5488281 20.535156 C 6.9058281 19.256156 6 17.646 6 16 C 6 12.14 10.71 9 16.5 9 z M 11.5 15 A 1.5 1.5 0 0 0 11.5 18 A 1.5 1.5 0 0 0 11.5 15 z M 16.5 15 A 1.5 1.5 0 0 0 16.5 18 A 1.5 1.5 0 0 0 16.5 15 z M 21.5 15 A 1.5 1.5 0 0 0 21.5 18 A 1.5 1.5 0 0 0 21.5 15 z"/>
+                </g>
               </svg>
             </div>
             <span class="icon-label" style="margin-left: -0px">Rocket.Chat</span>
@@ -258,23 +259,23 @@ If all goes well, both platforms should show the full exchange. You should see s
     </div>
   </div>
 </div>
-++++
++++
 
 {empty} +
 
-The communication bridge is in place — customers and support agents can now talk across platforms in real time. But a conversation is only the beginning. The support agent now knows what the customer needs, and it's time to act on it.
+通信ブリッジは整いました。これで顧客とサポート担当者は、リアルタイムでプラットフォームをまたいで会話できます。しかし、会話は始まりにすぎません。サポート担当者は、顧客が何を必要としているかを把握しました。次は、それに対して行動を起こす番です。
 
-In the next chapter, the agent will turn to an AI-powered agentic system for help — and you'll build the pieces that allow it to analyse the customer's problem and start working towards a resolution.
+次の章では、担当者が AI 搭載のエージェントシステムに助けを求めます。そして、顧客の問題を分析し、解決に向けて作業を始めるための要素を構築します。
 
 {empty} +
 
 [.verification]
 ****
-Did you see messages flowing in both directions — from _Matrix_ to _Rocket.Chat_ and back?
+メッセージが _Matrix_ から _Rocket.Chat_ へ、そして戻る双方向で流れているのを確認できましたか？
 
 [.success]
-The bidirectional integration is working. Customers and support agents can now communicate across platforms through _Kafka_.
+双方向統合は機能しています。顧客とサポート担当者は、_Kafka_ を通じてプラットフォームをまたいで通信できるようになりました。
 
 [.fail]
-Check the pod logs with `oc logs deployment/m2k` and `oc logs deployment/k2r` for errors.
+エラーがないか、`oc logs deployment/m2k` と `oc logs deployment/k2r` で Pod ログを確認してください。
 ****

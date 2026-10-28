@@ -3,12 +3,15 @@
 include::partial$style.adoc[]
 
 [id="setup"]
-== Setup the Lab working folder
+== ラボの作業フォルダーをセットアップする
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
 
-. From your terminal in _Dev Spaces_, run the following command:
+. ターミナルで _Dev Spaces_ から次の操作を行います:
+.. 実行中のプロセスがある場合は、kbd:[Ctrl+C] で停止します。
+.. 次のコマンドを実行します: +
+(このコマンドを実行する前に、開いている Camel のファイルタブをすべて閉じてください — コマンド実行後に自動更新されない場合があります)
 +
 {blank}
 +
@@ -19,24 +22,24 @@ step 4
 +
 [TIP]
 --
-Run the command above anytime to reset the exercise.
+上記のコマンドは、演習をいつでもリセットするために実行できます。
 
-.Helper commands
+. ヘルプ用コマンド
 [%collapsible]
 ====
-* `step N` — reset the lab to the beginning of step N
-* `steps` — list all available steps in the lab
-* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
-* `ff` — fast-forward to the next step
-* `rw` — rewind to the previous step
+* `step N` — ラボをステップ N の開始時点にリセットします
+* `steps` — ラボで利用可能なすべてのステップを一覧表示します
+* `start` または `restart` — いちばん最初に戻ります（`step 1` と同等です）
+* `ff` — 次のステップへ早送りします
+* `rw` — 前のステップへ巻き戻します
 ====
 --
 +
 {empty} +
 
-. Check your lab folder
+. ラボフォルダーを確認する
 +
-After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to:
+上記のコマンドを実行したら、エディターのツリービューを確認して、正しく表示されていることを確かめてください。次のようになっているはずです:
 +
 --
 [.indent2]
@@ -49,9 +52,9 @@ pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><
 [.indent2]
 [NOTE]
 ====
-The `application.properties` file contains pre-configured connection settings for your environment — it's ready to use. This lets you focus on building the integration logic rather than wiring up configuration.
+`application.properties` ファイルには、環境向けに事前設定された接続設定が含まれています。すぐに使用できます。これにより、設定の接続作業ではなく、統合ロジックの構築に集中できます。
 
-.What's inside?
+.中身は何ですか?
 [%collapsible]
 =====
 ++++
@@ -68,13 +71,13 @@ The `application.properties` file contains pre-configured connection settings fo
 
 [.verification]
 ****
-Do you see the same folder structure and files?
+同じフォルダー構成とファイルが表示されていますか?
 
 [.success]
-You're ready to continue.
+次に進む準備ができました。
 
 [.fail]
-Make sure the syntax of the commands are compatible with with your environment and try again.
+コマンドの構文がご利用の環境に適合していることを確認してから、もう一度試してください。
 ****
 
 

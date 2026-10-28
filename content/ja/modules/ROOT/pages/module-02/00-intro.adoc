@@ -1,0 +1,53 @@
+= モジュール 2: セキュアなソフトウェアサプライチェーン
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== 学習内容
+
+このモジュールでは、次の内容を学びます。
+
+* セキュリティのガードレールが開発ライフサイクルのすべての段階にどのように組み込まれているかを理解する
+* Red Hat Dependency Analytics を使用して、脆弱性がパイプラインに到達する前に特定し、修正する
+* Sigstore の keyless signing を使用して、自分の identity で commit に署名する
+* 自動化されたパイプラインが署名を検証し、イメージをスキャンし、ポリシーを強制する仕組みを確認する
+* merge request のチェック、Conforma/Enterprise Contract の検証、署名付き承認プロセスを通じてリリースを promote する
+* Sigstore Policy Controller が namespace レベルで unauthorized な deployment を防ぐ仕組みを確認する
+
+== このモジュールの対象者
+
+このモジュールでは、セキュリティの観点から開発およびリリースのプロセスを見ていきます。コードから production まで、すべての段階でセキュリティのガードレールを追加することで従来の開発ワークフローを強化したい developer、security engineer、platform engineer を対象としています。
+
+**経験レベル**: 中級。Git、CI/CD pipeline、container image の基礎知識があると役立ちます。
+
+== 想定所要時間
+
+このモジュールの完了には、約 **60〜90 分** かかります。
+
+== あなたの役割とミッション
+
+あなたは **Parasol Insurance** の developer です。普段使っている開発ワークフロー -- coding、commit、build、deploy -- は、platform team によって security guardrail が追加されています。あなたの仕事は、application の脆弱性を修正し、この hardened なプロセスを通して変更を届け、すべての security control について学ぶことです。
+
+Parasol の CISO office は、すべての production deployment に次の要件を課しています。
+
+* 検証済みの developer identity に追跡できる **signed commits** から build されていること
+* promote される前に **vulnerability scanning** と **policy checks** を通過すること
+* build pipeline が正しく実行されたことを証明する **signed attestation** を持つこと
+* production に到達する前に **明示的な承認** を受けること
+* deployment 時に **admission controller** によって検証されること
+
+
+
+== セキュアな開発の流れ
+
+このモジュールは、次の一連のストーリーに沿って進みます。
+
+. **platform を知る** -- Developer Hub でセキュアなコンポーネントを確認し、分離された sandbox を作成する
+. **脆弱性を左側で潰す** -- dependency analytics を使って、脆弱性が pipeline に到達する前に見つけて修正する
+. **commit に署名する** -- Sigstore keyless signing を使って、すべての commit を自分の identity に結び付ける
+. **sandbox pipeline** -- 自動チェックが署名を検証し、image をスキャンし、ACS policy を強制する様子を確認する
+. **production へ promote する** -- merge、build、Conforma policy による検証、リリース承認、deployment を行う
+. **namespace security** -- Policy Controller が unauthorized image の実行を防ぐ仕組みを確認する
+
+== 次の手順
+
+アクセスリンクと credentials については xref:module-02/01a-environment.adoc[Environment Details] のページに進み、続いて xref:module-02/01-vulnerabilities.adoc[Dealing with Vulnerabilities Early] に進んでください。

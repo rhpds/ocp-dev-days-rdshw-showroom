@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab5"]
-== Setup the Lab working folder
+== Lab 作業用フォルダーを準備する
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -12,15 +12,15 @@ include::../_shared/close-tabs.adoc[]
 [.indent2]
 [IMPORTANT]
 --
-If you skipped earlier chapters, expand the section below to catch up.
+前の章を飛ばした場合は、以下のセクションを展開して追いついてください。
 
 [%collapsible]
 ====
 
-* Enable access to the database
+* データベースへのアクセスを有効にする
 +
 ======
-This chapter requires access to a database, but it's unreachable by default.
+この章ではデータベースへのアクセスが必要ですが、デフォルトでは到達できません。
 
 {blank}
 
@@ -35,7 +35,7 @@ flowchart LR
         end
     end
 
-    Camel -.-x|"❌ unreachable"| SVC
+    Camel -.-x|"❌ 到達不可"| SVC
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -56,17 +56,17 @@ flowchart LR
     style SVC fill:#fce4e4,stroke:#EE0000,color:#333
 ----
 
-To enable access to the database, run the following command in your terminal in _Dev Spaces_:
+_Dev Spaces_ のターミナルで次のコマンドを実行して、データベースへのアクセスを有効にします。
 
 [.copypaste]
 ****
 si-setup
 ****
 
-You should see all resources reporting `ready OK`:
+すべてのリソースが `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -75,9 +75,9 @@ You should see all resources reporting `ready OK`:
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-++++
++++
 
-The above output indicates a Service Interconnect link has been established between your namespace and the database namespace.
+上記の出力は、あなたの namespace とデータベースの namespace の間に Service Interconnect リンクが確立されたことを示しています。
 
 {blank}
 
@@ -126,7 +126,9 @@ flowchart LR
 
 {empty} +
 
-. From your terminal in _Dev Spaces_, run the following command:
+. _Dev Spaces_ のターミナルで:
+.. 実行中のプロセスがあれば、kbd:[Ctrl+C] で停止します。
+.. 次のコマンドを実行します。
 +
 {blank}
 +
@@ -137,24 +139,24 @@ step 9
 +
 [TIP]
 --
-.Run the command above anytime to reset the exercise.
+.上のコマンドは、いつでも実行して演習をリセットできます。
 [%collapsible]
 ====
-The workshop includes handy helper scripts that let you jump to any step or reset the lab to a known good state:
+このワークショップには、任意のステップに移動したり、既知の正常な状態にラボをリセットしたりできる便利な補助スクリプトが含まれています。
 
-* `step N` — reset the lab to the beginning of step N
-* `steps` — list all available steps in the lab
-* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
-* `ff` — fast-forward to the *next* step
-* `rw` — rewind to the *previous* step
+* `step N` — ラボを step N の開始位置にリセットする
+* `steps` — ラボで利用可能なすべてのステップを一覧表示する
+* `start` または `restart` — 最初からやり直す（`step 1` と同等）
+* `ff` — *次の* ステップへ早送りする
+* `rw` — *前の* ステップへ巻き戻す
 ====
 --
 +
 {empty} +
 
-. Check your lab folder
+. ラボフォルダーを確認する
 +
-After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to the folder structure you've seen in the previous exercise. 
+上記のコマンドを実行したら、エディターのツリービューで状態を確認してください。前の演習で見たフォルダー構成と同様になっているはずです。
 +
 --
 [.indent2]
@@ -169,7 +171,7 @@ pass:[<mark style="padding-left: 1rem; background-color: white; color: #b07219">
 pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
 
 [.indent2]
-NOTE: This version of the exercise does not use MCP servers to simplify execution. All tools are embedded directly in the Camel agentic process — they're defined as regular Camel routes that the agent can discover and call.
+NOTE: この演習のこの版では、実行を簡略化するために MCP サーバーは使用しません。すべてのツールは Camel のエージェント処理に直接組み込まれており、通常の Camel ルートとして定義され、エージェントが検出して呼び出せます。
 --
 +
 {empty} +
@@ -178,13 +180,13 @@ NOTE: This version of the exercise does not use MCP servers to simplify executio
 
 [.verification]
 ****
-Do you see the expected folder structure and files?
+期待どおりのフォルダー構成とファイルが表示されていますか？
 
 [.success]
-You're ready to continue.
+先へ進む準備ができました。
 
 [.fail]
-Make sure the syntax of the commands is compatible with your environment and try again.
+コマンドの構文が環境と互換性があることを確認してから、もう一度試してください。
 ****
 
 {empty} +

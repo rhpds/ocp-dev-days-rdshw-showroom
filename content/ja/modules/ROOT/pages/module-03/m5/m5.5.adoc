@@ -3,16 +3,16 @@
 include::partial$style.adoc[]
 
 
-== Summary
+== 概要
 
 
 
-Congratulations! You have completed the final phase of the workshop, adding a governance layer to manage tiered AI consumption for customer profile analysis.
+おめでとうございます！ これでワークショップの最終段階が完了しました。顧客プロファイル分析のための階層化された AI 消費を管理するガバナンス層を追加しました。
 
-=== Key Takeaways
+=== 主なポイント
 
-* **_Connectivity Link_ policies attach to _Gateway API_ resources** (HTTPRoutes, Gateways) -- no changes to the AI agent or application code required.
-* **Policies compose together** -- the AuthPolicy extracts identity information that the TokenRateLimitPolicy uses for per-tier token budgets, enabling the Gold/Silver fallback strategy.
-* **Token-based rate limiting** is purpose-built for AI/LLM workloads, giving you cost control based on actual token consumption rather than simple request counts.
-* **Everything is declarative and _Kubernetes_-native** -- policies are YAML resources managed with `oc`, making them easy to version, review, and automate.
-* **Integration tools provide the foundation for AI** -- As you've seen across all the modules, robust connectivity tools like _Apache Camel_, _Kafka_, Service Interconnect, and _Connectivity Link_ provide the essential, secure foundation needed to successfully weave AI into everyday business workflows.
+* **_Connectivity Link_ ポリシーは _Gateway API_ リソースに適用されます** (HTTPRoutes、Gateways) -- AI エージェントやアプリケーションコードの変更は不要です。
+* **ポリシーは組み合わせて利用できます** -- AuthPolicy が認証情報を抽出し、TokenRateLimitPolicy がそれを使って階層ごとのトークン予算を適用することで、Gold/Silver のフォールバック戦略を実現します。
+* **トークンベースのレート制限** は AI/LLM ワークロード向けに設計されており、単純なリクエスト数ではなく実際のトークン消費に基づいてコストを制御できます。
+* **すべてが宣言的で _Kubernetes_ ネイティブです** -- ポリシーは `oc` で管理する YAML リソースであり、バージョン管理、レビュー、自動化が容易です。
+* **統合ツールが AI の基盤を提供します** -- これまで各モジュールで見てきたように、_Apache Camel_、_Kafka_、Service Interconnect、_Connectivity Link_ のような堅牢な接続ツールは、AI を日常業務のワークフローにうまく組み込むために不可欠で、安全な基盤を提供します。

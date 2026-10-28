@@ -2,9 +2,9 @@
 :page-time: 5
 include::partial$style.adoc[]
 
-== Token Rate Limiting
+== トークンレート制限
 
-With authentication in place, the next layer of control is token consumption. A **TokenRateLimitPolicy** tracks the actual *tokens used* in LLM responses, rather than simply counting requests like traditional rate limiting.
+認証が整ったら、次の制御層はトークン消費です。 **TokenRateLimitPolicy** は、従来のレート制限のように単純にリクエスト数を数えるのではなく、LLM 応答で実際に *使用されたトークン* を追跡します。
 
 {blank}
 
@@ -33,11 +33,26 @@ flowchart LR
     style SP fill:none,stroke:none
 ----
 
-Rate limiting policies are a powerful way to combine AI capabilities with cost and resource control. In this exercise, you'll see how the Customer Profile Tool uses token budgets to decide which tier of analysis to produce.
+レート制限ポリシーは、AI の機能とコストおよびリソース制御を組み合わせる強力な方法です。この演習では、Customer Profile Tool がトークン予算を使って、どの階層の分析を出力するかを決定する仕組みを確認します。
 
-Every LLM request consumes compute power, and richer analysis consumes more of it. As AI adoption grows, managing cost and infrastructure capacity becomes critical. Rate limiting policies help organisations control token usage across their services.
+すべての LLM リクエストは計算能力を消費し、より豊富な分析ほど多くの計算資源を必要とします。AI の採用が進むにつれて、コストとインフラ容量の管理は重要になります。レート制限ポリシーは、各サービス全体でのトークン使用量を制御するのに役立ちます。
 
-In this exercise, the Customer Profile Tool goes beyond simple rate limiting with a graceful degradation strategy. It first attempts a *Gold* analysis, and when the Gold budget is consumed, falls back to *Silver* to keep producing useful profiles at a lower cost. Only when both are exhausted is the request rejected:
+この演習では、Customer Profile Tool が穏やかな縮退戦略を伴って単純なレート制限を超えます。まず *Gold* 分析を試み、Gold 予算が使い切られたら *Silver* にフォールバックして、より低コストで有用なプロファイルを生成し続けます。両方が尽きた場合にのみ、リクエストは拒否されます。
+
+[NOTE]
+====
+.Camel でフォールバックがどのように実装されているかを見る
+[%collapsible]
+=====
+以下のルートは、Camel における Gold パスの定義を示しています。Circuit Breaker ブロック内で、LLM が処理するためのデータを取得します。Connectivity Link が呼び出しをレート制限すると、エラーで応答し、Camel はそのパスを失敗としてマークし、ルートは Silver パスへフォールバックします。
+
+image::module-03/m5/kaoto-gold-fallback.png[Kaoto におけるフォールバック付き Gold ルート,width=100%]
+=====
+====
+
+{blank} 
+
+以下の図は、フォールバック戦略の流れを示しています。
 
 {blank}
 
@@ -69,13 +84,13 @@ flowchart TD
     style fallback fill:none,stroke:none
 ----
 
-To put this into practice, you will apply a TokenRateLimitPolicy that assigns each tier its own token budget. Then you'll test the fallback behaviour by sending profile requests until the Gold budget is consumed, and observe the system switch to Silver.
+実践として、各階層にそれぞれのトークン予算を割り当てる TokenRateLimitPolicy を適用します。その後、プロファイル要求を送り続けて Gold 予算が消費されるまで試し、システムが Silver に切り替わる様子を確認します。
 
 {empty} +
 
-=== Start the Agentic Integration
+=== エージェントの統合を開始する
 
-Ensure the agent is running in your terminal. If you stopped it after the previous exercise, start it again:
+エージェントがターミナルで実行中であることを確認してください。前の演習のあとに停止した場合は、もう一度起動します。
 
 {blank}
 
@@ -86,25 +101,25 @@ camel run * --local-kamelet-dir ../support/kamelets
 
 [TIP]
 --
-.What does this command do?
+.このコマンドは何をしますか？
 [%collapsible]
 ====
-* `camel run *` — runs all Camel route files in the current directory
-* `--local-kamelet-dir ../support/kamelets` — loads custom Kamelets (connectors) from the support folder +
-(includes Rocket.Chat connector)
+* `camel run *` — 現在のディレクトリにあるすべての Camel ルートファイルを実行します
+* `--local-kamelet-dir ../support/kamelets` — support フォルダからカスタム Kamelets（コネクタ）を読み込みます +
+(Rocket.Chat コネクタを含む)
 ====
 --
 
 {empty} +
 
-=== Apply and Verify the TokenRateLimitPolicy
+=== TokenRateLimitPolicy を適用して確認する
 
-The TokenRateLimitPolicy is a gateway-level resource. It defines token budgets per tier and lets the gateway enforce them independently of the running application.
+TokenRateLimitPolicy はゲートウェイレベルのリソースです。階層ごとのトークン予算を定義し、実行中のアプリケーションとは独立してゲートウェイにそれを強制させます。
 
-. Open a new terminal tab in _DevSpaces_ by clicking the kbd:[+] icon (keep the previous tab with _Camel_ running so you can test later).
+. _DevSpaces_ で kbd:[+] アイコンをクリックして新しいターミナルタブを開きます（後でテストできるよう、_Camel_ が実行中の前のタブはそのまま残してください）。
 +
 [#terminal-tab]
-image::module-03/m5/devspace_terminal_new_tab.png[Dev Spaces terminal,width=70%]
+image::module-03/m5/devspace_terminal_new_tab.png[Dev Spaces のターミナル,width=70%]
 +
 [.overlay]
 ****
@@ -117,22 +132,22 @@ terminal-tab
 +
 {empty} +
 +
-NOTE: Because the policy operates at the infrastructure level, you can apply it while the agent is running, with no restart required.
+NOTE: このポリシーはインフラストラクチャ層で動作するため、エージェントを実行したままでも適用でき、再起動は不要です。
 +
 {empty} +
 
-. Examine the token budgets for each tier, then apply the policy to your namespace:
+. 各階層のトークン予算を確認し、ポリシーを名前空間に適用します。
 +
 --
-The policy defines two token budgets that reflect the cost of each tier:
+このポリシーは、各階層のコストを反映した 2 つのトークン予算を定義します。
 
-* *Gold* — richer analysis, higher compute cost. A stricter token allowance with a slower renewal window.
-* *Silver* — lighter analysis, lower compute cost. A more generous token allowance that renews faster.
+* *Gold* — より豊富な分析、より高い計算コスト。更新ウィンドウが長く、より厳しいトークン許容量です。
+* *Silver* — より軽い分析、より低い計算コスト。更新がより速く、より寛大なトークン許容量です。
 --
 +
 {blank}
 +
-Review the TokenRateLimitPolicy below and *apply it by pasting* the following yaml in your new terminal tab:
+以下の TokenRateLimitPolicy を確認し、次の yaml を新しいターミナルタブに *貼り付けて適用* してください。
 +
 {blank}
 +
@@ -171,18 +186,18 @@ spec:
 EOF
 ****
 +
-Notice how the YAML matches the tier budgets described above: `gold` with a tighter limit and longer window, `silver` with a more generous allowance that renews faster.
+YAML が上で説明した階層別の予算に対応していることに注目してください。`gold` はより厳しい制限と長いウィンドウを持ち、`silver` はより寛大な許容量で、より速く更新されます。
 +
 [IMPORTANT]
 ====
-The TokenRateLimitPolicy depends on the AuthPolicy. The `auth.identity.groups` and `auth.identity.userid` fields referenced here are populated by the AuthPolicy's `response.success.filters` section. Without the AuthPolicy, the TokenRateLimitPolicy would have no identity context to evaluate.
+TokenRateLimitPolicy は AuthPolicy に依存します。ここで参照している `auth.identity.groups` と `auth.identity.userid` フィールドは、AuthPolicy の `response.success.filters` セクションによって設定されます。AuthPolicy がなければ、TokenRateLimitPolicy には評価するための ID コンテキストがありません。
 ====
 +
 {empty} +
 
-. Verify the TokenRateLimitPolicy
+. TokenRateLimitPolicy を確認する
 +
-From the devspaces terminal, run the following command to check that the TokenRateLimitPolicy was created successfully:
+devspaces のターミナルから、TokenRateLimitPolicy が正常に作成されたことを確認するために次のコマンドを実行します。
 +
 [.copypaste]
 ****
@@ -192,20 +207,20 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
 +
 [TIP]
 --
-.What does this command do?
+.このコマンドは何をしますか？
 [%collapsible]
 ====
-* `oc describe tokenratelimitpolicy` — shows the full details of the TokenRateLimitPolicy resource
-* `-n {user-username}-devspaces` — targets your namespace
-* `grep -iE "Name:|target|..."` — filters the output to show only the key fields (name, targets, limits, and status)
+* `oc describe tokenratelimitpolicy` — TokenRateLimitPolicy リソースの完全な詳細を表示します
+* `-n {user-username}-devspaces` — あなたの名前空間を対象にします
+* `grep -iE "Name:|target|..."` — 出力を絞り込み、主要なフィールド（名前、ターゲット、制限、状態）のみを表示します
 ====
 --
 +
-You should see output confirming the TokenRateLimitPolicy exists, is targeting the correct HTTPRoute, and is in an enforced state, similar to:
+出力には、TokenRateLimitPolicy が存在し、正しい HTTPRoute を対象にし、強制状態になっていることが示されるはずです。例:
 +
 {blank}
 +
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         openai-token-limits
     <span style="color: #F14C4B;font-weight:bold">Gold:</span>
         <span style="color: #F14C4B;font-weight:bold">Limit:</span>   50
@@ -220,42 +235,42 @@ You should see output confirming the TokenRateLimitPolicy exists, is targeting t
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
     <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
-++++
++++
 +
-With the policy showing *Enforced*, the gateway is now actively tracking token usage for both tiers. +
-Time to see the fallback strategy in action.
+ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を現在追跡しています。+
+フォールバック戦略を実際に見てみましょう。
 
 {empty} +
 
-=== Test Token Rate Limiting from Rocket.Chat
+=== Rocket.Chat からトークンレート制限をテストする
 
-. Go back to _Rocket.Chat_ and issue the same request as in the previous exercise:
+. _Rocket.Chat_ に戻り、前の演習と同じリクエストを送ります。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Please, generate a customer profile for order 61356291
 ****
 +
-NOTE: The order number in this request is illustrative -- the Customer Profile Tool uses simulated input data from JSON files in the `data/` folder of your project. You can explore these files in the source code to see the mock CRM, history, audit, and ticket data that feeds the analysis.
+NOTE: このリクエストの注文番号は説明用です。Customer Profile Tool は、プロジェクトの `data/` フォルダにある JSON ファイルからのシミュレートされた入力データを使用します。ソースコード内でこれらのファイルを調べると、分析の元になるモック CRM、履歴、監査、チケットのデータを確認できます。
 +
-Since the Gold token budget is still fresh, the system should produce a *GOLD TIER ANALYSIS*, just like in the previous exercise.
-+
+Gold のトークン予算はまだ十分残っているため、システムは前の演習と同じように *GOLD TIER ANALYSIS* を出力するはずです。
+
 {empty} +
 
-. Test again to see the system switch to Silver.
+. もう一度試して、システムが Silver に切り替わることを確認します。
 +
-The previous request should have consumed the Gold token budget (approximately 50 tokens). Try asking again to see the system switch to Silver, a simple "try again" prompt should do the trick.
+前回のリクエストで Gold のトークン予算（およそ 50 トークン）が消費されているはずです。もう一度質問してシステムが Silver に切り替わるか確認してください。シンプルな「try again」プロンプトで十分です。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Please try again
 ****
 +
-You should now see a *SILVER TIER ANALYSIS* instead of Gold. The response is shorter, with only two sections (Customer Profile and Open Issues), reflecting the lighter analysis tier:
+今度は Gold ではなく *SILVER TIER ANALYSIS* が表示されるはずです。応答は短くなり、Customer Profile と Open Issues の 2 つのセクションだけになります。これは、より軽い分析階層を反映しています。
 +
 {blank}
 +
@@ -264,22 +279,22 @@ include::_figures/rc-silver-profile.adoc[]
 +
 {blank}
 +
-This confirms the fallback strategy in action: the Gold budget was consumed by the first request, so the system automatically switched to Silver.
-+
+これでフォールバック戦略が実際に動作していることが確認できます。最初のリクエストで Gold 予算が消費されたため、システムは自動的に Silver に切り替わりました。
+
 {empty} +
 
-. Keep sending profile requests. The Silver budget is more generous, so you should receive several Silver analyses before the budget is exhausted. Keep asking until the system can no longer produce a profile:
+. プロファイル要求を送り続けます。Silver 予算はより寛大なので、予算が尽きるまでに複数回の Silver 分析を受け取れるはずです。システムがこれ以上プロファイルを生成できなくなるまで続けてください。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Please try again
 ****
 +
 {empty} +
 
-. Once both budgets are consumed, the system has no remaining capacity. You should see a *SERVICE NOTICE* with a `429 Too Many Requests` status, confirming that the token rate limiting policy is fully enforced:
+. 両方の予算が消費されると、システムには残りの容量がありません。 *SERVICE NOTICE* と `429 Too Many Requests` ステータスが表示され、トークンレート制限ポリシーが完全に強制されていることが確認できます。
 +
 {blank}
 +
@@ -292,17 +307,17 @@ include::_figures/rc-service-notice.adoc[]
 
 {empty} +
 
-NOTE: Token budgets are not permanent. They operate on a time window basis, so after enough time passes the budgets get replenished. If you wait a few minutes and try again, the system will resume producing profiles following the same fallback strategy: Gold first, then Silver.
+NOTE: トークン予算は永続的ではありません。時間ウィンドウ単位で動作するため、十分な時間が経過すると予算は補充されます。数分待ってからもう一度試すと、システムは同じフォールバック戦略、つまり Gold を先に、その後 Silver を生成する動作に戻ります。
 
 {empty} +
 
 [.verification]
 ****
-Did you see Gold first, then Silver after the Gold budget ran out, and finally a 429 error when both budgets were exhausted?
+Gold の予算がなくなったあとに Silver が表示され、最後に両方の予算が尽きたときに 429 エラーが出る、という流れを確認できましたか？
 
 [.success]
-You have successfully applied tiered token rate limiting with a graceful degradation strategy.
+階層化されたトークンレート制限と穏やかな縮退戦略を正常に適用できました。
 
 [.fail]
-Ensure both the AuthPolicy and TokenRateLimitPolicy show Enforced status. Wait for the token budgets to renew and try again.
+AuthPolicy と TokenRateLimitPolicy の両方が Enforced 状態であることを確認してください。トークン予算が更新されるまで待ってから、もう一度試してください。
 ****

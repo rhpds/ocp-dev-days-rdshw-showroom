@@ -3,9 +3,9 @@
 include::partial$style.adoc[]
 
 [id="whats-next"]
-== What's next
+== 次は何をするか
 
-You now have both messaging platforms open and ready — *Matrix* on the customer side, *Rocket.Chat* on the support agent side. But right now, they're completely separate. A message sent in one has no way of reaching the other.
+これで、両方のメッセージングプラットフォームが開いて準備完了です。顧客側では *Matrix*、サポート担当者側では *Rocket.Chat* を使います。しかし現時点では、これらは完全に分かれています。一方で送信したメッセージが、もう一方に届く方法はありません。
 
 {blank}
 
@@ -29,19 +29,19 @@ flowchart LR
 
 {empty} +
 
-In the next lab, you'll build the integration that bridges them — using *Apache Camel* to transform messages and *Apache Kafka* as the streaming backbone that connects everything together.
+次のラボでは、メッセージを変換するために *Apache Camel* を使い、すべてをつなぐストリーミング基盤として *Apache Kafka* を使って、両者をつなぐ統合を構築します。
 
 {empty} +
 
 [.verification]
 ****
-Are you logged in to both Matrix and Rocket.Chat?
+Matrix と Rocket.Chat の両方にログインしていますか？
 
 [.success]
-You're all set — continue to the next module to start building the integration.
+準備完了です。次のモジュールに進んで、統合の構築を始めましょう。
 
 [.fail]
-Go back and make sure you can access both platforms before moving on.
+先に進む前に、両方のプラットフォームにアクセスできることを確認して戻ってください。
 ****
 
 {empty} +

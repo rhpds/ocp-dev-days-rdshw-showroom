@@ -3,11 +3,11 @@
 include::partial$style.adoc[]
 
 [id='lab4-agentic-flow']
-== Developing the AI assistant
+== AI アシスタントの開発
 
-=== Open the Camel route
+=== Camel ルートを開く
 
-In your editor's file explorer, click on the following file — Kaoto will automatically open it and render the route as a visual diagram.
+エディタのファイルエクスプローラーで次のファイルをクリックします。Kaoto が自動的に開き、ルートを視覚的な図として表示します。
 
 --
 [.indent2]
@@ -19,7 +19,7 @@ pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><
 
 [TIP]
 --
-.New to Kaoto?
+.Kaoto は初めてですか？
 [%collapsible]
 ====
 include::../_shared/kaoto-intro.adoc[]
@@ -27,7 +27,7 @@ include::../_shared/kaoto-intro.adoc[]
 --
 
 
-Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main agentic flow. Do as follows:
+Kaoto がファイルを開き、含まれているすべてのルート定義を表示します。このファイルにはいくつかのルートがありますが、ここで注目するのはメインのエージェントフローです。以下のように進めます。
 
 // You may find the routes displayed vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
 
@@ -36,8 +36,8 @@ Kaoto will open the file and display all the route definitions it contains. The 
 
 // {empty} +
 
-. Click the *Routes* dropdown in the upper-left toolbar
-. Select `rocketchat-to-agent` from the list
+. 画面左上のツールバーで *Routes* ドロップダウンをクリックします
+. 一覧から `rocketchat-to-agent` を選択します
 +
 {empty} +
 +
@@ -61,18 +61,18 @@ kaoto-routes-m4
 
 {empty} +
 
-To center the route in the canvas, click the *Reset View* button at the bottom:
+キャンバスの中央にルートを表示するには、下部の *Reset View* ボタンをクリックします。
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-reset-view.png[width=50%]
 
-TIP: Use the mouse wheel to zoom in and out of the canvas, and click and drag to pan around the view.
+TIP: マウスホイールでキャンバスを拡大・縮小し、クリックしてドラッグすると表示を移動できます。
 
 {empty} +
 
-You should now see the route you'll be working with — the starting point for the customer support flow:
+これで、これから作業するルート、つまり顧客サポートフローの開始点が表示されるはずです。
 
 {blank}
 
@@ -96,24 +96,24 @@ kaoto-agent-route
 
 {empty} +
 
-Reading left to right, the route listens for messages from _Rocket.Chat_ and extracts the text — but the flow is incomplete. The `set system prompt` step is disabled, and the pass:[<code style="background-color: #4494E5; color: white;">To do: Agent</code>] block contains only a `dummy response` that returns "Hello World" regardless of what the user says.
+左から右へ読むと、このルートは _Rocket.Chat_ からのメッセージを受け取り、テキストを抽出しますが、フローは未完成です。`set system prompt` ステップは無効になっており、pass:[<code style="background-color: #4494E5; color: white;">To do: Agent</code>] ブロックには、ユーザーが何を言っても "Hello World" を返す `dummy response` しかありません。
 
-Throughout this exercise, you'll be guided to complete this flow step by step:
+この演習では、次の手順でこのフローを段階的に完成させます。
 
 [.indent2]
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] You'll enable the `set system prompt` step — this will instruct the AI agent how to behave +
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] You'll replace the `Dummy response` with a MaaS-powered AI agent, and progressively equip it with tools to handle real customer requests
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `set system prompt` ステップを有効にします。これにより、AI エージェントの振る舞いを指示します +
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] `Dummy response` を MaaS を利用した AI エージェントに置き換え、実際の顧客要求に対応できるようにツールを順次追加していきます
 
 // . You'll enable the `set system prompt` step — this will instruct the AI agent how to behave
 // . You'll replace the `dummy response` with a MaaS-powered AI agent, and progressively equip it with tools to handle real customer requests
 
 {empty} +
 
-=== Start the dev loop
+=== 開発ループを開始する
 
-From this point on, you'll work in a rapid development cycle — _Camel JBang_ runs in dev mode, which means every change you make to the route is instantly picked up and applied. You can modify the flow, save the file, and immediately observe the new behaviour without restarting.
+ここからは、素早い開発サイクルで作業します。_Camel JBang_ は dev モードで動作するため、ルートに加えた変更はすぐに反映されます。フローを修正してファイルを保存すると、再起動せずに新しい動作をすぐ確認できます。
 
-Start by running the Camel route as-is to see the placeholder behaviour in action:
+まずは、プレースホルダーの動作を確認するために、現在のまま Camel ルートを実行します。
 
 {blank}
 
@@ -124,21 +124,21 @@ camel run agent --dev
 
 [TIP]
 --
-.What does this command do?
+.このコマンドは何をしますか？
 [%collapsible]
 ====
-* `camel run agent` — loads the resources under the `agent` directory and runs the route defined inside it.
-* `--dev` — dev mode, automatically reloads when you save changes to any source file.
+* `camel run agent` — `agent` ディレクトリ配下のリソースを読み込み、その中で定義されたルートを実行します。
+* `--dev` — dev モード。ソースファイルを保存すると自動的に再読み込みされます。
 ====
 --
 
-Wait for _Camel_ to fully start — you should see `...(agent) started...` in the terminal.
+_Camel_ が完全に起動するまで待ちます。ターミナルに `...(agent) started...` が表示されるはずです。
 
-Switch to your _Rocket.Chat_ window.
+_Rocket.Chat_ のウィンドウに切り替えます。
 
-TIP: If you haven't logged in yet, follow the xref:module-03/m2/m2.2.adoc[Rocket.Chat platform onboarding,window=_blank] instructions (opens in a new tab).
+TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] の手順に従ってください（新しいタブで開きます）。
 
-In the left sidebar, find and select the `ai-support` channel that matches your user number:
+左サイドバーで、ユーザー識別子に一致する `ai-support` チャンネルを探して選択します。
 
 [subs=attributes]
 ++++
@@ -164,16 +164,16 @@ In the left sidebar, find and select the `ai-support` channel that matches your 
 </script>
 ++++
 
-Then type a simple message:
+次に、簡単なメッセージを入力します。
 
 {blank}
 
-[.copypaste]
+[.copypaste.value]
 ****
 Hi
 ****
 
-The Camel bot picks up the message and responds with `Hello World` — confirming the route is working end to end:
+Camel のボットがメッセージを受け取り、`Hello World` と応答します。これでルートがエンドツーエンドで動作していることが確認できます。
 
 {blank}
 
@@ -182,23 +182,23 @@ The Camel bot picks up the message and responds with `Hello World` — confirmin
 :fig-bot-msg: Hello World
 include::_figures/rc-interaction.adoc[]
 
-This is expected — the route is still using the hardcoded dummy response. In the next steps, you'll replace it with a real AI agent that can reason and respond naturally.
+これは想定どおりです。ルートはまだハードコードされたダミー応答を使っています。次の手順で、推論して自然に応答できる本物の AI エージェントに置き換えます。
 
 {empty} +
 
-=== Wire the AI agent
+=== AI エージェントを接続する
 
-Now replace the dummy response with a real AI agent. Head back to the _Kaoto_ canvas and follow the steps below:
+次に、ダミー応答を本物の AI エージェントに置き換えます。_Kaoto_ キャンバスに戻り、以下の手順に従ってください。
 
 {empty} +
 
-. *Enable the system prompt*
+. *system prompt を有効にする*
 +
-The `set system prompt` step is currently disabled — it's greyed out because there was no AI agent to use it.
+`set system prompt` ステップは現在無効です。AI エージェントがまだいなかったため、グレー表示になっています。
 +
 [caption=]
-.Enable it:
-[cols="1a,6a"]
+.有効化します:
+[cols="3a,6a"]
 |===
 |
 [.bordered]
@@ -211,25 +211,28 @@ image::module-03/m4/kaoto-enable-step.png[width=100%]
 kaoto-enable-step
 
 [.numbers]
-{x: 80, y: 5, size: 8}
+{x: 92, y: 11, size: 3}
+
+[.arrows]
+{x: 82.5, y: 75, rot: 0, size: .8}
 ****
 |
-. Hover the step and click the {btn-enable} button (next to the {nbsp}{btn-replace}{nbsp} button).
+. ステップにカーソルを合わせ、{btn-enable} ボタンをクリックします。
 |===
 
-. *Replace the dummy response with an Agent*
+. *dummy response を Agent に置き換える*
 +
-The `Dummy response` step is a placeholder — it always returns "Hello World". Replace it with the _LangChain4j Agent_ component that connects to MaaS.
+`Dummy response` ステップはプレースホルダーで、常に "Hello World" を返します。これを MaaS に接続する _LangChain4j Agent_ コンポーネントに置き換えます。
 +
-1. Hover the `Dummy response` step and click the floating {nbsp}{btn-replace}{nbsp} button.
-1. Type `lang` in the {ui-filter} to find the _LangChain4j Agent_ component, then select it.
-1. Click the _LangChain4j Agent_ step to open the configuration panel.
-1. Select the `Required` configuration tab.
-1. Set the `Agent Id` to:
+1. `Dummy response` ステップにカーソルを合わせ、フローティングの {nbsp}{btn-replace}{nbsp} ボタンをクリックします。
+1. {ui-filter} に `lang` と入力して _LangChain4j Agent_ コンポーネントを見つけ、選択します。
+1. _LangChain4j Agent_ ステップをクリックして設定パネルを開きます。
+1. `Required` 設定タブを選択します。
+1. `Agent Id` を次のように設定します。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 myagent
 ****
@@ -238,21 +241,21 @@ image::module-03/m4/kaoto-agent-steps.png[width=100%]
 +
 {empty} +
 +
-Because you're running in dev mode, _Camel_ hot-reloads automatically. Watch the terminal — the logs should confirm the agent is running:
+dev モードで実行しているため、_Camel_ は自動的にホットリロードされます。ターミナルを見て、エージェントが実行中であることをログで確認してください。
 +
 {blank}
 +
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: #818181">2026-03-24 18:14:11.113  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> : <span style="color:#fff">Routes reloaded summary</span> (total:<span style="color:#0FBC7A">2</span> started:<span style="color:#0FBC7A">2</span>)
 2026-03-24 18:14:11.115  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">rocketchat-to-agent</span> (platform-http:///ai-support)
 2026-03-24 18:14:11.116  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">to-rocketchat</span> (direct://to-rocketchat)</pre>
-++++
++++
 +
 {empty} +
 
-. *Check the updated flow*
+. *更新されたフローを確認する*
 +
-The system prompt is now active (1) and the AI agent has replaced (2) the dummy response. Your route should look like this:
+これで system prompt が有効になり (1)、AI エージェントがダミー応答に置き換わりました (2)。ルートは次のようになっているはずです。
 +
 {blank}
 +
@@ -277,18 +280,18 @@ kaoto-agent-route-complete
 +
 {empty} +
 
-. *Interact with the agent*
+. *エージェントとやり取りする*
 +
-Switch back to your _Rocket.Chat_ window and type:
+_Rocket.Chat_ のウィンドウに戻り、次のように入力します。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Hi again
 ****
 +
-The AI agent processes your message — it sends it to the LLM via MaaS, which reasons about it and returns a natural language response. You should see something like:
+AI エージェントはメッセージを処理します。MaaS を通じて LLM に送信され、LLM がそれを推論して自然言語の応答を返します。次のような表示が見えるはずです。
 +
 {blank}
 +
@@ -299,27 +302,27 @@ include::_figures/rc-interaction.adoc[]
 +
 {empty} +
 +
-The bot is responding, but can it do real work? +
-*Not yet*. The MCP servers and tools exist in the exercise but are not active yet.
+ボットは応答していますが、実際の作業もできるでしょうか。+
+*まだできません*。MCP サーバーとツールは演習内に存在しますが、まだ有効ではありません。
 +
 {blank}
 +
-Try asking for something specific:
+具体的な要求をしてみましょう。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Can you show me policy document 61356291
 ****
 +
-NOTE: Your lab comes with a sample policy document (`61356291`) ready to use. This is the one referenced in the command above.
+NOTE: このラボには、使用可能なサンプルの policy document (`61356291`) が含まれています。これは上のコマンドで参照しているものです。
 +
-TIP: You can also try fetching policy documents you generated during the Ingestion lab — feel free to use any policy document number from your earlier exercises.
+TIP: Ingestion ラボで生成した policy document を取得することもできます。以前の演習で使った任意の policy document 番号を試してみてください。
 +
 {empty} +
 +
-The bot responds with something like:
+ボットは次のように応答します。
 +
 {blank}
 +
@@ -328,15 +331,15 @@ The bot responds with something like:
 :fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
 include::_figures/rc-interaction.adoc[]
 +
-As expected, the bot declines the request.
+予想どおり、ボットは要求を拒否します。
 +
 --
-.Why did the bot respond that way?
+.なぜそのように応答したのでしょうか？
 [caption=]
 ====
-The AI agent doesn't have access to the tools it needs — the MCP servers haven't been wired in yet.
+AI エージェントは必要なツールにアクセスできません。MCP サーバーがまだ接続されていないためです。
 
-The `system.message` file contains the system prompt that guides the AI agent's behaviour. One of its rules explicitly instructs the model to decline when it lacks the right tool:
+`system.message` ファイルには、AI エージェントの振る舞いを指示する system prompt が入っています。そのルールの 1 つは、適切なツールがない場合に拒否するよう明示的に指示しています。
 
 ----
 # CRITICAL CONSTRAINTS
@@ -345,17 +348,17 @@ The `system.message` file contains the system prompt that guides the AI agent's 
   the capability to retrieve that PDF right now."
 ----
 
-Once you register the tools, the agent will discover and use them automatically.
+ツールを登録すると、エージェントはそれを自動的に見つけて使用します。
 ====
 --
 
 {empty} +
 
-=== Wire in the MCP servers
+=== MCP サーバーを接続する
 
-The project includes MCP servers to provide the necessary tools for the Camel agentic flow — but the agent doesn't know about them yet. You need to wire them in to the agentic flow.
+このプロジェクトには、Camel の agentic flow に必要なツールを提供する MCP サーバーが含まれていますが、エージェントはまだそれを知りません。agentic flow に接続する必要があります。
 
-The diagram below shows how the Agentic Integration (once MCP is active) routes tool calls from the AI model. Two MCP servers provide distinct toolsets — Node.js and Camel Quarkus. When the AI model needs a tool, the Agentic Integration routes the request to the appropriate MCP server, which executes the tool against the backend systems and returns the result.
+下の図は、Agentic Integration（MCP が有効になった後）が AI モデルからのツール呼び出しをどのようにルーティングするかを示しています。2 つの MCP サーバーが、Node.js と Camel Quarkus の異なるツール群を提供します。AI モデルがツールを必要とすると、Agentic Integration は要求を適切な MCP サーバーにルーティングし、そこでバックエンドシステムに対してツールを実行して結果を返します。
 
 [.mermaid]
 ----
@@ -405,33 +408,33 @@ flowchart LR
     style ToolsInner fill:#fce4e4,stroke:#EE0000
 ----
 
-NOTE: The Agentic Integration can work with MCP servers implemented in different languages. This lab includes a Node.js MCP server and a Camel Quarkus MCP server — each providing distinct tools to the AI model.
+NOTE: Agentic Integration は、異なる言語で実装された MCP サーバーと連携できます。このラボには Node.js の MCP サーバーと Camel Quarkus の MCP サーバーが含まれており、それぞれが AI モデルに異なるツールを提供します。
 
 
 [TIP]
 --
-In Camel you don't need MCP servers to define tools. You can define them directly as regular routes that starts with the `langchain4j-tools` component. The route describes what the tool does — the agent discovers it automatically via tags and invokes it when needed.
+MCP サーバーを使わなくても、Camel ではツールを定義できます。`langchain4j-tools` コンポーネントで始まる通常のルートとして直接定義できます。ルートが何をするかを説明すると、エージェントがタグを通じて自動的に見つけ、必要に応じて呼び出します。
 
-For example, this is how you would define a local tool that retrieves the PDF URL for a given policy document:
+たとえば、ある policy document の PDF URL を取得するローカルツールは次のように定義できます。
 
 image::module-03/m4/kaoto-tool-route.png[width=50%]
 
-The route starts with the `langchain4j-tools` source, processes the request through a series of steps, and returns the result to the LLM. No special wiring is needed. Camel uses tags to match agents with tools — when an agent's tag matches a tool's tag, the agent can call that tool.
+ルートは `langchain4j-tools` ソースから始まり、一連のステップでリクエストを処理して、結果を LLM に返します。特別な接続設定は不要です。Camel はタグを使ってエージェントとツールを対応付けます。エージェントのタグがツールのタグと一致すると、そのツールを呼び出せます。
 --
 
 {empty} +
 
-. *Wire in the MCP servers* (Node.js and Camel Quarkus)
+. *MCP サーバーを接続する*（Node.js と Camel Quarkus）
 +
 [loweralpha]
-1. Stop the process running in your terminal with kbd:[CTRL+C].
-1. Open your agent's configuration file file.
+1. ターミナルで実行中のプロセスを kbd:[CTRL+C] で停止します。
+1. エージェントの設定ファイルを開きます。
 +
 &nbsp;&nbsp;📁 lab +
 &nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
 pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties*
 +
-1. Uncomment the properties for the MCP servers. You should see this:
+1. MCP サーバー用のプロパティのコメントを外します。次のようになっているはずです。
 +
 {blank}
 +
@@ -447,7 +450,7 @@ camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>
 +
 {blank}
 +
-1. Now, use the `mcp` script to start the MCP servers, as follows:
+1. 次に、`mcp` スクリプトを使って MCP サーバーを次のように起動します。
 +
 {blank}
 +
@@ -458,7 +461,7 @@ camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>
 +
 {blank}
 +
-You should see the MCP servers starting up in the terminal:
+ターミナルで MCP サーバーの起動が表示されるはずです。
 +
 {blank}
 +
@@ -479,10 +482,10 @@ Camel Main: mcp-camel (state: Starting)
 +
 [TIP]
 --
-.How to monitor the MCP server logs
+.MCP サーバーのログを監視する方法
 [%collapsible]
 ====
-You can follow the logs of either MCP server in real-time by passing its name (`camel` or `node`) to the `logs` command:
+`logs` コマンドにサーバー名（`camel` または `node`）を渡すと、どちらかの MCP サーバーのログをリアルタイムで追跡できます。
 
 {blank}
 
@@ -493,7 +496,7 @@ You can follow the logs of either MCP server in real-time by passing its name (`
 
 {blank}
 
-For example, the Camel MCP server logs show the five routes registered as MCP tools:
+たとえば、Camel MCP サーバーのログには、MCP ツールとして登録された 5 つのルートが表示されます。
 
 {blank}
 
@@ -512,10 +515,10 @@ For example, the Camel MCP server logs show the five routes registered as MCP to
 +
 [TIP]
 --
-.How do I check if the MCP servers are running?
+.MCP サーバーが実行中かどうかを確認するには？
 [%collapsible]
 ====
-You can check the status of the MCP servers at any time by running:
+次のコマンドを実行すれば、いつでも MCP サーバーの状態を確認できます。
 
 {blank}
 
@@ -526,7 +529,7 @@ You can check the status of the MCP servers at any time by running:
 
 {blank}
 
-You should see output similar to:
+次のような出力が表示されるはずです。
 
 {blank}
 
@@ -544,10 +547,9 @@ You should see output similar to:
 +
 {empty} +
 
-. *Restart the Camel agent*
+. *Camel エージェントを再起動する*
 +
-The MCP servers are now running and your agent is configured. +
-Restart it to pick up the new configuration:
+MCP サーバーは起動済みで、エージェントの設定も完了しました。新しい設定を反映するため、再起動します。
 +
 {blank}
 +
@@ -558,23 +560,23 @@ camel run agent
 +
 {empty} +
 
-. *Try it out*
+. *試してみる*
 +
-Go back to _Rocket.Chat_ and ask again:
+_Rocket.Chat_ に戻り、もう一度尋ねます。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Can you show me policy document 61356291
 ****
 +
 [TIP]
 --
-.What if the AI still says it can't help?
+.それでも AI が助けられないと言ったら？
 [%collapsible]
 ====
-The workshop uses a small LLM that can be inconsistent. The system prompt tells it to re-evaluate its tools before responding, but sometimes it replies as if no tools are available, for example:
+このワークショップでは、小さな LLM を使っているため、応答が不安定になることがあります。system prompt では、応答する前にツールを再評価するよう指示していますが、ツールがないかのように返答してしまうことがあります。たとえば、次のようになります。
 
 {blank}
 
@@ -583,26 +585,26 @@ The workshop uses a small LLM that can be inconsistent. The system prompt tells 
 :fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
 include::_figures/rc-interaction.adoc[]
 
-If that happens, try one or both of these options:
+その場合は、次の 1 つまたは両方を試してください。
 
-1. Send a more specific request:
+1. より具体的な要求を送ります。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Please try again using the tool to get policy documents
 ****
 +
-This points the LLM to the right tool, which is usually enough to get it working.
+これにより LLM は正しいツールに向きやすくなり、たいていはこれで動作します。
 +
 {blank}
-2. Stop the process with kbd:[CTRL+C] and restart it. A fresh start gives the LLM a clean tool list.
+2. kbd:[CTRL+C] でプロセスを停止し、再起動します。再起動すると LLM に新しいツール一覧が与えられます。
 
 ====
 --
 +
-If all goes well, this time the LLM discovers the tool, calls it, and responds with the policy document:
+順調にいけば、今度は LLM がツールを見つけて呼び出し、policy document を返します。
 +
 {blank}
 +
@@ -615,11 +617,11 @@ include::_figures/rc-interaction-attach.adoc[]
 +
 {blank}
 +
-The bot identified the right tool, retrieved the policy document, and returned a download link to the support agent. Clicking the link opens the PDF in a new tab.
+ボットは正しいツールを見つけ、policy document を取得し、サポート担当者にダウンロードリンクを返しました。リンクをクリックすると PDF が新しいタブで開きます。
 +
 {blank}
 +
-.See the sample policy document
+.サンプルの policy document を見る
 [%collapsible]
 =====
 {blank}
@@ -629,18 +631,18 @@ include::_figures/invoice-pdf.adoc[]
 
 {empty} +
 
-=== Amend the policy document
+=== policy document を修正する
 
-The ai-bot can do more than just retrieve data — it can act on it. Imagine the customer has changed their mind and wants to remove a coverage item. Ask the AI assistant to amend the policy document:
+ai-bot はデータを取得するだけではありません。データに対して操作することもできます。たとえば、顧客が考えを変えて補償項目を削除したい場合、AI アシスタントに policy document の修正を依頼できます。
 
 {blank}
 
-[.copypaste]
+[.copypaste.value]
 ****
 The customer would like to remove the Roadside Assistance coverage, could you please adjust the policy document?
 ****
 
-The agentic system inspects the policy document, identifies the matching coverage item, triggers the necessary tools to update the database, and responds with a summary of the changes:
+agentic system は policy document を調べ、該当する補償項目を見つけ、必要なツールを起動してデータベースを更新し、変更内容の要約を返します。
 
 {blank}
 
@@ -649,18 +651,18 @@ The agentic system inspects the policy document, identifies the matching coverag
 :fig-bot-msg: The database records have been updated. The Roadside Assistance coverage (Item 4) has been removed, and the summary values have been recalculated. Would you like to see the new policy document?
 include::_figures/rc-interaction.adoc[]
 
-The agentic system acted autonomously — it inspected the policy document, identified the coverage item, updated the record in the database, recalculated the totals, and confirmed the changes. All from a single natural language request.
+agentic system は自律的に動作しました。policy document を確認し、補償項目を特定し、データベースの記録を更新し、合計を再計算し、変更を確認しました。すべて 1 回の自然言語リクエストから行われています。
 
-Notice the bot's response — it may suggest viewing the updated policy document (LLMs are unpredictable, so the exact wording varies). If it does, simply reply `yes`. If it doesn't, ask to see the amended policy document:
+ボットの応答に注目してください。更新された policy document を見るよう提案することがあります（LLM は予測不能なので、文言は変わる場合があります）。その場合は `yes` と返します。そうでなければ、修正後の policy document を見るよう依頼します。
 
 {blank}
 
-[.copypaste]
+[.copypaste.value]
 ****
 Can you show me the updated policy document?
 ****
 
-Either way, the bot responds with the updated PDF link:
+どちらの場合でも、ボットは更新済み PDF のリンクを返します。
 
 {blank}
 
@@ -670,11 +672,11 @@ Either way, the bot responds with the updated PDF link:
 :fig-attach-desc: Click to view or download
 include::_figures/rc-bot-attach.adoc[]
 
-Click the link to open the regenerated policy document.
+リンクをクリックして再生成された policy document を開きます。
 
 {blank}
 
-.See a sample of the amended policy document
+.修正後の policy document のサンプルを見る
 [%collapsible]
 ====
 {blank}
@@ -682,24 +684,24 @@ Click the link to open the regenerated policy document.
 include::_figures/invoice-pdf-amended.adoc[]
 ====
 
-NOTE: Notice the red *Amended* tag in the upper-right corner of the document — this indicates the policy document has been modified from the original.
+NOTE: 文書の右上に赤い *Amended* タグが表示されていることに注目してください。これは policy document が元の内容から変更されていることを示します。
 
-Inspect the document and verify the modifications are correct — the Roadside Assistance coverage (item 4) should be removed, and the totals recalculated accordingly.
+文書を確認し、変更が正しいことを検証してください。Roadside Assistance coverage（item 4）が削除され、合計もそれに応じて再計算されているはずです。
 
 {empty} +
 
-=== Raise a ticket
+=== チケットを起票する
 
-A customer support process rarely ends with a single action. Amending a policy involves multiple departments — confirming the changes, processing any refund, updating the policy records, notifying the customer. Rather than handling each step manually, ask the AI agent to raise a ticket that coordinates everything:
+顧客サポートのプロセスは、1 つのアクションだけで終わることはほとんどありません。policy の修正には複数の部門が関わります。変更内容の確認、返金処理、policy 記録の更新、顧客への通知です。これらを手作業で個別に処理する代わりに、AI エージェントにチケットを起票させ、すべてを調整させます。
 
 {blank}
 
-[.copypaste]
+[.copypaste.value]
 ****
 Could you please raise a ticket? Include the details explained, and ask the right departments to process the policy amendment accordingly.
 ****
 
-The agentic system gathers the context from the conversation, creates a ticket in the HelpDesk system, and responds with a confirmation:
+agentic system は会話の文脈を集め、HelpDesk システムにチケットを作成し、確認メッセージを返します。
 
 {blank}
 
@@ -710,37 +712,37 @@ include::_figures/rc-interaction.adoc[]
 
 {empty} +
 
-IMPORTANT: Before going any further, make sure you have already onboarded to _Matrix_ and accepted the room invitation — the ticket will be shared with the customer there. Remember, _Matrix_ represents the customer side, while _Rocket.Chat_ is where the support agent works. If you haven't done this yet, follow the xref:module-03/m2/m2.1.adoc[Matrix platform onboarding,window=_blank] instructions.
+IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済みで、ルーム招待を受諾していることを確認してください。チケットはそこで顧客と共有されます。_Matrix_ は顧客側を表し、_Rocket.Chat_ はサポート担当者が作業する場所です。まだの場合は、xref:module-03/m2/m2.1.adoc[Matrix プラットフォームのオンボーディング,window=_blank] の手順に従ってください。
 
-The interaction above illustrates a simple request and response — but because LLMs are non-deterministic, the bot may have responded differently. Here's what to expect and how to handle each case:
+上のやり取りは単純なリクエストと応答を示していますが、LLM は非決定的なので、ボットの応答は異なる可能性があります。想定されるケースと対処方法は次のとおりです。
 
-* **The bot asks to share the ticket** (as shown above) — reply with:
+* **ボットがチケット共有を尋ねてくる**（上の例のように） — 次のように返答します。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Yes, please share it with the customer.
 ****
 +
 {blank}
 
-* **The bot doesn't mention sharing at all** — ask it explicitly:
+* **ボットが共有についてまったく触れない** — 明示的に依頼します。
 +
 {blank}
 +
-[.copypaste]
+[.copypaste.value]
 ****
 Could you share the ticket with the customer?
 ****
 +
 {blank}
 +
-* **The bot shares the ticket automatically** without asking — no action needed, skip ahead.
-+
+* **ボットが自動でチケットを共有する** — 操作は不要です。そのまま進みます。
+
 {empty} +
 
-Either way, the final outcome is the same — the bot shares the ticket and the customer receives a link to the HelpDesk system:
+どちらの場合でも最終結果は同じです。ボットがチケットを共有し、顧客は HelpDesk システムへのリンクを受け取ります。
 
 {blank}
 
@@ -749,9 +751,9 @@ Either way, the final outcome is the same — the bot shares the ticket and the 
 :fig-bot-msg: The ticket #1025 has been successfully shared with the customer. They will receive a link to the HelpDesk system.
 include::_figures/rc-interaction.adoc[]
 
-Remember — the customer communicates from the _Matrix_ messaging platform. The bot indicated the ticket was shared, which means the customer should have received a message with the ticket reference. Switch to your _Matrix_ window and check.
+覚えておいてください。顧客は _Matrix_ メッセージングプラットフォームからやり取りします。ボットがチケットを共有したと示したということは、顧客がチケット参照付きのメッセージを受け取っているはずです。_Matrix_ のウィンドウに切り替えて確認してください。
 
-You should see a message like this:
+次のようなメッセージが表示されるはずです。
 
 {blank}
 
@@ -762,28 +764,28 @@ include::_figures/matrix-message.adoc[]
 
 {empty} +
 
-=== Verify the ticket from the customer's perspective
+=== 顧客の視点でチケットを確認する
 
-Now put yourself in the customer's shoes. The customer received a message in _Matrix_ with a link to the _Parasol HelpDesk_ ticketing system. Click the ticket link in the _Matrix_ window.
+今度は顧客の立場になってみましょう。顧客は _Matrix_ で _Parasol HelpDesk_ のチケットシステムへのリンク付きメッセージを受け取りました。_Matrix_ ウィンドウのチケットリンクをクリックします。
 
-A new tab opens with the _Parasol HelpDesk_ login page:
+新しいタブが開き、_Parasol HelpDesk_ のログインページが表示されます。
 
 {blank}
 
 include::_figures/helpdesk-login.adoc[]
 
-Log in using the credentials below:
+以下の資格情報でログインします。
 
 * *Username*:
 +
-[.copypaste]
+[.copypaste.value]
 ****
 {user-username}
 ****
 
 * *Password*:
 +
-[.copypaste]
+[.copypaste.value]
 ****
 [.path]
 /credentials/im
@@ -796,34 +798,34 @@ REPLACE
 
 {empty} +
 
-Once logged in, the _Parasol HelpDesk_ displays the list of open tickets. You should see the ticket the AI agent just created:
+ログインすると、_Parasol HelpDesk_ に開いているチケットの一覧が表示されます。AI エージェントが作成したチケットが見えるはずです。
 
 {blank}
 
 include::_figures/helpdesk-tickets.adoc[]
 
-Click the ticket to inspect its details. The AI agent composed the ticket body from the conversation — it includes a summary of the changes and a link to the updated policy document:
+チケットをクリックして詳細を確認します。AI エージェントは会話内容からチケット本文を作成しており、変更内容の要約と更新済み policy document へのリンクが含まれています。
 
 {blank}
 
 include::_figures/helpdesk-ticket-detail.adoc[]
 
-The full circle is complete: the AI assistant retrieved a policy document, amended it, raised a ticket with all the relevant details, and shared it with the customer across messaging platforms. All from natural conversation.
+これで一連の流れが完了しました。AI アシスタントは policy document を取得し、修正し、関連情報をすべて含んだチケットを起票し、メッセージングプラットフォームを通じて顧客に共有しました。すべて自然な会話から行われています。
+
+終わったら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
 
 {empty} +
 
 [.verification]
 ****
-Can you see the ticket details and the link to the updated policy document in the _Parasol HelpDesk_?
+_Parasol HelpDesk_ でチケットの詳細と更新済み policy document へのリンクを確認できましたか？
 
 [.success]
-Well done — you've built an agentic flow that can retrieve, reason about, and modify data, raise tickets, and coordinate across departments through natural conversation.
+よくできました。データの取得、推論、変更、チケット起票、部門間の調整を自然な会話で行える agentic flow を構築できました。
 
 [.fail]
-Review your steps — make sure the agentic flow has tools enabled (`Tags` = `all`) and the system prompt is active. Check the _Matrix_ window for the correct room.
+手順を見直してください。agentic flow でツールが有効（`Tags` = `all`）になっていることと、system prompt が有効であることを確認します。_Matrix_ ウィンドウで正しいルームを確認してください。
 ****
 
 {empty} +
-
-
 

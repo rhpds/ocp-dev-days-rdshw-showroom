@@ -3,24 +3,24 @@
 include::partial$style.adoc[]
 
 [id='lab3-flow-implementation']
-== Flow Implementation
+== フローの実装
 
-Now that you understand the full ingestion flow, let's build it step by step. Here's the Camel route you'll be working with:
+ここまでで取り込みフロー全体を理解できたので、これから段階的に構築していきましょう。作業する Camel ルートは次のとおりです:
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-service-x12-route.png[width=90%]
 
-Notice that `sql` and `store-pdf-s3` are grayed out — they're disabled in the route. Camel will skip them when running. The idea is to start small: get the first steps working, verify the results, then enable the next ones as you progress.
+`sql` と `store-pdf-s3` がグレー表示になっていることに注目してください。これはルート内で無効化されていることを示しています。Camel は実行時にこれらをスキップします。まずは小さく始めて、最初の手順を動かし、結果を確認し、その後に次の手順を有効にしていく、という進め方です。
 
 {empty} +
 
-=== EDI to XML transformation
+=== EDI から XML への変換
 
-With the active steps (`platform-http` and `transform-x12`), the route receives a policy application in EDI format and returns it as XML:
+有効なステップ (`platform-http` と `transform-x12`) により、このルートは EDI 形式の保険申請を受け取り、XML として返します:
 
-TIP: Hover over the _Policy Application_ and _Policy Document_ nodes in the diagram below to see what the EDI and XML formats look like.
+TIP: 下の図で _Policy Application_ と _Policy Document_ のノードにカーソルを合わせると、EDI と XML の形式を確認できます。
 
 {blank}
 
@@ -129,18 +129,18 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 ++++
 
-Before running the route, let's configure the data mapping so the XML output includes Parasol Insurance as the Insurer.
+ルートを実行する前に、XML 出力に Insurer として Parasol Insurance が含まれるよう、データマッピングを設定しましょう。
 
 {empty} +
 
-=== Explore and modify the data mapping
+=== データマッピングを確認して修正する
 
-The `transform-x12` step uses a Kaoto data mapper to convert EDI fields into XML. Let's open it to see how the mappings work, and configure the Insurer address with Parasol Insurance's details.
+`transform-x12` ステップは、Kaoto のデータマッパーを使って EDI フィールドを XML に変換します。マッピングの仕組みを確認し、Parasol Insurance の情報で Insurer の住所を設定してみましょう。
 
-Switch to the `transform-x12` route:
+`transform-x12` ルートに切り替えます:
 
-. Click the *Routes* dropdown
-. Select `transform-x12`
+. *Routes* のドロップダウンをクリックします
+. `transform-x12` を選択します
 
 {empty} +
 
@@ -164,7 +164,7 @@ kaoto-routes-transform
 
 {empty} +
 
-You should now see the `transform-x12` route:
+次に `transform-x12` ルートが表示されます:
 
 {blank}
 
@@ -183,20 +183,20 @@ kaoto-transform-x12-route
 {x: 77.5, y: 37, size: 1.3}
 ****
 
-Reading left to right, the route:
+左から右へ読むと、このルートは次の処理を行います:
 
 [.indent2]
 --
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `unmarshal` — parses the raw EDI data into a structured format using the X12-850 schema
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `unmarshal` — X12-850 スキーマを使用して、未加工の EDI データを構造化された形式に解析します
 
 {blank}
 
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] — contains the `kaoto-datamapper` step where the EDI-to-XML field mappings are defined
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] — EDI から XML へのフィールドマッピングが定義された `kaoto-datamapper` ステップを含みます
 
 
 {blank}
 
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">3</span>] `get policyid` — (set variable step) obtains the policy number from the resulting XML for use downstream
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">3</span>] `get policyid` — （set variable ステップ）下流で使用するために、生成された XML から保険番号を取得します
 --
 
 // * `unmarshal` — parses the raw EDI data into a structured format using the X12-850 schema
@@ -215,9 +215,9 @@ pass:[<span style="display:inline-flex;align-items:center;justify-content:center
 
 // {empty} +
 
-==== Open and explore the data mapping
+==== データマッピングを開いて確認する
 
-. *Find the data mapping definition as follows:*
+. *次のようにデータマッピング定義を見つけます:*
 +
 [.bordered]
 [#kaoto-datamapper-configure-open]
@@ -240,23 +240,23 @@ kaoto-datamapper-configure-open
 +
 [.indent2]
 --
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] Click the `kaoto-datamapper` step inside the pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] container
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `To do: Update` コンテナー内の `kaoto-datamapper` ステップをクリックします
 
 {blank}
 
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] Click the pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>] button to open the data mapper
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>] ボタンをクリックしてデータマッパーを開きます
 --
 +
 {empty} +
 +
-You should see the mapping with the EDI source fields on the left (X12_850) connected to the XML target fields on the right (PolicyDocument):
+左側に EDI のソースフィールド（X12_850）、右側に XML のターゲットフィールド（PolicyDocument）が接続されたマッピングが表示されます:
 +
 [TIP]
 --
-.Overview of the data mapper UI.
+.データマッパー UI の概要。
 [%collapsible]
 ====
-This is what the data mapper looks like — *Source* on the left (where data comes from) and *Target* on the right (where data is mapped to):
+これがデータマッパーの画面です。左側が *Source*（データの取得元）、右側が *Target*（データの出力先）です:
 
 {blank}
 
@@ -271,58 +271,58 @@ image::module-03/m1/kaoto-datamapper-mappings.png[width=90%]
 +
 {empty} +
 
-. *Explore the mappings*
+. *マッピングを確認する*
 +
-On the right side (Target), find near the top the *Insurer > Address* section. Each address field is mapped using XPath expressions that extract values from the original EDI data.
+右側（Target）で、上部付近にある *Insurer > Address* セクションを見つけます。各住所フィールドは、元の EDI データから値を抽出する XPath 式を使ってマッピングされています。
 +
 {empty} +
 
-. *Configure the Insurer information*
+. *Insurer 情報を設定する*
 +
-Let's redefine the mapped fields with Parasol's hardcoded details. Replace the following fields in the *Target* with hardcoded values:
+ここでは、マッピングされたフィールドを Parasol の固定値で再定義します。以下のフィールドを *Target* で固定値に置き換えてください:
 +
 --
-... `Name` — the insurer's name
+... `Name` — 保険会社名
 +
-[.copypaste]
+[.copypaste.value]
 ****
 "Parasol Insurance"
 ****
 +
-... `Street` — street address +
+... `Street` — 住所
 +
-[.copypaste]
+[.copypaste.value]
 ****
 "One Parasol Plaza"
 ****
 +
-... `City` +
+... `City`
 +
-[.copypaste]
+[.copypaste.value]
 ****
 "Atlanta"
 ****
 +
-... `State` +
+... `State`
 +
-[.copypaste]
+[.copypaste.value]
 ****
 "GA"
 ****
 +
 ... `PostalCode`
 +
-[.copypaste]
+[.copypaste.value]
 ****
 "30313"
 ****
 +
-IMPORTANT: String values must be wrapped in double quotes (e.g. `"Atlanta"`). Without quotes, the data mapper treats the value as an XPath expression instead of a literal string.
+IMPORTANT: 文字列値は二重引用符で囲む必要があります（例: `"Atlanta"`）。引用符がない場合、データマッパーはその値をリテラル文字列ではなく XPath 式として扱います。
 --
 +
 {blank}
 +
-Your data mapper should now show Parasol Insurance's hardcoded values in the Insurer fields:
+これでデータマッパーには、Insurer フィールドに Parasol Insurance の固定値が表示されるはずです:
 +
 {blank}
 +
@@ -331,15 +331,15 @@ image::module-03/m1/kaoto-datamapper-personalized.png[width=90%]
 +
 {empty} +
 +
-To return to the canvas, click the *Design* tab:
+キャンバスに戻るには、*Design* タブをクリックします:
 +
 image::module-03/common/kaoto-design-tab.png[width=50%]
 +
 {empty} +
 
-. *Run the route and test*
+. *ルートを実行してテストする*
 +
-In the VS Code terminal inside Dev Spaces, run the route:
+Dev Spaces の VS Code ターミナルで、次のコマンドを実行します:
 +
 {blank}
 +
@@ -350,23 +350,23 @@ camel run * --dev
 +
 [TIP]
 --
-.What does this command do?
+.このコマンドは何をするのですか?
 [%collapsible]
 ====
-* `camel run` — runs a Camel integration using JBang
-* `*` — includes all source files in the current directory (routes, properties, supporting code)
-* `--dev` — enables dev mode: Camel watches for file changes and reloads the route automatically
+* `camel run` — JBang を使って Camel インテグレーションを実行します
+* `*` — 現在のディレクトリ内のすべてのソースファイル（ルート、プロパティ、補助コード）を含めます
+* `--dev` — 開発モードを有効にします。Camel がファイル変更を監視し、ルートを自動的に再読み込みします
 ====
 --
 +
-DevSpaces will detect that port 8080 is open and show a notification — click *Open In New Tab* to open the embedded Test Portal in your browser.
+DevSpaces は 8080 ポートが開いていることを検知し、通知を表示します。ブラウザーで埋め込みの Test Portal を開くには、*Open In New Tab* をクリックします。
 +
 {blank}
 +
 [.bordered]
 image::module-03/m1/devspaces-port-notification.png[width=50%]
 +
-In the Test Portal:
+Test Portal では:
 +
 {blank}
 +
@@ -388,12 +388,12 @@ testshop-order
 {blank}
 +
 --
-. Select a coverage — note the total amount
-. Expand *EDI X12 850 Preview* to peek at the raw EDI message — no need to fully understand it, but you may spot the coverage name, quantity, and total amount in the data
-. Click *Submit Application* — the portal sends the Policy Application to your Camel route
+. 料金プランを選択します。合計金額に注目してください
+. *EDI X12 850 Preview* を展開して生の EDI メッセージを確認します。完全に理解する必要はありませんが、データ内に料金プラン名、数量、合計金額が見えるはずです
+. *Submit Application* をクリックします。ポータルが Policy Application を Camel ルートに送信します
 --
 +
-Once processed, Camel returns the transformed XML and the Test Portal displays it. Notice the Insurer now shows Parasol Insurance's hardcoded details — not the original EDI data:
+処理が完了すると、Camel が変換後の XML を返し、Test Portal に表示されます。Insurer が元の EDI データではなく、Parasol Insurance の固定値になっていることに注目してください:
 +
 {blank}
 +
@@ -411,7 +411,7 @@ Once processed, Camel returns the transformed XML and the Test Portal displays i
 &lt;/<span style="color:#555">Insurer</span>&gt;</pre>
 ++++
 +
-Now click *Check Database* — since the `sql` step is still disabled in the route, the policy data was never stored. You should see:
+今度は *Check Database* をクリックします。`sql` ステップはまだルートで無効になっているため、保険データは保存されていません。次のように表示されるはずです:
 +
 {blank}
 +
@@ -423,32 +423,32 @@ Now click *Check Database* — since the `sql` step is still disabled in the rou
   <span style="display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 20px; white-space: nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> No record found (Policy Document 19462522)</span>
 </div>
 ++++
-+
-This is expected — you'll enable the database step next.
+
+これは想定どおりです。次にデータベースのステップを有効にします。
 
 {empty} +
 
-=== Enable the SQL step
+=== SQL ステップを有効にする
 
-With the transformation working, it's time to enable the next step in the route — persisting the policy data to the database.
+変換が動作したので、次はルートの次のステップ、つまり保険データをデータベースに永続化する処理を有効にします。
 
-Ensure you are in the *Design* view:
+*Design* ビューにいることを確認してください:
 
 image::module-03/common/kaoto-design-tab.png[width=50%]
 
 {empty} +
 
-. *Switch back to the main flow*
+. *メインフローに戻る*
 +
-Select pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] from the *Routes* dropdown.
+*Routes* のドロップダウンから pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] を選択します。
 +
 {empty} +
 
-. *Enable the `sql` step*
+. `sql` ステップを有効にする
 +
 --
-. Hover over the `sql` step — a toolbar appears above it
-. Click the *Enable step* button (the tick icon)
+. `sql` ステップにカーソルを合わせます。上にツールバーが表示されます
+. *Enable step* ボタン（チェックアイコン）をクリックします
 
 {empty} +
 
@@ -469,20 +469,20 @@ kaoto-enable-step
 {x: 60, y: -18, size: 2.5}
 ****
 
-Since Camel is running in `--dev` mode, the route will reload automatically with the new step active.
+Camel は `--dev` モードで実行されているため、新しいステップが有効になった状態でルートが自動的に再読み込みされます。
 --
 +
 {empty} +
 
-. *Place a new order*
+. *新しい注文を出す*
 +
-Go back to the Test Portal and submit a new policy application. The route will now transform the EDI and insert the data into the database.
+Test Portal に戻り、新しい保険申請を送信します。これでルートは EDI を変換し、データベースにデータを挿入します。
 +
 {empty} +
 
-. *Check the database*
+. *データベースを確認する*
 +
-This time, click *Check Database* — the policy data should now be stored:
+今度は *Check Database* をクリックします。保険データが保存されているはずです:
 +
 {blank}
 +
@@ -497,19 +497,19 @@ This time, click *Check Database* — the policy data should now be stored:
 
 {empty} +
 
-=== Enable the S3 storage step
+=== S3 ストレージのステップを有効にする
 
-The last step in the route generates a PDF policy document from the XML and uploads it to S3 object storage.
+ルートの最後のステップでは、XML から PDF の保険証書を生成し、それを S3 オブジェクトストレージにアップロードします。
 
 {empty} +
 
-. *Enable the `store-pdf-s3` step*
+. `store-pdf-s3` ステップを有効にする
 +
-Same as before — hover over the `store-pdf-s3` step and click the *Enable step* button (the tick icon). The route will reload automatically.
+これまでと同じです。`store-pdf-s3` ステップにカーソルを合わせ、*Enable step* ボタン（チェックアイコン）をクリックします。ルートは自動的に再読み込みされます。
 +
 {empty} +
 +
-With all steps enabled, the full ingestion flow is now active:
+すべてのステップが有効になると、完全な取り込みフローが稼働します:
 +
 {blank}
 +
@@ -518,10 +518,10 @@ image::module-03/m1/kaoto-service-x12-all-enabled.png[width=90%]
 +
 [TIP]
 --
-.What does `store-pdf-s3` do?
+.`store-pdf-s3` は何をしますか?
 [%collapsible]
 ====
-Select it from the *Routes* dropdown to see its sub-route — it applies an XSLT template to produce a PDF from the XML policy document, uploads it to S3 object storage, and returns a presigned link to the document.
+* *Routes* のドロップダウンから選択すると、そのサブルートを確認できます。XML の保険証書から PDF を生成するために XSLT テンプレートを適用し、S3 オブジェクトストレージにアップロードして、文書への presigned リンクを返します。
 
 [.bordered]
 image::module-03/m1/kaoto-store-pdf-s3-route.png[width=90%]
@@ -530,9 +530,9 @@ image::module-03/m1/kaoto-store-pdf-s3-route.png[width=90%]
 +
 {empty} +
 
-. *Place a new order*
+. *新しい注文を出す*
 +
-Go back to the Test Portal and submit another policy application. This time, the full flow runs — transformation, database insert, PDF generation, and S3 upload. The Test Portal will display a confirmation with a link to the generated policy document:
+Test Portal に戻り、別の保険申請を送信します。今回は変換、データベースへの挿入、PDF 生成、S3 アップロードまでの一連の流れが実行されます。Test Portal には、生成された保険証書へのリンク付きの確認画面が表示されます:
 +
 {blank}
 +
@@ -562,13 +562,13 @@ Go back to the Test Portal and submit another policy application. This time, the
   </div>
 </div>
 ++++
-+
+
 {empty} +
-+
-Click *View Policy Document (PDF)* to open it in your browser. The Insurer section should display Parasol Insurance's details:
-+
+
+*View Policy Document (PDF)* をクリックしてブラウザーで開きます。Insurer セクションには Parasol Insurance の情報が表示されるはずです:
+
 {blank}
-+
+
 ++++
 <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px 28px; max-width: 380px; font-family: sans-serif; color: #222; line-height: 1.6">
   <div style="display: flex; align-items: center; margin-bottom: 8px; margin-left: 38px">
@@ -585,17 +585,17 @@ Click *View Policy Document (PDF)* to open it in your browser. The Insurer secti
 
 {empty} +
 
-When you're done, press kbd:[Ctrl+C] in the terminal to stop Camel.
+終わったら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
 
 {empty} +
 
 [.verification]
 ****
-Does the Insurer section show Parasol Insurance?
+Insurer セクションに Parasol Insurance は表示されていますか?
 
 [.success]
-The full ingestion flow is working — EDI transformation, database storage, and PDF generation are all connected. You're ready to deploy.
+完全な取り込みフローが動作しています。EDI 変換、データベース保存、PDF 生成のすべてが接続されています。これでデプロイの準備が整いました。
 
 [.fail]
-Review the data mapper values and make sure Camel reloaded after saving. Try sending the request again.
+データマッパーの値を見直し、保存後に Camel が再読み込みされたことを確認してください。もう一度リクエストを送信してみてください。
 ****

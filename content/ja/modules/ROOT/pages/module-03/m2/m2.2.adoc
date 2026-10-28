@@ -7,39 +7,39 @@ include::partial$style.adoc[]
 
 {empty} +
 
-=== Join your Rocket.Chat room.
+=== Rocket.Chat のルームに参加する
 
 {blank}
 
-. Open _Rocket.Chat's_  web client:
+. _Rocket.Chat_ の Web クライアントを開きます。
 +
-Click on the link below to open the Login page in _Rocket.Chat_ (opens a new tab).
+下のリンクをクリックして、_Rocket.Chat_ のログインページを開きます（新しいタブで開きます）。
 +
 --
-- link:{url-rocketchat}[Rocket.Chat Login page,window="_blank"]
+- link:{url-rocketchat}[Rocket.Chat ログインページ,window="_blank"]
 --
 +
 {empty} +
 
-. You will be prompted to enter your credentials, as shown below:
+. 以下のように、認証情報の入力が求められます。
 +
 image::module-03/m2/rchat-login-credentials.png[width=50%]
 +
 {blank}
 +
 ====
-. Enter the following:
+. 次の情報を入力します。
 +
-* **Email or username**
+* **メールアドレスまたはユーザー名**
 +
-[.copypaste]
+[.copypaste.value]
 ****
 {user-username}
 ****
 +
-* **Password**
+* **パスワード**
 +
-[.copypaste]
+[.copypaste.value]
 ****
 [.path]
 /credentials/im
@@ -52,12 +52,12 @@ REPLACE
 +
 {empty} +
 +
-. Then, click **_"Login"_**
+. 次に、**_「Login」_** をクリックします。
 ====
 +
 {empty} +
 
-. When you log in, you'll see your home page in _Rocket.Chat_, and your room listed in the left panel of your screen, as shown below:
+. ログインすると、_Rocket.Chat_ のホームページが表示され、画面左側のパネルにルームが一覧表示されます。以下のようになります。
 +
 image::module-03/m2/rchat-room.png[width=60%]
 
@@ -65,7 +65,7 @@ image::module-03/m2/rchat-room.png[width=60%]
 
 [.verification]
 ****
-Were you able to join the _Rocket.Chat_ room successfully?
+_Rocket.Chat_ のルームに正常に参加できましたか？
 ****
 
 {empty} +

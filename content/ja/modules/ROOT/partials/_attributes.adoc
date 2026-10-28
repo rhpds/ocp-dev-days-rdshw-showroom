@@ -10,6 +10,8 @@
 :rhdh_url: https://backstage-developer-hub-rhdh.{openshift_cluster_ingress_domain}
 :argocd_url: https://openshift-gitops-server-openshift-gitops.{openshift_cluster_ingress_domain}
 :sonarqube_url: https://sonarqube-sonarqube.{openshift_cluster_ingress_domain}
+:acs_url: https://central-rhacs.{openshift_cluster_ingress_domain}
+:tpa_url: https://tpa.{openshift_cluster_ingress_domain}
 
 // User credentials
 :user: {user}

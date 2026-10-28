@@ -78,10 +78,10 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // Copy textarea content to clipboard
-  function cpCopy(btn, wrapper, textarea, index) {
+  function cpCopy(btn, wrapper, textarea, index, noNewline) {
     textarea.select();
     var text = textarea.textContent;
-    navigator.clipboard.writeText(text + '\n')
+    navigator.clipboard.writeText(text + (noNewline ? '' : '\n'))
       .then(function() { console.log('Copied to clipboard'); })
       .catch(function(err) { console.error('Failed to copy:', err); });
     cpMarkDone(wrapper, textarea, index);
@@ -154,7 +154,8 @@ window.addEventListener('DOMContentLoaded', function() {
     btn.className = 'cp-tooltip';
     btn.style.cssText = 'border: none; background-color: white; padding: 5px 15px; border-bottom: 1px solid transparent; transition: border-bottom-color 0.2s; cursor: pointer;';
     btn.innerHTML = copySvg + '<span class="cp-tooltiptext">Copy to clipboard</span>';
-    btn.addEventListener('click', function() { cpCopy(this, wrapper, textarea, index); });
+    var noNewline = sb.classList.contains('value');
+    btn.addEventListener('click', function() { cpCopy(this, wrapper, textarea, index, noNewline); });
 
     wrapper.appendChild(textarea);
     wrapper.appendChild(btn);

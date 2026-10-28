@@ -5,23 +5,23 @@ include::partial$style.adoc[]
 [id='lab4-ai-customer-support']
 == Lab 4 - AI Customer Support
 
-Use an AI agent to orchestrate backend actions based on natural language chat — powered by Agentic Apache Camel and Model-as-a-Service (MaaS).
+自然言語チャットに基づいてバックエンドのアクションをオーケストレーションするために AI エージェントを使用します — Agentic Apache Camel と Model-as-a-Service (MaaS) を活用しています。
 
 {empty} +
 
-*The Business Need*
+*ビジネス上の必要性*
 
-When a customer reaches out about a policy application — whether to update details, change coverage, or resolve a discrepancy — support agents traditionally have to manually navigate multiple backend databases and file systems to address the request. This is slow, error-prone, and frustrating for both agents and customers. They need a faster, frictionless way to handle these cases.
-
-{empty} +
-
-*The Technical Solution*
-
-Support agents interact with an AI bot directly within their Rocket.Chat window using natural language. Powered by Agentic Apache Camel and Model-as-a-Service (MaaS), the AI acts as a smart assistant — it interprets the agent's request, autonomously decides which tools to call, updates the database, and regenerates the corrected policy document in S3 storage. This dramatically reduces resolution time and eliminates manual "swivel-chair" tasks for support teams.
+お客様がポリシー申請について問い合わせてきたとき — 詳細の更新、補償範囲の変更、差異の解消など、内容はさまざまですが — 従来、サポート担当者は複数のバックエンドデータベースやファイルシステムを手作業で行き来して依頼に対応する必要がありました。これは遅く、ミスが起こりやすく、担当者にとってもお客様にとっても負担です。これらのケースを、もっと速く、摩擦なく処理できる方法が必要です。
 
 {empty} +
 
-*How it works*
+*技術的な解決策*
+
+サポート担当者は、Rocket.Chat のウィンドウ内で自然言語を使い、AI ボットと直接やり取りします。Agentic Apache Camel と Model-as-a-Service (MaaS) により、この AI は賢いアシスタントとして機能し、担当者の依頼を解釈し、呼び出すべきツールを自律的に判断し、データベースを更新し、S3 ストレージ内の修正済みポリシードキュメントを再生成します。これにより解決時間が大幅に短縮され、サポートチームの手作業による「スイベルチェア」業務がなくなります。
+
+{empty} +
+
+*仕組み*
 
 [.mermaid]
 ----
@@ -69,20 +69,20 @@ flowchart LR
 ----
 
 
-The AI agent follows a reasoning loop — it consults the LLM via MaaS, which decides what actions to take. Camel then executes the appropriate tools via *MCP* (update the database, regenerate a PDF policy document in S3), feeds the results back to the LLM, and returns the final answer to the support agent in Rocket.Chat.
+AI エージェントは推論ループに従います — MaaS を介して LLM に相談し、そこでどのアクションを取るかを決定します。次に Camel が *MCP* を通じて適切なツールを実行し（データベースの更新、S3 内の PDF ポリシードキュメントの再生成）、結果を LLM にフィードバックし、最終回答を Rocket.Chat のサポート担当者に返します。
 
 [NOTE]
 ====
-*What is MCP?* The Model Context Protocol (MCP) is an open standard that lets AI agents interact with external systems — databases, APIs, file storage, and more — using a consistent set of tools. In this lab, Apache Camel implements an MCP server that exposes backend actions (e.g. update database, upload to S3) as callable tools. The AI model decides which tools to invoke based on the user's natural language request.
+*MCP とは何ですか?* Model Context Protocol (MCP) は、AI エージェントがデータベース、API、ファイルストレージなどの外部システムと、一貫したツールセットを使って連携できるようにするオープン標準です。このラボでは、Apache Camel が MCP サーバーを実装し、バックエンドのアクション（例: データベースの更新、S3 へのアップロード）を呼び出し可能なツールとして公開します。AI モデルは、ユーザーの自然言語リクエストに基づいて、どのツールを呼び出すかを決定します。
 ====
 
 {empty} +
 
-*What you will do in this lab:*
+*このラボで行うこと:*
 
-. *Set up the environment* — Prepare the working folder and configure the AI agent.
-. *Develop the Agent* — Progressively enable the AI agent, from basic routes to fully-equipped with tools.
-. *Complete the flow* — Finish the integration that links Rocket.Chat, the AI agent, the database, and S3 storage.
-. *Test the flow* — Simulate a customer/agent interaction and validate the results.
+. *環境をセットアップする* — 作業フォルダーを準備し、AI エージェントを設定します。
+. *エージェントを開発する* — 基本ルートから、ツールを備えた完全な構成まで、AI エージェントを段階的に有効化します。
+. *フローを完成させる* — Rocket.Chat、AI エージェント、データベース、S3 ストレージを結ぶ統合を仕上げます。
+. *フローをテストする* — お客様/担当者のやり取りをシミュレーションし、結果を検証します。
 
 {empty} +

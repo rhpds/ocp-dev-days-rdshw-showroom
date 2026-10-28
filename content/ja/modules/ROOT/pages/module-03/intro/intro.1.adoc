@@ -3,18 +3,18 @@
 include::partial$style.adoc[]
 
 [id="workshop-journey"]
-== The Workshop Journey
+== ワークショップの流れ
 
-You'll play the role of an integration developer at Parasol Insurance. Through the workshop labs you will build the integrations that ingest policy applications, bridge messaging systems for customer support, plug in AI to help agents resolve issues, and add governance on top, all with application integration and connectivity tools.
+あなたは Parasol Insurance の統合開発者という役割を担います。ワークショップのラボを通して、保険契約申込を取り込み、メッセージングシステムを連携して顧客サポートを支え、AI を組み込んで担当者の問題解決を支援し、その上にガバナンスを追加する統合を構築します。すべてをアプリケーション統合と接続ツールで実現します。
 
 [TIP]
 --
-.Expand the instructions to full screen
+.手順を全画面に拡大する
 [%collapsible]
 ====
-For this module we recommend you expand the instructions frame to full screen. You can do so as follows:
+このモジュールでは、手順フレームを全画面に拡大することを推奨します。次のように操作できます。
 
-. Click the panel handle on the right edge
+. 右端のパネルハンドルをクリックする
 +
 [.bordered]
 [#showroom-expand-btn]
@@ -34,7 +34,7 @@ showroom-expand-btn
 +
 {blank}
 
-. Select the *Instructions* option
+. *Instructions* オプションを選択する
 +
 image::module-03/intro/showroom-expand-options.png[width=50%]
 ====
@@ -43,38 +43,45 @@ image::module-03/intro/showroom-expand-options.png[width=50%]
 
 {empty} +
 
-=== Application Connectivity Meets AI
+=== アプリケーション接続と AI の融合
 
-Integration and AI used to be separate concerns. You had your data flows on one side and your AI models on the other. That's changing. In this workshop they come together in a single platform.
+かつて、統合と AI は別々の関心事でした。片側にデータフローがあり、もう片側に AI モデルがある、という形です。しかし、その状況は変わりつつあります。このワークショップでは、両者が 1 つのプラットフォームに集約されます。
 
-An integration engine handles the data flows: moving data between systems, applying transformations, and orchestrating multi-step processes. A connectivity layer provides secure access to databases that live outside your cluster. An event broker decouples messaging platforms into an event-driven architecture. An AI service puts a large language model at the disposal of your agentic integration flows. And a gateway sits in front of the LLM to enforce authentication and rate-limit token consumption.
+統合エンジンはデータフローを担います。システム間でデータを移動し、変換を適用し、複数ステップの処理をオーケストレーションします。接続レイヤーは、クラスター外に存在するデータベースへの安全なアクセスを提供します。イベントブローカーは、メッセージングプラットフォームをイベント駆動アーキテクチャへと切り離します。AI サービスは、エージェント的な統合フローが利用できるよう、大規模言語モデルを提供します。そしてゲートウェイは LLM の前面に配置され、認証とトークン消費のレート制限を強制します。
 
-You will work with all of these as you progress through the labs.
-
-{empty} +
-
-=== The Business Scenario
-
-Your company is Parasol Insurance. Customers submit policy applications; the system ingests them, transforms the data, stores it in a database, and generates policy documents. When a customer spots a problem with their policy, they contact support through an instant messaging platform. A human support agent investigates, fixes the issue, and regenerates the policy document.
-
-The challenge: the systems involved don't talk to each other. The database sits on separate infrastructure. The messaging platforms are disconnected. The support team handles every step manually, jumping between systems to fix issues. There's no AI in the loop, and no controls around AI even if there were.
-
-Each lab in this workshop tackles one of those gaps.
+ラボを進めるにつれて、これらすべてを扱います。
 
 {empty} +
 
-=== What You Will Build
+=== ビジネスシナリオ
 
-The labs follow a story. Each phase solves a problem that sets up the next one.
+あなたの会社は Parasol Insurance です。顧客は保険契約申込を提出し、システムはそれを取り込み、データを変換してデータベースに保存し、保険契約書を生成します。顧客が自分の保険契約に問題を見つけると、インスタントメッセージングプラットフォームを通じてサポートに連絡します。人間のサポート担当者が調査し、問題を修正し、保険契約書を再生成します。
+
+課題は、関係するシステム同士が連携していないことです。データベースは別のインフラ上にあります。メッセージングプラットフォーム同士は分断されています。サポートチームは、問題を修正するためにシステム間を行き来しながら、すべての手順を手作業で処理しています。AI はフローに組み込まれておらず、仮にあったとしても AI を制御する仕組みがありません。
+
+このワークショップの各ラボは、これらのギャップの 1 つを解決します。
+
+{empty} +
+
+=== 何を構築するか
+
+ラボは 1 つの物語として進みます。各フェーズが次のフェーズの土台となる問題を解決します。
 
 {blank}
 
 [#journey-diagram.mermaid]
 ----
 flowchart LR
-    A["Ingest policy\napplications"] -->|"customer spots\na problem"| B["Multi-channel\ncommunication"]
-    B -->|"agent needs\nhelp resolving"| C["AI-assisted\nsupport"]
-    C -->|"AI usage must\nbe controlled"| D["Govern AI\nconsumption"]
+    A["保険契約申込を
+取り込む"] -->|"顧客が
+問題を見つける"| B["マルチチャネル
+コミュニケーション"]
+    B -->|"担当者が
+解決支援を必要とする"| C["AI 支援の
+サポート"]
+    C -->|"AI の利用は
+制御する必要がある"| D["AI 消費を
+ガバナンスする"]
 
     style A fill:#e8f5e9,stroke:#66bb6a,color:#000
     style B fill:#e3f2fd,stroke:#42a5f5,color:#000
@@ -96,21 +103,21 @@ journey-diagram
 
 [.mermaid-hints-simple]
 ****
-A | ① Secure Data Ingestion | The customer portal sends policy applications in EDI format. A Camel flow transforms the EDI into XML and stores the data in a backend database. The database lives on separate infrastructure, so Service Interconnect provides a secure link without exposing anything to the public network. The flow also renders PDF policy documents and pushes them to S3 storage. +
-B | ② Multi-Channel Communication | A customer reviews their policy document and spots a mistake. They reach out to support, but customer and support team use different messaging platforms. +
-You connect both so that messages from one show up in the other. Agents can respond from their own portal without caring which platform the customer is on. +
-C | ③ AI-assisted Issue Resolution | The support agent needs to look up the policy, fix it in the database, and regenerate the policy document. Instead of doing it manually, the agent talks to an AI bot right inside their messaging portal. +
-The integration layer sends the request to an LLM, which decides what to do (query the database, update the record, regenerate the PDF) and reports back. The whole thing happens using natural language. +
-D | ④ Governing AI Consumption | Once AI is part of the workflow, you need controls. Who can call the LLM? How many tokens can it consume? +
-A gateway sits in front of the AI service and enforces authentication and token-based rate limits. Multiple tiers of service, each with its own token budget. When one tier runs out, the system falls back to the next.
+A | ① 安全なデータ取り込み | 顧客ポータルが EDI 形式で保険契約申込を送信します。Camel フローが EDI を XML に変換し、バックエンドデータベースに保存します。データベースは別のインフラ上にあるため、Service Interconnect が公開ネットワークに何も露出させずに安全なリンクを提供します。フローは PDF の保険契約書も生成し、S3 ストレージに送信します。 +
+B | ② マルチチャネル通信 | 顧客が保険契約書を確認し、誤りを見つけます。サポートに連絡しますが、顧客とサポートチームは異なるメッセージングプラットフォームを使っています。 +
+一方のメッセージがもう一方にも表示されるよう、両者を接続します。担当者は、顧客がどのプラットフォームを使っているかを気にせず、自分のポータルから応答できます。 +
+C | ③ AI 支援による問題解決 | サポート担当者は保険契約を参照し、データベースで修正し、保険契約書を再生成する必要があります。手作業で行う代わりに、担当者は自分のメッセージングポータル内で AI ボットとやり取りします。 +
+統合レイヤーは要求を LLM に送信し、LLM は何をするか（データベースの照会、レコードの更新、PDF の再生成）を判断して結果を返します。すべては自然言語で進みます。 +
+D | ④ AI 消費のガバナンス | AI がワークフローの一部になったら、制御が必要です。誰が LLM を呼び出せるのか。どれだけのトークンを消費できるのか。 +
+ゲートウェイは AI サービスの前面に配置され、認証とトークンベースのレート制限を強制します。各サービス階層にはそれぞれ独自のトークン予算があります。ある階層が使い切ると、システムは次の階層にフォールバックします。
 ****
-TIP: Hover over each phase in the diagram to learn more.
+TIP: 図の各フェーズにカーソルを合わせると、詳細を確認できます。
 
 {empty} +
 
-=== The Big Picture
+=== 全体像
 
-The diagram below shows a very high-level view of the architecture, with the different components and how they interact with each other.
+以下の図は、アーキテクチャの非常に高いレベルの全体像を示し、各コンポーネントとそれらがどのように相互作用するかを表しています。
 
 {empty} +
 
@@ -121,7 +128,7 @@ flowchart LR
     chatInner ~~~ Customer
     chatInner ~~~ SupportAgent
 
-    Customer --> Portal -->|"EDI message"| Camel
+    Customer --> Portal -->|"EDI メッセージ"| Camel
 
     Camel --> ServiceInterconnect{{"Service\nInterconnect"}} --> Database
 
@@ -132,7 +139,7 @@ flowchart LR
     AgenticCamel --- spacer1[" "] --> Storage
     AgenticCamel --> ServiceInterconnect
 
-    subgraph chatOuter ["Customer Support Platform"]
+    subgraph chatOuter ["顧客サポートプラットフォーム"]
         subgraph chatInner [" "]
         direction LR
         ChatCustomer --- |Camel| Kafka --- |Camel| ChatAgent
@@ -175,31 +182,30 @@ flowchart LR
     style ConnectivityLink fill:none,stroke:none
 ----
 
-NOTE: Each lab includes its own detailed architecture diagram at a more granular level. This one just shows how the pieces fit together end to end.
+NOTE: 各ラボには、それぞれより詳細なアーキテクチャ図があります。この図は、各要素がエンドツーエンドでどのように組み合わさるかを示しているだけです。
 
 {empty} +
 
-=== Full Technology Stack
+=== 技術スタック全体
 
-Below is the stack of technologies you will interact with along the workshop. Combined, they unlock the potential for agile, scalable integration solutions, enabling seamless orchestration of containerized workflows, resilient data persistence across pipelines, and rapid deployment of event-driven microservices to modernize hybrid cloud architectures with minimal complexity.
+以下は、ワークショップを通じて扱う技術スタックです。これらを組み合わせることで、機敏でスケーラブルな統合ソリューションの可能性が広がり、コンテナ化されたワークフローのシームレスなオーケストレーション、パイプライン全体にわたる堅牢なデータ永続化、イベント駆動型マイクロサービスの迅速なデプロイが可能になり、ハイブリッドクラウドアーキテクチャを最小限の複雑さで近代化できます。
 
-* https://www.redhat.com/en/products/application-foundations[Red Hat Application Foundations,window=_blank]: A set of components engineered to help build, deploy, and operate applications. Among others, it includes the products below you will use in the workshop:
+* https://www.redhat.com/en/products/application-foundations[Red Hat Application Foundations,window=_blank]: アプリケーションの構築、デプロイ、運用を支援するよう設計されたコンポーネント群です。中でも、以下の製品をワークショップで使用します。
 
-** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: A versatile toolkit for streamlined application integration that simplifies and standardizes the practices of connecting diverse systems that runs in both Quarkus and Spring Boot runtimes.
+** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: Quarkus と Spring Boot の両方で動作し、多様なシステムの接続手法を簡素化・標準化する、効率的なアプリケーション統合のための多用途ツールキットです。
 
-** https://developers.redhat.com/products/streams-for-apache-kafka[Red Hat Streams for Apache Kafka,window=_blank]: Based on the Apache Kafka project, streams for Apache Kafka offers a distributed backbone that allows microservices and other applications to share data with extremely high throughput and extremely low latency.
+** https://developers.redhat.com/products/streams-for-apache-kafka[Red Hat Streams for Apache Kafka,window=_blank]: Apache Kafka プロジェクトを基盤とし、非常に高いスループットと非常に低いレイテンシーで、マイクロサービスやその他のアプリケーションがデータを共有できる分散基盤を提供します。
 +
 {blank}
 
-* https://developers.redhat.com/products/openshift-dev-spaces[Red Hat OpenShift Dev Spaces,window=_blank]: A collaborative Kubernetes-native development solution that delivers OpenShift workspaces and in-browser IDE for rapid cloud application development.
+* https://developers.redhat.com/products/openshift-dev-spaces[Red Hat OpenShift Dev Spaces,window=_blank]: OpenShift ワークスペースとブラウザ内 IDE を提供し、クラウドアプリケーションを迅速に開発できる、共同作業向けの Kubernetes ネイティブ開発ソリューションです。
 
-* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: A unified application development platform that lets you build, modernize, and deploy applications at scale on your choice of hybrid cloud infrastructure.
+* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: お好みのハイブリッドクラウドインフラ上で、アプリケーションを大規模に構築・モダナイズ・デプロイできる統合アプリケーション開発プラットフォームです。
 
-* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Persistent software-defined storage and essential data services integrated with and optimized for Red Hat OpenShift.
+* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Red Hat OpenShift と統合され、最適化された、永続的なソフトウェア定義ストレージと必要不可欠なデータサービスです。
 
-* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: A secure and scalable solution for connecting applications across network boundaries, enabling seamless communication between services running in different environments.
+* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: ネットワーク境界をまたいでアプリケーションを接続するための、安全でスケーラブルなソリューションです。異なる環境で動作するサービス間のシームレスな通信を可能にします。
 
-* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: A secure connectivity solution that allows applications running in OpenShift to access databases and other services that reside outside the cluster without exposing them to the public network.
+* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: OpenShift 上で動作するアプリケーションが、クラスターの外部に存在するデータベースやその他のサービスへ、公開ネットワークに露出させることなく安全にアクセスできるようにする接続ソリューションです。
 
 {empty} +
-

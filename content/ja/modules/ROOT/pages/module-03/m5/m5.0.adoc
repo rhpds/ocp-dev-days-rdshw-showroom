@@ -5,18 +5,18 @@ include::partial$style.adoc[]
 [id='lab5-govern-ai-consumption']
 == Lab 5 - LLM Governance
 
-Place a governance layer in front of the LLM endpoint using Connectivity Link. Enforce API key authentication and token-based rate limits across multiple service tiers.
+Connectivity Link を使用して、LLM エンドポイントの前にガバナンス層を配置します。複数のサービスティアにわたって、API キー認証とトークンベースのレート制限を適用します。
 
 {empty} +
 
 === The Scenario
 
-In the previous labs, you built an AI agent that resolves customer support issues through natural language. The agent queries the database, updates records, and regenerates policy documents, all from within the chat interface.
+前のラボでは、自然言語で顧客のサポート問題を解決する AI エージェントを構築しました。このエージェントは、チャットインターフェース内からデータベースを照会し、レコードを更新し、ポリシードキュメントを再生成します。
 
-Now you want to extend it with a new capability: **customer profile analysis**. When a support agent asks about a customer, the AI analyzes their data and returns a structured summary. Two tiers of analysis are available:
+ここで、新しい機能である **顧客プロファイル分析** を追加したいと考えています。サポート担当者が顧客について質問すると、AI はそのデータを分析し、構造化された要約を返します。利用できる分析ティアは 2 つです。
 
-* **Gold** -- full policy history, claims history, and loyalty status.
-* **Silver** -- recent policies and basic profile information.
+* **Gold** -- 完全なポリシー履歴、請求履歴、ロイヤルティステータス。
+* **Silver** -- 直近のポリシーと基本的なプロファイル情報。
 
 [.mermaid.mermaid-w60]
 ----
@@ -47,38 +47,38 @@ flowchart LR
     style LLM fill:none,stroke:none
 ----
 
-Gold consumes more tokens because the analysis is deeper and the response is richer. Silver is lighter. The system is designed with a fallback strategy: if the Gold tier's token budget is exhausted, the service falls back to Silver. If Silver is also exhausted, the request is deferred.
+Gold は分析がより深く、応答もより豊富なため、より多くのトークンを消費します。Silver はより軽量です。このシステムはフォールバック戦略を備えています。Gold ティアのトークン予算が尽きた場合、サービスは Silver にフォールバックします。Silver も尽きた場合、リクエストは保留されます。
 
-But before any of this works, you need governance. Who can access the LLM endpoint? How many tokens can each tier consume? Without controls, there is nothing stopping unchecked consumption from burning through the organization's API budget.
+しかし、これらが機能する前に、ガバナンスが必要です。LLM エンドポイントにアクセスできるのは誰か。各ティアはどれだけのトークンを消費できるのか。制御がなければ、無制限の消費によって組織の API 予算が使い果たされるのを防ぐことはできません。
 
-In this lab, you'll place a **governance layer** in front of the LLM endpoint using link:https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[*_Red Hat Connectivity Link_*,window=_blank]. You'll implement two policies:
+このラボでは、link:https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[*_Red Hat Connectivity Link_*,window=_blank] を使用して、LLM エンドポイントの前に **ガバナンス層** を配置します。2 つのポリシーを実装します。
 
-* **AuthPolicy** -- Control _who_ can access the endpoint using API key authentication and group-based authorization.
-* **TokenRateLimitPolicy** -- Control _how much_ each tier can consume by enforcing rate limits based on actual token usage.
+* **AuthPolicy** -- API キー認証とグループベースの認可を使用して、エンドポイントに _誰が_ アクセスできるかを制御します。
+* **TokenRateLimitPolicy** -- 実際のトークン使用量に基づいてレート制限を適用し、各ティアが _どれだけ_ 消費できるかを制御します。
 
 {empty} +
 
 === Why Connectivity Link?
 
-This is exactly the kind of problem _Red Hat Connectivity Link_ was designed for. Built on the link:https://kuadrant.io/[_Kuadrant_ project,window=_blank], it brings AI-aware governance to *Kubernetes*:
+これはまさに _Red Hat Connectivity Link_ が想定している種類の問題です。link:https://kuadrant.io/[_Kuadrant_ プロジェクト,window=_blank] を基盤とし、*Kubernetes* に AI を考慮したガバナンスをもたらします。
 
-* **Token-aware rate limiting** -- limits are based on actual tokens consumed, not request counts. This is what makes tiered AI services viable: each tier gets its own token budget, enforced at the gateway.
-* **Zero code changes** -- policies are applied at the infrastructure level. Your AI agent and integration code stay untouched.
-* **Kubernetes-native** -- policies are standard CRDs, applied with `oc apply`, stored in Git, reviewed in PRs. No separate management console or vendor control plane.
-* **Composable** -- one policy extracts identity, another uses it for per-tier token budgets. They layer on top of each other declaratively.
+* **トークン認識型レート制限** -- 制限はリクエスト数ではなく、実際に消費されたトークンに基づきます。これにより、階層化された AI サービスが実現可能になります。各ティアは独自のトークン予算を持ち、ゲートウェイで強制されます。
+* **コード変更不要** -- ポリシーはインフラストラクチャ層で適用されます。AI エージェントと統合コードはそのままです。
+* **Kubernetes ネイティブ** -- ポリシーは標準の CRD であり、`oc apply` で適用し、Git に保存し、PR でレビューします。別個の管理コンソールやベンダーのコントロールプレーンは不要です。
+* **合成可能** -- 1 つのポリシーが ID を抽出し、別のポリシーがそれを使ってティアごとのトークン予算を適用します。これらは宣言的に重ねて適用できます。
 
-These capabilities come from how Connectivity Link builds on the _Kubernetes Gateway API_ standard. Before you start configuring policies, let's look at the Gateway API model.
+これらの機能は、Connectivity Link が _Kubernetes Gateway API_ 標準の上に構築されていることから生まれます。ポリシーの設定を始める前に、Gateway API モデルを見てみましょう。
 
 {empty} +
 
 === The Gateway API Model
 
-Connectivity Link layers on top of the _Kubernetes Gateway API_, the standard for managing traffic routing in _Kubernetes_. Understanding this model will make the exercises that follow intuitive.
+Connectivity Link は、*Kubernetes* でトラフィックルーティングを管理する標準である _Kubernetes Gateway API_ の上に重なります。このモデルを理解すると、これからの演習が直感的になります。
 
-Here are the building blocks:
+構成要素は次のとおりです。
 
-* **GatewayClass + Gateway** -- owned by the platform team. Defines _how_ traffic enters the cluster. Already provisioned for you.
-* **HTTPRoute** -- owned by the platform or development team. Defines _where_ your traffic goes (in this case, the LLM API).
+* **GatewayClass + Gateway** -- プラットフォームチームが管理します。トラフィックが _どのように_ クラスターに入るかを定義します。すでにプロビジョニング済みです。
+* **HTTPRoute** -- プラットフォームチームまたは開発チームが管理します。トラフィックを _どこへ_ 送るかを定義します（この場合は LLM API）。
 
 [.text-center]
 [.mermaid]
@@ -115,15 +115,15 @@ flowchart LR
 
 [.mermaid-hints-simple]
 ****
-GC | GatewayClass | Owned by the platform team. Defines which controller implementation manages the Gateway and its configuration (IP pools, resource limits). +
-GT | Gateway | The entry point to your cluster -- a load balancer or service that directs traffic to the right destinations. +
-HTTP | HTTPRoute | Your routing rules -- maps requests from the Gateway to backend services (LLMs) based on URL paths, headers, or hosts.
+GC | GatewayClass | プラットフォームチームが管理します。Gateway とその設定（IP プール、リソース制限）を管理するコントローラー実装を定義します。 +
+GT | Gateway | クラスターへの प्रवेश点です。適切な宛先へトラフィックを振り分けるロードバランサーまたはサービスです。 +
+HTTP | HTTPRoute | ルーティングルールです。URL パス、ヘッダー、またはホストに基づいて、Gateway からバックエンドサービス（LLM）へのリクエストをマップします。
 ****
-TIP: Hover over each component above in the diagram to learn what it does.
+TIP: 上の図で各コンポーネントにカーソルを合わせると、その役割を確認できます。
 
 {empty} +
 
-This is where Connectivity Link comes in. Rather than embedding governance in your application, it attaches **policies** directly to these Gateway API resources. Authentication Policy and TokenRateLimit Policy layer onto the HTTPRoute -- enforced at the infrastructure level, invisible to your services:
+ここで Connectivity Link が登場します。アプリケーション内にガバナンスを埋め込むのではなく、これらの Gateway API リソースに直接 **ポリシー** を付与します。Authentication Policy と TokenRateLimit Policy は HTTPRoute に重ねて適用され、インフラストラクチャ層で強制されるため、サービスからは見えません。
 
 [.mermaid]
 ----
@@ -169,7 +169,7 @@ flowchart LR
 
 === End-to-End Request Flow
 
-Now that you understand the model, here's how it maps to your setup. The support agent interacts with the AI assistant, which sends requests through the gateway and governance layer before reaching the LLM:
+モデルを理解したので、次はそれがあなたの環境にどう対応するかを見てみましょう。サポート担当者は AI アシスタントとやり取りし、そのアシスタントがゲートウェイとガバナンス層を経由して LLM に到達するようにリクエストを送信します。
 
 {blank}
 
@@ -203,9 +203,7 @@ flowchart LR
     style Token fill:#fff3e0,stroke:#fb8c00
 ----
 
-The same architecture applies regardless of how the support agent connects: through Rocket.Chat, an internal chatbot, or any other application.
-
-
+サポート担当者がどのように接続するかに関係なく、この同じアーキテクチャが適用されます。たとえば、Rocket.Chat、社内チャットボット、またはその他のアプリケーションからでも同様です。
 
 
 

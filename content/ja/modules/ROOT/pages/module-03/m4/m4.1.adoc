@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab4"]
-== Setup the Lab working folder
+== Lab 作業フォルダーを設定する
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -11,23 +11,23 @@ include::../_shared/close-tabs.adoc[]
 [.indent2]
 [IMPORTANT]
 --
-If you skipped earlier chapters, expand the section below to catch up.
+前の章を飛ばした場合は、以下のセクションを展開して追いついてください。
 
 [%collapsible]
 ====
-These requirements need to be met:
+満たす必要がある要件は次のとおりです。
 
-. *Access to the database*
-. *Kafka integration with Matrix* (messaging platform for customers)
+. *データベースへのアクセス*
+. *Kafka と Matrix の統合*（お客様向けメッセージングプラットフォーム）
 
 {blank}
 
-Following the steps below will enable both requirements.
+以下の手順を実行すると、両方の要件が有効になります。
 
-. Enable access to the database
+. データベースへのアクセスを有効にする
 +
 ======
-This chapter requires access to a database, but it's unreachable by default.
+この章ではデータベースへのアクセスが必要ですが、デフォルトでは到達できません。
 
 {blank}
 
@@ -42,7 +42,7 @@ flowchart LR
         end
     end
 
-    Camel -.-x|"❌ unreachable"| SVC
+    Camel -.-x|"❌ 到達不可"| SVC
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -63,17 +63,17 @@ flowchart LR
     style SVC fill:#fce4e4,stroke:#EE0000,color:#333
 ----
 
-To enable access to the database, run the following command in your terminal in _Dev Spaces_:
+データベースへのアクセスを有効にするには、_Dev Spaces_ のターミナルで次のコマンドを実行します。
 
 [.copypaste]
 ****
 si-setup
 ****
 
-You should see all resources reporting `ready OK`:
+すべてのリソースが `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -82,9 +82,9 @@ You should see all resources reporting `ready OK`:
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-++++
++++
 
-The above output indicates a Service Interconnect link has been established between your namespace and the database namespace.
+上記の出力は、あなたの namespace とデータベース namespace の間に Service Interconnect リンクが確立されたことを示しています。
 
 {blank}
 
@@ -103,7 +103,7 @@ flowchart LR
 
     Camel --> SI1
 
-    SI1 -.-|"🔒 secure link"| SI2
+    SI1 -.-|"🔒 安全なリンク"| SI2
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -132,17 +132,17 @@ flowchart LR
 {empty} +
 
 [start=2]
-. Enable Kafka integration with Matrix
+. Kafka と Matrix の統合を有効にする
 +
 ======
-Scale up the Kafka integration with Matrix
+Matrix との Kafka 統合をスケールアップします。
 
 [.copypaste]
 ****
 oc scale deployment k2m --replicas=1
 ****
 
-The pod will enable the following notification flow:
+この pod により、次の通知フローが有効になります。
 
 [.mermaid]
 ----
@@ -160,19 +160,19 @@ flowchart LR
     style AI fill:none,stroke:none
 ----
 
-To verify the pod is running, run the following command:
+pod が実行中であることを確認するには、次のコマンドを実行します。
 
 [.copypaste]
 ****
 oc get deployment k2m
 ****
 
-You should see the deployment `Ready 1/1`:
+deployment が `Ready 1/1` になっていることを確認してください。
 
-++++
++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 k2m    1/1     1            1           27h</pre>
-++++
++++
 
 ======
 ====
@@ -180,7 +180,8 @@ k2m    1/1     1            1           27h</pre>
 
 {empty} +
 
-. From your terminal in _Dev Spaces_, run the following command:
+. _Dev Spaces_ のターミナルで、次のコマンドを実行します。 +
+（このコマンドを実行する前に、開いている Camel のファイルタブを閉じてください。コマンド実行後に自動更新されない場合があります）
 +
 {blank}
 +
@@ -191,24 +192,24 @@ step 7
 +
 [TIP]
 --
-.Run the command above anytime to reset the exercise.
+上記のコマンドは、いつでも実行して演習をリセットできます。
 [%collapsible]
 ====
-The workshop includes handy helper scripts that let you jump to any step or reset the lab to a known good state:
+ワークショップには、任意のステップへ移動したり、既知の正常な状態にラボをリセットしたりできる便利なヘルパースクリプトが含まれています。
 
-* `step N` — reset the lab to the beginning of step N
-* `steps` — list all available steps in the lab
-* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
-* `ff` — fast-forward to the *next* step
-* `rw` — rewind to the *previous* step
+* `step N` — ラボを step N の開始時点にリセットする
+* `steps` — ラボで利用可能なすべてのステップを一覧表示する
+* `start` または `restart` — 最初の状態に戻る（`step 1` と同等）
+* `ff` — *次の* ステップへ早送りする
+* `rw` — *前の* ステップへ巻き戻す
 ====
 --
 +
 {empty} +
 
-. Check your lab folder
+. ラボフォルダーを確認する
 +
-After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to:
+上記のコマンドを実行したら、エディターのツリービューを見て、正常な構造になっていることを確認してください。次のようになっているはずです。
 +
 --
 [.indent2]
@@ -224,20 +225,20 @@ pass:[<mark style="padding-left: .8rem; background-color: white; color: grey"><b
 {empty} +
 
 [.indent2]
-NOTE: `agent` and `mcp-servers` come with pre-configured settings for your environment — including AI model configuration and endpoint connectivity (database, S3 storage, and HelpDesk). It's ready to use, so you can focus on building the agentic flow.
+NOTE: `agent` と `mcp-servers` には、AI モデル設定やエンドポイント接続（database、S3 storage、HelpDesk）を含む、あなたの環境向けの事前設定が含まれています。すぐに使える状態なので、エージェントのフロー作成に集中できます。
 --
 +
 {empty} +
 
 [.verification]
 ****
-Do you see the expected folder structure and files?
+期待どおりのフォルダー構造とファイルが見えますか？
 
 [.success]
-You're ready to continue.
+続行できます。
 
 [.fail]
-Try running `step 7` again and check that the files appear in your editor's file explorer.
+もう一度 `step 7` を実行し、ファイルがエディターのファイルエクスプローラーに表示されるか確認してください。
 ****
 
 {empty} +

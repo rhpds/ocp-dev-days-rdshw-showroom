@@ -3,35 +3,35 @@
 include::partial$style.adoc[]
 
 [id='messaging-access']
-== Lab 2 - Messaging Access
+== ラボ 2 - メッセージングアクセス
 
-Get familiar with the two messaging platforms used in this workshop — Matrix and Rocket.Chat — and log in to both so you're ready for the integration exercises ahead.
+このワークショップで使用する 2 つのメッセージングプラットフォーム — Matrix と Rocket.Chat — に慣れ、両方にログインして、これからの統合演習に備えましょう。
 
 {empty} +
 
-=== The messaging scenario
+=== メッセージングのシナリオ
 
-Customers who have submitted Policy Applications may need to reach out to customer support — whether it's a complaint, a question about their coverage, or changes to an existing policy. On the other side, support agents are ready to assist them.
+Policy Applications を提出した顧客は、苦情、保険内容に関する質問、既存ポリシーの変更など、カスタマーサポートへ連絡する必要がある場合があります。その一方で、サポート担当者はいつでも対応できるよう準備しています。
 
-The interesting part is that each side uses a *different* messaging platform:
+興味深いのは、両者が *別々の* メッセージングプラットフォームを使っていることです。
 
-* *Matrix* — where customers connect to submit their enquiries
-* *Rocket.Chat* — where support agents work and respond
+* *Matrix* — 顧客が問い合わせを送る場所
+* *Rocket.Chat* — サポート担当者が作業し、返信する場所
 
 [TIP]
 --
-.What are these platforms?
+.これらのプラットフォームは何ですか?
 [%collapsible]
 ====
-Matrix and Rocket.Chat are messaging platforms similar to Slack, Telegram, or WhatsApp. This workshop uses them because they can be self-hosted on OpenShift, so no external accounts are needed.
+Matrix と Rocket.Chat は、Slack、Telegram、WhatsApp に似たメッセージングプラットフォームです。このワークショップでは、OpenShift 上で自己ホストできるため、外部アカウントが不要なことからこれらを使用しています。
 
-*Matrix* is an open standard and communication protocol for real-time decentralized communication. It works seamlessly between different service providers.
+*Matrix* は、リアルタイムの分散型コミュニケーションのためのオープン標準および通信プロトコルです。異なるサービスプロバイダー間でもシームレスに動作します。
 
-*Rocket.Chat* is an open-source communications platform with strict data protection standards. It enables real-time conversations between colleagues, other companies, or your customers across web, desktop, or mobile devices.
+*Rocket.Chat* は、厳格なデータ保護基準を備えたオープンソースのコミュニケーションプラットフォームです。Web、デスクトップ、モバイルの各デバイスを通じて、同僚、他社、または顧客とのリアルタイム会話を可能にします。
 ====
 --
 
-In the upcoming modules you'll use Apache Camel and Kafka to build the integrations that bridge both platforms — so that a message sent from one side appears seamlessly on the other.
+今後のモジュールでは、Apache Camel と Kafka を使って両方のプラットフォームをつなぐ統合を構築します。その結果、一方から送られたメッセージが、もう一方にもシームレスに表示されるようになります。
 
 [.mermaid]
 ----
@@ -47,6 +47,6 @@ flowchart LR
     style RC fill:none,stroke:none
 ----
 
-Both platforms are deployed on OpenShift with web access, so you can interact with them directly from your browser. The next pages will guide you through logging in to each one, so you're ready when the integration work begins.
+両方のプラットフォームは OpenShift 上にデプロイされ、Web アクセスが可能なので、ブラウザーから直接操作できます。次のページでは、それぞれにログインする手順を案内します。統合作業を始める準備を整えましょう。
 
 {empty} +

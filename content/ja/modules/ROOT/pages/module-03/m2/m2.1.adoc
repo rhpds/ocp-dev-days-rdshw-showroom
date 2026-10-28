@@ -7,13 +7,13 @@ include::partial$style.adoc[]
 
 {empty} +
 
-=== Join your Matrix room.
+=== Matrix room に参加する。
 
 {blank}
 
 . Open _Matrix's_ web client
 +
-Click on the link below to open the Login page in _Matrix_ (opens a new tab).
+下のリンクをクリックして、_Matrix_ のログインページを開きます（新しいタブで開きます）。
 +
 --
 - link:{url-element}[Matrix Login page,window="_blank"]
@@ -21,31 +21,31 @@ Click on the link below to open the Login page in _Matrix_ (opens a new tab).
 +
 {blank}
 +
-You'll be presented with a Login page.
+ログインページが表示されます。
 +
 {empty} +
 
-. Login with your credentials
+. 認証情報でログインする
 +
-You will be prompted to enter your credentials, as shown below:
+以下のように、認証情報の入力を求められます。
 +
 image::module-03/m2/matrix-login-credentials.jpg[width=60%]
 +
 {blank}
 +
 ====
-. Enter the following:
+. 次の情報を入力します。
 +
 * **Username**
 +
-[.copypaste]
+[.copypaste.value]
 ****
 {user-username}
 ****
 +
 * **Password**
 +
-[.copypaste]
+[.copypaste.value]
 ****
 [.path]
 /credentials/im
@@ -58,29 +58,29 @@ REPLACE
 +
 {empty} +
 +
-. Then, click **_"Sign in"_**
+. 次に、**_"Sign in"_** をクリックします
 ====
 +
 {empty} +
 +
-You will be asked to confirm your identity. Enter your password to do so, as shown below:
+本人確認を求められます。以下のように、パスワードを入力してください。
 +
 image::module-03/m2/matrix-login-confirm.jpg[width=60%]
 +
 {blank}
 +
-Confirm by clicking on _"Continue"_.
+_"Continue"_ をクリックして確認します。
 +
 {empty} +
 +
-Finally, you'll notice looking at your _Matrix_ screen, a pending invitation to join your room. +
-Follow the steps below to accept your invitation:
+最後に、_Matrix_ の画面で、ルームへの参加招待が保留中であることが表示されます。 +
+以下の手順に従って招待を承認してください。
 +
 image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 +
 --
-. Click on your room.
-. And, click on _"Accept"_.
+. ルームをクリックします。
+. 次に、_"Accept"_ をクリックします。
 --
 
 {empty} +
@@ -88,7 +88,7 @@ image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 
 [.verification]
 ****
-Were you able to join the Matrix room successfully?
+Matrix room に正常に参加できましたか？
 ****
 
 {empty} +

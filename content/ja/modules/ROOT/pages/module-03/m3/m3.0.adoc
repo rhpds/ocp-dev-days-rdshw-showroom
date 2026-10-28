@@ -3,24 +3,24 @@
 include::partial$style.adoc[]
 
 [id='lab3-introduction']
-== Introduction
+== はじめに
 
-Build the integration flows that connect Matrix and Rocket.Chat through Apache Kafka — creating a decoupled, event-driven architecture ready to welcome new systems.
-
-{empty} +
-
-
-=== Quick reminder
-
-Customers reach out about their Policy Applications through *Matrix*, while support agents respond from *Rocket.Chat*. The goal is to bridge both platforms so messages flow seamlessly between them.
+Apache Kafka を介して Matrix と Rocket.Chat をつなぐ統合フローを構築します。これにより、分離されたイベント駆動型アーキテクチャを実現し、新しいシステムを迎え入れる準備が整います。
 
 {empty} +
 
-=== Why Kafka in the middle?
 
-Rather than connecting Matrix and Rocket.Chat directly to each other, we place *Kafka* between them as a streaming backbone. This decouples the two platforms — neither needs to know about the other. Each system simply publishes and consumes messages through Kafka.
+=== 簡単なおさらい
 
-Why does this matter? Because it opens the architecture. Any new system — a helpdesk tool, a notification service, an AI agent — can plug into the same Kafka topics without touching the existing flows.
+お客様は *Matrix* で Policy Applications について問い合わせ、サポート担当者は *Rocket.Chat* から応答します。目標は、両方のプラットフォームを橋渡しし、メッセージがシームレスに行き来するようにすることです。
+
+{empty} +
+
+=== なぜ中央に Kafka を置くのか?
+
+Matrix と Rocket.Chat を直接つなぐのではなく、ストリーミングの基盤としてその間に *Kafka* を配置します。これにより、2 つのプラットフォームは分離され、どちらも相手を知る必要がありません。各システムは Kafka を通じてメッセージを単純に公開し、消費するだけです。
+
+なぜこれが重要なのでしょうか? それは、アーキテクチャの拡張性が高まるからです。ヘルプデスクツール、通知サービス、AI エージェントなど、どんな新しいシステムでも、既存のフローに手を加えることなく、同じ Kafka トピックに接続できます。
 
 {blank}
 
@@ -29,14 +29,14 @@ image::module-03/m3/data-flow.png[width=90%]
 
 {empty} +
 
-=== A common data model
+=== 共通データモデル
 
-For this to work cleanly, we adopt a *standard data model* as the common language on Kafka. Instead of translating directly between platform-specific formats (Matrix to Rocket.Chat), each flow transforms in two steps:
+これをきれいに機能させるために、Kafka 上の共通言語として *標準データモデル* を採用します。プラットフォーム固有の形式どうしを直接変換するのではなく (Matrix から Rocket.Chat へ)、各フローは 2 段階で変換します。
 
-* *Inbound*: platform-specific format → standard data model (into Kafka)
-* *Outbound*: standard data model → platform-specific format (from Kafka)
+* *Inbound*: プラットフォーム固有の形式 → 標準データモデル (Kafka へ)
+* *Outbound*: 標準データモデル → プラットフォーム固有の形式 (Kafka から)
 
-This means every system integrates with *one* common interface, not with every other system individually.
+これにより、各システムは他のすべてのシステムと個別に連携するのではなく、*1 つ* の共通インターフェースとだけ統合すればよくなります。
 
 {blank}
 
@@ -45,15 +45,15 @@ image::module-03/m3/standard-data-model.png[width=90%]
 
 {empty} +
 
-=== Four flows, one pattern
+=== 4 つのフロー、1 つのパターン
 
-To bridge Matrix and Rocket.Chat bidirectionally through Kafka, we need four distinct flows:
+Kafka を介して Matrix と Rocket.Chat を双方向につなぐには、4 つの個別フローが必要です。
 
 * Matrix → Kafka
 * Kafka → Rocket.Chat
 * Rocket.Chat → Kafka
 * Kafka → Matrix
 
-TIP: This may seem like more work than a direct connection, but the pattern is the same across all four. In this lab we'll focus on building *one* of them — the rest follow the same approach and will be enabled at the end.
+TIP: 直接接続より手間が増えたように見えるかもしれませんが、4 つすべてでパターンは同じです。このラボでは、そのうちの *1 つ* を作成することに集中します。残りも同じ手順で進められ、最後に有効化されます。
 
 {empty} +

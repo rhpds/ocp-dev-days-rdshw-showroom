@@ -1,0 +1,208 @@
+= サンドボックス・パイプラインの確認
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+署名済みのコミットが push され、サンドボックス・パイプラインが実行中です。このセクションでは、パイプラインの動作内容を確認し、セキュリティ・チェックをレビューし、サンドボックス・パイプラインがブロックするのではなく *通知する* ように設計されている理由を理解します。
+
+[#section-1]
+== セクション 1: サンドボックス・パイプラインを理解する
+
+=== 演習 1: Developer Hub でパイプラインを表示する
+
+. Developer Hub でサンドボックス・コンポーネントに移動し、**CI** タブをクリックします。
+
+. 実行中（または最近完了した）のパイプラインが表示されるはずです。それをクリックして詳細を表示します。
++
+image::m02-rhdh-sandbox-pipeline-running.png[Developer Hub のタスク詳細付きサンドボックス・パイプライン,link=self,window=blank,width=700]
+
+. サンドボックス・パイプラインは次のステップを実行します。
+* **clone-source** -- フィーチャー・ブランチをクローンします
+* **verify-commit-signature** -- コミットが署名されているかを確認します
+* **maven-build** -- アプリケーションをコンパイルします
+* **sonar-scan** -- SonarQube のコード品質分析を実行します
+* **build-and-push** -- コンテナー・イメージをビルドし、レジストリーに push します
+* **acs-image-scan** -- 既知の脆弱性についてイメージをスキャンします
+* **acs-image-check** -- ACS セキュリティ・ポリシーに照らしてイメージを確認します
+* **report-to-commit** -- 結果をコミット・コメントとして GitLab に投稿します
+
+IMPORTANT: サンドボックス・パイプラインは、開発者を **決してブロックしない** ように設計されています。すべてのセキュリティ・チェックは実行されますが、失敗は情報として報告されるだけで、ビルドは停止しません。これにより、開発者は迅速に反復しながら、本番パイプラインで何が失敗するかを正確に把握できます。
+
+[#section-2]
+== セクション 2: サンドボックスでのセキュリティ・チェック
+
+=== 演習 1: コミット署名の検証を確認する
+
+. パイプライン詳細で、**verify-commit-signature** タスクをクリックします。
+
+. ログ出力を確認します。コミットが署名されていれば、次のように表示されるはずです。
++
+----
+✅ Good signature — {user}@demo.redhat.com (issuer: https://sso.{subdomain}/realms/sso)
+----
++
+image::m02-pipeline-verify-signature.png[正常にコミット署名検証が行われたことを示すパイプライン・ログ,link=self,window=blank,width=700]
+
+=== 演習 2: RHDH でパイプライン結果を確認する
+
+. Developer Hub の CI（パイプライン実行）ページに戻り、右側の **Output** アイコンをクリックして結果を確認します。
++
+image::m02-rhdh-pipeline-output-icon.png[パイプライン実行の Output アイコン表示,link=self,window=blank,width=700]
+
+. ページには、パイプラインのタスクとして実行された ACS（Advanced Cluster Security）のスキャンとポリシー・チェックが表示されます。
++
+image::m02-pipeline-acs-tasks.png[パイプライン内の ACS image scan と image check タスク,link=self,window=blank,width=400]
++
+**Image Scan** タブには、コンテナー・イメージ内で見つかったすべての CVE が重大度ごとに整理して表示されます。
++
+image::m02-rhdh-acs-image-scan.png[重大度別の CVE を表示する ACS Image Scan 結果,link=self,window=blank,width=700]
++
+**Image Check** タブには ACS のポリシー違反が表示されます。**Breaks build** 列に注目してください。"yes" とマークされたポリシーは保護されたパイプラインではビルドをブロックしますが、"no" のポリシーは情報として扱われます。
++
+image::m02-rhdh-acs-image-check.png[ポリシー違反を表示する ACS Image Check 結果,link=self,window=blank,width=700]
+
+=== 演習 3: GitLab で結果を確認する
+
+. GitLab を開き、コミットに移動します。
+
+. パイプラインによって投稿された、完全なセキュリティ・レポートを含むコメントが表示されるはずです。
++
+* 🧪 **Sandbox Build Results**
+* ✅ or ⛔ **Commit Signature** status
+* ✅ or ❌ **ACS Policy Check** with policy details
+* 🔍 **ACS Image Scan** with vulnerability counts by severity
++
+コミット・コメント内でレポート詳細を展開できます。
++
+image::m02-gitlab-commit-report.png[GitLab のコミット・コメントとして投稿されたパイプラインのセキュリティ・レポート,link=self,window=blank,width=700]
+
+ポリシー・チェックの横にある ❌ アイコンに注目してください。サンドボックス外では、これは通過しません。
+
+.**オプション: 署名なしコミットを試す**
+[%collapsible]
+====
+署名なしコミットで何が起こるかを確認するには、次の手順を実行します。
+
+. GitLab に移動し、サンドボックス・ブランチへ移動します。**`main` ではなく、自分のブランチにいることを確認してください。**
++
+image::m02-gitlab-branch-selector.png[サンドボックス・ブランチにいることを確認する,link=self,window=blank,width=400]
+
+. GitLab 上でファイルを直接編集します（たとえば `README.md`）-- 1 行テキストを追加します。
+
+. GitLab Web UI から直接変更をコミットします。GitLab CE はコミット署名を行わないため、このコミットは **署名されません**。
+
+. パイプラインの実行を確認します。`verify-commit-signature` ステップには次が表示されます。
++
+----
+⚠️  WARNING! UNSIGNED COMMIT DETECTED!
+----
++
+パイプラインは最後まで完了します（サンドボックスでは強制しないため）が、GitLab のコミット・コメントには次が表示されます。
++
+----
+⛔ UNSIGNED COMMIT — as per company policy, unsigned code will not be promoted beyond developer sandboxes
+----
+
+これは、開発者はサンドボックス内で自由に反復できる一方で、システムがすべてのステップで署名状態を追跡し報告していることを示しています。
+====
+
+[#section-3]
+== セクション 3: 脆弱なベース・イメージを修正する
+
+=== 演習 1: ACS ポリシー違反を理解する
+
+コミットは署名され、アプリケーションのビルドは成功し、アプリケーション内の脆弱性の大部分は（Dependency Analytics の支援と quarkus フレームワーク・バージョンのアップグレードにより）修正されていましたが、ACS ポリシー・チェックで違反が検出され、__アプリケーション・イメージには依然として多数の脆弱性が残っています__。これらの違反は、アプリケーション・コードではなくコンテナーの **ベース・イメージ** に由来します。
+
+. GitLab のコミット・コメントにある ACS ポリシー・チェック結果を確認します。次のような違反が見つかる場合があります。
+* `Parasol: Curl in Image`
+* `Parasol: Red Hat Package Manager in Image`
+* `Parasol: Fixable Severity at least Important`
++
+image::m02-gitlab-acs-violations.png[コミット・レポート内の ACS ポリシー違反,link=self,window=blank,width=400]
+
+. これらのポリシーは Parasol のセキュリティ・チームによって定義されており、攻撃面を増やすツール（`curl` や `dnf` など）を含むイメージ、またはベース・イメージに修正可能な高重大度の脆弱性があるイメージを検出します。
+
+NOTE: このワークショップでは、「fixable severities at least important」はブロックしないポリシーとして定義されています。実際には、これはベース・ポリシーであるべきです。修正できるものは修正すべきです。実際、このポリシーは新しい ACS インストールではデフォルトで有効になっています。
+
+=== 演習 2: ハードニングされたベース・イメージに切り替える
+
+. Dev Spaces に戻り、プロジェクトのルートにある `Containerfile` を開きます。
++
+image::m02-devspaces-containerfile.png[Dev Spaces で FROM 文を表示している Containerfile,link=self,window=blank,width=700]
+
+. `FROM` 文を見つけ、現在のベース・イメージを確認します。標準的なランタイム・イメージを使用している場合があります。
+
+. これをハードニングされた最小構成のベース・イメージに置き換えます。`FROM` 行を次のように変更します。
++
+[source,dockerfile,role="copypaste"]
+----
+FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.20
+----
++
+image::m02-devspaces-containerfile-changed.png[ハードニングされたベース・イメージを使用する Containerfile,link=self,window=blank,width=700]
++
+TIP: ハードニングされたイメージとは、パッケージ・マネージャーやネットワーク・ツールのような不要なパッケージを削除し、攻撃対象領域を大幅に減らす最小ベース・イメージです。さらに、これらは継続的に検証および更新され、CVE がほぼゼロの状態に保たれます。
+
+. 次のような説明的なメッセージで変更をコミットします。
++
+[source,role="copypaste"]
+----
+Switch to hardened base image to resolve ACS policy violations
+----
+
+. 変更を署名し（前と同じように検証コードを貼り付け）、push します。
+
+. サンドボックス・パイプラインが新しいイメージをビルドするのを待ちます。
+
+. Developer Hub でパイプライン結果を確認します。脆弱性数は大幅に減少し、ACS ポリシー違反は解消されているはずです。
++
+image::m02-rhdh-pipeline-after-fix.png[ベース・イメージ修正後に脆弱性が減少したことを示すパイプライン結果,link=self,window=blank,width=700]
++
+image::m02-rhdh-acs-check-after-fix.png[修正後にブロックするポリシー違反がゼロであることを示す ACS Image Check,link=self,window=blank,width=700]
++
+image::m02-gitlab-commit-report-after-fix.png[修正後に ACS ポリシー・チェックが通過したことを示す GitLab コミット・レポート,link=self,window=blank,width=700]
+
+=== どうやって実現したのか?
+
+演習を読みやすくするために、詳細を以下に追加しています。展開して実装方法を確認してください。
+
+.**詳細を表示する**
+[%collapsible]
+====
+**Red Hat Advanced Cluster Security (ACS)** は、コンテナー・イメージに対してイメージ・スキャンとポリシー適用を提供します。今回のユースケースで重要な機能は次のとおりです。
+
+* **Image scanning** -- コンテナー・イメージのすべてのレイヤーにある既知の脆弱性（CVE）を特定します
+* **Policy enforcement** -- イメージ内で何が許容されるかに関するルールを定義します（パッケージ・マネージャーなし、高重大度で修正可能な CVE なしなど）
+* **Policies as Code** -- セキュリティ・ポリシーは Git リポジトリ内の `SecurityPolicy` Custom Resources として定義され、ArgoCD 経由でデプロイされます
+
+TIP: ACS にはさらに多くの機能があります。ここでは、今回のユースケースで使っている機能の小さなサブセットに焦点を当てています。たとえば、ネットワーク・フローの評価、ネットワーク・ポリシーの構築とシミュレーション、許容されるコンテナー動作のベースライン定義とベースライン逸脱への対応、さまざまなランタイム・ポリシーの適用、CIS や NIST などの業界標準およびカスタム制御に対するクラスタ・コンプライアンス報告など、さらにその先まで対応できます。
+
+
+この環境で使用されているポリシーは、GitLab 上の `acs-policies` リポジトリに保存されており、**Parasol Secured Build Gate** カテゴリーの下にあります。ACS コンソールで確認できます。
+
+. {acs_url}[ACS console^] を開き、**Log in** をクリックします。すでに Keycloak で認証済みなので、資格情報を再入力する必要はありません。
++
+image::m02-acs-login.png[Keycloak SSO を使った ACS ログイン,link=self,window=blank,width=500]
+. **Platform Configuration** → **Policy Management** に移動します。
++
+image::m02-acs-policy-management.png[ACS Policy Management のナビゲーション,link=self,window=blank,width=700]
+. カテゴリーでフィルターします: **Parasol Secured Build Gate**
++
+image::m02-acs-parasol-policies.png[Parasol Secured Build Gate カテゴリーでフィルターされた ACS ポリシー,link=self,window=blank,width=700]
+
+パイプライン・タスク `acs-image-scan` と `acs-image-check` は `roxctl` CLI を使用して ACS Central API とやり取りし、`--categories="Parasol Secured Build Gate"` フラグを渡して Parasol のカスタム・ポリシーのみを評価します。
+====
+
+=== 確認
+
+ここまでで、次の内容を完了しているはずです。
+
+* サンドボックス・パイプラインのステップとセキュリティ・チェックを確認した
+* パイプライン・ログでコミット署名の検証を確認した
+* GitLab でセキュリティ・レポートを確認した
+* ハードニングされたベース・イメージに切り替え、ACS 違反が解消されたことを確認した
+
+'''
+
+== 次のステップ
+
+xref:module-02/04-promotion.adoc[次の段階へ進む] を続けて、変更をマージし、保護されたパイプラインを通して昇格させます。

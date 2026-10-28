@@ -3,13 +3,13 @@
 include::partial$style.adoc[]
 
 [id="lab3-ingestion-flow"]
-== The Ingestion Flow
+== 取り込みフロー
 
-With database connectivity in place via {rhsi}, you can now implement the complete ingestion flow. The Camel integration will handle the full lifecycle of an incoming policy application — from reception to archival.
+{rhsi} によるデータベース接続が整ったので、ここから完全な取り込みフローを実装できます。Camel の統合は、保険申請の受信からアーカイブまで、受信した申請のライフサイクル全体を処理します。
 
 {empty} +
 
-*Data Flow Overview*
+*データフローの概要*
 
 {blank}
 
@@ -50,9 +50,9 @@ flowchart LR
 
 {empty} +
 
-*Sequence of Operations*
+*操作の順序*
 
-The sequence diagram below details each step the Camel integration performs when processing a policy application:
+以下のシーケンス図は、Camel の統合が保険申請を処理する際の各ステップを示しています。
 
 {blank}
 
@@ -77,12 +77,13 @@ sequenceDiagram
 
 {empty} +
 
-=== Prepare the working folder
+=== 作業フォルダーを準備する
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
 
-. From your terminal in _Dev Spaces_, run the following command:
+. _Dev Spaces_ のターミナルで、次のコマンドを実行します。 +
+(このコマンドを実行する前に、開いている Camel のファイルタブを閉じてください。実行後に自動更新されない場合があります)
 +
 {blank}
 +
@@ -93,24 +94,24 @@ step 2
 +
 [TIP]
 --
-.Run the command above anytime to reset the exercise.
+.上のコマンドは、演習をリセットしたいときにいつでも実行できます。
 [%collapsible]
 ====
-The workshop includes handy helper scripts that let you jump to any step or reset the lab to a known good state:
+このワークショップには、任意のステップへ移動したり、ラボを既知の正常な状態に戻したりできる便利なヘルパースクリプトがあります。
 
-* `step N` — reset the lab to the beginning of step N
-* `steps` — list all available steps in the lab
-* `start` or `restart` — go to the very beginning (equivalent to `step 1`)
-* `ff` — fast-forward to the *next* step
-* `rw` — rewind to the *previous* step
+* `step N` — ラボをステップ N の最初にリセットする
+* `steps` — ラボで利用可能なすべてのステップを一覧表示する
+* `start` または `restart` — 最初に戻る（`step 1` と同等）
+* `ff` — *次の* ステップへ早送りする
+* `rw` — *前の* ステップへ巻き戻す
 ====
 --
 +
 {empty} +
 
-. Check your lab folder
+. ラボフォルダーを確認する
 +
-After executing the commands above, have a look in your editor's tree view to confirm it looks healthy. It should be similar to:
+上のコマンドを実行したら、エディターのツリービューを開いて、正常な状態になっていることを確認してください。次のようになっているはずです。
 +
 --
 [.indent2]
@@ -124,18 +125,18 @@ pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>
 pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;≋&nbsp;&nbsp;</b></mark>] *X12-850.dfdl.xsd* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *x12.java* +
 
-TIP: The `index.html` file is a simple portal app that simulates a customer submitting policy applications. Camel JBang can serve static HTML alongside your routes, so you'll use it in the next sections to trigger submissions and test your integration end to end.
+TIP: `index.html` ファイルは、顧客が保険申請を送信する様子をシミュレートするシンプルなポータルアプリです。Camel JBang はルートと並行して静的 HTML を配信できるため、次のセクションではこれを使って送信をトリガーし、統合をエンドツーエンドでテストします。
 --
 +
 {empty} +
 
-. Review your configuration
+. 設定を確認する
 +
-The `application.properties` file is already pre-configured with the credentials for both backends used by the ingestion flow:
+`application.properties` ファイルには、取り込みフローで使用する両方のバックエンド向けの認証情報がすでに事前設定されています。
 +
 --
-* *Database* — connection settings for the PostgreSQL database (reachable via Service Interconnect)
-* *S3 object storage* — access key, secret, and endpoint for uploading generated PDF policy documents
+* *Database* — Service Interconnect 経由で到達可能な PostgreSQL データベースへの接続設定
+* *S3 object storage* — 生成された PDF 保険文書をアップロードするためのアクセスキー、シークレット、エンドポイント
 --
 +
 {blank}
@@ -153,18 +154,18 @@ flowchart LR
 +
 {empty} +
 
-=== Open the ingestion flow in Kaoto
+=== Kaoto で取り込みフローを開く
 
 [TIP]
 --
-.Unfold for a quick overview of Kaoto.
+.Kaoto の簡単な概要を表示するには折りたたみを開いてください。
 [%collapsible]
 ====
 include::../_shared/kaoto-intro.adoc[]
 ====
 --
 
-In your editor's file explorer, click on the following file — Kaoto will automatically open it and render the ingestion route as a visual diagram.
+エディターのファイルエクスプローラーで次のファイルをクリックします。すると Kaoto が自動的に開き、取り込みルートをビジュアルな図として表示します。
 
 --
 [.indent2]
@@ -173,7 +174,7 @@ In your editor's file explorer, click on the following file — Kaoto will autom
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
 --
 
-Kaoto will open the file and display all the route definitions it contains. The file includes several routes, but the one we want to focus on is the main ingestion flow. Do as follows:
+Kaoto はファイルを開き、その中に含まれるすべてのルート定義を表示します。このファイルには複数のルートがありますが、ここで注目するのはメインの取り込みフローです。次のように進めてください。
 
 // By default, Kaoto displays routes stacked vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
 
@@ -184,8 +185,8 @@ Kaoto will open the file and display all the route definitions it contains. The 
 
 // The file contains several routes. To focus on the main ingestion flow:
 
-. Click the *Routes* dropdown in the upper-left toolbar
-. Select `service-x12` from the list
+. 左上のツールバーにある *Routes* ドロップダウンをクリックする
+. 一覧から `service-x12` を選択する
 
 {empty} +
 
@@ -209,42 +210,42 @@ kaoto-routes
 
 {empty} +
 
-Kaoto will now display only the `service-x12` route. To center it in the canvas, click the *Reset View* button at the bottom:
+これで Kaoto には `service-x12` ルートだけが表示されます。キャンバス中央に表示するには、下部にある *Reset View* ボタンをクリックします。
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-reset-view.png[width=50%]
 
-TIP: Use the mouse wheel to zoom in and out of the canvas, and click and drag to pan around the view.
+TIP: マウスホイールでキャンバスのズームイン・ズームアウトができ、クリックしてドラッグすると表示を移動できます。
 
 {empty} +
 
-You should now see the `service-x12` route — the main ingestion flow:
+これで、メインの取り込みフローである `service-x12` ルートが表示されるはずです。
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-service-x12-route.png[width=90%]
 
-Reading left to right, each step in the pipeline handles a stage of the policy application lifecycle:
+左から右へ読むと、パイプラインの各ステップが保険申請のライフサイクルの各段階を処理していることがわかります。
 
-* `platform-http` — the API endpoint that receives incoming policy applications
-* `transform-x12` — transforms the EDI data into XML
-* `sql` — stores the data in the backend database
-* `store-pdf-s3` — renders a PDF policy document and uploads it to S3
+* `platform-http` — 受信した保険申請を受け付ける API エンドポイント
+* `transform-x12` — EDI データを XML に変換する
+* `sql` — バックエンドデータベースにデータを保存する
+* `store-pdf-s3` — PDF の保険文書を生成し、S3 にアップロードする
 
-NOTE: Notice the two blue *To do: Enable* blocks — these are disabled steps that you'll activate in the next exercise. By the end, the full flow will be connected and functional.
+NOTE: 青い *To do: Enable* ブロックが 2 つあることに注目してください。これらは次の演習で有効化する無効状態のステップです。最終的には、フロー全体が接続され、動作するようになります。
 
 {empty} +
 
 [.verification]
 ****
-Can you see the source files in the file explorer and the `service-x12` ingestion flow in Kaoto?
+ファイルエクスプローラーにソースファイルが表示され、Kaoto に `service-x12` の取り込みフローが表示されていますか？
 
 [.success]
-You're all set — continue to the next exercise to complete the flow.
+準備完了です。次の演習へ進んでフローを完成させましょう。
 
 [.fail]
-Make sure you ran the `step 2` command, opened `ingest.camel.yaml`, and selected the `service-x12` route.
+`step 2` コマンドを実行し、`ingest.camel.yaml` を開き、`service-x12` ルートを選択したことを確認してください。
 ****

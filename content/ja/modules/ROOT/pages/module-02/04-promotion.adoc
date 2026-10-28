@@ -1,0 +1,277 @@
+= 次の段階へ進む
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+サンドボックスのイメージはクリーンです -- 脆弱性は対処済み、ベースイメージは強化済み、コミットは署名済みです。ここで、保護されたパイプライン段階へ変更を進めるときです。マージリクエストのチェック、マージ後のビルド、本番へのタグベースのプロモーションです。
+
+サンドボックスとは異なり、これらのパイプラインはセキュリティポリシーを **強制** します。署名されていないコミット、ポリシー違反、承認の不足はプロモーションをブロックします。
+
+[#section-1]
+== セクション 1: マージリクエスト
+
+=== 演習 1: マージリクエストを作成する
+
+. GitLab を開き、`parasol-insurance-secured` リポジトリー内のサンドボックスブランチに移動します。
++
+Developer Hub のサンドボックスコンポーネントで **View Source** をクリックすると、すばやく見つけることができます。
++
+image::m02-rhdh-sandbox-view-source.png[サンドボックスコンポーネントページでの View Source,link=self,window=blank,width=700]
+
+. **Create merge request** をクリックします（または **Merge Requests** → **New merge request** に移動します）。
++
+image::m02-gitlab-create-mr.png[GitLab の Create merge request ボタン,link=self,window=blank,width=700]
+
+. ソースブランチをサンドボックスブランチに、ターゲットブランチを `main` に設定します。
++
+image::m02-gitlab-new-mr-form.png[ソースブランチとターゲットブランチを示す新しいマージリクエストフォーム,link=self,window=blank,width=700]
+
+. マージリクエストにわかりやすいタイトルを付けます:
++
+[source,role="copypaste"]
+----
+Sec-fix done, security posture improved
+----
++
+「Description」を削除し、**Create merge request** をクリックします。
+
+=== 演習 2: MR チェックパイプラインを確認する
+
+. マージリクエストを作成すると、チェックパイプラインが自動的に起動します。「このビルドは preprod で動くか、通るか、標準に準拠しているか？」 これに失敗すると、変更を含むブランチはマージできません。これが **merge request check pipeline** です -- これはサンドボックスではなく、Parasol の保護されたビルド namespace で実行されます。
++
+image::m02-gitlab-mr-pipeline-running.png[マージがブロックされた状態で実行中の MR チェックパイプライン,link=self,window=blank,width=700]
+
+. GitLab でパイプラインビューを開き、タスクの 1 つをクリックします。Developer Hub の MR Check Pipeline Run が開きます。
++
+image::m02-gitlab-mr-pipeline-jobs.png[コミット検証と ACS ジョブを表示する GitLab の MR パイプライン,link=self,window=blank,width=700]
+
+. コンポーネントに注目してください -- これはもはやサンドボックスではなく `Parasol Insurance (Secured)` です。
++
+image::m02-rhdh-mr-check-pipeline.png[Developer Hub で Parasol Insurance Secured 上に表示された MR チェックパイプライン,link=self,window=blank,width=700]
+
+. MR チェックパイプラインは次を実行します:
+* **コミット署名を検証** -- `ENFORCE=true` により、署名されていないコミットは **パイプラインに失敗** します
+* MR ブランチからイメージを **ビルド** します
+* ACS ポリシーに照らしてイメージを **スキャンし、チェック** します
+* GitLab に commit status と詳細な MR コメントとして **結果を報告** します
+
+. パイプラインが完了するまで待ちます。
+
+. GitLab のマージリクエストページに戻ります
+* 「Merge」ボタンが有効になっているので、マージできます。ただし、その前に
+* Activity の最新エントリーまでスクロールすると、署名ステータス、ACS ポリシー結果、脆弱性数を含む **🔀 Merge Request Check Results** コメントが投稿されています
+* pre-check が成功した場合、失敗内容と修正方法を確認するほどは興味深くありません。あなたにとっては情報提供用です（成功しているため）
++
+image::m02-gitlab-mr-ready-to-merge.png[パイプラインが通過し、マージ準備完了のマージリクエスト,link=self,window=blank,width=700]
++
+image::m02-gitlab-mr-results.png[署名と ACS 検証を示すマージリクエストチェック結果,link=self,window=blank,width=700]
+
+=== 演習 3: リクエストをマージする
+
+. すべてのチェックに合格すると、**Merge** ボタンが使用可能になります。
++
+NOTE: パイプラインが失敗した場合（たとえば署名のないコミット）、マージはブロックされます。GitLab はこれを強制するために `onlyMergeWhenPipelineSucceeds` で設定されています。
+
+. **Merge** をクリックします。
++
+これにより **post-merge build pipeline** が起動します -- **__final image__** は `main` からビルドされ、Tekton Chains によって署名と証明が行われ、Quay に保存されて preprod 環境へデプロイされます。
++
+image::m02-rhdh-post-merge-pipeline.png[Developer Hub の post-merge build pipeline,link=self,window=blank,width=700]
+
+'''
+
+[#section-2]
+== セクション 2: 本番環境へプロモートする
+
+マージ後のビルドで、`main` ブランチから署名済みイメージが作成されました。これを本番環境へプロモートするには、**Git tag** を作成します -- これが tag-promote パイプラインを起動します。
+
+=== 演習 1: タグを作成する
+
+. GitLab で **Repository** → **Tags** に移動します。
+
+. **New tag** をクリックします。
+
+. タグ名を入力し（例: `v2.0`）、ソースとして `main` ブランチを選択します。
++
+image::m02-gitlab-create-tag.png[GitLab でタグを作成している様子,link=self,window=blank,width=700]
+
+. **Create tag** をクリックします。
+
+=== 演習 2: tag-promote パイプラインを確認する
+
+. タグによって **tag-promote pipeline** が起動します。このパイプラインは次を行います:
+* レジストリーからイメージ SHA を取得する
+* イメージの証跡に対して **Conforma/Enterprise Contract validation** を実行する
+* **SBOM** を生成して TPA にアップロードする
+* イメージをタグ付きバージョンとしてレジストリーにコピーする
+* 本番デプロイメントを更新するために GitOps manifests リポジトリーで **merge request** を開く
+
+. Developer Hub で **Parasol Insurance (Secured)** コンポーネントに移動し、**CI** タブをクリックします。
++
+`parasol-insurance-secured-tag-promote` のパイプライン実行を探します。
++
+image::m02-rhdh-tag-promote-failed.png[Developer Hub で ec-validate の失敗を示す tag promote パイプライン失敗,link=self,window=blank,width=700]
+
+. **パイプラインは失敗します。** 理由を確認するためにパイプライン出力を開きます。
++
+image::m02-rhdh-tag-promote-view-output.png[失敗した tag-promote パイプラインの View output ボタン,link=self,window=blank,width=700]
++
+image::m02-rhdh-ec-validation-failed.png[失敗した承認ルールを示す Enterprise Contract validation,link=self,window=blank,width=700]
+
+=== 演習 3: Conforma のポリシー違反を理解する
+
+. **Conforma (ec)** の検証は、イメージの署名済み証跡を一連のポリシーに照らしてチェックします。次の内容が表示されるはずです:
+* ✅ **Image signature check** -- イメージは Tekton Chains によって署名されています
+* ✅ **Attestation signature check** -- 証跡は署名済みで有効です
+* ✅ **Commit must be signed** -- SLSA 証跡が、コミットが署名されていたことを証明します
+* ✅ **ACS checks passed** -- イメージスキャンとポリシーチェックの結果が証跡に含まれています
+* ✅ **SonarQube quality gate** -- コード品質メトリクスが証跡に含まれています
+* ❌ **Parasol Release Approved** -- リリース承認の証跡が見つかりません
++
+
+
+. イメージがリリース承認されていないため、パイプラインは正しくプロモーションをブロックします。イメージには **signed attestation of a release approval** が付与されていません
+
+=== 演習 4: リリースを承認する
+
+. RHDH コンポーネントの概要ページで、**Release Approval** リンク（Links セクションの封筒アイコン）をクリックします。
++
+image::m02-rhdh-approval-link.png[コンポーネントページの Links セクションにある Release Approval リンク,link=self,window=blank,width=700]
+
+. Release Approval アプリケーションには、現在 preprod にデプロイされているイメージが表示されます。
++
+image::m02-approval-process.png[preprod デプロイメントと Approve ボタンを表示する Release Approval アプリケーション,link=self,window=blank,width=500]
++
+`latest` タグ (1) が preprod (2) にデプロイされており、デプロイメントの状態が "ready" (3) である一方、リリース証跡 (4) がないことが示されています。
+
+
+
+
+. **Approve** をクリックし、承認メッセージを入力します:
++
+[source,role="copypaste"]
+----
+Approved for production release. All ACS policy checks passed, vulnerabilities remediated, commit signature verified. Risk assessment: low.
+----
++
+image::m02-approval-submit.png[理由と Submit ボタンを表示する Release Approval ダイアログ,link=self,window=blank,width=500]
++
+承認はコンテナーイメージ上の **signed attestation** として記録されます -- あなたの commit signature と同様に、あなたの ID で署名されます。
++
+image::m02-approval-success.png[transparency log index を含む、正常に承認されたリリース,link=self,window=blank,width=500]
++
+transparency log index は、キーレス署名の後続の署名検証のために、署名イベントがログデータベースに保存される場所です。
+
+. チェックマークアイコンをクリックして証跡の詳細を表示します -- これで承認が暗号学的にイメージへ結び付けられています（クリック時に取得および検証されます）
++
+image::m02-approval-attestation.png[署名者と理由を表示する承認証跡の詳細,link=self,window=blank,width=400]
+
+=== 演習 5: tag-promote パイプラインを再実行する
+
+. GitLab に戻って新しいタグを作成するか（例: `v2.1`）、OpenShift Console の secured-build namespace からパイプラインを再実行します。
+
+. 今度は、`ec-validate` タスクが承認証跡を見つけ、パイプラインは成功します。
+
+. パイプライン出力では、次の内容が確認できます:
+* リリース承認を含む、すべての Conforma ポリシーが通過している
+* 脆弱性数と SonarQube メトリクスを示す警告
+* TPA にアップロードされた SBOM への **SBOM link**。そこにはバージョン（タグ）が表示される
++
+image::m02-rhdh-ec-validation-passed.png[すべてのポリシーが通過した Enterprise Contract validation,link=self,window=blank,width=700]
++
+image::m02-rhdh-tag-promote-sbom.png[View SBOM ボタン付きの成功した tag-promote パイプライン,link=self,window=blank,width=700]
++
+image::m02-tpa-sbom-details.png[Trusted Profile Analyzer の SBOM 詳細,link=self,window=blank,width=700]
+
+. パイプラインはさらに次も行います:
+* イメージをバージョンタグ付きでレジストリーにコピーする
+* GitOps manifests リポジトリーで **merge request** を開く
+
+=== 演習 6: 本番デプロイメントを完了する
+
+. `open-prod-pr` のパイプラインログで merge request リンクを見つけてクリックします。
++
+image::m02-rhdh-tag-promote-open-prod-pr.png[open-prod-pr タスクを表示する tag promote パイプライン,link=self,window=blank,width=700]
++
+image::m02-rhdh-open-prod-pr-log.png[manifests リポジトリーへの merge request リンクを表示するパイプラインログ,link=self,window=blank,width=700]
++
+manifests リポジトリー上の MR には、Quay 内のイメージへのリンクを含め、すべての Conforma 検証結果が表示されます。
++
+image::m02-gitlab-prod-mr.png[Conforma 検証結果を表示する manifests リポジトリー上の本番 MR,link=self,window=blank,width=700]
++
+image::m02-gitlab-prod-mr-merge.png[本番 MR 上の Merge ボタン,link=self,window=blank,width=700]
+
+. manifests リポジトリー上の MR を承認してマージします。
+
+. ArgoCD が変更を検出し、新しい、署名済み、証明済み、検証済み、承認済みのイメージを `secured-prod` namespace にロールアウトします。
+
+=== なぜこれが重要なのか?
+
+本番にデプロイされるイメージには、完全な **SLSA provenance chain** が付与されます:
+
+* **Signed commit** -- 検証済みの開発者 ID に追跡可能
+* **SLSA attestation** -- ビルドパイプラインが実行されたこと、どのタスクが実行されたか、そして何を生成したかを証明する
+* **ACS scan results** -- 証跡に組み込まれた脆弱性評価
+* **SonarQube results** -- 証跡内のコード品質メトリクス
+* **Signed approval** -- リリースに対する明示的な人の承認
+* **SBOM** -- イメージ内コンポーネントの完全な一覧で、継続的な脆弱性照合のために TPA に保存される
+
+これは単なるチェックボックスの演習ではありません -- すべての証拠が暗号学的に署名され、個別に検証可能です。
+
+=== どのように実現したのか?
+
+演習を読みやすく保つために、詳細を以下に追加しました。展開して、どのように実現したかを読んでください。
+
+.**Open to view implementation details**
+[%collapsible]
+====
+**Tekton Chains** は Sigstore の keyless signing を使用して、パイプラインアーティファクトに自動で署名します:
+
+* 各パイプライン実行後、Chains はパイプラインの service account の ID を使って Fulcio から短命の証明書を要求します
+* すべてのタスク結果を含む **SLSA provenance attestation** を作成します
+* 証跡と署名は **Rekor**（transparency log）に記録され、レジストリー内のイメージに添付されます
+
+**Conforma (Enterprise Contract)** は、GitLab の {gitlab_url}/parasol/conforma-policies[`conforma-policies` repository on GitLab^] に保存された一連の Rego ポリシーに対して証跡を検証します。`parasol-software-supply-chain` バンドルのポリシーは次をチェックします:
+
+* 必要なタスクが実行されたこと（verify-commit-signature, acs-image-scan, acs-image-check, sonar-scan）
+* コミット署名ステータスが `SIGNED` であること（unsigned や bot commit ではないこと）
+* ACS ポリシーチェックが通過したこと
+* SonarQube quality gate が通過したこと
+* 署名済みのリリース承認証跡がイメージに存在すること
+
+image::m02-gitlab-conforma-policies.png[GitLab の Conforma ポリシーリポジトリー,link=self,window=blank,width=700]
+
+**approval attestation** は、predicate type `https://parasol-insurance.com/releases/v1` を持つカスタム in-toto attestation です。これは承認者の ID によって（Fulcio 経由で）署名され、Chains attestation とともにイメージに添付されます。
+
+現在本番にあるイメージに関連付けられた署名済み証跡を確認したい場合は、Developer Hub の **Parasol Insurance (Secured)** コンポーネント経由で **Release Approval** アプリに戻ってください:
+
+image::m02-rhdh-release-approval-link.png[Parasol Insurance Secured コンポーネント上の Release Approval リンク,link=self,window=blank,width=400]
+
+タグをクリックすると、そのイメージに関連付けられた署名済み証跡を確認できます:
+
+image::m02-approval-inspect-attestations.png[タグをクリックして Inspect Attestations を表示,link=self,window=blank,width=500]
+
+ここでは、カスタム attestation の署名者 ID と、Tekton Chains によって署名された自動生成 attestation の両方を確認できます:
+
+image::m02-approval-attestation-details.png[Release Approval と SLSA Provenance および署名者 ID を表示する attestation 詳細,link=self,window=blank,width=700]
+
+**Attestation Detail** セクションでは、イメージとともに保存された attestation を確認できます:
+
+image::m02-approval-attestation-json.png[in-toto statement と predicate および subject を表示する Attestation Detail,link=self,window=blank,width=700]
+
+**SBOM** は **syft** を使って生成され、開発者とバージョンタグを識別するラベル付きで TPA にアップロードされます。TPA は取り込まれた脆弱性データと SBOM を継続的に照合し、デプロイ済みイメージのセキュリティ状態を継続的に可視化します。
+====
+
+=== 確認
+
+ここまでで、次のことを行ったはずです:
+
+* 署名済み MR をマージし、マージ後ビルドの成功を確認した
+* タグを作成し、承認不足により tag-promote パイプラインが失敗するのを確認した
+* リリースを承認し、Conforma 検証が通過するのを確認した
+* 完全な SLSA provenance chain を使って本番デプロイメントを検証した
+
+'''
+
+== 次の手順
+
+xref:module-02/05-namespace-security.adoc[名前空間の保護] に進み、Policy Controller が未承認のイメージのデプロイをどのように防ぐかを確認してください。

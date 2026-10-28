@@ -3,22 +3,22 @@ include::partial$_attributes.adoc[]
 
 == ワークショップ環境
 
-必要なものはすべて既にプロビジョニングされています。ラボ環境には以下が含まれます:
+必要なものはすべてあらかじめ準備されています。ラボ環境には次が含まれます。
 
-* Developer Hub、Dev Spaces、Pipelines、GitOpsが事前設定されたOpenShiftクラスター
-* すべてのワークショップリソースへのアクセス権を持つユーザーアカウント
-* 新機能で拡張するサンプルアプリケーション (Parasol Insurance)
+* Developer Hub、Dev Spaces、Pipelines、GitOps が事前設定された OpenShift クラスター
+* すべてのワークショップリソースにアクセスできるユーザーアカウント
+* 新しい機能を追加して拡張するサンプルアプリケーション（Parasol Insurance）
 
-ログイン認証情報 (Developer Hub、GitLab、すべてのワークショップサービスでこれらを使用):
+ログイン認証情報（Developer Hub、GitLab、その他すべてのワークショップサービスで使用します）:
 
 * **ユーザー名**: `{user}`
 * **パスワード**: `{password}`
 
-TIP: これらの認証情報を手元に置いてください。ワークショップ中に何度か必要になります。
+TIP: これらの認証情報はすぐ使えるようにしておいてください -- ワークショップの中で何度か必要になります。
 
-== 環境アクセス
+== 環境へのアクセス
 
-ラボ環境には以下が含まれます:
+ラボ環境には次が含まれます。
 
 * **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
 * **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
@@ -26,57 +26,57 @@ TIP: これらの認証情報を手元に置いてください。ワークショ
 * **GitLab**: {gitlab_url}[{gitlab_url}^]
 * **Argo CD**: {argocd_url}[{argocd_url}^]
 
-NOTE: すべてのURLと認証情報は、このラボインターフェースの右側パネルでも利用できます。上部のタブを使用して、OpenShift Console、Terminal、GitLabを切り替えます。
+NOTE: すべての URL と認証情報は、このラボインターフェースの右側パネルにも表示されています。上部のタブを使用して、OpenShift Console、Terminal、GitLab を切り替えてください。
 
-== タイミング
+== 所要時間
 
-このワークショップは**90分**のハンズオン作業向けに設計されています。
+このワークショップは、**90 分** のハンズオン作業向けに設計されています。
 
 [cols="2,1,3",options="header"]
 |===
-| セクション | 所要時間 | 実施内容
+| セクション | 所要時間 | やること
 
-| プラットフォームを知る
-| 10分
-| Developer Hubにログインし、ソフトウェアカタログ、API、AIアシスタントを探索
+| プラットフォームを確認する
+| 10 分
+| Developer Hub にログインし、ソフトウェアカタログ、API、AI アシスタントを確認する
 
-| あなたのミッション
-| 10分
-| 割り当てられたタスクを見つけ、セルフサービステンプレートを使用して開発環境を作成
+| ミッション
+| 10 分
+| 割り当てられたタスクを見つけ、セルフサービステンプレートを使って開発環境を作成する
 
-| 機能を構築する
-| 25分
-| Dev Spacesを開き、IDEを探索し、AIコーディングアシスタントを使用して機能を実装
+| 機能を実装する
+| 25 分
+| Dev Spaces を開き、IDE を確認し、AI コーディングアシスタントを使って機能を実装する
 
-| デプロイする
-| 15分
-| コードをプッシュし、Developer HubでCIパイプラインを表示し、品質ゲートの失敗を診断
+| リリースする
+| 15 分
+| コードを push し、Developer Hub で CI パイプラインを確認し、品質ゲートの失敗を診断する
 
-| AIを呼び出す
-| 10分
-| エージェンティックAIアシスタントを使用してコードの問題を修正し、修正をプッシュし、パイプラインの通過を確認
+| AI を呼び出す
+| 10 分
+| エージェント型 AI アシスタントを使ってコードの問題点を修正し、修正を push し、パイプラインが通過するのを確認する
 
-| 本番稼働する
-| 15分
-| mainにマージし、リリースタグを作成し、GitOpsプロモーションを承認し、本番環境で機能を検証
+| 本番公開
+| 15 分
+| main にマージし、リリースタグを作成し、GitOps のプロモーションを承認し、本番環境で機能を確認する
 |===
 
-== テクノロジースタック
+== 技術スタック
 
-このワークショップでは、以下のRed Hat製品とアップストリームプロジェクトを使用します:
+このワークショップでは、次の Red Hat 製品と upstream プロジェクトを使用します。
 
 * **Red Hat OpenShift** -- コンテナプラットフォーム
-* **Red Hat Developer Hub** -- 社内開発者ポータル (Backstageベース)
-* **Red Hat OpenShift Dev Spaces** -- クラウド開発環境 (Eclipse Cheベース)
-* **Red Hat OpenShift Pipelines** -- CI/CDパイプライン (Tektonベース)
-* **Red Hat OpenShift GitOps** -- GitOps駆動デプロイメント (Argo CDベース)
+* **Red Hat Developer Hub** -- 社内向け開発者ポータル（Backstage ベース）
+* **Red Hat OpenShift Dev Spaces** -- クラウド開発環境（Eclipse Che ベース）
+* **Red Hat OpenShift Pipelines** -- CI/CD パイプライン（Tekton ベース）
+* **Red Hat OpenShift GitOps** -- GitOps 駆動のデプロイメント（Argo CD ベース）
 * **SonarQube** -- 静的解析とコード品質スキャン
-* **Parasol Insurance** -- ワークショップ全体で使用されるサンプルQuarkusアプリケーション
+* **Parasol Insurance** -- ワークショップ全体で使用するサンプル Quarkus アプリケーション
 
-== 作成者
+== 著者
 
 Red Hat Developer Experience Team
 
 == 次のステップ
 
-xref:module-01/02-developer-experience.adoc[開発者エクスペリエンス]に進んで、ハンズオンラボを開始してください。
+ハンズオンラボを開始するには、xref:module-01/02-developer-experience.adoc[開発者エクスペリエンス] に進んでください。
