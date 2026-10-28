@@ -148,6 +148,20 @@ files_are_identical() {
   [[ -f "$target_file" ]] && diff -q "$en_file" "$target_file" &>/dev/null
 }
 
+translation_rules() {
+  cat <<RULES
+- Preserve ALL AsciiDoc syntax exactly as-is: section headings (= == ===), include:: directives, xref: targets, image:: references, attribute references like {attribute_name}, [source,...] code blocks, block delimiters (---- **** ==== -- ++++), role annotations ([.tile], [#anchor-id], [%collapsible]), passthrough blocks, conditional directives (ifdef/ifndef/endif)
+- For xref: links, translate ONLY the display text inside [...], not the file path or anchor
+- For image:: references, translate ONLY the alt text inside [...], not the file path
+- Do NOT translate content inside [source,...] code blocks
+- Keep these terms in English (do not translate them): $PRESERVE_TERMS
+- For UI labels that appear in English in the product (button names, menu items), keep the English term
+- For technical terms that practitioners in the target language commonly use in English -- such as deploy, pipeline, container, namespace, cluster, workflow, merge request, rollout, commit, branch, pod, node, operator, registry -- keep the English term or use the appropriate target language term rather than translating it into a formal/literal equivalent that reads like a textbook
+- IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
+- Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file
+RULES
+}
+
 # ── build file manifest ──────────────────────────────────────────────────────
 
 echo "==> Scanning for translatable files..."
@@ -286,15 +300,8 @@ for rel_path in "${NEW_FILES[@]+"${NEW_FILES[@]}"}"; do
 Write the translated content to $target_file, creating the file if it does not exist.
 
 Rules:
-- Preserve ALL AsciiDoc syntax exactly as-is: section headings (= == ===), include:: directives, xref: targets, image:: references, attribute references like {attribute_name}, [source,...] code blocks, block delimiters (---- **** ==== -- ++++), role annotations ([.tile], [#anchor-id], [%collapsible]), passthrough blocks, conditional directives (ifdef/ifndef/endif)
-- For xref: links, translate ONLY the display text inside [...], not the file path or anchor
-- For image:: references, translate ONLY the alt text inside [...], not the file path
-- Do NOT translate content inside [source,...] code blocks
-- Keep these technical terms in English (do not translate them): $PRESERVE_TERMS
-- For UI labels that appear in English in the product (button names, menu items), keep the English term
 - Translate all prose text naturally and idiomatically
-- IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
-- Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file"
+$(translation_rules)"
 
   if opencode run --model "$MODEL" "$PROMPT"; then
     update_status "$rel_path" "$source_commit" "$MODEL"
@@ -326,15 +333,8 @@ for rel_path in "${STALE_FILES[@]+"${STALE_FILES[@]}"}"; do
 Write the translated content to $target_file, replacing the existing file.
 
 Rules:
-- Preserve ALL AsciiDoc syntax exactly as-is: section headings (= == ===), include:: directives, xref: targets, image:: references, attribute references like {attribute_name}, [source,...] code blocks, block delimiters (---- **** ==== -- ++++), role annotations ([.tile], [#anchor-id], [%collapsible]), passthrough blocks, conditional directives (ifdef/ifndef/endif)
-- For xref: links, translate ONLY the display text inside [...], not the file path or anchor
-- For image:: references, translate ONLY the alt text inside [...], not the file path
-- Do NOT translate content inside [source,...] code blocks
-- Keep these technical terms in English (do not translate them): $PRESERVE_TERMS
-- For UI labels that appear in English in the product (button names, menu items), keep the English term
 - Translate all prose text naturally and idiomatically
-- IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
-- Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file"
+$(translation_rules)"
   else
     # Write diff to a temp file so OpenCode can reference it
     DIFF_FILE=$(mktemp)
@@ -350,14 +350,8 @@ Write the updated translation to $target_file, replacing the existing file.
 
 Rules:
 - Only update the sections that correspond to changes in the diff — keep unchanged sections exactly as they are in the current translation
-- Preserve ALL AsciiDoc syntax exactly as-is: section headings (= == ===), include:: directives, xref: targets, image:: references, attribute references like {attribute_name}, [source,...] code blocks, block delimiters (---- **** ==== -- ++++), role annotations ([.tile], [#anchor-id], [%collapsible]), passthrough blocks, conditional directives (ifdef/ifndef/endif)
-- For xref: links, translate ONLY the display text inside [...], not the file path or anchor
-- For image:: references, translate ONLY the alt text inside [...], not the file path
-- Do NOT translate content inside [source,...] code blocks
-- Keep these technical terms in English (do not translate them): $PRESERVE_TERMS
-- For UI labels that appear in English in the product (button names, menu items), keep the English term
 - Translate changed prose text naturally and idiomatically
-- Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file"
+$(translation_rules)"
   fi
 
   if opencode run --model "$MODEL" "$PROMPT"; then

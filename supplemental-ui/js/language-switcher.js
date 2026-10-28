@@ -8,7 +8,8 @@
   const languages = {
     en: { label: 'English', flag: '🇺🇸' },
     ja: { label: '日本語', flag: '🇯🇵' },
-    es: { label: 'Español', flag: '🇪🇸' },
+    // es: { label: 'Español', flag: '🇪🇸' },
+    // it: { label: 'Italiano', flag: '🇮🇹' },
   }
 
   /**

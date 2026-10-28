@@ -10,6 +10,11 @@ target_languages:
     native_name: Español
     flag: "\U0001F1EA\U0001F1F8"
     antora_display_version: Español
+  it:
+    name: Italian
+    native_name: Italiano
+    flag: "\U0001F1EE\U0001F1F9"
+    antora_display_version: Italiano
 # Files that should never be translated (relative to modules/ROOT/).
 # These are purely technical: CSS/JS passthrough, attribute definitions,
 # SVG icons, HTML figure templates. They are copied verbatim from en/.

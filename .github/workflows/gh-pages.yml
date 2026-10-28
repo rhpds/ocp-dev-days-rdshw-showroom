@@ -50,6 +50,7 @@ jobs:
           # Verify both versions built
           test -f www/modules/en/index.html || { echo "English version not built"; exit 1; }
           test -f www/modules/ja/index.html || { echo "Japanese version not built"; exit 1; }
+          test -f www/modules/it/index.html || { echo "Italian version not built"; exit 1; }
           test -f www/modules/es/index.html || { echo "Spanish version not built"; exit 1; }
 
           # Count pages (should match)
@@ -62,6 +63,7 @@ jobs:
           # Verify images exist
           test -d www/modules/en/_images || { echo "English images missing"; exit 1; }
           test -d www/modules/ja/_images || { echo "Japanese images missing"; exit 1; }
+          test -d www/modules/it/_images || { echo "Italian images missing"; exit 1; }
           test -d www/modules/es/_images || { echo "Spanish images missing"; exit 1; }
 
           echo "✓ Both language versions built successfully"
