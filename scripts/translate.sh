@@ -12,6 +12,7 @@ MODEL=""
 SPECIFIC_FILE=""
 DRY_RUN=false
 CLEAN_ORPHANS=false
+FORCE=false
 
 usage() {
   cat <<EOF
@@ -25,6 +26,7 @@ Options:
   --file <path>        Translate only this file (relative to modules/ROOT/)
   --dry-run            Show what would be translated without calling the API
   --clean-orphans      Remove translated files whose English source no longer exists
+  --force              Force re-translation of all files, ignoring staleness status
   -h, --help           Show this help
 EOF
   exit 0
@@ -39,6 +41,7 @@ while [[ $# -gt 0 ]]; do
     --file)        SPECIFIC_FILE="$2"; shift 2 ;;
     --dry-run)     DRY_RUN=true; shift ;;
     --clean-orphans) CLEAN_ORPHANS=true; shift ;;
+    --force)       FORCE=true; shift ;;
     -h|--help)     usage ;;
     *)             echo "Unknown option: $1" >&2; exit 1 ;;
   esac
@@ -189,7 +192,9 @@ for rel_path in "${TRANSLATABLE_FILES[@]}"; do
   source_commit=$(get_source_commit "content/en/modules/ROOT/$rel_path")
   stored_commit=$(get_stored_commit "$rel_path")
 
-  if [[ -z "$stored_commit" ]]; then
+  if [[ "$FORCE" == true ]]; then
+    NEW_FILES+=("$rel_path")
+  elif [[ -z "$stored_commit" ]]; then
     # No status entry — check if the file is already translated
     if [[ -f "$target_file" ]] && ! files_are_identical "$en_file" "$target_file"; then
       # Already translated, bootstrap the status entry
@@ -288,6 +293,7 @@ Rules:
 - Keep these technical terms in English (do not translate them): $PRESERVE_TERMS
 - For UI labels that appear in English in the product (button names, menu items), keep the English term
 - Translate all prose text naturally and idiomatically
+- IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
 - Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file"
 
   if opencode run --model "$MODEL" "$PROMPT"; then
@@ -327,6 +333,7 @@ Rules:
 - Keep these technical terms in English (do not translate them): $PRESERVE_TERMS
 - For UI labels that appear in English in the product (button names, menu items), keep the English term
 - Translate all prose text naturally and idiomatically
+- IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
 - Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file"
   else
     # Write diff to a temp file so OpenCode can reference it
