@@ -3,13 +3,13 @@
 include::partial$style.adoc[]
 
 [id='lab5-govern-ai-consumption']
-== Lab 5 - LLM Governance
+== Lab 5 - LLM ガバナンス
 
 Connectivity Link を使用して、LLM エンドポイントの前にガバナンス層を配置します。複数のサービスティアにわたって、API キー認証とトークンベースのレート制限を適用します。
 
 {empty} +
 
-=== The Scenario
+=== シナリオ
 
 前のラボでは、自然言語で顧客のサポート問題を解決する AI エージェントを構築しました。このエージェントは、チャットインターフェース内からデータベースを照会し、レコードを更新し、ポリシードキュメントを再生成します。
 
@@ -25,15 +25,15 @@ flowchart LR
     AI5 <--> GW
 
     GW <--> GWp
-    %%GWp[" "] --> |"🥇 Rate Limit"| GP
-    %%GWp --> |"🥈 Rate Limit"| SP
+    %%GWp[" "] --> |"🥇 レート制限"| GP
+    %%GWp --> |"🥈 レート制限"| SP
     GWp[" "] --- GP --- GWp2[" "] <--> LLM
     GWp --- SP --- GWp2
 
-    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
-    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Assistant", pos: "b", h: 80, w: 80, constraint: "on" }
-    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold Profile", pos: "b", h: 80, w: 70, constraint: "on" }
-    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver Profile", pos: "b", h: 80, w: 70, constraint: "on" }
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
     GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
     LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
 
@@ -58,7 +58,7 @@ Gold は分析がより深く、応答もより豊富なため、より多くの
 
 {empty} +
 
-=== Why Connectivity Link?
+=== Connectivity Link を選ぶ理由
 
 これはまさに _Red Hat Connectivity Link_ が想定している種類の問題です。link:https://kuadrant.io/[_Kuadrant_ プロジェクト,window=_blank] を基盤とし、*Kubernetes* に AI を考慮したガバナンスをもたらします。
 
@@ -71,7 +71,7 @@ Gold は分析がより深く、応答もより豊富なため、より多くの
 
 {empty} +
 
-=== The Gateway API Model
+=== Gateway API モデル
 
 Connectivity Link は、*Kubernetes* でトラフィックルーティングを管理する標準である _Kubernetes Gateway API_ の上に重なります。このモデルを理解すると、これからの演習が直感的になります。
 
@@ -85,7 +85,7 @@ Connectivity Link は、*Kubernetes* でトラフィックルーティングを�
 [subs="attributes"]
 ----
 ---
-title: The Gateway API Model
+title: Gateway API モデル
 config:
     flowchart:
         titleTopMargin: -200
@@ -110,13 +110,13 @@ flowchart LR
 ----
 
 // ++++
-// <p style="text-align: center; margin-top: -2rem; padding-right: 12rem; font-style: italic; color: #555">The Gateway API Model</p>
+// <p style="text-align: center; margin-top: -2rem; padding-right: 12rem; font-style: italic; color: #555">Gateway API モデル</p>
 // ++++
 
 [.mermaid-hints-simple]
 ****
 GC | GatewayClass | プラットフォームチームが管理します。Gateway とその設定（IP プール、リソース制限）を管理するコントローラー実装を定義します。 +
-GT | Gateway | クラスターへの प्रवेश点です。適切な宛先へトラフィックを振り分けるロードバランサーまたはサービスです。 +
+GT | Gateway | クラスターへの入口です。適切な宛先へトラフィックを振り分けるロードバランサーまたはサービスです。 +
 HTTP | HTTPRoute | ルーティングルールです。URL パス、ヘッダー、またはホストに基づいて、Gateway からバックエンドサービス（LLM）へのリクエストをマップします。
 ****
 TIP: 上の図で各コンポーネントにカーソルを合わせると、その役割を確認できます。
@@ -132,26 +132,26 @@ config:
   markdownAutoWrap: false
 ---
 flowchart LR
-    Client([App])
+    Client([アプリ])
     Gateway[Gateway]
 
     subgraph S1 ["HTTPRoute"]
         direction LR
         subgraph S2 [" "]
             direction LR
-            Auth[Auth Policy]
-            RateLimit[Token Rate Limit Policy]
+            Auth[認証ポリシー]
+            RateLimit[トークンレート制限ポリシー]
             Auth ~~~ RateLimit
         end
         
-        A@{ shape: braces, label: "<i>Connectivity Link policies attach to Gateway API resources</i>" }
+        A@{ shape: braces, label: "<i>Connectivity Link ポリシーは Gateway API リソースに付与されます</i>" }
     end
 
     Service[Service]
     Pod1[Pod]
     Pod2[Pod]
 
-    Client -.->|HTTP request| Gateway --> S2 -->|routing rule| Service
+    Client -.->|HTTP リクエスト| Gateway --> S2 -->|ルーティングルール| Service
     Service --> Pod1
     Service --> Pod2
 
@@ -167,7 +167,7 @@ flowchart LR
     style Pod2 fill:#336,color:#fff
 ----
 
-=== End-to-End Request Flow
+=== エンドツーエンドのリクエストフロー
 
 モデルを理解したので、次はそれがあなたの環境にどう対応するかを見てみましょう。サポート担当者は AI アシスタントとやり取りし、そのアシスタントがゲートウェイとガバナンス層を経由して LLM に到達するようにリクエストを送信します。
 
@@ -177,20 +177,20 @@ flowchart LR
 ----
 flowchart LR
     Agent --> Bot
-    Bot -->|api key| Gateway
+    Bot -->|API キー| Gateway
     Gateway --> S2
     Auth -->|userid + group| Token
     S2 --> LLM
 
     subgraph S2 ["HTTPRoute"]
         subgraph S3 ["Connectivity Link"]
-            Auth[Auth Policy]
-            Token[Token Rate Limit]
+            Auth[認証ポリシー]
+            Token[トークンレート制限]
         end
     end
 
-    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
-    Bot@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Assistant", pos: "b", h: 80, w: 80, constraint: "on" }
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    Bot@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
     LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
 
     style Agent fill:none,stroke:none
@@ -204,8 +204,6 @@ flowchart LR
 ----
 
 サポート担当者がどのように接続するかに関係なく、この同じアーキテクチャが適用されます。たとえば、Rocket.Chat、社内チャットボット、またはその他のアプリケーションからでも同様です。
-
-
 
 
 

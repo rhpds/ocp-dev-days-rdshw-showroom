@@ -1,13 +1,13 @@
 :imagesdir: ../assets/images
 include::partial$style.adoc[]
 
-+++
+++++
 <style>.pagination, .nav-footer { display: none !important; }</style>
-+++
+++++
 
 == AI のためのアプリケーション接続
 
-__App Connectivity for AI__ へようこそ。このモジュールは、Red Hat の強力なツールとテクノロジーを使って AI データフローを構築するための包括的な入門を提供するよう設計されています。AI が初めての方でも、経験豊富な開発者でも、このワークショップでは、AI アプリケーションを支える効率的で安全なデータフローを作成する手順を案内します。
+ようこそ、 __AI 向けアプリケーション接続__ へ。このモジュールは、Red Hat の強力なツールとテクノロジーを使って AI データフローを構築するための包括的な入門を提供するよう設計されています。AI が初めての方でも、経験豊富な開発者でも、このワークショップでは、AI アプリケーションを支える効率的で安全なデータフローを作成する手順を案内します。
 
 [TIP]
 --
@@ -18,42 +18,42 @@ __App Connectivity for AI__ へようこそ。このモジュールは、Red Hat
 
 [.tile]
 ****
-xref:module-03/intro/intro.1.adoc[Introduction]
+xref:module-03/intro/intro.1.adoc[はじめに]
 
 ワークショップの目的、使用するテクノロジー、シナリオを把握し、開発環境をセットアップします。
 ****
 
 [.tile]
 ****
-xref:module-03/m1/m1.0.adoc[Lab 1 -- Ingest Service]
+xref:module-03/m1/m1.0.adoc[ラボ 1 -- 取り込みサービス]
 
 EDI ポリシー申請を取り込み、変換してバックエンドデータベースに保存し、Service Interconnect による安全なクロスクラスター接続を使って PDF ポリシードキュメントを生成します。
 ****
 
 [.tile]
 ****
-xref:module-03/m2/m2.0.adoc[Lab 2 -- Messaging Access]
+xref:module-03/m2/m2.0.adoc[ラボ 2 -- メッセージングアクセス]
 
 Matrix と Rocket.Chat のプラットフォームに参加し、両方のメッセージングシステムを接続する最初の統合フローを確認します。
 ****
 
 [.tile]
 ****
-xref:module-03/m3/m3.0.adoc[Lab 3 -- Multi-channel Hub]
+xref:module-03/m3/m3.0.adoc[ラボ 3 -- マルチチャネルハブ]
 
 Kafka を基盤としてメッセージングアーキテクチャを分離し、標準データモデルを採用して、イベント駆動型ソリューション全体を OpenShift にデプロイします。
 ****
 
 [.tile]
 ****
-xref:module-03/m4/m4.0.adoc[Lab 4 -- AI Customer Support]
+xref:module-03/m4/m4.0.adoc[ラボ 4 -- AI カスタマーサポート]
 
 Rocket.Chat 内で自然言語を使ってポリシーの問題を解決する AI 搭載サポートエージェントを構築します。これは Agentic Apache Camel と MaaS によってオーケストレーションされます。
 ****
 
 [.tile]
 ****
-xref:module-03/m5/m5.0.adoc[Lab 5 -- LLM Governance]
+xref:module-03/m5/m5.0.adoc[ラボ 5 -- LLM ガバナンス]
 
 Red Hat Connectivity Link で LLM へのアクセスを保護し、統制します。API キー認証と、ユーザー層ごとのトークンベースのレート制限を適用します。
 ****

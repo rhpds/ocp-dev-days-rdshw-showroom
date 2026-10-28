@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id="enable-and-test"]
 == OpenShift で本番稼働させる
 
-_Kafka_ から _Rocket.Chat_ へのフローは完了しました。時間を節約するため、4 つすべてのフローが _OpenShift_ にデプロイされています。これから、それらをテストし、顧客とサポート担当者の会話をシミュレートします。
+「 _Kafka_ から _Rocket.Chat_ へ」のフローは完了しました。時間を節約するため、4 つすべてのフローが _OpenShift_ にデプロイされています。これから、それらをテストし、顧客とサポート担当者の会話をシミュレートします。
 
 下の図は、顧客とサポート担当者の間で双方向通信を可能にする 4 つのフローを示しています。
 
@@ -31,13 +31,13 @@ flowchart LR
 
 {empty} +
 
-_OpenShift_ Developer Console の *Topology* ビューを開くと、事前にデプロイされた 4 つのフローを確認できます。
+事前にデプロイされた 4 つのフローは、 _OpenShift_ Developer Console の *Topology* ビューを開くと確認できます。
 
 * {url-devconsole}[Topology ビューを開く^]
 ** ユーザー名: `{user-username}`
 ** パスワード: `{user-password}`
 
-下の画像は、見つかるはずの内容を示しています。4 つの Camel integration (`m2k`, `k2r`, `r2k`, `k2m`) が中央の _Kafka_ クラスターに接続されています。デプロイメントは現在ゼロまでスケールダウンしており、まだ実行されていません。次にそれを行います。
+下の画像は、表示されるはずの内容を示しています。4 つの Apache Camel 統合フロー (`m2k`, `k2r`, `r2k`, `k2m`) が中央の _Kafka_ クラスターに接続されています。デプロイメントは現在レプリカ数がゼロにスケールダウンされており、まだ実行されていません。次に起動します。
 
 TIP: レイアウトは異なる場合があります。ノードはドラッグ & ドロップで整理できます。
 
@@ -48,7 +48,7 @@ image::module-03/m3/openshift-topology-flows.png[width=60%]
 
 === フローを開始する
 
-_Dev Spaces_ のターミナルから、4 つすべてのデプロイメントをスケールアップしてフローを開始します。
+ターミナルで _Dev Spaces_ を使い、4 つすべてのデプロイメントをスケールアップしてフローを開始します。
 
 {blank}
 
@@ -62,9 +62,9 @@ oc scale deployment m2k r2k k2m k2r --replicas=1
 .このコマンドは何をしますか？
 [%collapsible]
 ====
-* `oc scale deployment` — 1 つまたは複数のデプロイメントで実行中のレプリカ数を調整します
-* `m2k r2k k2m k2r` — 4 つの Camel integration フロー
-* `--replicas=1` — 各デプロイメントを 1 レプリカまでスケールし、起動します
+* `oc scale deployment` — 1 つ以上のデプロイメントで実行するレプリカ数を調整します
+* `m2k r2k k2m k2r` — 4 つの Apache Camel 統合フロー
+* `--replicas=1` — 各デプロイメントを 1 つのレプリカにスケールし、起動します
 ====
 --
 
@@ -92,7 +92,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
 +
 [.copypaste.value]
 ****
-Hi, I need some help with a policy application I submitted recently.
+こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
 ****
 +
 {blank}
@@ -103,7 +103,7 @@ Hi, I need some help with a policy application I submitted recently.
 +
 [.copypaste.value]
 ****
-Of course! Could you share your policy reference so we can look into it?
+もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
 ****
 
 {empty} +
@@ -111,7 +111,7 @@ Of course! Could you share your policy reference so we can look into it?
 うまくいけば、両方のプラットフォームにやり取り全体が表示されます。以下のような見え方になるはずです。
 
 [subs=attributes]
-+++
+++++
 <div class="matrix-flow-wrapper">
   <style>
     .matrix-flow-wrapper {
@@ -193,7 +193,7 @@ Of course! Could you share your policy reference so we can look into it?
               4:10
             </div>
             <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
-              Hi, I need some help with a policy application I submitted recently.
+              こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
             </div>
           </div>
           <div style="background-color: #eee; display: flex; align-items: baseline; padding: 5px 0px;">
@@ -201,7 +201,7 @@ Of course! Could you share your policy reference so we can look into it?
               4:11
             </div>
             <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
-              <span style="font-weight:700">{user-username}@rocketchat:</span> Of course! Could you share your policy reference so we can look into it?
+              <span style="font-weight:700">{user-username}@rocketchat:</span> もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
             </div>
           </div>
         </div>
@@ -236,7 +236,7 @@ Of course! Could you share your policy reference so we can look into it?
                 <span style="font-size: 11px; color: #aaa;">4:10 PM</span>
               </div>
               <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
-                <span style="font-weight:700">{user-username}@matrix:</span> Hi, I need some help with a policy application I submitted recently.
+                <span style="font-weight:700">{user-username}@matrix:</span> こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
               </div>
             </div>
           </div>
@@ -250,7 +250,7 @@ Of course! Could you share your policy reference so we can look into it?
                 <span style="font-size: 11px; color: #aaa;">4:11 PM</span>
               </div>
               <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
-                Of course! Could you share your policy reference so we can look into it?
+                もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
               </div>
             </div>
           </div>
@@ -259,7 +259,7 @@ Of course! Could you share your policy reference so we can look into it?
     </div>
   </div>
 </div>
-+++
+++++
 
 {empty} +
 
@@ -274,8 +274,8 @@ Of course! Could you share your policy reference so we can look into it?
 メッセージが _Matrix_ から _Rocket.Chat_ へ、そして戻る双方向で流れているのを確認できましたか？
 
 [.success]
-双方向統合は機能しています。顧客とサポート担当者は、_Kafka_ を通じてプラットフォームをまたいで通信できるようになりました。
+双方向統合は機能しています。顧客とサポート担当者は、 _Kafka_ を通じてプラットフォームをまたいで通信できるようになりました。
 
 [.fail]
-エラーがないか、`oc logs deployment/m2k` と `oc logs deployment/k2r` で Pod ログを確認してください。
+エラーがないか、 `oc logs deployment/m2k` と `oc logs deployment/k2r` で Pod ログを確認してください。
 ****

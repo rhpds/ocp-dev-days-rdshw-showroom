@@ -4,7 +4,7 @@ include::partial$style.adoc[]
 
 == 認証のテスト
 
-前のセクションでは、LLM エンドポイントを保護する AuthPolicy をデプロイしました。ここでは、Customer Profile の分析機能がアーキテクチャにどう組み込まれているか、また AuthPolicy image:module-03/common/guardrail-icon.svg[width=40] がどこで作用するのかを説明します。
+前のセクションでは、LLM エンドポイントを保護する AuthPolicy をデプロイしました。ここでは、顧客プロファイル分析機能がアーキテクチャにどう組み込まれているか、また AuthPolicy image:module-03/common/guardrail-icon.svg[width=40] がどこで作用するのかを説明します。
 
 [#auth-diagram.mermaid]
 ----
@@ -13,13 +13,13 @@ flowchart LR
     RC <--> Integration
 
     subgraph Integration ["⚙️ Agentic Integration&nbsp;"]
-        Steps["<div style='text-align:left'>① AI reasoning<br/>② Tool calling</div>"]
+        Steps["<div style='text-align:left'>① AI 推論<br/>② ツール呼び出し</div>"]
     end
 
     subgraph ProfileLabel ["🔧 Customer Profile Tool&nbsp;&nbsp;"]
         subgraph ProfileInner [" "]
             direction LR
-            DB -->|customer<br/>data| ProfileAgent
+            DB -->|顧客<br/>データ| ProfileAgent
         end
     end
 
@@ -31,12 +31,12 @@ flowchart LR
     Integration <-->|②| ProfileInner
     ProfileAgent --> Gateway --> ProfileModel
 
-    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポートエージェント", pos: "b", h: 80, w: 80, constraint: "on" }
     RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 80, w: 80, constraint: "on" }
-    Model@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI Model", pos: "b", h: 80, w: 80, constraint: "on" }
+    Model@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI モデル", pos: "b", h: 80, w: 80, constraint: "on" }
     ProfileModel@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
-    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "System Stores", pos: "b", h: 70, w: 70, constraint: "on" }
-    ProfileAgent@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Agent", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "システムストア", pos: "b", h: 70, w: 70, constraint: "on" }
+    ProfileAgent@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI エージェント", pos: "b", h: 80, w: 80, constraint: "on" }
     Gateway@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "AuthPolicy", pos: "b", h: 80, w: 80, constraint: "on" }
 
     style Agent fill:none,stroke:none
@@ -68,7 +68,7 @@ auth-diagram
 この統合では、2 つの異なる AI モデルを使用します。
 
 * pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] *AI Model* -- 推論を行い、ツールを呼び出します。
-* pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] *LLM* -- Customer Profile Tool を動かし、顧客分析を生成します。
+* pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] *LLM* -- Customer Profile Tool を使って顧客分析を生成します。
 
 この演習では、デプロイした AuthPolicy image:module-03/common/guardrail-icon.svg[width=40] は 2 つ目のモデルのみに適用され、メインの推論モデルには影響しません。
 ====
@@ -78,22 +78,22 @@ auth-diagram
 
 === API キーなしでテストする
 
-デプロイした AuthPolicy は、単に許可するか拒否するかだけではありません。サービス階層を判別します。ここでは、Customer Profile Tool が gateway を通じてリクエストをどのようにルーティングするかを示します。
+デプロイした AuthPolicy は、単に許可するか拒否するかを判定するだけではありません。サービス階層も判別します。ここでは、Customer Profile Tool がゲートウェイを通じてリクエストをどのようにルーティングするかを示します。
 
 [.mermaid.mermaid-w60]
 ----
 flowchart LR
     AGT5 <--> AI5
-    AI5 <--> |🥇 Gold key<br>🥈 Silver key|GW
+    AI5 <--> |🥇 Gold キー<br>🥈 Silver キー|GW
 
     GW --- GWp
     GWp[" "] --> GP
     GWp --> SP
 
-    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
-    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Assistant", pos: "b", h: 80, w: 80, constraint: "on" }
-    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold Profile", pos: "b", h: 80, w: 70, constraint: "on" }
-    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver Profile", pos: "b", h: 80, w: 70, constraint: "on" }
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポートエージェント", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
 
     style AGT5 fill:none,stroke:none
     style AI5 fill:none,stroke:none
@@ -107,9 +107,9 @@ flowchart LR
 
 {empty} +
 
-Gold と Silver の両方の profile は同じ LLM によって生成されます。AuthPolicy は各リクエストで提示される API キーを検証し、提供するサービス階層を判定します。
+Gold と Silver の両方のプロファイルは同じ LLM によって生成されます。AuthPolicy は各リクエストで提示される API キーを検証し、提供するサービス階層を判定します。
 
-これは `application.properties` ファイルに反映されています。1 つのエンドポイントを指す 2 つの agent 定義があり、それぞれに独自の API キーがあります。
+これは `application.properties` ファイルに反映されています。1 つのエンドポイントを指す 2 つの agent 定義があり、それぞれに独自の API キーが設定されています。
 
 [#config-snippet]
 [source,properties, subs="attributes"]
@@ -137,11 +137,11 @@ config-snippet
 {x: 34, y: 88, rot: -80}
 ****
 
-現在、両方のキーは `EMPTY` です。Customer Profile Tool を呼び出すすべてのリクエストは、gateway で拒否されます。
+現在、両方のキーは `EMPTY` です。Customer Profile Tool を呼び出すすべてのリクエストは、ゲートウェイで拒否されます。
 
 {empty} +
 
-顧客プロファイル分析を要求して、これを確認しましょう。
+顧客プロファイルの分析をリクエストして、これを確認しましょう。
 
 . Camel agent アプリケーションを実行する
 +
@@ -167,14 +167,14 @@ camel run * --local-kamelet-dir ../support/kamelets
 
 . _Rocket.Chat_ ウィンドウに切り替えます。
 +
-TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat platform onboarding,window=_blank] の手順に従ってください（新しいタブで開きます）。
+TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの初期設定,window=_blank] の手順に従ってください（新しいタブで開きます）。
 +
 {empty} +
 
 . 左側のサイドバーで、自分のユーザー識別子に一致する `ai-support` チャンネルを見つけて選択します。
 +
 [subs=attributes]
-+++
+++++
 <div style="display: inline-flex; align-items: center; gap: 8px; background: #2f343d; border-radius: 4px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 8px 0;">
   <span style="width: 32px; height: 32px; background: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">A</span>
   <span style="color: #ccc; font-size: 15px;">&#x2317; <b>ai-support<span id="rc-channel-num"></span></b></span>
@@ -195,7 +195,7 @@ TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Ro
   else window.addEventListener('load', resolve);
 })();
 </script>
-+++
+++++
 +
 {empty} +
 
@@ -217,8 +217,8 @@ Please, generate a customer profile for order 61356291
 :fig-time: 6:49 PM
 :fig-user-msg: Please, generate a customer profile for order 61356291
 :fig-status: 401 Unauthorized
-:fig-action: Authentication failed due to invalid or missing API Key.
-:fig-notice: Please verify your API key and try again.
+:fig-action: 認証に失敗しました。API キーが無効か、設定されていません。
+:fig-notice: API キーを確認して、もう一度お試しください。
 include::_figures/rc-service-notice.adoc[]
 +
 {empty} +
@@ -242,7 +242,7 @@ include::_figures/rc-service-notice.adoc[]
 ff
 ****
 +
-これにより、cluster secrets から取得した有効な値で `application.properties` の Gold と Silver の API キーが埋められます。
+これにより、クラスターシークレットから取得した有効な値で `application.properties` の Gold と Silver の API キーが設定されます。
 
 [TIP]
 --
@@ -261,7 +261,7 @@ ff
 +
 {empty} +
 
-. `application.properties` を開き、API キーが設定済みになっていることを確認します。pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] の Gold キーと pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] の Silver キーは、もはや `EMPTY` ではないはずです。どちらにも有効な API キー値が入っている必要があります。
+. `application.properties` を開き、API キーが設定されていることを確認します。pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] Gold キーと pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] Silver キーは、`EMPTY` ではなく、それぞれ有効な API キー値になっているはずです。
 +
 [#config-snippet-2]
 [source,properties, subs="attributes"]
@@ -322,11 +322,11 @@ camel run * --local-kamelet-dir ../support/kamelets
 Please, generate a customer profile for order 61356291
 ****
 +
-NOTE: このリクエストの注文番号は説明用です。Customer Profile Tool は、プロジェクトの `data/` フォルダー内にある JSON ファイルからのシミュレートされた入力データを使用します。ソースコード内でこれらのファイルを確認すると、分析に使われる mock CRM、history、audit、ticket のデータを見ることができます。
+NOTE: このリクエストの注文番号は説明用です。Customer Profile Tool は、プロジェクトの `data/` フォルダーにある JSON ファイルの模擬データを使用します。ソースコード内でこれらのファイルを確認すると、分析に使われる模擬 CRM、履歴、監査、チケットのデータを見ることができます。
 +
 {empty} +
 
-. 今度はリクエストが成功するはずです。両方のキーが設定されているため、システムはデフォルトで Gold、つまり 2 つの分析階層のうちよりリッチな方を使います。次のような *GOLD TIER ANALYSIS* と、完全な customer profile が表示されるはずです。
+. 今度はリクエストが成功するはずです。両方のキーが設定されているため、システムはデフォルトで Gold、つまり 2 つの分析階層のうち、より詳細な方を使います。次のような *GOLD TIER ANALYSIS* と、完全な顧客プロファイルが表示されるはずです。
 +
 {blank}
 +
@@ -335,11 +335,11 @@ include::_figures/rc-gold-profile.adoc[]
 
 {empty} +
 
-NOTE: LLM の応答は非決定的であるため、正確な文言は上のサンプルと異なる場合があります。重要なのは *GOLD TIER ANALYSIS* バナーと、Customer Profile、Sentiment & Risk、Open Issues、Recommended Action の 4 つのセクションです。
+NOTE: LLM の応答は確定的ではないため、正確な文言は上のサンプルと異なる場合があります。重要なのは *GOLD TIER ANALYSIS* バナーと、「顧客プロファイル」、「感情とリスク」、「未解決の問題」、「推奨アクション」の 4 つのセクションです。
 
 {empty} +
 
-この時点で、認証は強制されています。Gold と Silver の両方のキーが設定され、AuthPolicy は LLM へのアクセスを許可する前にそれらを検証します。次の演習では、gateway が各階層の消費量をどのように制御し、ある階層が上限に達したときに何が起こるかを学びます。
+この時点で、認証が適用されています。Gold と Silver の両方のキーが設定され、AuthPolicy は LLM へのアクセスを許可する前にそれらを検証します。次の演習では、ゲートウェイが各階層の利用量をどのように制御するか、また階層が上限に達すると何が起こるかを確認します。
 
 {empty} +
 

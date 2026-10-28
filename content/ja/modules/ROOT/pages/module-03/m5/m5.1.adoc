@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab5"]
-== Lab 作業用フォルダーを準備する
+== ラボ作業用フォルダーを準備する
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -31,7 +31,7 @@ include::../_shared/close-tabs.adoc[]
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ Integration]
+            Camel[⚙️ 統合]
         end
     end
 
@@ -45,7 +45,7 @@ flowchart LR
         end
     end
 
-    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
 
     style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
     style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
@@ -66,7 +66,7 @@ si-setup
 すべてのリソースが `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -75,7 +75,7 @@ si-setup
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-+++
+++++
 
 上記の出力は、あなたの namespace とデータベースの namespace の間に Service Interconnect リンクが確立されたことを示しています。
 
@@ -88,7 +88,7 @@ Namespace: shared-database
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ Integration]
+            Camel[⚙️ 統合]
 
             SI1{{"Service\nInterconnect"}}
         end
@@ -96,7 +96,7 @@ flowchart LR
 
     Camel --> SI1
 
-    SI1 -.-|"🔒 secure link"| SI2
+    SI1 -.-|"🔒 セキュアリンク"| SI2
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -108,7 +108,7 @@ flowchart LR
 
     SI2 --> SVC
 
-    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
 
     style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
     style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
@@ -146,7 +146,7 @@ step 9
 
 * `step N` — ラボを step N の開始位置にリセットする
 * `steps` — ラボで利用可能なすべてのステップを一覧表示する
-* `start` または `restart` — 最初からやり直す（`step 1` と同等）
+* `start` または `restart` — 最初からやり直す（ `step 1` と同等）
 * `ff` — *次の* ステップへ早送りする
 * `rw` — *前の* ステップへ巻き戻す
 ====
@@ -162,8 +162,8 @@ step 9
 [.indent2]
 📁 workshop +
 &nbsp;&nbsp;📁 lab +
-&nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(mock inputs)</small>] +
-&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(model prompts)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(モック入力)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(モデルプロンプト)</small>] +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-main.camel.yaml* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-tool-profile.camel.yaml* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +

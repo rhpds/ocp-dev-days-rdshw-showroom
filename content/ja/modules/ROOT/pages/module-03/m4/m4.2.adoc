@@ -29,7 +29,7 @@ include::../_shared/kaoto-intro.adoc[]
 
 Kaoto がファイルを開き、含まれているすべてのルート定義を表示します。このファイルにはいくつかのルートがありますが、ここで注目するのはメインのエージェントフローです。以下のように進めます。
 
-// You may find the routes displayed vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+// ルートが縦向きに表示される場合があります。読みやすくするには、キャンバス下部の中央のボタンをクリックして横向きのレイアウトに切り替えます。
 
 // [.bordered]
 // image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
@@ -104,8 +104,8 @@ kaoto-agent-route
 pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `set system prompt` ステップを有効にします。これにより、AI エージェントの振る舞いを指示します +
 pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] `Dummy response` を MaaS を利用した AI エージェントに置き換え、実際の顧客要求に対応できるようにツールを順次追加していきます
 
-// . You'll enable the `set system prompt` step — this will instruct the AI agent how to behave
-// . You'll replace the `dummy response` with a MaaS-powered AI agent, and progressively equip it with tools to handle real customer requests
+// . `set system prompt` ステップを有効にして、AI エージェントの振る舞いを指示します
+// . `dummy response` を MaaS を利用した AI エージェントに置き換え、実際の顧客要求に対応できるようにツールを順次追加します
 
 {empty} +
 
@@ -178,8 +178,8 @@ Camel のボットがメッセージを受け取り、`Hello World` と応答し
 {blank}
 
 :fig-time: 5:05 PM
-:fig-user-msg: Hi
-:fig-bot-msg: Hello World
+:fig-user-msg: こんにちは
+:fig-bot-msg: こんにちは
 include::_figures/rc-interaction.adoc[]
 
 これは想定どおりです。ルートはまだハードコードされたダミー応答を使っています。次の手順で、推論して自然に応答できる本物の AI エージェントに置き換えます。
@@ -245,11 +245,11 @@ dev モードで実行しているため、_Camel_ は自動的にホットリ�
 +
 {blank}
 +
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: #818181">2026-03-24 18:14:11.113  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> : <span style="color:#fff">Routes reloaded summary</span> (total:<span style="color:#0FBC7A">2</span> started:<span style="color:#0FBC7A">2</span>)
 2026-03-24 18:14:11.115  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">rocketchat-to-agent</span> (platform-http:///ai-support)
 2026-03-24 18:14:11.116  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">to-rocketchat</span> (direct://to-rocketchat)</pre>
-+++
+++++
 +
 {empty} +
 
@@ -288,7 +288,7 @@ _Rocket.Chat_ のウィンドウに戻り、次のように入力します。
 +
 [.copypaste.value]
 ****
-Hi again
+もう一度、こんにちは
 ****
 +
 AI エージェントはメッセージを処理します。MaaS を通じて LLM に送信され、LLM がそれを推論して自然言語の応答を返します。次のような表示が見えるはずです。
@@ -296,8 +296,8 @@ AI エージェントはメッセージを処理します。MaaS を通じて LL
 {blank}
 +
 :fig-time: 5:06 PM
-:fig-user-msg: Hi again
-:fig-bot-msg: Hello! How can I assist you today?
+:fig-user-msg: もう一度、こんにちは
+:fig-bot-msg: こんにちは。どのようにお手伝いできますか？
 include::_figures/rc-interaction.adoc[]
 +
 {empty} +
@@ -313,12 +313,12 @@ include::_figures/rc-interaction.adoc[]
 +
 [.copypaste.value]
 ****
-Can you show me policy document 61356291
+保険証券 61356291 を表示してもらえますか？
 ****
 +
-NOTE: このラボには、使用可能なサンプルの policy document (`61356291`) が含まれています。これは上のコマンドで参照しているものです。
+NOTE: このラボには、使用できるサンプルの保険証券 (`61356291`) が用意されています。上のコマンドで参照しているのはこの保険証券です。
 +
-TIP: Ingestion ラボで生成した policy document を取得することもできます。以前の演習で使った任意の policy document 番号を試してみてください。
+TIP: 取り込みラボで生成した保険証券を取得することもできます。以前の演習で使った任意の保険証券番号を試してみてください。
 +
 {empty} +
 +
@@ -327,8 +327,8 @@ TIP: Ingestion ラボで生成した policy document を取得することもで
 {blank}
 +
 :fig-time: 5:07 PM
-:fig-user-msg: Can you show me policy document 61356291
-:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
 include::_figures/rc-interaction.adoc[]
 +
 予想どおり、ボットは要求を拒否します。
@@ -356,7 +356,7 @@ AI エージェントは必要なツールにアクセスできません。MCP �
 
 === MCP サーバーを接続する
 
-このプロジェクトには、Camel の agentic flow に必要なツールを提供する MCP サーバーが含まれていますが、エージェントはまだそれを知りません。agentic flow に接続する必要があります。
+このプロジェクトには、Camel のエージェントフローに必要なツールを提供する MCP サーバーが含まれていますが、エージェントはまだそれを知りません。エージェントフローに接続する必要があります。
 
 下の図は、Agentic Integration（MCP が有効になった後）が AI モデルからのツール呼び出しをどのようにルーティングするかを示しています。2 つの MCP サーバーが、Node.js と Camel Quarkus の異なるツール群を提供します。AI モデルがツールを必要とすると、Agentic Integration は要求を適切な MCP サーバーにルーティングし、そこでバックエンドシステムに対してツールを実行して結果を返します。
 
@@ -415,7 +415,7 @@ NOTE: Agentic Integration は、異なる言語で実装された MCP サーバ�
 --
 MCP サーバーを使わなくても、Camel ではツールを定義できます。`langchain4j-tools` コンポーネントで始まる通常のルートとして直接定義できます。ルートが何をするかを説明すると、エージェントがタグを通じて自動的に見つけ、必要に応じて呼び出します。
 
-たとえば、ある policy document の PDF URL を取得するローカルツールは次のように定義できます。
+たとえば、ある保険証券の PDF URL を取得するローカルツールは次のように定義できます。
 
 image::module-03/m4/kaoto-tool-route.png[width=50%]
 
@@ -568,7 +568,7 @@ _Rocket.Chat_ に戻り、もう一度尋ねます。
 +
 [.copypaste.value]
 ****
-Can you show me policy document 61356291
+保険証券 61356291 を表示してもらえますか？
 ****
 +
 [TIP]
@@ -581,8 +581,8 @@ Can you show me policy document 61356291
 {blank}
 
 :fig-time: 5:10 PM
-:fig-user-msg: Can you show me policy document 61356291
-:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
 include::_figures/rc-interaction.adoc[]
 
 その場合は、次の 1 つまたは両方を試してください。
@@ -593,7 +593,7 @@ include::_figures/rc-interaction.adoc[]
 +
 [.copypaste.value]
 ****
-Please try again using the tool to get policy documents
+ツールを使って保険証券を取得し、もう一度試してください。
 ****
 +
 これにより LLM は正しいツールに向きやすくなり、たいていはこれで動作します。
@@ -604,24 +604,24 @@ Please try again using the tool to get policy documents
 ====
 --
 +
-順調にいけば、今度は LLM がツールを見つけて呼び出し、policy document を返します。
+順調にいけば、今度は LLM がツールを見つけて呼び出し、保険証券を返します。
 +
 {blank}
 +
 :fig-time: 6:47 PM
-:fig-user-msg: Can you show me policy document 61356291
-:fig-bot-msg: Here is the policy document you requested.
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: ご依頼の保険証券はこちらです。
 :fig-attach-title: Policy Document 61356291 PDF ▾
 :fig-attach-desc: Click to view or download
 include::_figures/rc-interaction-attach.adoc[]
 +
 {blank}
 +
-ボットは正しいツールを見つけ、policy document を取得し、サポート担当者にダウンロードリンクを返しました。リンクをクリックすると PDF が新しいタブで開きます。
+ボットは正しいツールを見つけ、保険証券を取得し、サポート担当者にダウンロードリンクを返しました。リンクをクリックすると PDF が新しいタブで開きます。
 +
 {blank}
 +
-.サンプルの policy document を見る
+.サンプルの保険証券を見る
 [%collapsible]
 =====
 {blank}
@@ -631,35 +631,35 @@ include::_figures/invoice-pdf.adoc[]
 
 {empty} +
 
-=== policy document を修正する
+=== 保険証券を修正する
 
-ai-bot はデータを取得するだけではありません。データに対して操作することもできます。たとえば、顧客が考えを変えて補償項目を削除したい場合、AI アシスタントに policy document の修正を依頼できます。
+AI ボットはデータを取得するだけではありません。データに対して操作することもできます。たとえば、顧客が考えを変えて補償項目を削除したい場合、AI アシスタントに保険証券の修正を依頼できます。
 
 {blank}
 
 [.copypaste.value]
 ****
-The customer would like to remove the Roadside Assistance coverage, could you please adjust the policy document?
+顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
 ****
 
-agentic system は policy document を調べ、該当する補償項目を見つけ、必要なツールを起動してデータベースを更新し、変更内容の要約を返します。
+エージェントシステムは保険証券を調べ、該当する補償項目を見つけ、必要なツールを起動してデータベースを更新し、変更内容の要約を返します。
 
 {blank}
 
 :fig-time: 6:49 PM
-:fig-user-msg: The customer would like to remove the Roadside Assistance coverage, could you please adjust the policy document?
-:fig-bot-msg: The database records have been updated. The Roadside Assistance coverage (Item 4) has been removed, and the summary values have been recalculated. Would you like to see the new policy document?
+:fig-user-msg: 顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
+:fig-bot-msg: データベースの記録を更新しました。ロードサイドアシスタンス補償（項目 4）を削除し、集計値を再計算しました。新しい保険証券を確認しますか？
 include::_figures/rc-interaction.adoc[]
 
-agentic system は自律的に動作しました。policy document を確認し、補償項目を特定し、データベースの記録を更新し、合計を再計算し、変更を確認しました。すべて 1 回の自然言語リクエストから行われています。
+エージェントシステムは自律的に動作しました。保険証券を確認し、補償項目を特定し、データベースの記録を更新し、合計を再計算し、変更を確認しました。すべて 1 回の自然言語リクエストから行われています。
 
-ボットの応答に注目してください。更新された policy document を見るよう提案することがあります（LLM は予測不能なので、文言は変わる場合があります）。その場合は `yes` と返します。そうでなければ、修正後の policy document を見るよう依頼します。
+ボットの応答に注目してください。更新された保険証券を見るよう提案することがあります（LLM は予測不能なので、文言は変わる場合があります）。その場合は `yes` と返します。そうでなければ、修正後の保険証券を見るよう依頼します。
 
 {blank}
 
 [.copypaste.value]
 ****
-Can you show me the updated policy document?
+更新された保険証券を表示してもらえますか？
 ****
 
 どちらの場合でも、ボットは更新済み PDF のリンクを返します。
@@ -667,16 +667,16 @@ Can you show me the updated policy document?
 {blank}
 
 :fig-time: 6:50 PM
-:fig-bot-msg: Here is the updated PDF for Policy Document 61356291.
+:fig-bot-msg: 保険証券 61356291 の更新済み PDF はこちらです。
 :fig-attach-title: Policy Document 61356291 PDF ▾
 :fig-attach-desc: Click to view or download
 include::_figures/rc-bot-attach.adoc[]
 
-リンクをクリックして再生成された policy document を開きます。
+リンクをクリックして再生成された保険証券を開きます。
 
 {blank}
 
-.修正後の policy document のサンプルを見る
+.修正後の保険証券のサンプルを見る
 [%collapsible]
 ====
 {blank}
@@ -684,30 +684,30 @@ include::_figures/rc-bot-attach.adoc[]
 include::_figures/invoice-pdf-amended.adoc[]
 ====
 
-NOTE: 文書の右上に赤い *Amended* タグが表示されていることに注目してください。これは policy document が元の内容から変更されていることを示します。
+NOTE: 文書の右上に赤い *Amended* タグが表示されていることに注目してください。これは保険証券が元の内容から変更されていることを示します。
 
-文書を確認し、変更が正しいことを検証してください。Roadside Assistance coverage（item 4）が削除され、合計もそれに応じて再計算されているはずです。
+文書を確認し、変更が正しいことを検証してください。ロードサイドアシスタンス補償（項目 4）が削除され、合計もそれに応じて再計算されているはずです。
 
 {empty} +
 
 === チケットを起票する
 
-顧客サポートのプロセスは、1 つのアクションだけで終わることはほとんどありません。policy の修正には複数の部門が関わります。変更内容の確認、返金処理、policy 記録の更新、顧客への通知です。これらを手作業で個別に処理する代わりに、AI エージェントにチケットを起票させ、すべてを調整させます。
+顧客サポートのプロセスは、1 つのアクションだけで終わることはほとんどありません。保険証券の修正には複数の部門が関わります。変更内容の確認、返金処理、保険証券の記録の更新、顧客への通知です。これらを手作業で個別に処理する代わりに、AI エージェントにチケットを起票させ、すべてを調整させます。
 
 {blank}
 
 [.copypaste.value]
 ****
-Could you please raise a ticket? Include the details explained, and ask the right departments to process the policy amendment accordingly.
+チケットを起票してもらえますか？説明した詳細を含め、適切な部門に保険証券の修正処理を依頼してください。
 ****
 
-agentic system は会話の文脈を集め、HelpDesk システムにチケットを作成し、確認メッセージを返します。
+エージェントシステムは会話の文脈を集め、HelpDesk システムにチケットを作成し、確認メッセージを返します。
 
 {blank}
 
 :fig-time: 6:52 PM
-:fig-user-msg: Could you please raise a ticket? Include the details explained, and ask the right departments to refund the customer accordingly.
-:fig-bot-msg: A ticket has been created with ID 1025. Would you like to share this ticket with the customer?
+:fig-user-msg: チケットを起票してもらえますか？説明した詳細を含め、適切な部門に顧客への返金を依頼してください。
+:fig-bot-msg: ID 1025 のチケットを作成しました。このチケットを顧客と共有しますか？
 include::_figures/rc-interaction.adoc[]
 
 {empty} +
@@ -722,7 +722,7 @@ IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済み�
 +
 [.copypaste.value]
 ****
-Yes, please share it with the customer.
+はい、顧客と共有してください。
 ****
 +
 {blank}
@@ -733,7 +733,7 @@ Yes, please share it with the customer.
 +
 [.copypaste.value]
 ****
-Could you share the ticket with the customer?
+チケットを顧客と共有してもらえますか？
 ****
 +
 {blank}
@@ -747,8 +747,8 @@ Could you share the ticket with the customer?
 {blank}
 
 :fig-time: 6:53 PM
-:fig-user-msg: Yes, please share it with the customer.
-:fig-bot-msg: The ticket #1025 has been successfully shared with the customer. They will receive a link to the HelpDesk system.
+:fig-user-msg: はい、顧客と共有してください。
+:fig-bot-msg: チケット #1025 を顧客と共有しました。顧客には HelpDesk システムへのリンクが送信されます。
 include::_figures/rc-interaction.adoc[]
 
 覚えておいてください。顧客は _Matrix_ メッセージングプラットフォームからやり取りします。ボットがチケットを共有したと示したということは、顧客がチケット参照付きのメッセージを受け取っているはずです。_Matrix_ のウィンドウに切り替えて確認してください。
@@ -804,13 +804,13 @@ REPLACE
 
 include::_figures/helpdesk-tickets.adoc[]
 
-チケットをクリックして詳細を確認します。AI エージェントは会話内容からチケット本文を作成しており、変更内容の要約と更新済み policy document へのリンクが含まれています。
+チケットをクリックして詳細を確認します。AI エージェントは会話内容からチケット本文を作成しており、変更内容の要約と更新済み保険証券へのリンクが含まれています。
 
 {blank}
 
 include::_figures/helpdesk-ticket-detail.adoc[]
 
-これで一連の流れが完了しました。AI アシスタントは policy document を取得し、修正し、関連情報をすべて含んだチケットを起票し、メッセージングプラットフォームを通じて顧客に共有しました。すべて自然な会話から行われています。
+これで一連の流れが完了しました。AI アシスタントは保険証券を取得して修正し、関連情報をすべて含んだチケットを起票して、メッセージングプラットフォームを通じて顧客に共有しました。すべて自然な会話から行われています。
 
 終わったら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
 
@@ -818,14 +818,13 @@ include::_figures/helpdesk-ticket-detail.adoc[]
 
 [.verification]
 ****
-_Parasol HelpDesk_ でチケットの詳細と更新済み policy document へのリンクを確認できましたか？
+_Parasol HelpDesk_ でチケットの詳細と更新済み保険証券へのリンクを確認できましたか？
 
 [.success]
-よくできました。データの取得、推論、変更、チケット起票、部門間の調整を自然な会話で行える agentic flow を構築できました。
+よくできました。データの取得、推論、変更、チケット起票、部門間の調整を自然な会話で行えるエージェントフローを構築できました。
 
 [.fail]
-手順を見直してください。agentic flow でツールが有効（`Tags` = `all`）になっていることと、system prompt が有効であることを確認します。_Matrix_ ウィンドウで正しいルームを確認してください。
+手順を見直してください。エージェントフローでツールが有効（`Tags` = `all`）になっていることと、system prompt が有効であることを確認します。_Matrix_ ウィンドウで正しいルームを確認してください。
 ****
 
 {empty} +
-

@@ -12,10 +12,10 @@ include::partial$style.adoc[]
 [.mermaid]
 ----
 flowchart LR
-    C([Customer]) --> MX
+    C([顧客]) --> MX
     MX ~~~ Gap
     Gap ~~~ RC
-    RC --> A([Support Agent])
+    RC --> A([サポート担当者])
 
     MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
     RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }

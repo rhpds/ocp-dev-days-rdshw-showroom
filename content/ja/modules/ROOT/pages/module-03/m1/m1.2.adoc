@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id="lab3-ingestion-flow"]
 == 取り込みフロー
 
-{rhsi} によるデータベース接続が整ったので、ここから完全な取り込みフローを実装できます。Camel の統合は、保険申請の受信からアーカイブまで、受信した申請のライフサイクル全体を処理します。
+{rhsi} を介したデータベース接続が確立されたので、これで完全な取り込みフローを実装できます。Camel インテグレーションは、受信からアーカイブまで、保険契約の申し込みを受け付ける一連のライフサイクル全体を処理します。
 
 {empty} +
 
@@ -17,25 +17,25 @@ include::partial$style.adoc[]
 ----
 flowchart LR
 
-    Customer --> Portal -->|"EDI message"| Camel
+    Customer --> Portal -->|"EDI メッセージ"| Camel
 
     subgraph LocalEnvironment [OpenShift]
         Portal
-        Camel --> |"① XML data"|ServiceInterconnect{{"Service\nInterconnect"}}
-        Camel --> |"② PDF policy documents"|Storage
+        Camel --> |"① XML データ"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② PDF 保険契約書類"|Storage
     end
 
-    subgraph RemoteEnvironment [Remote Environment]
+    subgraph RemoteEnvironment [リモート環境]
         ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
     end
 
-    ServiceInterconnect --- |"🔒 secure link"| ServiceInterconnect2{{"Service\nInterconnect"}}
+    ServiceInterconnect --- |"🔒 セキュアリンク"| ServiceInterconnect2{{"Service\nInterconnect"}}
 
     Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel Integration", pos: "b", h: 80, w: 80, constraint: "on" }
-    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Customer", pos: "b", h: 80, w: 80, constraint: "on" }
-    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Portal", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
     Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
-    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 70, w: 70, constraint: "on" }
 
     style LocalEnvironment fill:#fce4e4,stroke:#EE0000
     style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
@@ -50,9 +50,9 @@ flowchart LR
 
 {empty} +
 
-*操作の順序*
+*操作の流れ*
 
-以下のシーケンス図は、Camel の統合が保険申請を処理する際の各ステップを示しています。
+以下のシーケンス図では、保険契約の申し込みを処理する際に Camel インテグレーションが実行する各手順を詳しく説明します。
 
 {blank}
 
@@ -62,17 +62,17 @@ sequenceDiagram
     actor Customer
     participant Camel
     participant ServiceInterconnect as Service Interconnect
-    participant DB@{ "type": "database", "alias": "Database" }
-    participant S3Bucket@{ "type": "collections", "alias": "S3 Bucket" }
-    Customer->>Camel: Send Policy Application (EDI)
-    Camel->>Camel: Transform EDI → XML
-    Camel->>ServiceInterconnect: Push XML data
-    ServiceInterconnect->>DB: Store data
-    DB-->>ServiceInterconnect: Confirmation
-    ServiceInterconnect-->>Camel: Data saved
-    Camel->>Camel: Render PDF from XML
-    Camel->>S3Bucket: Upload PDF
-    S3Bucket-->>Camel: Upload complete
+    participant DB@{ "type": "database", "alias": "データベース" }
+    participant S3Bucket@{ "type": "collections", "alias": "S3 バケット" }
+    Customer->>Camel: 保険契約の申し込みを送信 (EDI)
+    Camel->>Camel: EDI を XML に変換
+    Camel->>ServiceInterconnect: XML データを送信
+    ServiceInterconnect->>DB: データを保存
+    DB-->>ServiceInterconnect: 確認
+    ServiceInterconnect-->>Camel: データを保存済み
+    Camel->>Camel: XML から PDF を生成
+    Camel->>S3Bucket: PDF をアップロード
+    S3Bucket-->>Camel: アップロード完了
 ----
 
 {empty} +
@@ -83,7 +83,7 @@ sequenceDiagram
 include::../_shared/close-tabs.adoc[]
 
 . _Dev Spaces_ のターミナルで、次のコマンドを実行します。 +
-(このコマンドを実行する前に、開いている Camel のファイルタブを閉じてください。実行後に自動更新されない場合があります)
+(このコマンドの実行後に自動更新されない場合があるため、先に開いている Camel ファイルのタブをすべて閉じてください)
 +
 {blank}
 +
@@ -94,24 +94,24 @@ step 2
 +
 [TIP]
 --
-.上のコマンドは、演習をリセットしたいときにいつでも実行できます。
+.上記のコマンドは、演習をリセットする場合にいつでも実行できます。
 [%collapsible]
 ====
-このワークショップには、任意のステップへ移動したり、ラボを既知の正常な状態に戻したりできる便利なヘルパースクリプトがあります。
+このワークショップには、任意のステップに移動したり、ラボを既知の正常な状態にリセットしたりできる便利なヘルパースクリプトが含まれています。
 
-* `step N` — ラボをステップ N の最初にリセットする
-* `steps` — ラボで利用可能なすべてのステップを一覧表示する
-* `start` または `restart` — 最初に戻る（`step 1` と同等）
-* `ff` — *次の* ステップへ早送りする
-* `rw` — *前の* ステップへ巻き戻す
+* `step N` — ラボをステップ N の開始時点にリセット
+* `steps` — ラボで利用可能なすべてのステップを一覧表示
+* `start` または `restart` — 最初に戻る (`step 1` と同じ)
+* `ff` — *次の* ステップへ早送り
+* `rw` — *前の* ステップへ巻き戻し
 ====
 --
 +
 {empty} +
 
-. ラボフォルダーを確認する
+. ラボのフォルダーを確認します。
 +
-上のコマンドを実行したら、エディターのツリービューを開いて、正常な状態になっていることを確認してください。次のようになっているはずです。
+上記のコマンドを実行したら、エディターのツリービューを確認し、問題がないことを確かめます。次のように表示されているはずです。
 +
 --
 [.indent2]
@@ -125,18 +125,18 @@ pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>
 pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;≋&nbsp;&nbsp;</b></mark>] *X12-850.dfdl.xsd* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *x12.java* +
 
-TIP: `index.html` ファイルは、顧客が保険申請を送信する様子をシミュレートするシンプルなポータルアプリです。Camel JBang はルートと並行して静的 HTML を配信できるため、次のセクションではこれを使って送信をトリガーし、統合をエンドツーエンドでテストします。
+TIP: `index.html` ファイルは、顧客が保険契約の申し込みを送信する様子をシミュレートするシンプルなポータルアプリです。Camel JBang はルートと一緒に静的 HTML を提供できるため、以降のセクションではこのアプリを使って申し込みを送信し、インテグレーションをエンドツーエンドでテストします。
 --
 +
 {empty} +
 
-. 設定を確認する
+. 設定を確認します。
 +
-`application.properties` ファイルには、取り込みフローで使用する両方のバックエンド向けの認証情報がすでに事前設定されています。
+`application.properties` ファイルには、取り込みフローで使用する両方のバックエンドの認証情報があらかじめ設定されています。
 +
 --
-* *Database* — Service Interconnect 経由で到達可能な PostgreSQL データベースへの接続設定
-* *S3 object storage* — 生成された PDF 保険文書をアップロードするためのアクセスキー、シークレット、エンドポイント
+* *データベース* — PostgreSQL データベースの接続設定 (Service Interconnect 経由でアクセス可能)
+* *S3 オブジェクトストレージ* — 生成された PDF 保険契約書類をアップロードするためのアクセスキー、シークレット、およびエンドポイント
 --
 +
 {blank}
@@ -144,7 +144,7 @@ TIP: `index.html` ファイルは、顧客が保険申請を送信する様子�
 [.mermaid]
 ----
 flowchart LR
-    X[ ] -->|"✅ configured"| DB[(Database)] ~~~ Y[ ] -->|"✅ configured"| S3[(S3 / ODF)]
+    X[ ] -->|"✅ 設定済み"| DB[(データベース)] ~~~ Y[ ] -->|"✅ 設定済み"| S3[(S3 / ODF)]
 
     style DB fill:#e8f5e9,stroke:#66bb6a
     style S3 fill:#e8f5e9,stroke:#66bb6a
@@ -158,14 +158,14 @@ flowchart LR
 
 [TIP]
 --
-.Kaoto の簡単な概要を表示するには折りたたみを開いてください。
+.Kaoto の概要を確認するには展開してください。
 [%collapsible]
 ====
 include::../_shared/kaoto-intro.adoc[]
 ====
 --
 
-エディターのファイルエクスプローラーで次のファイルをクリックします。すると Kaoto が自動的に開き、取り込みルートをビジュアルな図として表示します。
+エディターのファイルエクスプローラーで次のファイルをクリックすると、Kaoto が自動的に開き、取り込みルートをビジュアル図として表示します。
 
 --
 [.indent2]
@@ -174,19 +174,19 @@ include::../_shared/kaoto-intro.adoc[]
 pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
 --
 
-Kaoto はファイルを開き、その中に含まれるすべてのルート定義を表示します。このファイルには複数のルートがありますが、ここで注目するのはメインの取り込みフローです。次のように進めてください。
+Kaoto はファイルを開き、ファイルに含まれるすべてのルート定義を表示します。ファイルには複数のルートがありますが、ここではメインの取り込みフローに注目します。次の手順を実行してください。
 
-// By default, Kaoto displays routes stacked vertically. For better readability, switch to horizontal layout by clicking the middle button at the bottom of the canvas:
+// デフォルトでは、Kaoto はルートを縦に並べて表示します。読みやすくするには、キャンバス下部にある中央のボタンをクリックして横方向のレイアウトに切り替えます。
 
 // [.bordered]
 // image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
 
 // {empty} +
 
-// The file contains several routes. To focus on the main ingestion flow:
+// ファイルには複数のルートが含まれています。メインの取り込みフローに注目するには、次の操作をします。
 
-. 左上のツールバーにある *Routes* ドロップダウンをクリックする
-. 一覧から `service-x12` を選択する
+. 左上のツールバーで *Routes* ドロップダウンをクリックします。
+. リストから `service-x12` を選択します。
 
 {empty} +
 
@@ -210,42 +210,42 @@ kaoto-routes
 
 {empty} +
 
-これで Kaoto には `service-x12` ルートだけが表示されます。キャンバス中央に表示するには、下部にある *Reset View* ボタンをクリックします。
+Kaoto に `service-x12` ルートのみが表示されるようになります。キャンバスの中央に配置するには、下部にある *Reset View* ボタンをクリックします。
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-reset-view.png[width=50%]
 
-TIP: マウスホイールでキャンバスのズームイン・ズームアウトができ、クリックしてドラッグすると表示を移動できます。
+TIP: マウスホイールでキャンバスを拡大・縮小し、クリックしたままドラッグして表示位置を移動できます。
 
 {empty} +
 
-これで、メインの取り込みフローである `service-x12` ルートが表示されるはずです。
+これで、メインの取り込みフローである `service-x12` ルートが表示されます。
 
 {blank}
 
 [.bordered]
 image::module-03/m1/kaoto-service-x12-route.png[width=90%]
 
-左から右へ読むと、パイプラインの各ステップが保険申請のライフサイクルの各段階を処理していることがわかります。
+左から右へ読むと、パイプラインの各ステップが保険契約の申し込みのライフサイクルにおける各段階を処理します。
 
-* `platform-http` — 受信した保険申請を受け付ける API エンドポイント
-* `transform-x12` — EDI データを XML に変換する
-* `sql` — バックエンドデータベースにデータを保存する
-* `store-pdf-s3` — PDF の保険文書を生成し、S3 にアップロードする
+* `platform-http` — 受信した保険契約の申し込みを受け付ける API エンドポイント
+* `transform-x12` — EDI データを XML に変換
+* `sql` — バックエンドデータベースにデータを保存
+* `store-pdf-s3` — PDF の保険契約書類を生成し、S3 にアップロード
 
-NOTE: 青い *To do: Enable* ブロックが 2 つあることに注目してください。これらは次の演習で有効化する無効状態のステップです。最終的には、フロー全体が接続され、動作するようになります。
+NOTE: 青色の *To do: Enable* ブロックが 2 つあることに注目してください。これらは無効になっているステップで、次の演習で有効にします。最後には、フロー全体が接続され、機能するようになります。
 
 {empty} +
 
 [.verification]
 ****
-ファイルエクスプローラーにソースファイルが表示され、Kaoto に `service-x12` の取り込みフローが表示されていますか？
+ファイルエクスプローラーにソースファイルが表示され、Kaoto に `service-x12` の取り込みフローが表示されていることを確認できましたか？
 
 [.success]
-準備完了です。次の演習へ進んでフローを完成させましょう。
+準備完了です。フローを完成させるため、次の演習に進んでください。
 
 [.fail]
-`step 2` コマンドを実行し、`ingest.camel.yaml` を開き、`service-x12` ルートを選択したことを確認してください。
+`step 2` コマンドを実行し、`ingest.camel.yaml` を開いて、`service-x12` ルートを選択したことを確認してください。
 ****

@@ -6,7 +6,7 @@ include::partial$_attributes.adoc[]
 
 `parasol-insurance-eap` を `quarkus` ブランチに切り替えます。これは EAP → Quarkus の移行が完了したものです。そのうえで、次の作業を行います。
 
-* 以前のセクションで修正した内容と、 आधुनिक化されたコードを照らし合わせて確認する
+* 以前のセクションで修正した内容と、近代化されたコードを照らし合わせて確認する
 * 必要に応じてアプリをローカルで実行する
 * OpenShift にビルドしてデプロイし、Parasol の UI と API を検証する
 

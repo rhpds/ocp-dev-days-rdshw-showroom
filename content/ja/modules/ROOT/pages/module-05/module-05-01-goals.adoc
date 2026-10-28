@@ -1,28 +1,28 @@
-= このラボの目標
+= セクション 1: このラボの目標
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-Red Hat OpenShift Dev Spaces 上で、Red Hat Developer Lightspeed for MTA（DLS）を使ったエンドツーエンドのアプリケーションモダナイゼーションを体験します。このラボでは、以下を使用します。
+Red Hat OpenShift Dev Spaces で Red Hat Developer Lightspeed for MTA (DLS) を使用した、エンドツーエンドのアプリケーションモダナイゼーションを体験します。このラボでは、次のものを使用します。
 
-* 静的解析のための MTA 拡張機能
-* ガイド付きコードリファクタリングのための Developer Lightspeed（生成 AI）
-* レガシー Java EE / EAP の Parasol Insurance アプリケーション（`parasol-insurance-eap`）
-* Quarkus および Jakarta EE への移行パス
-* enterprise audit logging API などの独自ライブラリー向けのカスタムルール
+* 静的解析用の MTA 拡張機能
+* ガイド付きコードリファクタリング用の Developer Lightspeed (生成 AI)
+* レガシー Java EE / EAP Parasol Insurance アプリケーション ( `parasol-insurance-eap` )
+* Quarkus と Jakarta EE への移行パス
+* エンタープライズ監査ログ API などの独自ライブラリー向けカスタムルール
 
-image::module-05-mta-dls/05-01-dls-01.jpg[Developer Lightspeed の高レベルな概念 — レガシー Java を分析し、LLM で移行し、モダナイズされたアプリを OpenShift にデプロイする,link=self,window=blank,width=800]
-企業組織がクラウド導入を加速するにつれ、最も大きな課題の 1 つは、レガシー Java アプリケーションを Red Hat OpenShift のようなモダンプラットフォームで動作するようにモダナイズすることです。従来のコードリファクタリングのアプローチは時間がかかり、ミスが起こりやすく、レガシー技術と移行先技術の両方について深い知識を必要とします。
+image::module-05-mta-dls/05-01-dls-01.jpg[Developer Lightspeed の概要 — レガシー Java を解析し、LLM で移行し、モダナイズしたアプリを OpenShift にデプロイ,link=self,window=blank,width=800]
+エンタープライズ組織がクラウド導入を加速する中で、直面する最も大きな課題の 1 つは、Red Hat OpenShift のような最新のプラットフォームで実行できるように、レガシー Java アプリケーションをモダナイズすることです。従来のコードリファクタリングの手法は時間がかかり、エラーが発生しやすく、レガシー技術と移行先の技術の両方に関する深い知識が必要です。
 
-このラボの目的は、Red Hat Developer Lightspeed for Migration Toolkit for Applications（MTA）が、静的コード解析と生成 AI を組み合わせることで、Java EE 8 / EAP 7 アプリケーションの Quarkus への移行を加速し、アプリケーションモダナイゼーションをどう革新するかを体験することです。
+このラボの目標は、静的コード解析と生成 AI を組み合わせて Java EE 8 / EAP 7 アプリケーションから Quarkus への移行を加速する、Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA) によるアプリケーションモダナイゼーションを体験することです。
 
 == 学習目標
 
 このモジュールを終えると、次のことができるようになります。
 
-* Red Hat Dev Spaces で MTA 拡張機能を設定する。これには Developer Lightspeed（AI 支援による移行）が含まれる
-* `parasol-insurance-eap` を分析し、AI によるコードリファクタリングの推奨を受け取る
-* `EmailIntakeMDB` をモダナイズする（JMS MDB → Reactive Messaging）
-* 独自の `audit-logging-library`（v1 → v2）向けにカスタム MTA ルールを作成して適用する
-* `ClaimService` をモダナイズする（`@Stateless` EJB → `@ApplicationScoped` + `@Transactional`）
-* 完了した `quarkus` ブランチをチェックアウトし、移行後のコードを確認して、OpenShift にデプロイする
-* インテリジェントな修正を適用し、アプリケーションを Quarkus および Jakarta EE へ移行する
+* Developer Lightspeed (AI 支援による移行) を含め、Red Hat Dev Spaces で MTA 拡張機能を設定する
+* `parasol-insurance-eap` を解析し、AI を活用したコードリファクタリングの推奨事項を受け取る
+* `EmailIntakeMDB` をモダナイズする (JMS MDB → Reactive Messaging)
+* 独自の `audit-logging-library` (v1 → v2) 向けにカスタム MTA ルールを作成して適用する
+* `ClaimService` をモダナイズする ( `@Stateless` EJB → `@ApplicationScoped` + `@Transactional` )
+* 完成済みの `quarkus` ブランチをチェックアウトし、移行後のコードを確認して OpenShift にデプロイする
+* インテリジェントな修正を適用し、Quarkus と Jakarta EE へのアプリケーション移行を進める

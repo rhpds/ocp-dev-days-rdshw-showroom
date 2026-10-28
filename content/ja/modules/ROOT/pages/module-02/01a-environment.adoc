@@ -7,7 +7,7 @@ include::partial$_attributes.adoc[]
 
 * Developer Hub、Dev Spaces、Pipelines、GitOps、および完全な Sigstore スタックが事前設定された OpenShift クラスタ
 * すべてのワークショップリソースにアクセスできるユーザーアカウント
-* あなたが保護し、ハードニングされたパイプラインを通じて昇格させるサンプルアプリケーション（Parasol Insurance -- Secured）
+* 保護し、セキュリティを強化したパイプラインを通じて昇格させるサンプルアプリケーション（Parasol Insurance -- Secured）
 
 ログイン認証情報（Developer Hub、GitLab、およびすべてのワークショップサービスで使用します）:
 
@@ -65,9 +65,9 @@ NOTE: すべての URL と認証情報は、このラボインターフェース
 
 * **Red Hat Trusted Artifact Signer (RHTAS)** -- Sigstore ベースの署名インフラストラクチャ（Fulcio、Rekor、TUF）
 * **gitsign** -- OIDC を介して開発者 ID に結び付けられた Sigstore のキーレスコミット署名
-* **Tekton Chains** -- パイプライン成果物の自動署名と SLSA provenance 証跡
-* **Conforma (Enterprise Contract)** -- 署名済み証跡を Rego ポリシーに照らして検証するポリシーエンジン
-* **Sigstore Policy Controller** -- デプロイ時にイメージ署名と証跡を検証する Kubernetes admission controller
+* **Tekton Chains** -- パイプライン成果物の自動署名と SLSA 来歴証明のアテステーション
+* **Conforma (Enterprise Contract)** -- 署名済みアテステーションを Rego ポリシーに照らして検証するポリシーエンジン
+* **Sigstore Policy Controller** -- デプロイ時にイメージ署名とアテステーションを検証する Kubernetes アドミッションコントローラー
 * **Red Hat Advanced Cluster Security (ACS)** -- イメージ脆弱性スキャンとセキュリティポリシーの強制
 * **Red Hat Dependency Analytics (RHDA)** -- 依存関係の脆弱性をリアルタイムで分析する IDE 拡張機能
 * **Trusted Profile Analyzer (TPA)** -- Lightwell の修正データと SBOM 管理を備えた脆弱性インテリジェンスバックエンド

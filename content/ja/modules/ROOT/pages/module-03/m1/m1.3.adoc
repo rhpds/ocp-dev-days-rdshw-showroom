@@ -27,12 +27,12 @@ TIP: 下の図で _Policy Application_ と _Policy Document_ のノードにカ�
 [.mermaid]
 ----
 flowchart LR
-    PO["📄 Policy Application\n(EDI)"] -->|HTTP request| Camel((Camel)) -->|response| XML["📄 Policy Document\n(XML)"]
+    PO["📄 保険申請\n(EDI)"] -->|HTTP リクエスト| Camel((Camel)) -->|レスポンス| XML["📄 保険証書\n(XML)"]
 ----
 
 ++++
 <div id="xml-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:520px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">XML Policy Document (output)</div>
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">XML 保険証書（出力）</div>
   <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px">&lt;<span style="color:#ff6188">PolicyDocument</span>&gt;
   &lt;<span style="color:#ff6188">PolicyNumber</span>&gt;61356291&lt;/<span style="color:#ff6188">PolicyNumber</span>&gt;
   &lt;<span style="color:#ff6188">DateOfIssue</span>&gt;20120906&lt;/<span style="color:#ff6188">DateOfIssue</span>&gt;
@@ -59,7 +59,7 @@ flowchart LR
 &lt;/<span style="color:#ff6188">PolicyDocument</span>&gt;</pre>
 </div>
 <div id="edi-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:600px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">EDI Policy Application (X12 850)</div>
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">EDI 保険申請（X12 850）</div>
   <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px"><span style="color:#ff6188">ISA</span>*00*          *00*          *01*939988477    *01*949849105    *120906*1200*U*00401*000000001*0*P*:~
 <span style="color:#ff6188">GS</span>*PO*939988477*949849105*20120906*1200*1*X*004010~
 <span style="color:#ff6188">ST</span>*850*0001~
@@ -78,7 +78,7 @@ flowchart LR
 <span style="color:#ff6188">SE</span>*15*0001~
 <span style="color:#ff6188">GE</span>*1*1~
 <span style="color:#ff6188">IEA</span>*1*000000001~</pre>
-  <div style="color:#888; font-size:10px; margin-top:10px; border-top:1px solid #555; padding-top:6px"><span style="color:#ff6188">ISA/GS</span>=Header &nbsp; <span style="color:#ff6188">BEG</span>=Order &nbsp; <span style="color:#ff6188">N1</span>=Name &nbsp; <span style="color:#ff6188">N3/N4</span>=Address &nbsp; <span style="color:#ff6188">PO1/PID</span>=Line Item &nbsp; <span style="color:#ff6188">AMT</span>=Total &nbsp;·&nbsp; <code style="color:#fff">*</code> separates fields &nbsp; <code style="color:#fff">~</code> ends segments</div>
+  <div style="color:#888; font-size:10px; margin-top:10px; border-top:1px solid #555; padding-top:6px"><span style="color:#ff6188">ISA/GS</span>=ヘッダー &nbsp; <span style="color:#ff6188">BEG</span>=注文 &nbsp; <span style="color:#ff6188">N1</span>=名前 &nbsp; <span style="color:#ff6188">N3/N4</span>=住所 &nbsp; <span style="color:#ff6188">PO1/PID</span>=明細 &nbsp; <span style="color:#ff6188">AMT</span>=合計 &nbsp;·&nbsp; <code style="color:#fff">*</code> はフィールドを区切り、<code style="color:#fff">~</code> はセグメントを終了します</div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -240,7 +240,7 @@ kaoto-datamapper-configure-open
 +
 [.indent2]
 --
-pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `To do: Update` コンテナー内の `kaoto-datamapper` ステップをクリックします
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `kaoto-datamapper` ステップを、pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] コンテナー内でクリックします
 
 {blank}
 
@@ -359,7 +359,7 @@ camel run * --dev
 ====
 --
 +
-DevSpaces は 8080 ポートが開いていることを検知し、通知を表示します。ブラウザーで埋め込みの Test Portal を開くには、*Open In New Tab* をクリックします。
+Dev Spaces は 8080 ポートが開いていることを検知し、通知を表示します。ブラウザーで埋め込みの Test Portal を開くには、*Open In New Tab* をクリックします。
 +
 {blank}
 +

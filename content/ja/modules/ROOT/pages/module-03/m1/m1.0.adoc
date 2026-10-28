@@ -7,21 +7,21 @@ include::partial$style.adoc[]
 
 
 
-顧客からデータを取り込み、バックエンドデータベースに保存し、PDF ポリシードキュメントを生成します。これらはすべて、{rhsi} による安全なクラスター間接続で Apache Camel がオーケストレーションします。
+顧客からデータを取り込み、バックエンドデータベースに保存し、PDF のポリシー文書を生成します。これらすべてを Apache Camel でオーケストレーションし、{rhsi} による安全なクラスター間接続を実現します。
 
 {empty} +
 
 *ビジネスニーズ*
 
-顧客は、ポリシー申請を EDI 形式でプラットフォームに送信します。これらの申請は取り込み、変換、バックエンドデータベースへの保存を行い、アーカイブ用の PDF ポリシードキュメントとして出力する必要があります。データベースは別のインフラストラクチャ上にあり、OpenShift から直接アクセスすることはできません。そのため、安全な接続ソリューションが必要です。
+顧客は EDI 形式の保険契約申請書をプラットフォームに送信します。これらの申請書は取り込まれ、変換され、バックエンドデータベースに保存された後、アーカイブ用の PDF ポリシー文書としてレンダリングされる必要があります。データベースは別のインフラストラクチャ上にあり、OpenShift から直接アクセスできないため、安全な接続ソリューションが必要です。
 
 {empty} +
 
-*技術ソリューション（構築するもの）*
+*構築する技術ソリューション*
 
-Apache Camel の統合により API エンドポイントが公開され、受信した EDI ポリシー申請を受け取ります。このフローは EDI データを XML 形式に変換し、{rhsi} を介してバックエンドの Database に保存し、PDF ポリシードキュメントを生成して S3 オブジェクトストレージ（OpenShift Data Foundation）にアップロードします。
+Apache Camel インテグレーションが API エンドポイントを公開し、受信した EDI 形式の保険契約申請書を受け取ります。フローでは EDI データを XML 形式に変換し、{rhsi} を介してバックエンドデータベースに保存するとともに、PDF のポリシー文書をレンダリングして S3 オブジェクトストレージ（OpenShift Data Foundation）にアップロードします。
 
-{rhsi} により、OpenShift クラスターとリモートのバックエンドデータベース間で、データベースをパブリックネットワークに公開することなく、安全な接続が実現します。
+{rhsi} により、データベースをパブリックネットワークに公開せずに、OpenShift クラスターとリモートのバックエンドデータベースとの間で安全な接続を確立できます。
 
 {empty} +
 
@@ -33,25 +33,25 @@ Apache Camel の統合により API エンドポイントが公開され、受�
 ----
 flowchart LR
 
-    Customer --> Portal -->|"EDI message"| Camel
+    Customer --> Portal -->|"EDI メッセージ"| Camel
 
     subgraph LocalEnvironment [OpenShift]
         Portal
-        Camel --> |"① XML data"|ServiceInterconnect{{"Service\nInterconnect"}}
-        Camel --> |"② PDF policy documents"|Storage
+        Camel --> |"① XML データ"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② PDF のポリシー文書"|Storage
     end
 
-    subgraph RemoteEnvironment [Remote Environment]
+    subgraph RemoteEnvironment [リモート環境]
         ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
     end
 
-    ServiceInterconnect --- |"🔒 secure link"| ServiceInterconnect2{{"Service\nInterconnect"}}
+    ServiceInterconnect --- |"🔒 セキュアリンク"| ServiceInterconnect2{{"Service\nInterconnect"}}
 
-    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel Integration", pos: "b", h: 80, w: 80, constraint: "on" }
-    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Customer", pos: "b", h: 80, w: 80, constraint: "on" }
-    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Portal", pos: "b", h: 80, w: 80, constraint: "on" }
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel インテグレーション", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
     Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
-    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 70, w: 70, constraint: "on" }
 
     style LocalEnvironment fill:#fce4e4,stroke:#EE0000
     style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
@@ -68,8 +68,8 @@ flowchart LR
 
 *このラボで行うこと:*
 
-. *接続を有効化する* — {rhsi} を設定して、バックエンドデータベースへの安全なリンクを確立します。
-. *フローを完成させる* — ポリシー申請の取り込み、変換、保存、レンダリングを行う Camel 統合を実装します。
+. *接続を有効にする* — {rhsi} を設定して、バックエンドデータベースへの安全なリンクを確立します。
+. *フローを完成させる* — 保険契約申請書を取り込み、変換、保存、レンダリングする Camel インテグレーションを実装します。
 . *テストして検証する* — フローをローカルで実行し、結果を検証します。
 
 {empty} +

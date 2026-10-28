@@ -8,8 +8,8 @@ include::partial$style.adoc[]
 [.indent2]
 include::../_shared/close-tabs.adoc[]
 
-. ターミナルで _Dev Spaces_ から次の操作を行います:
-.. 実行中のプロセスがある場合は、kbd:[Ctrl+C] で停止します。
+. _Dev Spaces_ のターミナルで、次の操作を行います:
+.. 実行中のプロセスがある場合は、kbd:[Ctrl+C] を押して停止します。
 .. 次のコマンドを実行します: +
 (このコマンドを実行する前に、開いている Camel のファイルタブをすべて閉じてください — コマンド実行後に自動更新されない場合があります)
 +
@@ -22,16 +22,16 @@ step 4
 +
 [TIP]
 --
-上記のコマンドは、演習をいつでもリセットするために実行できます。
+演習をリセットするときは、いつでも上記のコマンドを実行できます。
 
-. ヘルプ用コマンド
+. 補助コマンド
 [%collapsible]
 ====
 * `step N` — ラボをステップ N の開始時点にリセットします
 * `steps` — ラボで利用可能なすべてのステップを一覧表示します
-* `start` または `restart` — いちばん最初に戻ります（`step 1` と同等です）
-* `ff` — 次のステップへ早送りします
-* `rw` — 前のステップへ巻き戻します
+* `start` または `restart` — 最初に戻ります（ `step 1` と同じです）
+* `ff` — 次のステップへ進みます
+* `rw` — 前のステップに戻ります
 ====
 --
 +
@@ -39,7 +39,7 @@ step 4
 
 . ラボフォルダーを確認する
 +
-上記のコマンドを実行したら、エディターのツリービューを確認して、正しく表示されていることを確かめてください。次のようになっているはずです:
+上記のコマンドを実行したら、エディターのツリービューを確認し、問題なく表示されていることを確かめてください。次のようになっているはずです:
 +
 --
 [.indent2]
@@ -52,13 +52,13 @@ pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><
 [.indent2]
 [NOTE]
 ====
-`application.properties` ファイルには、環境向けに事前設定された接続設定が含まれています。すぐに使用できます。これにより、設定の接続作業ではなく、統合ロジックの構築に集中できます。
+ `application.properties` ファイルには、環境用の接続設定があらかじめ含まれているため、そのまま使用できます。接続設定ではなく、統合ロジックの構築に集中できます。
 
-.中身は何ですか?
+.何が含まれていますか?
 [%collapsible]
 =====
 ++++
-<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat credentials</span>
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat の認証情報</span>
 <span style="color: #a6e22e">rocketchat.token</span>=<span style="color: #e6db74">&lt;your-token&gt;</span>
 <span style="color: #a6e22e">rocketchat.userid</span>=<span style="color: #e6db74">&lt;your-userid&gt;</span></pre>
 ++++
@@ -71,13 +71,13 @@ pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><
 
 [.verification]
 ****
-同じフォルダー構成とファイルが表示されていますか?
+同じフォルダー構成とファイルを確認できましたか?
 
 [.success]
-次に進む準備ができました。
+これで次に進む準備ができました。
 
 [.fail]
-コマンドの構文がご利用の環境に適合していることを確認してから、もう一度試してください。
+コマンドの構文がご利用の環境に合っていることを確認し、もう一度試してください。
 ****
 
 

@@ -15,13 +15,13 @@ flowchart LR
     AI5 <--> GW
 
     GW --- GWp
-    GWp[" "] --> |"🥇 Rate Limit"| GP
-    GWp --> |"🥈 Rate Limit"| SP
+    GWp[" "] --> |"🥇 レート制限"| GP
+    GWp --> |"🥈 レート制限"| SP
 
-    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Support Agent", pos: "b", h: 80, w: 80, constraint: "on" }
-    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Assistant", pos: "b", h: 80, w: 80, constraint: "on" }
-    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold Profile", pos: "b", h: 80, w: 70, constraint: "on" }
-    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver Profile", pos: "b", h: 80, w: 70, constraint: "on" }
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポートエージェント", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
 
     style AGT5 fill:none,stroke:none
     style AI5 fill:none,stroke:none
@@ -59,11 +59,11 @@ image::module-03/m5/kaoto-gold-fallback.png[Kaoto におけるフォールバッ
 [.mermaid]
 ----
 flowchart TD
-    REQ(["Profile Request"]) --> QA["🥇 Gold quota available?"]
-    QA -->|"✅ yes"| GOLDBox
-    QA2 -->|"✅ yes"| SILVERBox
-    QA --> |"❌ no"| QA2["🥈 Silver quota available?"]
-    QA2 -->|"❌ no"| ERR["⚠️ Try again later"]
+    REQ(["プロファイルのリクエスト"]) --> QA["🥇 Gold の割り当てはありますか？"]
+    QA -->|"✅ はい"| GOLDBox
+    QA2 -->|"✅ はい"| SILVERBox
+    QA --> |"❌ いいえ"| QA2["🥈 Silver の割り当てはありますか？"]
+    QA2 -->|"❌ いいえ"| ERR["⚠️ 後でもう一度お試しください"]
 
     subgraph fallback [" "]
         direction TD
@@ -71,9 +71,9 @@ flowchart TD
         ERR
     end
 
-    GOLDBox["<div style='display:flex;align-items:center;gap:20px;min-width:280px'><img src='../../_images/module-03/common/profile-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Gold Analysis</b><br/>• Full purchase history<br/>• Spending patterns<br/>• Loyalty status</div></div>"]
+    GOLDBox["<div style='display:flex;align-items:center;gap:20px;min-width:280px'><img src='../../_images/module-03/common/profile-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Gold 分析</b><br/>• 購入履歴全体<br/>• 支出パターン<br/>• ロイヤルティ状況</div></div>"]
 
-    SILVERBox["<div style='display:flex;align-items:center;gap:20px;min-width:230px'><img src='../../_images/module-03/common/profile-silver-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Silver Analysis</b><br/>• Recent orders<br/>• Basic profile</div></div>"]
+    SILVERBox["<div style='display:flex;align-items:center;gap:20px;min-width:230px'><img src='../../_images/module-03/common/profile-silver-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Silver 分析</b><br/>• 最近の注文<br/>• 基本プロフィール</div></div>"]
 
     style REQ fill:#f5f5f5,stroke:#EE0000,color:#333
     style QA fill:none,stroke:none,color:#333
@@ -220,7 +220,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
 +
 {blank}
 +
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         openai-token-limits
     <span style="color: #F14C4B;font-weight:bold">Gold:</span>
         <span style="color: #F14C4B;font-weight:bold">Limit:</span>   50
@@ -235,7 +235,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
     <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
-+++
+++++
 +
 ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を現在追跡しています。+
 フォールバック戦略を実際に見てみましょう。
@@ -250,7 +250,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
 +
 [.copypaste.value]
 ****
-Please, generate a customer profile for order 61356291
+注文 61356291 の顧客プロファイルを生成してください
 ****
 +
 NOTE: このリクエストの注文番号は説明用です。Customer Profile Tool は、プロジェクトの `data/` フォルダにある JSON ファイルからのシミュレートされた入力データを使用します。ソースコード内でこれらのファイルを調べると、分析の元になるモック CRM、履歴、監査、チケットのデータを確認できます。
@@ -267,7 +267,7 @@ Gold のトークン予算はまだ十分残っているため、システムは
 +
 [.copypaste.value]
 ****
-Please try again
+もう一度試してください
 ****
 +
 今度は Gold ではなく *SILVER TIER ANALYSIS* が表示されるはずです。応答は短くなり、Customer Profile と Open Issues の 2 つのセクションだけになります。これは、より軽い分析階層を反映しています。
@@ -289,7 +289,7 @@ include::_figures/rc-silver-profile.adoc[]
 +
 [.copypaste.value]
 ****
-Please try again
+もう一度試してください
 ****
 +
 {empty} +

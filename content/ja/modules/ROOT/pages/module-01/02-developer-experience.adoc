@@ -1,221 +1,221 @@
-= 開発者体験
+= 開発者エクスペリエンス
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-Parasol Insurance の初出勤日です。あなたは保険金請求処理チームに配属され、会社のアプリケーションプラットフォームへのアクセス権を与えられました。上司からは、Parasol アプリケーションに新しい請求統計 API エンドポイントを追加するよう依頼されています。これは、請求件数とカテゴリを追跡するのに役立つ機能です。
+Parasol Insuranceでの初出勤日です。保険金請求処理チームに配属され、会社のアプリケーションプラットフォームへのアクセス権が付与されました。マネージャーから、Parasolアプリケーションに保険金請求統計APIエンドポイントを追加するよう依頼されました。これは、事業部門が請求件数やカテゴリーを把握するのに役立つ機能です。
 
-何かをインストールする必要はありません。チケットを起票する必要もありません。必要なものはすべて、すでにプラットフォーム上であなたを待っています。
+何もインストールする必要はありません。チケットを申請する必要もありません。必要なものはすべて、すでにプラットフォーム上で利用できます。
 
-TIP: レイアウト表示（Split / Instructions / Tabs）を切り替えたあとに指示パネルのスクロール位置が失われた場合は、もう一度レイアウトモードを切り替えると元に戻ります。
+TIP: レイアウト表示（Split / Instructions / Tabs）を切り替えた後に手順パネルのスクロール位置が失われた場合は、レイアウトモードをもう一度切り替えると元に戻ります。
 
 [#section-1]
-== セクション 1: プラットフォームに触れる
+== セクション 1: プラットフォームを知る
 
-最初に向かうのは Red Hat Developer Hub です。Parasol の社内開発者ポータルです。ここでは開発者がサービスを見つけ、API を確認し、ドキュメントを読み、プラットフォームについて AI の支援を受けながら回答を得ることができます。どこに何があるか同僚に尋ねる代わりに、ここですべて見つけられます。
+最初に訪れるのは、Parasolの社内開発者ポータルである Red Hat Developer Hub です。開発者はここで、サービスの検索、APIの確認、ドキュメントの閲覧、プラットフォームに関するAI支援の回答の取得ができます。どこに何があるか同僚に尋ねる代わりに、ここですべてを見つけられます。
 
-=== 演習 1: Developer Hub を探索する
+=== 演習 1: Developer Hubを探索する
 
 . 右側の **Developer Hub** タブを選択するか、{rhdh_url}[{rhdh_url}^] で **Red Hat Developer Hub** を開きます
 
-. OIDC プロバイダーを使って資格情報でログインします:
+. OIDCプロバイダーを使用して、認証情報でログインします:
 +
 --
-Username:
+ユーザー名:
 [source,subs="attributes",role="copypaste"]
 ----
 {user}
 ----
-Password:
+パスワード:
 [source,subs="attributes",role="copypaste"]
 ----
 {password}
 ----
 --
 +
-image::rhdh-login.png[Red Hat Developer Hub のログインページ,link=self,window=blank,width=700]
+image::rhdh-login.png[Red Hat Developer Hubのログインページ,link=self,window=blank,width=700]
 
-. ログインすると、Developer Hub のホームページが表示されます。ここが Parasol のすべての開発作業の出発点です。
+. ログインすると、Developer Hubのホームページが表示されます。ここが、Parasolでのすべての開発作業の出発点です。
 +
-image::rhdh-homepage.png[Red Hat Developer Hub のホームページ,link=self,window=blank,width=700]
+image::rhdh-homepage.png[Red Hat Developer Hubのホームページ,link=self,window=blank,width=700]
 
-. 少しインターフェースを見てみましょう:
-* **Catalog**（左サイドバー）-- すべてのアプリケーション、コンポーネント、API が登録されるソフトウェアカタログ
-* **Self-Service**（ページ上部の **+** ボタン）-- 新しいプロジェクトや環境をプロビジョニングするためのテンプレート
-* **Lightspeed**（右下のフローティングアイコン）-- プラットフォームについて質問に答えてくれる AI アシスタント
+. インターフェースを少し見てみましょう:
+* **Catalog** (左サイドバー) -- すべてのアプリケーション、コンポーネント、APIが登録されているソフトウェアカタログ
+* **Self-Service** (ページ上部の **+** ボタン) -- 新しいプロジェクトや環境をプロビジョニングするためのテンプレート
+* **Lightspeed** (右下に浮かぶアイコン) -- プラットフォームに関する質問に答えるAIアシスタント
 
-=== 演習 2: ソフトウェアカタログで Parasol アプリケーションを見つける
+=== 演習 2: ソフトウェアカタログでParasolアプリケーションを見つける
 
 . 左サイドバーの **Catalog** をクリックします。
 +
-image::rhdh-catalog-main.png[登録済みコンポーネントが表示されたソフトウェアカタログ,link=self,window=blank,width=700]
+image::rhdh-catalog-main.png[登録済みのすべてのコンポーネントを表示するソフトウェアカタログ,link=self,window=blank,width=700]
 
-. **Kind** ドロップダウンを使って **System** エンティティに絞り込みます。
+. **Kind** ドロップダウンを使って、**System** エンティティに絞り込みます。
 
 . **parasol-insurance** を見つけてクリックします。
 +
-これは Parasol Insurance アプリケーションのシステムです。アプリケーションを構成するすべてのコンポーネント、API、リソースをまとめています。
+これはParasol Insuranceアプリケーションのシステムです。アプリケーションを構成するすべてのコンポーネント、API、リソースがまとめられています。
 
-. システム表示を確認します:
-* このシステムに登録されているコンポーネントに注目する
-* コンポーネント間の依存関係を確認する
-* コンポーネントをクリックして詳細ページを表示する
+. システムビューを確認します:
+* このシステムに登録されているコンポーネントを確認します
+* コンポーネント間の依存関係を確認します
+* コンポーネントをクリックして詳細ページを表示します
 
-. コンポーネント詳細ページで、各タブを確認します:
+. コンポーネントの詳細ページで、タブを確認します:
 * **Overview** -- 所有者、ライフサイクル、システム情報
-* **API** -- 提供および利用する API 定義
-* **Relations** -- このコンポーネントが依存しているもの、また依存されているもの
+* **API** -- 提供および利用するAPI定義
+* **Relations** -- このコンポーネントが依存するもの、およびこのコンポーネントに依存するもの
 +
-image::rhdh-component-detail.png[Overview と CI/CD タブがあるコンポーネント詳細ページ,link=self,window=blank,width=700]
+image::rhdh-component-detail.png[OverviewおよびCI/CDタブを含むコンポーネント詳細ページ,link=self,window=blank,width=700]
 
-. **API** タイルで **parasol-insurance-api** を見つけます。それをクリックし、**Definition** タブを選択します。
+. **API** タイルで **parasol-insurance-api** を見つけます。クリックしてから、**Definition** タブを選択します。
 +
-API ドキュメントはソースリポジトリから直接レンダリングされます。コードが変更されると、ドキュメントも自動的に最新状態に保たれます -- 別途維持する wiki は不要です。
+APIドキュメントはソースリポジトリーから直接レンダリングされます。コードが変更されると、ドキュメントも自動的に最新状態に保たれるため、別途Wikiをメンテナンスする必要はありません。
 +
-image::rhdh-api-definition.png[Developer Hub でソースからレンダリングされた API 定義,link=self,window=blank,width=700]
+image::rhdh-api-definition.png[Developer HubでソースからレンダリングされたAPI定義,link=self,window=blank,width=700]
 
-=== 演習 3: AI アシスタントに質問する
+=== 演習 3: AIアシスタントに質問する
 
-Developer Hub には **Lightspeed** と呼ばれる AI アシスタントがあり、アプリケーション、API、ドキュメントについて質問できます。
+Developer Hubには **Lightspeed** というAIアシスタントがあり、アプリケーション、API、ドキュメントに関する質問に答えてくれます。
 
-. Developer Hub インターフェースの右下にある **Lightspeed** アイコンをクリックします。
+. Developer Hubインターフェースの右下にある **Lightspeed** アイコンをクリックします。
 
-. Lightspeed ウィンドウの右上にある三点メニューを使って、フルスクリーン表示に切り替えます。
+. Lightspeedウィンドウの右上にある三点メニューを使って、全画面表示に切り替えます。
 +
-image::rhdh-lightspeed.png[Developer Hub の Lightspeed AI アシスタント,link=self,window=blank,width=700]
+image::rhdh-lightspeed.png[Developer HubのLightspeed AIアシスタント,link=self,window=blank,width=700]
 
-. Parasol アプリケーションについて質問してみます:
+. Parasolアプリケーションについて質問してみましょう:
 +
 [source,subs="attributes",role="copypaste"]
 ----
 Tell me about the parasol-insurance-api-{user} API in the catalog
 ----
 
-. 回答を確認します。Lightspeed はソフトウェアカタログとドキュメントから情報を取得し、文脈に沿った回答を返します。
+. 回答を確認します。Lightspeedはソフトウェアカタログやドキュメントから情報を取得し、状況に応じた回答を提供します。
 +
-image::rhdh-lightspeed-response.png[Developer Hub の Lightspeed AI アシスタント,link=self,window=blank,width=700]
+image::rhdh-lightspeed-response.png[Developer HubのLightspeed AIアシスタント,link=self,window=blank,width=700]
 
 
-. 別の質問も試してみます:
+. 別の質問も試してみましょう:
 +
 [source,role="copypaste"]
 ----
 What components make up the parasol-insurance system?
 ----
 
-NOTE: Lightspeed の応答は試行ごとに異なる場合があります。最初の試行で特定のエンティティが見つからない場合は、まず「list all APIs in the catalog」と尋ねてから、元の質問をもう一度してください。
+NOTE: Lightspeedの回答は、試すたびに異なる場合があります。最初の試行で特定のエンティティが見つからない場合は、まず「カタログ内のすべてのAPIを一覧表示して」と尋ねてから、元の質問をもう一度してください。
 
 === 確認
 
-ここまでで、次のことができるはずです:
+ここまでで、次のことができるようになりました:
 
-* Developer Hub にログインする
-* ソフトウェアカタログで Parasol Insurance システムを見つける
-* コンポーネントの詳細、CI/CD 状態、API ドキュメントを表示する
-* Lightspeed を使ってプラットフォームについて質問する
+* Developer Hubにログインする
+* ソフトウェアカタログでParasol Insuranceシステムを見つける
+* コンポーネントの詳細、CI/CDのステータス、APIドキュメントを表示する
+* Lightspeedを使ってプラットフォームについて質問する
 
 '''
 
 [#section-2]
-== セクション 2: あなたのミッション
+== セクション 2: ミッション
 
-使い方がわかったところで、作業に取りかかりましょう。あなたには、Parasol アプリケーションに請求統計 API エンドポイントを追加するタスクが割り当てられています。コーディングを始める前に、独立した開発環境と、その専用 CI/CD パイプラインを準備する必要があります。
+操作方法が分かったところで、作業を始めましょう。Parasolアプリケーションに保険金請求統計APIエンドポイントを追加するタスクが割り当てられました。コーディングを始める前に、独自のCI/CDパイプラインを備えた分離開発環境をセットアップする必要があります。
 
 === 演習 1: 開発環境を作成する
 
-Developer Hub は、チケットを起票せずに環境をプロビジョニングできるセルフサービステンプレートを提供します。プラットフォームチームは、必要なものをすべてセットアップするテンプレートを作成しました。Feature ブランチ、専用パイプライン、そして作業を追跡するためのカタログエントリが含まれます。
+Developer Hubには、チケットを申請せずに環境をプロビジョニングできるセルフサービステンプレートが用意されています。プラットフォームチームが、機能ブランチ、専用パイプライン、作業を追跡するカタログエントリーなど、必要なものをすべてセットアップするテンプレートを作成しました。
 
-. Developer Hub で、ページ上部の **Self-Service** ボタン（**+** アイコン）をクリックします。
+. Developer Hubで、ページ上部の **Self-Service** ボタン ( **+** アイコン) をクリックします。
 +
-TIP: Lightspeed がまだインターフェースを覆っている場合は、右下の小さな **X** アイコンをクリックして閉じます。アシスタントは常に利用可能です -- 同じフローティングアイコンをクリックすれば、いつでも再度開けます。
+TIP: Lightspeedがまだインターフェースを覆っている場合は、右下にある小さな **X** アイコンをクリックして閉じます。アシスタントはいつでも利用でき、同じ浮遊アイコンをクリックすれば再び開けます。
 
-. 利用可能なソフトウェアテンプレートを参照します。これらはプラットフォームチームが管理するゴールデンパスのテンプレートです。
+. 利用可能なソフトウェアテンプレートを確認します。これらはプラットフォームチームが管理するゴールデンパステンプレートです。
 
-. **Parasol Insurance Development Environment** テンプレート（または同様の名前のテンプレート）を選択します。
+. **Parasol Insurance Development Environment** テンプレート (または同様の名前のテンプレート) を選択します。
 
 . テンプレートフォームに入力します:
-* **Branch name**: Feature ブランチの短い名前を入力します。例: `claims-stats`
+* **Branch name**: 機能ブランチの短い名前を入力します。例: `claims-stats`
 +
-TIP: ブランチ名は短く保ってください。OpenShift Routes の生成に使われ、長さ制限があるためです。
+TIP: ブランチ名は短くしてください。長さ制限のあるOpenShift Routeの生成に使用されます。
 +
 image::rhdh-template-values.png[ワンクリックでプロビジョニングされた開発環境,link=self,window=blank,width=700]
 
-. **Review** をクリックして詳細を確認し、続けて **Create** をクリックしてプロビジョニングの進行を確認します:
-* ソースリポジトリに Feature ブランチが作成される
-* ブランチ用に CI/CD パイプラインが設定される
-* Developer Hub カタログに新しいコンポーネントが登録される
+. **Review** をクリックして詳細を確認し、**Create** をクリックしてプロビジョニングの進行状況を確認します:
+* ソースリポジトリーに機能ブランチが作成されます
+* ブランチ用にCI/CDパイプラインが設定されます
+* Developer Hubカタログに新しいコンポーネントが登録されます
 
 . プロビジョニングが完了したら、**Open in Catalog** をクリックして新しいコンポーネントを表示します。
 +
 image::rhdh-template-results.png[ワンクリックでプロビジョニングされた開発環境,link=self,window=blank,width=700]
 
-. コンポーネントページで **View Source** をクリックし、GitLab で Feature ブランチを開きます。
+. コンポーネントページで **View Source** をクリックし、GitLabで機能ブランチを開きます。
 +
-GitLab へのログインを求められる場合があります。同じ資格情報を使います:
+GitLabへのログインを求められる場合があります。同じ認証情報を使用します:
 +
 --
-Username:
+ユーザー名:
 [source,subs="attributes",role="copypaste"]
 ----
 {user}
 ----
-Password:
+パスワード:
 [source,subs="attributes",role="copypaste"]
 ----
 {password}
 ----
 --
 +
-リポジトリを確認してください -- ここが、変更をマージするまで作業内容が置かれるブランチです。
+リポジトリーを確認してください。ここが、変更をマージするまで変更を保持するブランチです。
 
 === 確認
 
-これで次のものができました:
+次のものが用意できました:
 
-* Parasol ソースリポジトリ内の Feature ブランチ (`claims-stats`)
-* ブランチに接続された CI/CD パイプライン（これは次のセクションでビルドすると、`CI` タブに表示されます）
-* 開発作業を追跡する Developer Hub のカタログエントリ
+* Parasolのソースリポジトリーに機能ブランチ (`claims-stats`)
+* ブランチに接続されたCI/CDパイプライン (次のセクションでビルドすると、`CI` タブに表示されます)
+* 開発作業を追跡するDeveloper Hubのカタログエントリー
 
 '''
 
 [#section-3]
-== セクション 3: 機能を実装する
+== セクション 3: 機能を開発する
 
-開発環境が整ったので、コードを書き始めましょう。ここでは Red Hat OpenShift Dev Spaces を使います。クラスタ内で完全に動作するクラウドベースの IDE です。ローカル環境のセットアップも、依存関係の衝突も、「自分の環境では動く」問題もありません。
+開発環境の準備ができたので、コードを書きましょう。クラスター内で完全に実行されるクラウドベースのIDE、Red Hat OpenShift Dev Spacesを使用します。ローカルセットアップも、依存関係の競合も、「自分のマシンでは動くのに」という問題もありません。
 
-=== 演習 1: Dev Spaces を開く
+=== 演習 1: Dev Spacesを開く
 
-. Developer Hub のコンポーネント概要ページから、**Open in Dev Spaces** リンクをクリックして、Feature ブランチ用のクラウドワークスペースを開きます。
+. Developer Hubのコンポーネント概要ページで、**Open in Dev Spaces** リンクをクリックし、機能ブランチ用のクラウドワークスペースを開きます。
 +
-または、{devspaces_url}[{devspaces_url}^] で Dev Spaces を直接開き、リポジトリ URL からワークスペースを作成することもできます。
+または、{devspaces_url}[{devspaces_url}^] からDev Spacesを直接開き、リポジトリーURLを使ってワークスペースを作成できます。
 +
-image::rhdh-devspaces-link.png[Red Hat Developer Hub で表示される、事前設定済み Dev Spaces を開くリンク,link=self,window=blank,width=700]
+image::rhdh-devspaces-link.png[Red Hat Developer Hubに表示される、事前設定済みDev Spacesを開くリンク,link=self,window=blank,width=700]
 
-. Dev Spaces を初めて開くときは、**Log In With OpenShift** をクリックします。いくつかの承認プロンプトが表示されます。これらは、IDE が明示的な同意のもとでのみ動作することを保証するセキュリティゲートです:
+. Dev Spacesを初めて開くときは、**Log In With OpenShift** をクリックします。複数の認可プロンプトが表示されます。これらは、IDEが明示的な同意のもとでのみ動作するようにするセキュリティゲートです:
 
-.. **Authorize access to OpenShift** -- **Allow selected permissions** をクリック
-.. **Do you trust the authors of this repository?** -- **Continue** をクリック
-.. **GitLab login** -- 必要に応じて資格情報でログイン（ユーザー名: `{user}`、パスワード: `{password}`）
-.. **GitLab Authorization** -- DevSpaces がブランチを開けるように **Authorize** をクリック（ここで時間をかけすぎると、権限付与後に **Retry** をクリックして再試行する必要がある場合があります）
+.. **Authorize access to OpenShift** -- **Allow selected permissions** をクリックします
+.. **Do you trust the authors of this repository?** -- **Continue** をクリックします
+.. **GitLab login** -- 必要に応じて認証情報でログインします (ユーザー名: `{user}`、パスワード: `{password}`)
+.. **GitLab Authorization** -- ブランチを開く権限をDev Spacesに付与するため、**Authorize** をクリックします (ここで待ちすぎると、権限付与後に再試行するため **Retry** をクリックする必要がある場合があります)
 
-. ワークスペースが読み込まれたら、少し中を見てみましょう:
-.. **Trust the workspace files** -- **Yes, I trust the authors** をクリック
-.. **Trust publishers and install** -- AI コーディングアシスタントを含む推奨拡張機能をインストールするためにクリック
-.. MicroProfile や Dependency Analytics に関するポップアップは **X** をクリックして閉じる
+. ワークスペースが読み込まれたら、少し見てみましょう:
+.. **Trust the workspace files** -- **Yes, I trust the authors** をクリックします
+.. **Trust publishers and install** -- AIコーディングアシスタントを含む推奨拡張機能をインストールするため、クリックします
+.. MicroProfileまたはDependency Analyticsに関するポップアップが表示されたら、**X** をクリックして閉じます
 +
-WARNING: 「trust the authors」プロンプトを見逃すと、Dev Spaces は Restricted Mode で開かれ、ウィンドウ下部に強調表示されたバナーが表示されます。拡張機能が正しく読み込まれるように、バナーをクリックして信頼を確認してください。
+WARNING: 「trust the authors」プロンプトを見逃すと、Dev SpacesはRestricted Modeで開き、ウィンドウ下部に強調表示されたバナーが表示されます。バナーをクリックして信頼を確認し、拡張機能が正しく読み込まれるようにしてください。
 +
-* ファイルエクスプローラーにはプロジェクト全体の構成が表示される
-* ターミナルには CLI ツール（`oc`、`mvn` など）があらかじめインストールされている
-* Java、Quarkus、YAML、AI コーディングアシスタント用の拡張機能はすでに設定済み
-* Git は Feature ブランチに接続済み
+* ファイルエクスプローラーには、プロジェクトの完全な構造が表示されます
+* ターミナルにはCLIツール (`oc`、`mvn` など) が事前にインストールされています
+* Java、Quarkus、YAML、AIコーディングアシスタント用の拡張機能がすでに設定されています
+* Gitは機能ブランチに接続されています
 +
-image::devspaces-workspace-loaded.png[Parasol Insurance プロジェクトが完全に読み込まれたクラウド開発ワークスペース,link=self,window=blank,width=700]
+image::devspaces-workspace-loaded.png[Parasol Insuranceプロジェクトがすべて読み込まれたクラウド開発ワークスペース,link=self,window=blank,width=700]
 
 === 演習 2: 開発モードでアプリケーションを起動する
 
-新しいコードを書く前に、まずアプリケーションを起動して、何を相手にしているのか確認しましょう。
+新しいコードを書く前に、アプリケーションを起動して作業対象を確認しましょう。
 
-. kbd:[Ctrl+Shift+P]（Mac では kbd:[Cmd+Shift+P]）を押してコマンドパレットを開きます。
+. kbd:[Ctrl+Shift+P] (Macでは kbd:[Cmd+Shift+P]) を押して、コマンドパレットを開きます。
 
 . **Tasks: Run Task** と入力して選択します。
 
@@ -223,32 +223,32 @@ image::devspaces-workspace-loaded.png[Parasol Insurance プロジェクトが完
 
 . **Start Development Mode (Hot Reload + debug)** を選択します。
 
-. アプリケーションが起動するのを待ちます。Dev Spaces がアプリケーションを開くポップアップ通知を表示したら、**Open In New Tab** をクリックします。
+. アプリケーションが起動するまで待ちます。Dev Spacesにアプリケーションを開くポップアップ通知が表示されたら、**Open In New Tab** をクリックします。
 +
-image::devspaces-workspace-popup.png[Quarkus のポップアップ,link=self,window=blank,width=700]
+image::devspaces-workspace-popup.png[Quarkusのポップアップ,link=self,window=blank,width=700]
 +
-TIP: ポップアップを見逃した場合は、Dev Spaces ウィンドウ左下の *ENDPOINTS* パネルからアプリケーションを開きます。*quarkus-dev (8080/https)* を見つけて矢印アイコンをクリックしてください。
+TIP: ポップアップを見逃した場合は、Dev Spacesウィンドウ左下の *ENDPOINTS* パネルからアプリケーションを開きます。*quarkus-dev (8080/https)* を見つけ、矢印アイコンをクリックします。
 
-. 実行中の Parasol Insurance アプリケーションを確認します:
-* これは Parasol のエージェントが使う請求と顧客管理のプラットフォームです
-* 保険金請求の処理と顧客とのコミュニケーションを扱います
-* 裏側では、メッセージルーティングに Apache Kafka を使用しています
+. 起動中のParasol Insuranceアプリケーションを確認します:
+* これはParasolの担当者が使用する、保険金請求および顧客管理プラットフォームです
+* 保険金請求処理と顧客とのコミュニケーションを扱います
+* 内部では、メッセージのルーティングにApache Kafkaを使用しています
 +
-image::parasol-app-home.png[Parasol Insurance アプリケーションのダッシュボード,link=self,window=blank,width=700]
+image::parasol-app-home.png[Parasol Insuranceアプリケーションのダッシュボード,link=self,window=blank,width=700]
 
-=== 演習 3: 請求統計エンドポイントを追加する
+=== 演習 3: 保険金請求統計エンドポイントを追加する
 
-いよいよ機能を実装します。請求統計（合計、カテゴリ別、ステータス別の内訳）を返す新しい REST エンドポイントを作成します。
+機能を実装しましょう。保険金請求統計 (合計、カテゴリー別およびステータス別の内訳) を返す新しいRESTエンドポイントを作成します。
 
-. Dev Spaces に戻り、左サイドバーの **Explorer** アイコンをクリックします。ファイルツリーで `src` -> `main` -> `java` -> `com` -> `parasol` を展開します。
+. Dev Spacesに戻り、左サイドバーの **Explorer** アイコンをクリックします。ファイルツリーで `src` -> `main` -> `java` -> `com` -> `parasol` の順に展開します。
 
-. `parasol` ディレクトリを右クリックし、**New File** を選択します。ファイル名を `ClaimsStatsResource.java` にします。
+. `parasol` ディレクトリーを右クリックして **New File** を選択します。ファイル名を `ClaimsStatsResource.java` にします。
 +
-完全なパスは `src/main/java/com/parasol/ClaimsStatsResource.java` でなければなりません。
+フルパスは `src/main/java/com/parasol/ClaimsStatsResource.java` でなければなりません。
 +
-WARNING: `parasol` フォルダの中にファイルを作成してください -- `com` でも `java` でもなく、プロジェクトルートでもありません。間違った場所に作成すると、後のパイプラインでビルドやルートの失敗につながります。
+WARNING: ファイルは `com` や `java` の中、またはプロジェクトルートではなく、必ず `parasol` フォルダー内に作成してください。誤った場所に作成すると、後のパイプラインでビルドやRouteに失敗します。
 +
-image::parasol-app-newfile.png[Parasol Insurance アプリケーションのダッシュボード,link=self,window=blank,width=700]
+image::parasol-app-newfile.png[Parasol Insuranceアプリケーションのダッシュボード,link=self,window=blank,width=700]
 
 . 次のコードを新しいファイルにコピーして貼り付けます:
 +
@@ -301,15 +301,15 @@ public class ClaimsStatsResource {
 }
 ----
 +
-NOTE: このコードは動作しますが、いくつか簡略化されています。`System.out.println` を適切な logging framework の代わりに使っており、`catch` ブロックは例外を黙って飲み込んでいます。これらの code smell は意図的なものです -- CI/CD パイプラインが第 4 セクションで検出します。
+NOTE: このコードは動作しますが、いくつか簡略化されています。適切なロギングフレームワークの代わりに `System.out.println` を使い、`catch` ブロックでは例外を黙って無視しています。これらのコードスメルは意図的なもので、セクション 4 でCI/CDパイプラインが検出します。
 
-. kbd:[Ctrl+S]（Mac では kbd:[Cmd+S]）でファイルを保存します。Quarkus の dev mode が変更を検知してアプリケーションを再読み込みします -- 手動のビルド手順は不要です。
+. kbd:[Ctrl+S] (Macでは kbd:[Cmd+S]) を押してファイルを保存します。Quarkusの開発モードが変更を検出し、アプリケーションを再読み込みします。手動でビルドする必要はありません。
 +
-TIP: アプリケーションが自動で再読み込みされない場合は、Dev Spaces のターミナルでコンパイルエラーを確認してください。kbd:[Ctrl+Shift+P] を押して **Tasks: Run Task** -> **devfile** -> **Start Development Mode (Hot Reload + debug)** を選び、dev mode を再起動することもできます。ポート競合が出た場合は、先に既存のタスクを停止してください。
+TIP: アプリケーションが自動的に再読み込みされない場合は、Dev Spacesのターミナルでコンパイルエラーを確認してください。kbd:[Ctrl+Shift+P] を押して **Tasks: Run Task** -> **devfile** -> **Start Development Mode (Hot Reload + debug)** を選択し、開発モードを再起動することもできます。ポート競合が表示された場合は、まず既存のタスクを停止してください。
 
-. ブラウザーで、実行中の Parasol アプリケーションのタブに切り替え、URL から `dashboard.html` を削除して、ブラウザーのアドレスバーの末尾に `/api/claims/stats` を追加します。
+. ブラウザーでParasolアプリケーションが実行されているタブに切り替え、URLから `dashboard.html` を削除して、ブラウザーのアドレスバーの末尾に `/api/claims/stats` を追加します。
 +
-請求件数の合計と内訳を含む JSON データが表示されるはずです:
+請求件数と内訳を含むJSONデータが表示されるはずです:
 +
 ----
 {
@@ -326,135 +326,135 @@ TIP: アプリケーションが自動で再読み込みされない場合は、
 }
 ----
 +
-新しいエンドポイントは動作しています。コードを書き、ファイルを保存すると、アプリケーションは数秒で再読み込みされました。ビルドコマンドも、再パッケージも、再デプロイもありません。
+新しいエンドポイントが動作しています。コードを書いてファイルを保存すると、数秒でアプリケーションが再読み込みされました。ビルドコマンドも、再パッケージも、再デプロイも必要ありません。
 +
-image::parasol-claims-stats-devmode.png[開発モードで JSON データを返す請求統計エンドポイント,link=self,window=blank,width=700]
+image::parasol-claims-stats-devmode.png[開発モードでJSONデータを返す保険金請求統計エンドポイント,link=self,window=blank,width=700]
 
 === 確認
 
-これで次の状態になりました:
+次のことができるようになりました:
 
-* Quarkus の開発モードで動作する Parasol アプリケーション
-* 請求データを返す新しい `/api/claims/stats` エンドポイント
-* ライブリロードが動作している -- コード変更が数秒で反映される
+* Quarkus開発モードでParasolアプリケーションを実行する
+* 保険金請求データを返す新しい `/api/claims/stats` エンドポイントを作成する
+* ライブリロードが動作し、コード変更が数秒で反映される
 
 '''
 
 [#section-4]
-== セクション 4: リリースする
+== セクション 4: デプロイする
 
-NOTE: 途中で再度ログインが必要になった場合、資格情報は次のとおりです: ユーザー名 `{user}`、パスワード `{password}`。
+NOTE: 途中で再度ログインが必要になった場合の認証情報は、ユーザー名 `{user}`、パスワード `{password}` です。
 
-機能はローカルで動作しています。次はプラットフォームの CI/CD パイプラインに流し込みましょう。シンプルな `git push` で、自動パイプラインが起動し、コードをビルド、テスト、スキャンします。チケットも、手動トリガーも、受け渡しも不要です。
+機能はローカルで動作しています。プラットフォームのCI/CDパイプラインにプッシュしましょう。単純な `git push` で、コードをビルド、テスト、スキャンする自動パイプラインが起動します。チケットも手動起動も引き継ぎも必要ありません。
 
-=== 演習 1: コードを push する
+=== 演習 1: コードをプッシュする
 
-. Dev Spaces で、左サイドバーの **Source Control** アイコン（ブランチのアイコン）をクリックします。
+. Dev Spacesで、左サイドバーの **Source Control** アイコン (ブランチアイコン) をクリックします。
 
 . 新しい `ClaimsStatsResource.java` ファイルが **Changes** の下に表示されます。
 
-. ファイル横の **+** アイコンをクリックしてステージします。
+. ファイルの横にある **+** アイコンをクリックしてステージします。
 
-. テキスト欄にコミットメッセージを入力します:
+. テキストフィールドにコミットメッセージを入力します:
 +
 [source,role="copypaste"]
 ----
 Add claims statistics API endpoint
 ----
 +
-WARNING: コミットメッセージを省略しないでください。空のメッセージ欄のまま **Commit & Push** をクリックすると、エディタが `COMMIT_EDITMSG` というファイルを開き、メッセージ入力とファイルタブを閉じるのを待ちます（`COMMIT_EDITMSG` タブの **X** をクリック）。回転中の進行インジケーターが何か進んでいるように見えるかもしれませんが、実際には何も進んでいません。メッセージを入力してファイルを閉じるのを待っているだけです。これが起きたら、1 行目にメッセージを入力し、タブを閉じればコミットが進みます。
+WARNING: コミットメッセージを省略しないでください。メッセージ欄が空のまま **Commit & Push** をクリックすると、`COMMIT_EDITMSG` というファイルが開き、メッセージの入力とファイルのクローズを求められます (`COMMIT_EDITMSG` タブの **X** をクリックします)。進行状況を示すインジケーターが回転して処理中のように見えることがありますが、実際には処理中ではありません。メッセージを入力してファイルを閉じるのを待っています。この状態になった場合は、1行目にメッセージを入力してタブを閉じると、コミットが続行されます。
 
-. **Commit** ボタンの横にあるドロップダウン矢印をクリックし、**Commit & Push** を選択します。
+. **Commit** ボタンの横のドロップダウン矢印をクリックし、**Commit & Push** を選択します。
 +
-image::scm-commit.png[IDE からコードをコミットして push する開発者,link=self,window=blank,width=700]
+image::scm-commit.png[IDEからコードをコミットしてプッシュする開発者,link=self,window=blank,width=700]
 
-=== 演習 2: Developer Hub でパイプラインを確認する
+=== 演習 2: Developer Hubでパイプラインを確認する
 
-. ブラウザーで **Developer Hub** に戻ります。セッションの有効期限が切れている場合は、再度ログインが必要かもしれません:
+. ブラウザーで **Developer Hub** に戻ります。セッションの有効期限が切れている場合は、再度ログインが必要です:
 +
 --
-Username:
+ユーザー名:
 [source,subs="attributes",role="copypaste"]
 ----
 {user}
 ----
-Password:
+パスワード:
 [source,subs="attributes",role="copypaste"]
 ----
 {password}
 ----
 --
 
-. カタログでコンポーネントに移動します。
+. カタログで自分のコンポーネントに移動します。
 
-. **CI** タブをクリックして、push によってトリガーされたパイプライン実行を確認します。（失敗している GitLab パイプラインが表示されても無視して構いません -- この演習では OpenShift Pipelines を使っています）
+. **CI** タブをクリックして、プッシュによって起動したパイプラインの実行を確認します。(失敗と表示されるGitLabパイプラインは無視してかまいません。この演習ではOpenShiftパイプラインを使用します。)
 +
-. 展開して、パイプラインがいくつかの段階を実行していることを確認します:
+. パイプライン実行をクリックして展開し、複数のステージが実行されることを確認します:
 +
-* **Clone** -- Git リポジトリからソースコードを取得
+* **Clone** -- Gitリポジトリーからソースコードを取得
 * **SonarQube SAST** -- 静的解析とコード品質スキャン
-* **Build and Push** -- アプリケーションをコンパイルし、コンテナイメージをビルドしてレジストリに push
-* **Re-rollout app** -- 更新されたアプリケーションを dev 環境にデプロイ
+* **Build and Push** -- アプリケーションをコンパイルし、コンテナーイメージをビルドしてレジストリーにプッシュ
+* **Re-rollout app** -- 更新されたアプリケーションを開発環境にデプロイ
 
-. パイプラインの進行を見守ります。**sonar-scan** ステージは失敗します。
+. パイプラインの進行状況を確認します。**sonar-scan** ステージは失敗します。
 +
-image::ocp-pipeline-running.png[進行中のステージを示す Developer Hub のパイプライン実行,link=self,window=blank,width=700]
+image::ocp-pipeline-running.png[Developer Hubで進行中のステージを表示するパイプライン実行,link=self,window=blank,width=700]
 
-=== 演習 3: パイプライン失敗を診断する
+=== 演習 3: パイプラインの失敗を診断する
 
-パイプラインが何かを検出しました。SonarQube の quality gate は、先ほど加えたコードの簡略化が原因で失敗しました。
+パイプラインが問題を検出しました。先ほどのコードの簡略化が原因で、SonarQubeの品質ゲートに失敗しました。
 
-. 失敗した `sonar-scan` ステップをクリックして詳細を表示します。
+. 失敗した `sonar-scan` ステップをクリックして詳細を確認します。
 
-. パイプラインログ出力から **SonarQube report URL** を見つけます。
+. パイプラインログ出力で **SonarQube report URL** を見つけます。
 +
-image::ocp-pipeline-sonar-fail.png[コード smell の違反を示す SonarQube レポート,link=self,window=blank,width=700]
+image::ocp-pipeline-sonar-fail.png[コードスメル違反を示すSonarQubeレポート,link=self,window=blank,width=700]
 
-. SonarQube レポートを開いて、具体的な問題を確認します:
-* **`System.out.println` の使用** -- 本番コードのログに標準出力を使うべきではありません
-* **空の catch ブロック** -- 例外を黙って飲み込むべきではありません
-* **フィールドインジェクション** -- SonarQube は、テスト容易性の向上のため、`@Inject` によるフィールドインジェクションよりコンストラクタインジェクションを推奨します
+. SonarQubeレポートを開いて、具体的な問題を確認します:
+* **`System.out.println` の使用** -- 本番コードのロギングに標準出力を使用すべきではありません
+* **空のcatchブロック** -- 例外を黙って無視してはいけません
+* **フィールドインジェクション** -- テスト容易性を高めるため、SonarQubeは `@Inject` によるフィールドインジェクションではなくコンストラクターインジェクションを推奨しています
 +
-これらは単なる提案ではありません。厳格な quality gate です。これらの違反があるコードは先に進めません。
+これらは単なる提案ではありません。厳格な品質ゲートです。これらの違反があるコードは先に進めません。
 +
-image::ocp-pipeline-sonar-report.png[コード smell の違反を示す SonarQube レポート,link=self,window=blank,width=700]
+image::ocp-pipeline-sonar-report.png[コードスメル違反を示すSonarQubeレポート,link=self,window=blank,width=700]
 
 === 確認
 
-ここまでで次のことを行いました:
+ここまでで、次のことができました:
 
-* コードを push し、自動 CI/CD パイプラインを起動した
-* SonarQube の quality gate が実際の code smell を検出するのを確認した
-* SonarQube レポートで具体的な違反を見つけた
+* コードをプッシュして自動CI/CDパイプラインを起動した
+* SonarQubeの品質ゲートが実際のコードスメルを検出するのを確認した
+* SonarQubeレポートで具体的な違反を見つけた
 
-パイプラインはその役割を果たしました -- 本番環境に到達する前に問題を検出しました。次は、それを修正する必要があります。
+パイプラインは役割を果たし、問題が本番環境に到達する前に検出しました。次は問題を修正します。
 
 '''
 
 [#section-5]
-== セクション 5: AI を呼び出す
+== セクション 5: AIに頼る
 
-Quarkus の logging API を調べ、SonarQube の修正ガイドを読み、手作業でコードをリファクタリングすることもできます。あるいは、AI コーディングアシスタントに任せることもできます。
+QuarkusのロギングAPIを調べ、SonarQubeの修正ガイドを読み、手作業でコードをリファクタリングすることもできます。あるいは、AIコーディングアシスタントに頼んで修正してもらうこともできます。
 
-プラットフォームエンジニアリングチームは、セキュリティチーム承認済みのエージェント型 AI コーディングアシスタント（Zoo Code を使用）を、すべての Dev Spaces ワークスペースに事前設定しています。これは、スニペットを提案するだけのチャットボットではありません。プロジェクト全体を読み取り、使用しているフレームワークを理解し、ファイルをまたいでパターンを探し、エディタに直接変更を適用できる AI エージェントです。問題を自然言語で説明すれば、修正方法を導き出してくれます。
+プラットフォームエンジニアリングチームは、セキュリティチームが承認したエージェント型AIコーディングアシスタント (Zoo Codeを利用) を、すべてのDev Spacesワークスペースに事前設定しています。これはコード断片を提案するだけのチャットボットではありません。プロジェクト全体を読み取り、使用中のフレームワークを理解し、ファイル間を移動してパターンを探し、エディター内で直接変更を適用できるAIエージェントです。問題を自然な言葉で説明すれば、修正方法を判断してくれます。
 
-=== 演習 1: AI の支援でコードを修正する
+=== 演習 1: AI支援でコードを修正する
 
-AI アシスタントを使って SonarQube の違反を解消しましょう。
+AIアシスタントを使ってSonarQubeの違反を解決しましょう。
 
-NOTE: link:https://www.zoocode.dev/[Zoo Code] のオープンソース AI コーディングアシスタントを使います。このワークショップを進めやすくするため、ホストしている大規模言語モデル（LLM）で動作するよう設定済みです。
+NOTE: link:https://www.zoocode.dev/[Zoo Code] というオープンソースAIコーディングアシスタントを使用します。このワークショップを支援するため、ホスティングしている大規模言語モデル (LLM) と連携するように設定しています。
 
 . **Dev Spaces** に戻ります。
 
 . 左サイドバーの **AI assistant** アイコンをクリックします。
 +
-image::zoo-code-sidebar.png[Dev Spaces 左サイドバーにある AI コーディングアシスタントのアイコン,link=self,window=blank,width=700]
+image::zoo-code-sidebar.png[Dev Spacesの左サイドバーにあるAIコーディングアシスタントのアイコン,link=self,window=blank,width=700]
 +
-チャットパネル下部のコントロールに注目してください。ペルソナを切り替えられます -- 設計指針の **Architect**、実装用の **Code**、一般的な質問用の **Ask**、トラブルシュート用の **Debug** です。また、プラットフォームチームとセキュリティチームが使用を承認した AI モデルを選択できます -- いわゆる shadow AI はありません -- さらに、どの種類の操作をアシスタントが自動承認できるか（ファイル編集やターミナルコマンドなど）も設定できます。この演習では、ファイル編集にはあなたの承認が必要です。アシスタントが提案する各編集のあとに **Save** をクリックして、人間が確認する流れを維持してください。開発者がアシスタントへの信頼を十分に高めたら、より速いワークフローのために auto-approve に切り替えることもできます。
+チャットパネルの下部にあるコントロールを確認してください。ペルソナを切り替えられます。設計ガイダンスには **Architect**、実装には **Code**、一般的な質問には **Ask**、トラブルシューティングには **Debug** を選びます。また、プラットフォームチームとセキュリティチームが使用を承認したAIモデルから選択できます。ここでは未承認のAIは使えません。さらに、ファイル編集やターミナルコマンドなど、アシスタントが自動承認できるアクションの種類を設定できます。この演習ではファイル編集に承認が必要です。人間が確認できるように、アシスタントが提案する編集ごとに **Save** をクリックする必要があります。アシスタントへの信頼が高まれば、自動承認に切り替えてワークフローを高速化できます。
 
-. チャットパネルの下部でペルソナセレクターをクリックし、**Code** を選択します -- 大きな設計変更ではなく実装コードを編集しているためです。
+. チャットパネル下部のペルソナセレクターをクリックし、**Code** を選択します。大きな設計変更ではなく、実装コードを編集するためです。
 +
-image::zoo-code-persona.png[AI アシスタントで Code ペルソナを選択しているところ,link=self,window=blank,width=700]
+image::zoo-code-persona.png[AIアシスタントでCodeペルソナを選択,link=self,window=blank,width=700]
 
 . チャットパネルに次のプロンプトを入力します:
 +
@@ -466,26 +466,26 @@ System.out.println, field injection, and empty catch block. Don't
 throw any new exceptions, just log it using standard Quarkus logging.
 ----
 +
-image::zoo-code-prompt.png[SonarQube 違反を修正するためのプロンプト入力,link=self,window=blank,width=700]
+image::zoo-code-prompt.png[SonarQubeの違反を修正するプロンプトを入力,link=self,window=blank,width=700]
 
-. アシスタントの作業を見守ります。ファイルを読み取り、これが Quarkus プロジェクトであることを理解し、修正を直接適用します:
-* `System.out.println` を Quarkus logging API の `Log.info` に置換
-* 空の `try-catch` を削除 -- 例外は自然に伝播する
-* フィールドインジェクションをコンストラクタインジェクションに置換
+. アシスタントの作業を確認します。ファイルを読み取り、Quarkusプロジェクトであることを理解して、修正を直接適用します:
+* `System.out.println` をQuarkusロギングAPIの `Log.info` に置き換え
+* 空の `try-catch` を削除 -- 例外は自然に伝播
+* フィールドインジェクションをコンストラクターインジェクションに置き換え
 +
 
-. アシスタントが変更を加えるたびに、承認が必要です。各ファイル編集を承認するには **Save** をクリックします。アシスタントがファイルを変更するには、明示的な承認が必要であることを忘れないでください。
+. アシスタントが変更を加えるたびに、承認が必要です。ファイル編集を承認するには **Save** をクリックします。アシスタントがファイルを変更する前に、明示的な承認が必要です。
 +
-image::zoo-code-save.png[AI アシスタントのファイル編集を承認するために Save をクリックしているところ,link=self,window=blank,width=700]
+image::zoo-code-save.png[AIアシスタントのファイル編集を承認するためにSaveをクリック,link=self,window=blank,width=700]
 
-. 完了すると、変更はファイルに反映されているはずです。アシスタント経由で差分を見ることもできます:
+. 完了したら、変更がファイルに反映されているはずです。アシスタントから差分を確認することもできます:
 +
-image::zoo-code-result.png[AI アシスタントのファイル編集を承認するために Save をクリックしているところ,link=self,window=blank,width=700]
+image::zoo-code-result.png[AIアシスタントのファイル編集を承認するためにSaveをクリック,link=self,window=blank,width=700]
 
 
-TIP: AI アシスタントが応答しない、または修正が正しく適用されない場合は、`ClaimsStatsResource.java` の内容を以下の修正版に手動で置き換えてください。
+TIP: AIアシスタントが応答しない場合や、正しく修正できない場合は、`ClaimsStatsResource.java` の内容を以下の修正版に手動で置き換えることができます。
 
-. LLM は決定論的ではないため、修正後のコードが次の内容とほぼ同じであることを確認してください:
+. LLMは決定論的ではないため、修正後のコードが次の例と同様であることを確認します:
 +
 [source,java,role="copypaste"]
 ----
@@ -540,79 +540,79 @@ public class ClaimsStatsResource {
 }
 ----
 
-. コミットする前に -- 未テストのコードを push しないですよね？ -- ブラウザーで Parasol アプリケーションがまだ動作しているタブに切り替え、kbd:[Ctrl+R]（Mac では kbd:[Cmd+R]）を押して再読み込みします。Quarkus の dev mode はすでに変更を取り込んでいるので、先ほどと同じ `/api/claims/stats` の JSON 応答が表示されるはずです。そのタブを閉じていた場合は、左サイドバーの **Explorer** アイコンをクリックし、下部の *ENDPOINTS* パネルで *quarkus-dev (8080/https)* をクリックして再度開きます。エンドポイントがエラーを返す場合は、続行する前に Dev Spaces のターミナルを確認してコードを調整してください。
+. コミットする前に -- テストしていないコードはプッシュしませんよね? -- ブラウザーでParasolアプリケーションを実行中のタブに切り替え、kbd:[Ctrl+R] (Macでは kbd:[Cmd+R]) を押して再読み込みします。Quarkus開発モードは変更をすでに検出しているため、以前と同じJSONレスポンスが `/api/claims/stats` に表示されるはずです。タブを閉じた場合は、左サイドバーの **Explorer** アイコンをクリックし、下部にある *ENDPOINTS* パネルから *quarkus-dev (8080/https)* をクリックして再度開きます。エンドポイントがエラーを返す場合は、Dev Spacesのターミナルを確認し、続行する前にコードを調整します。
 
-. **Source Control** ビューを使って修正をコミットして push します:
-* 変更した `ClaimsStatsResource.java` をステージする
+. **Source Control** ビューを使って修正をコミットし、プッシュします:
+* 変更した `ClaimsStatsResource.java` をステージします
 * コミットメッセージ:
 +
 [source,role="copypaste"]
 ----
 Fix code smells: use proper logging and remove empty catch block
 ----
-* **Commit** の横にあるドロップダウン矢印をクリックし、**Commit & Push** を選択する
+* **Commit** の横にあるドロップダウン矢印をクリックし、**Commit & Push** を選択します
 
-=== 演習 2: パイプラインが通ることを確認する
+=== 演習 2: パイプラインが成功することを確認する
 
 . **Developer Hub** に戻り、**CI/CD** タブを確認します。
 
 . 新しいパイプライン実行が自動的に開始されます。
 
-. すべてのステージが正常に完了するのを確認します:
-* 今回は SonarQube の quality gate が通過する
-* イメージがビルドされて push される
-* アプリケーションが再デプロイされる
+. すべてのステージが正常に完了することを確認します:
+* 今度はSonarQubeの品質ゲートに合格します
+* イメージがビルドされ、プッシュされます
+* アプリケーションが再デプロイされます
 +
-image::ocp-pipeline-passed.png[code smell を修正した後、すべてのパイプラインステージが通過している様子,link=self,window=blank,width=700]
+image::ocp-pipeline-passed.png[コードスメル修正後にすべてのパイプラインステージが合格,link=self,window=blank,width=700]
 
 === 確認
 
-ここまでで次のことを行いました:
+ここまでで、次のことができました:
 
-* エージェント型 AI アシスタントを使って SonarQube が検出した code smell を修正した
-* 修正を push し、パイプラインが通るのを確認した
-* AI 支援がプラットフォームの開発ワークフローにどのように統合されるかを確認した
+* エージェント型AIアシスタントを使って、SonarQubeが特定したコードスメルを修正した
+* 修正をプッシュし、パイプラインが成功するのを確認した
+* AI支援がプラットフォームの開発ワークフローにどのように統合されるかを確認した
 
 '''
 
 [#section-6]
-== セクション 6: 本番公開する
+== セクション 6: 本番稼働
 
-NOTE: 途中で再度ログインが必要になった場合、資格情報は次のとおりです: ユーザー名 `{user}`、パスワード `{password}`。
+NOTE: 途中で再度ログインが必要になった場合の認証情報は、ユーザー名 `{user}`、パスワード `{password}` です。
 
-パイプラインは通過しました。コードはビルド、テスト、スキャン、パッケージ化されています。次は変更をマージし、GitOps を通じて本番環境へデプロイされる様子を確認しましょう。
+パイプラインは成功しました。コードはビルド、テスト、スキャン、パッケージ化されています。次は変更をマージし、GitOpsを通じて本番環境にデプロイされる様子を確認します。
 
-=== 演習 1: Feature ブランチをマージする
+=== 演習 1: 機能ブランチをマージする
 
-. **Developer Hub** でコンポーネントに移動し、**View Source** をクリックして GitLab でリポジトリを開きます。
+. **Developer Hub** でコンポーネントに移動し、**View Source** をクリックしてGitLabのリポジトリーを開きます。
 
-. Feature ブランチから **Create merge request** を促すプロンプトが上部に表示されるはずです。クリックします。
+. 上部に機能ブランチから **Create merge request** するためのプロンプトが表示されます。クリックします。
 +
-image::gitlab-merge-prompt.png[Merge Request を開くための GitLab のプロンプト,link=self,window=blank,width=700]
+image::gitlab-merge-prompt.png[Merge Requestを開くためのGitLabプロンプト,link=self,window=blank,width=700]
 +
-NOTE: プロンプトが表示されない場合は、左サイドバーの **Merge Requests** をクリックし、**New Merge Request** を選び、ブランチを選択します。
+NOTE: プロンプトが表示されない場合は、左サイドバーの **Merge Requests**、次に **New Merge Request** をクリックし、自分のブランチを選択します。
 
 . マージリクエストを確認します:
-* 下部の _Commits_ タブでは、この環境で最初に作成されたコミットの上に、あなたの 2 つのコミットが表示される
-* _Changes_ タブでは、修正済みコードを含む新しい `ClaimsStatsResource.java` ファイルが表示される
+* 下部付近にある _Commits_ タブには、この環境で最初に作成されたコミットの後に、今回の2つのコミットが表示されます
+* _Changes_ タブには、修正済みコードを含む新しい `ClaimsStatsResource.java` ファイルが表示されます
 
-. 下部の **Create merge request** をクリックして新しいリクエストを作成します。リクエストは作成され、あなたや他の人が確認できるように開かれます。
+. 下部の **Create merge request** をクリックして、新しいリクエストを作成します。リクエストが作成され、あなたや他の人がレビューできるように開きます。
 
-. 通常はここで他の人がレビューして承認しますが、今回は main ブランチへ変更をマージするため、**Merge** をクリックします。
+. 通常は他の人がコードをレビューして承認しますが、今回は変更をmainブランチにマージするため、**Merge** をクリックします。
 +
 image::gitlab-merged.png[マージ完了,link=self,window=blank,width=700]
 
-これで変更は main ブランチにマージされました。これを自動的に取り込む dev 環境のパイプラインを見るには、*Developer Hub* に戻り、*Catalog* を開いて、主となる *Parasol Insurance* コンポーネントを選択します。これは最上位コンポーネントであり、_Feature ブランチに紐づくものではありません_。パイプラインが dev 環境へ再デプロイします。本番に昇格するには、リリースを作成する必要があります。
+変更はmainブランチにマージされました。これを自動的に取り込む開発環境のパイプラインを確認するには、*Developer Hub* に戻り、*Catalog* を開いて、プライマリーの *Parasol Insurance* コンポーネントを選択します。これは最上位のコンポーネントであり、機能ブランチに関連付けられたものではありません。パイプラインによって開発環境に再デプロイされます。本番環境に昇格するには、リリースを作成する必要があります。
 
-image::rhdh-dev-merge-build.png[MR のマージ後にトリガーされたパイプライン実行,link=self,window=blank,width=700]
+image::rhdh-dev-merge-build.png[MRのマージ後に起動したパイプライン実行,link=self,window=blank,width=700]
 
 === 演習 2: リリースタグを作成する
 
-実際の組織では、コードの本番昇格は通常プラットフォームエンジニアやリリースマネージャが担当します。このワークショップでは、エンドツーエンドの流れを確認するため、あなた自身でこのステップを実行します。
+実際の組織では、本番環境へのコード昇格は通常、プラットフォームエンジニアまたはリリースマネージャーが担当します。このワークショップでは、エンドツーエンドの流れを確認するため、この手順を自分で実行します。
 
-. GitLab で、再び **parasol-insurance** リポジトリに移動します（上部のパンくずにあるプロジェクト名を使います。`{user} / parasol-insurance` になっているはずです。左上の GitLab アイコンをクリックすると、すべてのリポジトリを表示できます）。
+. GitLabで **parasol-insurance** リポジトリーに戻ります (上部のパンくずリストにあるプロジェクト名を使用します。`{user} / parasol-insurance` と表示されているはずです。左上のGitLabアイコンをクリックすると、すべてのリポジトリーを確認できます)。
 
-. 左サイドバーで **Code** をクリックし、次に **Tags** をクリックします。
+. 左サイドバーで **Code**、次に **Tags** をクリックします。
 
 . **New tag** をクリックします。
 
@@ -623,85 +623,85 @@ image::rhdh-dev-merge-build.png[MR のマージ後にトリガーされたパイ
 
 . **Create tag** をクリックします。
 +
-image::gitlab-create-tag.png[GitLab でリリースタグを作成しているところ,link=self,window=blank,width=700]
+image::gitlab-create-tag.png[GitLabでリリースタグを作成,link=self,window=blank,width=700]
 
-このタグを作成すると、裏側でパイプラインが起動します。進行状況は *Developer Hub* で *Catalog* に移動し、主となる *Parasol Insurance* コンポーネント（Feature ブランチのものではない）を選択して確認できます -- *CI* タブでタグのパイプライン実行を確認してください。パイプラインが完了すると（数分かかります）、あなたの `{user}/parasol-insurance-manifests` リポジトリに対するマージリクエストが生成されます -- これは Argo CD を通じて本番デプロイを行う GitOps manifests リポジトリです。
+このタグの作成により、バックグラウンドでパイプラインが起動します。*Developer Hub* で *Catalog* に移動し、プライマリーの *Parasol Insurance* コンポーネントを選択すると、進行状況を確認できます (機能ブランチのコンポーネントではありません)。*CI* タブでタグパイプラインの実行を確認してください。パイプラインが完了すると (数分かかります)、`{user}/parasol-insurance-manifests` リポジトリーに対するマージリクエストが生成されます。これは、Argo CDを通じた本番デプロイを駆動するGitOpsマニフェストリポジトリーです。
 
-=== 演習 3: GitOps 昇格を承認する
+=== 演習 3: GitOpsによる昇格を承認する
 
-IMPORTANT: このステップでは、これまで作業していたものとは *別のリポジトリ* を使用します。**manifests** リポジトリ（`parasol-insurance-manifests`）に移動する必要があります。ソースコードのリポジトリ（`parasol-insurance`）ではありません。manifests リポジトリには、本番に何をデプロイするかを制御する Argo CD/GitOps 設定が含まれています。
+IMPORTANT: この手順では、作業してきたものとは *別のリポジトリー* を使用します。ソースコードリポジトリー (`parasol-insurance`) ではなく、**manifests** リポジトリー (`parasol-insurance-manifests`) に移動してください。manifestsリポジトリーには、本番環境にデプロイされる内容を制御するArgo CD/GitOps設定が含まれています。
 
-. GitLab で、`{user}/parasol-insurance-manifests` リポジトリに移動します。
+. GitLabで `{user}/parasol-insurance-manifests` リポジトリーに移動します。
 +
-左上の GitLab ロゴをクリックしてホームページに戻り、プロジェクト一覧から **parasol-insurance-manifests** を選択すると見つけられます（`parasol-insurance` ではありません）。
+左上のGitLabロゴをクリックしてホームページに移動し、プロジェクト一覧から **parasol-insurance-manifests** を選択すると見つかります (`parasol-insurance` ではありません)。
 
 . 左サイドバーの **Merge Requests** をクリックします。
 
-. Argo CD の values を新しいタグ（`1.1`）に更新するマージリクエストを見つけてクリックします。
+. Argo CDの値を新しいタグ (`1.1`) に更新するマージリクエストを見つけてクリックします。
 +
-TIP: マージリクエストがまだ表示されていない場合は、1 分ほど待ってください -- 先にタグのパイプラインが完了する必要があります。Developer Hub の主な *Parasol Insurance* コンポーネントの *CI* タブで進行状況を確認できます。パイプライン完了後にこのページを更新して、再度確認してください。
+TIP: まだマージリクエストが表示されない場合は、タグパイプラインの完了まで1分ほど待ちます。Developer Hubでプライマリーの *Parasol Insurance* コンポーネントの *CI* タブを確認できます。パイプラインが完了したら、このページを更新して再確認します。
 
-. 変更内容を確認します -- イメージタグが新しいリリースを参照するように更新されているのが見えるはずです。
+. 変更を確認します。イメージタグが新しいリリースを参照するように更新されています。
 
-. **Merge** をクリックして本番への昇格を承認します。
+. **Merge** をクリックして、本番環境への昇格を承認します。
 +
-image::gitlab-manifests-mr.png[GitOps manifests リポジトリで本番イメージタグを更新するマージリクエスト,link=self,window=blank,width=700]
+image::gitlab-manifests-mr.png[GitOpsマニフェストリポジトリーで本番イメージタグを更新するマージリクエスト,link=self,window=blank,width=700]
 
-Argo CD はこの manifests リポジトリを監視しています。マージが完了すると変更を検知し、新しいバージョンの本番ロールアウトを開始します。
+Argo CDはこのmanifestsリポジトリーを監視しています。マージが完了すると、変更を検出し、新しいバージョンの本番環境へのロールアウトを開始します。
 
-=== 演習 4: 本番で機能を確認する
+=== 演習 4: 本番環境で機能を確認する
 
 . **Developer Hub** に戻ります。
 
-. **Catalog** に移動し、あなたのユーザーが所有する本番の **Parasol Insurance** コンポーネントを見つけます。`claims-stats` ブランチのコンポーネントではありません。**Owned** フィルターを使うと絞り込みやすくなります。
+. **Catalog** に移動し、自分のユーザーが所有するメインの **Parasol Insurance** コンポーネントを見つけます。`claims-stats` ブランチのコンポーネントではありません。一覧を絞り込むには、**Owned** フィルターをクリックします。
 
-. コンポーネントをクリックし、**Topology** タブを選択します。
+. コンポーネントをクリックしてから、**Topology** タブを選択します。
 +
-トポロジービューには、アプリケーションの dev と prod の両方の環境が表示されます。
+トポロジービューには、アプリケーションの開発環境と本番環境の両方が表示されます。
 
-. 本番環境を見守ります。新しいバージョンがロールアウトしている間は、最初は赤く表示される場合があります。デプロイが完了すると青に変わり、アプリケーションが正常であることを示します。
+. 本番環境を確認します。新しいバージョンのロールアウト中は、最初は赤色で表示されることがあります。デプロイが完了すると、青色に変わり、アプリケーションが正常であることを示します。
 +
-image::rhdh-topology-dev-prod.png[dev と prod 環境を示す Developer Hub のトポロジー,link=self,window=blank,width=700]
+image::rhdh-topology-dev-prod.png[開発環境と本番環境を表示するDeveloper Hubのトポロジー,link=self,window=blank,width=700]
 +
-NOTE: **Topology** タブから **CD** タブに切り替えると、`prod` の Argo CD アプリケーションが新しいコミットを検知して 1.1 タグを使い始めたタイミングを確認できます。**Topology** ビューの Pod はその直後に正常になります。
-. 本番アプリケーション右上の小さな **Open** アイコン（矢印）をクリックして、新しいタブで開きます。
+NOTE: **Topology** タブから **CD** タブに切り替えると、`prod` Argo CDアプリケーションが1.1タグを使用する新しいコミットを検出したタイミングを確認できます。その後すぐに、**Topology** ビューのPodが正常になります。
+. 本番アプリケーションの右上にある小さな **Open** アイコン (矢印) をクリックして、新しいタブで開きます。
 
-. `dashboard.html` を削除し、URL に `/api/claims/stats` を付け足して、請求統計エンドポイントが本番環境でデータを返していることを確認します。
+. `dashboard.html` を削除し、URLの末尾に `/api/claims/stats` を追加して、本番環境で保険金請求統計エンドポイントがデータを返すことを確認します。
 
-あなたが書き、テストし、修正し、マージした機能は、今や本番で稼働しています -- デプロイチケットは 1 枚もありません。
+作成、テスト、修正、マージした機能が、デプロイチケットを一枚も申請することなく本番環境で稼働しました。
 
 === 確認
 
-ここまでで次のことを行いました:
+次のことができました:
 
-* GitLab 経由で Feature ブランチを main にマージした
-* リリースタグを作成して昇格パイプラインをトリガーした
-* GitOps のマージリクエストを承認して本番マニフェストを更新した
-* 請求統計エンドポイントが本番で稼働していることを確認した
+* GitLabを通じて機能ブランチをmainにマージした
+* 昇格パイプラインを起動するリリースタグを作成した
+* 本番マニフェストを更新するGitOpsマージリクエストを承認した
+* 保険金請求統計エンドポイントが本番環境で稼働していることを確認した
 
 '''
 
 == モジュールのまとめ
 
-Parasol Insurance での開発者としての一連の流れを、オンボーディングから本番デプロイまで、チケットを 1 枚も起票せず、ツールを 1 つもインストールせず、誰かを待つこともなく完了しました。
+チケットを一枚も申請せず、ツールをインストールせず、誰かを待つこともなく、Parasol Insuranceでの開発者の一連の作業をオンボーディングから本番デプロイまで完了しました。
 
 **達成したこと:**
 
-* Developer Hub のソフトウェアカタログを通じてアプリケーション、API、ドキュメントを見つけた
-* Lightspeed を使ってプラットフォームに関する AI の回答を得た
-* セルフサービステンプレートで分離された開発環境を作成した
-* Dev Spaces の事前設定済みクラウド IDE でコードを書き、テストした
-* AI コーディングアシスタントを使ってコード品質の問題を修正した
-* 品質ゲート付きの自動 CI/CD パイプラインを通してコードを push した
-* リリースタグを作成し、GitOps 昇格を承認して本番にデプロイした
-* Developer Hub のトポロジービューで本番の機能を確認した
+* Developer Hubのソフトウェアカタログを通じて、アプリケーション、API、ドキュメントを見つけた
+* Lightspeedを使って、プラットフォームに関するAI支援の回答を得た
+* セルフサービステンプレートで分離開発環境を作成した
+* Dev Spacesを備えた事前設定済みのクラウドIDEでコードを書き、テストした
+* AIコーディングアシスタントを使ってコード品質の問題を修正した
+* 品質ゲートを備えた自動CI/CDパイプラインにコードをプッシュした
+* リリースタグを作成し、GitOpsによる本番環境への昇格を承認した
+* Developer Hubのトポロジービューで本番環境の機能を確認した
 
 **重要なポイント:**
 
-* **Developer Hub** は単一の統合ビューです -- カタログ、テンプレート、CI/CD の可視化、AI 支援がすべて一か所にあります
-* **Dev Spaces** はローカル環境のセットアップを不要にします -- すべての開発者に同じ事前設定済みワークスペースが提供されます
-* **Pipelines** は品質を自動で強制します -- code smell やセキュリティ問題は本番前に検出されます
-* **GitOps** はデプロイを再現可能かつ監査可能にします -- Git が唯一の信頼できるソースです
-* **プラットフォーム** が差別化されない重労働を担うので、開発者はコードを書くことに集中できます
+* **Developer Hub** は単一の管理画面です。カタログ、テンプレート、CI/CDの可視化、AI支援を1か所で提供します
+* **Dev Spaces** によりローカル環境のセットアップが不要になります。すべての開発者が同じ事前設定済みワークスペースを利用できます
+* **Pipelines** は品質を自動的に徹底します。コードスメルやセキュリティ上の問題が本番環境に到達する前に検出されます
+* **GitOps** によって、再現性があり監査可能なデプロイが実現します。Gitが唯一の信頼できる情報源です
+* **プラットフォーム** が差別化につながらない煩雑な作業を担うため、開発者はコードの作成に集中できます
 
-これが、一貫性のあるアプリケーションプラットフォームの姿です。コードから本番まで、必要なものはすべて、オンプレミスでも、あらゆるクラウドでも、エッジでも利用できます。
+これが、統合されたアプリケーションプラットフォームの姿です。コードから本番環境まで、必要なものすべてをオンプレミス、あらゆるクラウド、またはエッジで利用できます。

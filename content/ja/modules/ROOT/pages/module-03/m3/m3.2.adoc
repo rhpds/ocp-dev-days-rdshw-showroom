@@ -71,7 +71,7 @@ include::../_shared/kaoto-intro.adoc[]
 
 {empty} +
 
-[ #flow-k2r-todo-new]
+[#flow-k2r-todo-new]
 [.bordered]
 image::module-03/m3/flow-k2r-todo-new.png[width=90%]
 
@@ -186,7 +186,7 @@ kaoto-datamapper-configure
 ****
 |
 
-1. バー ` To do: Filter ` をクリックします。
+1. バー pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Filter&nbsp;</code>] をクリックします。
 
 1. `Required` タブが選択されていることを確認します。既定で `JQ` 式言語が選ばれているはずです。
 +
@@ -364,7 +364,7 @@ labrun k2r --background
 ====
 `labrun` は、Camel JBang を裏で実行するラボ用ヘルパーです。上のコマンドは次と同等です。
 
-* `camel run --name k2r` — `k2r` という名前の integration を実行する
+* `camel run --name k2r` — `k2r` という名前のインテグレーションを実行する
 * `--source-dir k2r` — `k2r` ディレクトリからルートファイルを読み込む
 * `--local-kamelet-dir ../support/kamelets` — Rocket.Chat 用を含むカスタム Kamelet（コネクタ）を読み込む
 * `--background` — ターミナルで作業を続けられるようにバックグラウンドで実行する
@@ -388,12 +388,12 @@ camel get
 
 ++++
 <pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">  PID   NAME  CAMEL   PLATFORM  PROFILE  READY  STATUS   RELOAD  AGE  ROUTE  MSG/S  TOTAL  FAIL  INFLIGHT  LAST  SINCE-LAST
-  16763  k2r   4.18.0  Camel     dev       1/1   Running     0/0  16s    1/1   0.00      0     0         0             -/-/-</pre>
+ 16763  k2r   4.18.0  Camel     dev       1/1   Running     0/0  16s    1/1   0.00      0     0         0             -/-/-</pre>
 ++++
 
 {empty} +
 
-テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat platform onboarding,window=_blank] の手順に従ってください。
+テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの利用開始,window=_blank] の手順に従ってください。
 
 準備ができたら、テストメッセージを _Kafka_ に送信します。
 

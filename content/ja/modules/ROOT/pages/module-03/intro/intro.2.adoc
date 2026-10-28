@@ -9,7 +9,7 @@ include::partial$style.adoc[]
 
 === 概要
 
-オープンソースの Eclipse Che プロジェクトを基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes とコンテナーを使用して、開発チームや IT チームの誰もが一貫性があり、安全で、設定不要の開発環境を利用できるようにします。体験は、ノートパソコン上の統合開発環境と同じくらい高速で使い慣れたものです。
+オープンソースの Eclipse Che プロジェクトを基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes とコンテナーを使用して、開発チームや IT チームの誰もが一貫性があり、安全で、設定不要の開発環境を利用できるようにします。ノートパソコン上の統合開発環境と同じくらい高速で、使い慣れた操作感を提供します。
 
 [.text-center]
 image::module-03/intro/devspaces-ide-developer.png[width=70%]
@@ -28,7 +28,7 @@ OpenShift Dev Spaces は OpenShift サブスクリプションに含まれてお
 {blank}
 
 . 最初に _OpenShift_ を選んでログインするよう求められます。 +
-*Log in with OpenShift* ボタンをクリックします:
+ボタン *Log in with OpenShift* をクリックします:
 +
 image:module-03/intro/devspaces-login-with-ocp.png[width=30%]
 +
@@ -51,10 +51,10 @@ image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
 +
 {empty} +
 +
-ログインすると、_Dev Spaces_ ダッシュボードが表示されます。ここには利用可能なワークスペースが一覧表示されます。
+ログインすると、 _Dev Spaces_ ダッシュボードが表示されます。ここには利用可能なワークスペースが一覧表示されます。
 +
 [.bordered]
-image::module-03/intro/devspaces-dashboard.png[Dev Spaces Dashboard]
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces ダッシュボード]
 
 {empty} +
 
@@ -66,7 +66,7 @@ image::module-03/intro/devspaces-dashboard.png[Dev Spaces Dashboard]
 +
 [.bordered]
 [#devspaces-dashboard-open]
-image::module-03/intro/devspaces-dashboard.png[Open Dev Spaces Workspace]
+image::module-03/intro/devspaces-dashboard.png[Dev Spaces ワークスペースを開く]
 +
 [.overlay]
 ****
@@ -80,7 +80,7 @@ devspaces-dashboard-open
 {x: 85.5, y: 115, size: 1.5}
 ****
 +
-// image::module-03/intro/devspaces-dashboard-open.png[Open Dev Spaces Workspace, role="integr8ly-img-responsive"]
+// image::module-03/intro/devspaces-dashboard-open.png[Dev Spaces ワークスペースを開く, role="integr8ly-img-responsive"]
 // +
 {empty} +
 +
@@ -95,7 +95,7 @@ devspaces-dashboard-open
 a|
 . *Trust Publisher & Install* をクリックします
 +
-image::module-03/intro/devspaces-trust-redhat.png[Trust Publisher Red Hat, width=80%]
+image::module-03/intro/devspaces-trust-redhat.png[発行元 Red Hat を信頼, width=80%]
 a|
 {empty} +
 {empty} +
@@ -103,9 +103,9 @@ a|
 
 a|
 [start=2]
-. 次に、*Trust Workspace & Install* をクリックします
+. 次に、 *Trust Workspace & Install* をクリックします
 +
-image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, , width=90%]
+image::module-03/intro/devspaces-trust-authors.png[ワークショッププロジェクトを信頼, , width=90%]
 |===
 +
 [TIP]
@@ -113,7 +113,7 @@ image::module-03/intro/devspaces-trust-authors.png[Trust Workshop Project, , wid
 .上の通知を見逃しましたか?
 [%collapsible]
 ====
-その場合、最も簡単な解決策はブラウザータブを閉じることです (ワークスペースのタブを閉じます)。その後、手順 1 を繰り返して再度開きます。 +
+その場合、最も簡単な解決策はブラウザータブ (ワークスペースのタブ) を閉じてから、手順 1 を繰り返して再度開くことです。 +
 すると通知が再び表示されます。
 ======
 +
@@ -154,14 +154,14 @@ close-tabs-img
 +
 {empty} +
 
-// . `Get Started...` タブを、pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>] をクリックして閉じます。 +
+// . `Get Started...` タブを、 pass:[<span style="background-color: black; color: white;">&nbsp;&nbsp;x&nbsp;&nbsp;</span>] をクリックして閉じます。 +
 // Explorer には、作業する *workshop* フォルダーが表示されます。
 // +
-// image::intro/devspaces-get-started.png[Dev Spaces Get Started screen, role="integr8ly-img-responsive"]
+// image::intro/devspaces-get-started.png[Dev Spaces の「Get Started」画面, role="integr8ly-img-responsive"]
 // +
 // NOTE: この IDE は _Microsoft VS Code_ を基にしています。すでに使ったことがあれば、なじみやすいはずです。
 // +
-// 追加のタブが開くことがありますが、その場合はすべて閉じてください:
+// 追加のタブが開くことがあります。その場合はすべて閉じてください:
 // +
 // image::intro/close-tabs.jpg[width=30%]
 // +
@@ -178,8 +178,8 @@ image::module-03/intro/toggle-terminal.png[width=40%]
 
 === コマンドのコピー/貼り付け
 
-ラボ全体を通してコマンド操作を使います。 +
-ラボの手順で実行するコマンドが示されたら、次の手順を、図のとおりに実行してください:
+ラボ全体を通してコマンド操作を行います。 +
+ラボの手順で実行するコマンドが示されたら、図のとおりに次の手順を実行してください:
 
 image::module-03/intro/copypaste.png[width=60%]
 
@@ -227,7 +227,7 @@ WARNING: これらのキーの組み合わせは、常に機能するとは限�
 +
 {blank}
 
-. 貼り付けに失敗し、_Dev Spaces_ に次の通知が表示された場合:
+. 貼り付けに失敗し、 _Dev Spaces_ に次の通知が表示された場合:
 +
 image::module-03/intro/clipboard-notification.png[width=40%]
 +
@@ -242,7 +242,7 @@ image::module-03/intro/clipboard-settings.png[width=100%]
 
 // === より良い学習のためのヒント
 
-// 画面が横長、または複数モニターの構成であれば、下の画像のように、_Dev Spaces_ の表示をラボ手順の横に並べてブラウザータブを整理することを強くおすすめします:
+// 画面が横長、または複数モニターの構成であれば、下の画像のように、 _Dev Spaces_ の表示をラボ手順の横に並べてブラウザータブを整理することをおすすめします:
 
 // [.text-center]
 // image::intro/better-learning.png[width=80%]

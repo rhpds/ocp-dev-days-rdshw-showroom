@@ -1,31 +1,31 @@
 = セクション 3: Dev Spaces にアクセスして MTA extension を設定する
 include::partial$_attributes.adoc[]
- :imagesdir: ../../assets/images
+:imagesdir: ../../assets/images
 
 [IMPORTANT]
 ====
-このラボでは、**Migration Toolkit for Applications** の Visual Studio Code extension、つまり VS Code ベースの GUI を提供する Red Hat Dev Spaces 環境内の **MTA extension** を使用します。
+このラボでは、VS Code ベースの GUI を提供する Red Hat Dev Spaces 環境で、**Migration Toolkit for Applications** の Visual Studio Code 拡張機能（**MTA extension**）を使用します。
 
-**Developer Lightspeed** は別個の extension ではありません。これは MTA の AI 搭載コードリファクタリング機能です。IDE にインストールされるのは **MTA extension** であり、MTA の静的コード分析と Developer Lightspeed（generative AI）の両方が含まれます。
+**Developer Lightspeed** は独立した拡張機能ではありません。これは MTA の AI 搭載コードリファクタリング機能です。IDE にインストールされるのは **MTA extension** で、MTA の静的コード分析と Developer Lightspeed（生成 AI）の両方が含まれています。
 ====
 
 == ゴール
 
-ラボの残りの作業に向けて、OpenShift Dev Spaces の workspace (`mta-lab`) と MTA extension を準備します。
+ラボの残りの作業に向けて、OpenShift Dev Spaces の `mta-lab` ワークスペースと MTA extension を準備します。
 
-* `parasol-insurance-eap` project を開く（GitLab account から clone されたもの）
-* migration profile（source と target technologies）を作成する
-* Developer Lightspeed が GenAI / `provider-settings.yaml` を介して lab の LLM に到達できることを確認する
+* GitLab アカウントから clone した `parasol-insurance-eap` プロジェクトを開く
+* 移行プロファイル（移行元と移行先のテクノロジー）を作成する
+* Developer Lightspeed が GenAI / `provider-settings.yaml` を介してラボの LLM に接続できることを確認する
 
-まずは、事前に provision された development environment を開き、Parasol Insurance の `parasol-insurance-eap` application を modernize するために、Developer Lightspeed（AI）settings を含む MTA extension を設定します。
+まず、事前にプロビジョニングされた開発環境を開き、Parasol Insurance の `parasol-insurance-eap` アプリケーションをモダナイズするため、Developer Lightspeed（AI）の設定を含む MTA extension を設定します。
 
-== Exercise 1: Dev Spaces を開いて log in する
+== 演習 1: Dev Spaces を開いてログインする
 
-. workshop interface の **OpenShift Dev Spaces** tab をクリックして Red Hat OpenShift Dev Spaces に切り替えます。
+. ワークショップ画面で **OpenShift Dev Spaces** タブをクリックし、Red Hat OpenShift Dev Spaces に切り替えます。
 
-. OpenShift credentials を使用して Dev Spaces に log in します:
+. OpenShift の認証情報を使用して Dev Spaces にログインします:
 +
-NOTE: 初期 page は Keycloak SSO login page です
+NOTE: 最初に表示されるのは Keycloak SSO のログインページです
 +
 --
 Username:
@@ -40,75 +40,75 @@ Password:
 ----
 --
 
-. log in 後、__Authorize Access__ のプロンプトが表示されたら
+. ログイン後、__Authorize Access__ のプロンプトが表示された場合
 +
-* **Allow selected permissions** button をクリックします
+* **Allow selected permissions** ボタンをクリックします
 +
-image::module-05-mta-dls/05-03-dls-01.jpg[DevSpaces Login,link=self,window=blank,title="Logging In"]
+image::module-05-mta-dls/05-03-dls-01.jpg[Dev Spaces のログイン,link=self,window=blank,title="Logging In"]
 +
-CAUTION: 認証が再度必要だという message が表示された場合は、browser の refresh icon をクリックせずに、workshop UI の **OpenShift Dev Spaces** tab に戻ってください。そうすると workspace listing に戻るので、そこで **mta-lab** を再度開けます。
+CAUTION: 認証が再度必要であるというメッセージが表示された場合は、ブラウザーの更新アイコンをクリックせずに、ワークショップ UI の **OpenShift Dev Spaces** タブに戻ってください。ワークスペース一覧に戻るので、そこから **mta-lab** を再度開けます。
 
-. **mta-lab** workspace を開きます
+. **mta-lab** ワークスペースを開きます
 +
-* log in 後、workspace listing が開き、**mta-lab** entry（あなたの user 向けに provision 済み）が表示されます
-* workspace listing の右側にある **Open** link をクリックします
+* ログイン後、ワークスペース一覧が開き、ユーザー用にプロビジョニングされた **mta-lab** の項目が表示されます
+* ワークスペース一覧の右側にある **Open** リンクをクリックします
 +
-image::module-05-mta-dls/05-03-dls-02.jpg[Open Workspace,link=self,window=blank,title="Open Workspace"]
+image::module-05-mta-dls/05-03-dls-02.jpg[Workspace を開く,link=self,window=blank,title="Open Workspace"]
 
-. workspace が initialize されて開くまで待ちます:
+. ワークスペースが初期化されて開くまで待ちます:
 +
-GitLab project の **parasol-insurance-eap** repository が Dev Spaces に load され、development environment の準備が整います。
+GitLab プロジェクトの **parasol-insurance-eap** リポジトリーが Dev Spaces に読み込まれ、開発環境の準備が整います。
 +
-workspace は新しい browser tab で開きます。
+ワークスペースは新しいブラウザータブで開きます。
 +
-* publishers または workspace を trust するよう求められたら、trust を確認します。（Figure 3）
-* introductory layout panel が表示されたら、ラボ後半で見やすいように **Light** theme を選び、**Mark Done** をクリックします。Mark done により introductory panel は閉じられ、下の image に示すように screen 左側の extensions icon をクリックして installed extensions panel が開きます。（Figure 4）
+* 発行元またはワークスペースを信頼するよう求められたら、信頼を確認します。（図 3）
+* 初期レイアウトパネルが表示されたら、ラボ後半で見やすくなるよう **Light** テーマを選択し、**Mark Done** をクリックします。これにより初期レイアウトパネルが閉じます。次に、下の画像の Step 2 に示すように、画面左側の拡張機能アイコンをクリックして、インストール済み拡張機能のパネルを開きます。（図 4）
 +
-image::module-05-mta-dls/05-03-dls-05.png[VSCode Tab,link=self,window=blank,title="Manage profiles"]
+image::module-05-mta-dls/05-03-dls-05.png[VSCode の tab,link=self,window=blank,title="Manage profiles"]
 +
-image::module-05-mta-dls/05-03-dls-03.png[VSCode Tab,link=self,window=blank,title="Mark done"]
+image::module-05-mta-dls/05-03-dls-03.png[VSCode の tab,link=self,window=blank,title="Mark done"]
 
-場合によっては、extensions の install に時間がかかることがあります。reload window button が表示されたら、クリックしてください。browser tab が自動的に reload されます。
+拡張機能のインストールに時間がかかる場合があります。reload window button が表示されたらクリックしてください。ブラウザータブが自動的に再読み込みされます。
 
-image::module-05-mta-dls/05-03-dls-04.png[VSCode Tab,link=self,window=blank,title="Trust the Authors"]
+image::module-05-mta-dls/05-03-dls-04.png[VSCode の tab,link=self,window=blank,title="Trust the Authors"]
 
 
-== Exercise 2: MTA profiles と GenAI provider を設定する
+== 演習 2: MTA プロファイルと GenAI provider を設定する
 
-すばらしいです！Exercise 2 まで進みました。これで Analysis profiles を設定するための working environment も整いました。
+すばらしいです！演習 2 に進みました。これで分析プロファイルを設定するための環境も整いました。
 
-複数 profile の管理は、MTA extension の強力な機能です。これにより、異なる analysis profile を簡単に切り替えられます。下の image の Step 3 に示すように **New Profile** button をクリックして、新しい profile を作成できます。
+複数のプロファイルを管理できることは、MTA extension の強力な機能です。異なる分析プロファイルを簡単に切り替えられます。下の画像の Step 3 に示すように **New Profile** ボタンをクリックして、新しいプロファイルを作成できます。
 
-まず最初の profile である `quarkus-profile` を作成します。これは application を Quarkus に migrate するためのものです。xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Section 5: Custom rules (audit logging)] では、audit-logging の custom rules を確認します。
+まず、最初のプロファイルである `quarkus-profile` を作成し、アプリケーションを Quarkus に移行します。xref:module-05/module-05-05-custom-rules-audit-logging.adoc[セクション 5: カスタムルール（監査ログ）] では、監査ログ用のカスタムルールを確認します。
 
-`Manage Profiles` button をクリックして profiles management panel を開きます。
+`Manage Profiles` ボタンをクリックして、プロファイル管理パネルを開きます。
 
-image::module-05-mta-dls/05-03-dls-06.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
+image::module-05-mta-dls/05-03-dls-06.png[VSCode の tab,link=self,window=blank,title="VSCode Tab"]
 
-- 新しい profile `quarkus-profile` を作成する
+- 新しいプロファイル `quarkus-profile` を作成します
 - Profile Name: `quarkus-profile``
 - Target Technologies: `quarkus``, `quarkus3+``, `jakarta-ee``
 
-image::module-05-mta-dls/05-03-dls-07.png[VSCode Tab,link=self,window=blank,title="Review profiles"]
+image::module-05-mta-dls/05-03-dls-07.png[VSCode の tab,link=self,window=blank,title="Review profiles"]
 
-これが最初の profile であるため、DLS extension によって自動的に active にされます。
+これが最初のプロファイルなので、DLS extension によって自動的に有効になります。
 
-上記のとおり正しい detail になっていることを確認し、この tab を閉じます。
+上記の詳細が正しいことを確認して、このタブを閉じます。
 
 
-上の screenshot では、**Open Analysis** の横に control が表示されています。そこをクリックして、以下の instruction に従ってください。
-MTA panel から GenAI provider settings を開き、次の image のようにします。
+上のスクリーンショットでは、**Open Analysis** の横にあるコントロールを確認できます。そこをクリックし、以下の手順に従ってください。
+次の画像に示すように、MTA パネルから GenAI provider の設定を開きます。
 
-- *1* settings `⚙︎` icon をクリックします。
+- *1* 設定 `⚙︎` アイコンをクリックします。
 - *2* `Configure GenAI Settings` をクリックします
 
-image::module-05-mta-dls/05-03-dls-08.png[VSCode Tab,link=self,window=blank,title="Gen-AI Provider Settings"]
+image::module-05-mta-dls/05-03-dls-08.png[VSCode の tab,link=self,window=blank,title="Gen-AI Provider Settings"]
 
-これで provider settings configuration が開くはずです。MTA は **provider-settings.yaml** を使用して LLM に接続します。
+provider の設定画面が開きます。MTA は **provider-settings.yaml** を使用して LLM に接続します。
 
-lab workspace には provider settings と LiteLLM credentials が pre-configure されています。**OpenShift** model が active であり、base URL / API key fields に値が入力されていることを確認してください（これらはすでに lab environment と一致しているはずです）。
+ラボのワークスペースには provider の設定と LiteLLM の認証情報が事前に設定されています。**OpenShift** model が有効で、base URL / API key の各フィールドに値が入力されていることを確認してください（すでにラボ環境に合った値になっているはずです）。
 
-TIP: この lab では provider settings は通常あらかじめ入力されています。ファイルが空、または不完全な場合（たとえば workspace reset の後）にのみ、下の YAML を使用してください。これは recovery step であり、想定される bug ではありません。
+TIP: このラボでは、provider の設定は通常あらかじめ入力されています。下の YAML は、ファイルが空、または不完全な場合（たとえばワークスペースのリセット後）にのみ使用してください。これは復旧手順であり、通常想定される問題ではありません。
 
 [.console-input]
 [source,yaml,subs="+attributes,macros+"]
@@ -125,26 +125,26 @@ models:
 active: *active
 ----
 
-以下の field に、次の value が設定されていることを確認します。
+以下の各フィールドに、指定された値が設定されていることを確認します。
 
-- `OPENAI_API_KEY` : OpenShift AI でホストされている model に対する LLM key です
-- `model` : 使用している model の name です
-- `baseURL` : chat completions API を介して model が request を listen している url/route です。
-- `active` : 最後に、この profile が active であることを確認します。MTA は複数の LLM で設定できますが、active にできる LLM は一度に 1 つだけです。
+- `OPENAI_API_KEY` : OpenShift AI でホストされている model に接続するための LLM key です
+- `model` : 使用する model の名前です
+- `baseURL` : chat completions API 経由のリクエストを model が受け付ける URL/route です。
+- `active` : 最後に、このプロファイルが有効であることを確認します。MTA では複数の LLM を設定できますが、一度に有効にできる LLM は 1 つだけです。
 
-image::module-05-mta-dls/05-03-dls-09.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
+image::module-05-mta-dls/05-03-dls-09.png[VSCode の tab,link=self,window=blank,title="VSCode Tab"]
 
-== Verify
+== 確認
 
-Dev Spaces environment と MTA extension（Developer Lightspeed を含む）が正しく set up されていることを確認します。
+Dev Spaces 環境と MTA extension（Developer Lightspeed を含む）が正しく設定されていることを確認します。
 
-. MTA Extension が正しく setup されていることを確認する
-* MTA extension icon が選択され、MTA Analysis View tab が active の状態で:
-* screen 右側の gear icon をクリックする
-* **Get Ready to Analyze** pane が screen の右側に開きます
-* 4 つすべての message box に green check mark があり、それぞれ completed と表示されている必要があります
+. MTA Extension が正しく設定されていることを確認します
+* MTA extension アイコンを選択し、MTA Analysis View タブをアクティブにします:
+* 画面右側にある歯車アイコンをクリックします
+* **Get Ready to Analyze** ペインが画面右側に開きます
+* 4 つすべてのメッセージボックスに緑色のチェックマークが表示され、それぞれが完了済みとして表示されていることを確認します
 
-. Dev Spaces workspace が正しい repository を pointing していることを確認する
-* Dev Spaces environment の左側にある file icon をクリックします
-* File _EXPLORER_ に **parasol-insurance-eap** directory が表示されます（共有 sample ではなく、あなたの GitLab copy です）
-* 必要に応じて file explorer の arrow で directories を expand します。`com.parasol.mdb`（`EmailIntakeMDB`）や `com.parasol.ejb`（`ClaimService`）などの package が見えるはずです
+. Dev Spaces のワークスペースが正しいリポジトリーを参照していることを確認します
+* Dev Spaces 環境の左側にあるファイルアイコンをクリックします
+* File _EXPLORER_ に **parasol-insurance-eap** ディレクトリーが表示されます（共有サンプルではなく、自分の GitLab のコピーです）
+* 必要に応じて、ファイルエクスプローラーの矢印を使ってディレクトリーを展開します。`com.parasol.mdb`（`EmailIntakeMDB`）や `com.parasol.ejb`（`ClaimService`）などのパッケージが表示されるはずです

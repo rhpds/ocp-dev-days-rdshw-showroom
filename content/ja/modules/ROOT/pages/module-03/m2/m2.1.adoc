@@ -3,20 +3,20 @@
 include::partial$style.adoc[]
 
 [id="matrix-chat"]
-== Matrix platform onboarding
+== Matrix プラットフォームの初期設定
 
 {empty} +
 
-=== Matrix room に参加する。
+=== Matrix ルームに参加する
 
 {blank}
 
-. Open _Matrix's_ web client
+. _Matrix_ の Web クライアントを開く
 +
-下のリンクをクリックして、_Matrix_ のログインページを開きます（新しいタブで開きます）。
+下のリンクをクリックして、 _Matrix_ のログインページを開きます（新しいタブで開きます）。
 +
 --
-- link:{url-element}[Matrix Login page,window="_blank"]
+- link:{url-element}[Matrix のログインページ,window="_blank"]
 --
 +
 {blank}
@@ -25,7 +25,7 @@ include::partial$style.adoc[]
 +
 {empty} +
 
-. 認証情報でログインする
+. 認証情報を使ってログインする
 +
 以下のように、認証情報の入力を求められます。
 +
@@ -36,14 +36,14 @@ image::module-03/m2/matrix-login-credentials.jpg[width=60%]
 ====
 . 次の情報を入力します。
 +
-* **Username**
+* **Username** 
 +
 [.copypaste.value]
 ****
 {user-username}
 ****
 +
-* **Password**
+* **Password** 
 +
 [.copypaste.value]
 ****
@@ -58,7 +58,7 @@ REPLACE
 +
 {empty} +
 +
-. 次に、**_"Sign in"_** をクリックします
+. 次に、 **_"Sign in"_** をクリックします
 ====
 +
 {empty} +
@@ -69,18 +69,18 @@ image::module-03/m2/matrix-login-confirm.jpg[width=60%]
 +
 {blank}
 +
-_"Continue"_ をクリックして確認します。
+ _"Continue"_ をクリックして確認します。
 +
 {empty} +
 +
-最後に、_Matrix_ の画面で、ルームへの参加招待が保留中であることが表示されます。 +
+最後に、 _Matrix_ の画面に、ルームへの参加招待が保留中であることが表示されます。 +
 以下の手順に従って招待を承認してください。
 +
 image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 +
 --
 . ルームをクリックします。
-. 次に、_"Accept"_ をクリックします。
+. 次に、 _"Accept"_ をクリックします。
 --
 
 {empty} +
@@ -88,7 +88,7 @@ image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 
 [.verification]
 ****
-Matrix room に正常に参加できましたか？
+Matrix ルームに正常に参加できましたか？
 ****
 
 {empty} +

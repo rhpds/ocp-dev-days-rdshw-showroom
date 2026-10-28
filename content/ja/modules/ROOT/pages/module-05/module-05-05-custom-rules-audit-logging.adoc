@@ -1,140 +1,140 @@
-= Section 5: 監査ログライブラリー向けのカスタムルール
+= セクション 5: 監査ロギングライブラリー用のカスタムルール
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-== Goal
+== 目標
 
-独自の MTA ルールがプロプライエタリーライブラリーで重要な理由を学びます:
+独自ライブラリーにカスタム MTA ルールが重要な理由を学びます。
 
-* `parasol-insurance-eap` に同梱されている audit-logging ルールを確認する
-* それらを MTA の分析プロファイルに関連付ける
-* 分析を実行して、標準の Quarkus ルールでは検出できない検出結果を確認する
+* `parasol-insurance-eap` に同梱されている監査ロギングルールを確認する
+* それらを MTA 分析プロファイルに追加する
+* 標準の Quarkus ルールでは検出できない問題を確認できるように分析を実行する
 
-標準の移行ルールセット（たとえば Quarkus のターゲットルール）は、Java EE、Jakarta、一般的なオープンソースフレームワークについては把握しています。しかし、Parasol の内部 `audit-logging-library` までは知りません。カスタムルールがなければ、MTA は EJB や MDB を問題なく移行しつつ、壊れて古くなった監査 API を静かにそのまま残してしまいます。これは保険プラットフォームにとってコンプライアンス上のリスクです。
+標準の移行ルールセット (Quarkus ターゲットルールなど) は、Java EE、Jakarta、および一般的なオープンソースフレームワークについて認識しています。しかし、Parasol の内部ライブラリーである `audit-logging-library` については認識していません。カスタムルールがない場合、MTA は EJB や MDB を問題なく移行する一方で、古くなった監査 API が壊れた状態で残っていることを見落としてしまいます。これは保険プラットフォームにとってコンプライアンス上のリスクです。
 
-このセクションでは、カスタムルールを一級の移行知識として扱います。つまり、プラットフォーム / アーキテクチャーチームが一度作成し、そのライブラリーに依存するアプリケーションがあるたびに再利用する、という考え方です。
+このセクションでは、カスタムルールを移行に関する重要な知識として扱います。プラットフォーム / アーキテクチャチームが一度作成し、そのライブラリーに依存するアプリケーションの移行で繰り返し再利用します。
 
-== なぜ Parasol にカスタムルールが必要なのか
+== Parasol にカスタムルールが必要な理由
 
-Parasol Insurance は共有のエンタープライズライブラリー `com.enterprise:audit-logging-library` に依存しており、これはプロジェクト内でローカル Maven リポジトリーとして vendoring されています:
+Parasol Insurance は、共有エンタープライズライブラリー `com.enterprise:audit-logging-library` に依存しています。このライブラリーは、プロジェクト内のローカル Maven リポジトリーとしてベンダー提供されています。
 
-* **v1 (`1.0.0`)** — 同期型でファイル指向の監査ログ記録（builder ベースの `AuditEvent`、`FileSystemAuditLogger`、`logSuccess` / `logFailure` のような便利メソッド）
-* **v2 (`2.0.0`)** — ストリーミング指向の API（`StreamableAuditLogger`、record 風の `AuditEvent`、非ブロッキングな `logEventAsync`）
+* **v1 (`1.0.0`)** — 同期型でファイルシステム指向の監査ロギング (`AuditEvent` のビルダーパターン、`FileSystemAuditLogger`、`logSuccess` / `logFailure` などの便利なメソッド)
+* **v2 (`2.0.0`)** — ストリーミング指向の API (`StreamableAuditLogger`、レコード形式の `AuditEvent`、ノンブロッキングの `logEventAsync`)
 
-JAR と POM は `lib/repository/` 配下にあります。アプリケーションは現在、`project-local` ファイルリポジトリー経由で `pom.xml` に **v1** を宣言しています。これは Maven Central には決して現れず、公開されている Quarkus ルールにも含まれない、まさにその種のプライベート依存関係です。
+JAR と POM は `lib/repository/` にあります。アプリケーションでは現在、`project-local` ファイルリポジトリー経由で `pom.xml` に **v1** を宣言しています。これは Maven Central に公開されず、公開されている Quarkus ルールにも含まれない、まさにプライベート依存関係の典型例です。
 
 [cols="2,2"]
 |===
-| v1（現在の状態） | v2（移行先）
+| v1 (現在使用中) | v2 (移行先)
 
-| 同期的なファイルベースのログ記録
-| 非同期 / ストリーミングログ記録
+| 同期型のファイルベースロギング
+| 非同期 / ストリーミングロギング
 
 | `AuditEvent.builder()` パターン
-| 直接の `AuditEvent` 構築（record 風 API）
+| `AuditEvent` の直接構築 (レコード形式の API)
 
 | `FileSystemAuditLogger`
 | `StreamableAuditLogger`
 
 | `logEvent(...)`、`logSuccess(...)`、`logFailure(...)`
-| 完全な `AuditEvent` とともに `logEventAsync(...)` を使う
+| `AuditEvent` 全体を使う `logEventAsync(...)` を推奨
 |===
 
-== Exercise 1: カスタムルールを調べる
+== 演習 1: カスタムルールを確認する
 
-xref:module-05/module-05-logging.adoc[logging.yaml] を開き、Dev Spaces の `parasol-insurance-eap/rules/logging.yaml` にその内容を **ダウンロード** するか **コピー** してください（まだ存在しない場合は `rules/` ディレクトリーを作成してください）。
+xref:module-05/module-05-logging.adoc[logging.yaml] を開き、Dev Spaces 内の `parasol-insurance-eap/rules/logging.yaml` にコンテンツを **ダウンロード** または **コピー** します (`rules/` ディレクトリーがまだない場合は作成してください)。
 
-`logging.yaml` にある各 `ruleID`、`when:` 句、`message:` をざっと確認してください。これらが Analysis パネルでアナライザーにより報告される内容です。このファイルには **5** つのルール（`audit-logging-0001` … `audit-logging-0005`）が定義されています。
+`logging.yaml` の各 `ruleID`、`when:` 条件、および `message:` をざっと確認します。これらが Analysis パネルに表示される分析結果です。このファイルには **5 つ** のルール (`audit-logging-0001` … `audit-logging-0005`) が定義されています。
 
-=== 各ルールが検出するもの
+=== 各ルールが検出する内容
 
 [cols="1,3,2"]
 |===
-| Rule ID | Detects | Typical migration action
+| ルール ID | 検出対象 | 典型的な移行アクション
 
 | `audit-logging-0001`
 | `com.enterprise:audit-logging-library` の **1.x** 範囲の Maven 依存関係
-| `2.0.0` に更新し、Java レベルを v2 ライブラリーの前提に合わせる
+| `2.0.0` に更新する (また、Java のレベルを v2 ライブラリーの要件に合わせる)
 
 | `audit-logging-0002`
-| `AuditEvent.builder` への呼び出し
-| builder を直接の `AuditEvent` 構築に置き換える
+| `AuditEvent.builder` の呼び出し
+| ビルダーを `AuditEvent` の直接構築に置き換える
 
 | `audit-logging-0003`
 | `FileSystemAuditLogger` への参照
-| ストリーミング / TCP スタイルの監査 sink に対して `StreamableAuditLogger` に切り替える
+| ストリーミング / TCP 形式の監査シンクには `StreamableAuditLogger` に切り替える
 
 | `audit-logging-0004`
-| 監査 logger 型での同期的な `logEvent(...)`
-| 非ブロッキングな `logEventAsync(...)` を優先する
+| 監査ロガー型に対する同期型の `logEvent(...)`
+| ノンブロッキングの `logEventAsync(...)` を推奨
 
 | `audit-logging-0005`
-| 旧式の `logSuccess` / `logFailure` の便利メソッド
-| 完全な `AuditEvent` を構築して非同期にログ記録する
+| レガシーな `logSuccess` / `logFailure` 便利メソッド
+| `AuditEvent` 全体を作成して非同期でログに記録する
 |===
 
-TIP: カスタムルールは、公開ルールセット（`java.dependency`、`java.referenced`、categories、effort、labels）と同じ MTA ルール言語を使います。違いは **所有者** です。これらのルールは Parasol のプライベートなライブラリー契約を表現しています。
+TIP: カスタムルールでは、公開ルールセットと同じ MTA ルール言語 (`java.dependency`、`java.referenced`、カテゴリ、工数、ラベル) を使います。違いは **所有者** です。これらのルールには Parasol のプライベートライブラリーの契約が記述されています。
 
-また `pom.xml` を開き、`audit-logging-library` のバージョン `1.0.0` への依存関係と、`lib/repository` を指す `project-local` リポジトリーを見つけてください。これはルール `audit-logging-0001` の具体的な手がかりです。
+また、`pom.xml` を開いて `audit-logging-library` バージョン `1.0.0` への依存関係と、`lib/repository` を指す `project-local` リポジトリーを確認します。これがルール `audit-logging-0001` の具体的な対象です。
 
-== Exercise 2: カスタムルールを MTA プロファイルに関連付ける
+== 演習 2: カスタムルールを MTA プロファイルに追加する
 
-以前に MTA 拡張機能を設定し、分析でカスタムルールを追加するオプションがあることに気づいていたはずです。では、`quarkus-profile` にカスタムルールを追加していきましょう。
+前の手順で MTA 拡張機能を設定しました。分析にカスタムルールを追加するオプションにも気づいたかもしれません。それでは、`quarkus-profile` にカスタムルールを追加しましょう。
 
 . MTA Analysis View を開きます。**gear** アイコン (1) をクリックし、**Select Profile** の下にある **Edit in Profile Manager** (2) をクリックします。
 +
 image::module-05-mta-dls/05-05-dls-01.jpg[Get Ready to Analyze から Profile Manager を開く,link=self,window=blank,title="Edit in Profile Manager"]
 
-. `quarkus-profile` に customer rules を関連付けます。
+. `quarkus-profile` にカスタムルールを追加します。
 
-. **Profile Settings** で、この workshop と一致する migration target を設定します（Quarkus / `quarkus-profile` が使っているのと同じ target family）。このリポジトリーのカスタムルールは、Quarkus 3 スタイルの target に向けてラベル付けされています。
+. **Profile Settings** で、このワークショップに合った移行ターゲットを設定します (Quarkus / `quarkus-profile` で使用するものと同じターゲットファミリー)。このリポジトリーのカスタムルールは、Quarkus 3 形式のターゲット向けです。
 
-. **Custom Rules** の下で **Upload Custom Rules...** をクリックし、ローカルに保存した xref:module-05/module-05-logging.adoc[`logging.yaml`] ファイルをアップロードします（または、`logging.yaml` を含むプロジェクトの `rules/` ディレクトリーを profile に指定します）。
+. **Custom Rules** の下にある **Upload Custom Rules...** をクリックし、ローカルに保存した xref:module-05/module-05-logging.adoc[`logging.yaml`] ファイルをアップロードします (または、`logging.yaml` を含むプロジェクトの `rules/` ディレクトリーをプロファイルに指定します)。
 +
-image::module-05-mta-dls/05-05-dls-02.jpg[Profile Settings で Custom Rules をアップロードする,link=self,window=blank,title="Custom Rules"]
+image::module-05-mta-dls/05-05-dls-02.jpg[Profile Settings で Custom Rules をアップロード,link=self,window=blank,title="Custom Rules"]
 
-. 次の分析実行でこの profile が使われるように、profile を有効化します。
+. 次回の分析実行で使われるように、プロファイルを有効化します。
 
-IMPORTANT: カスタムルールのパスや upload を指定せずに `quarkus-profile` だけを実行すると、Java EE → Quarkus の検出結果（MDB、EJB など）は引き続き表示されますが、audit library の事象は **見落とします**。カスタムルールと標準ルールは相互に補完し合います。
+IMPORTANT: カスタムルールのパスを指定せず、アップロードも行わずに `quarkus-profile` だけを実行すると、Java EE → Quarkus の分析結果 (MDB、EJB など) は表示されますが、監査ライブラリーに関する問題は **見落とされます**。カスタムルールと標準ルールは互いを補完します。
 
-== Exercise 3: 分析を実行してカスタム検出結果を確認する
+== 演習 3: 分析を実行し、カスタムの検出結果を確認する
 
-. Exercise 3 の完了おめでとうございます。では分析を実行しましょう。前と同じアクティブ profile `quarkus-profile` を使っているので、もう一度 analysis panel に向かい、分析を実行してください。
+. 演習 3 の完了、おめでとうございます。次は分析を実行します。前と同じ有効なプロファイル `quarkus-profile` を使うので、もう一度 Analysis パネルを開いて分析を実行します。
 
-. Analysis panel が表示されたら、**audit** / **`Audit`** に関連する検出結果をフィルターまたは検索します。incident を展開し、`logging.yaml` で読んだ rule ID に紐づけられることを確認してください。少なくとも `pom.xml` 内の `audit-logging-library` **1.0.0** に対する **dependency** の検出結果（rule `audit-logging-0001`）が見えるはずです。
+. Analysis パネルに結果が表示されたら、**audit** / **`Audit`** に関連する結果をフィルターまたは検索します。問題を展開し、`logging.yaml` で確認したルール ID と対応していることを確かめます。少なくとも `pom.xml` 内の `audit-logging-library` **1.0.0** に対する **依存関係** の検出結果 (ルール `audit-logging-0001`) が表示されるはずです。
 
-. `FileSystemAuditLogger` の置き換えのような検出結果については、**AI** ドロップダウンを開き、**Get solution**（または **Get solution for N incidents**）を選びます。
+. `FileSystemAuditLogger` の置き換えなどの検出結果では、**AI** ドロップダウンを開き、**Get solution** (または **Get solution for N incidents**) を選択します。
 +
-image::module-05-mta-dls/05-05-dls-03.jpg[Audit の検出結果と Get Solution,link=self,window=blank,title="Get Solution"]
+image::module-05-mta-dls/05-05-dls-03.jpg[監査に関する検出結果と Get Solution,link=self,window=blank,title="Get Solution"]
 
-. **MTA Resolution Details** で生成されたパッチを確認します。変更内容（たとえば `FileSystemAuditLogger` → `StreamableAuditLogger`）を確認したうえで、**Review in Editor**、**Reject**、または **Accept** を選びます。
+. **MTA Resolution Details** で生成されたパッチを確認します。変更内容 (たとえば `FileSystemAuditLogger` → `StreamableAuditLogger`) を確かめてから、**Review in Editor**、**Reject**、または **Accept** を選択します。
 +
-image::module-05-mta-dls/05-05-dls-04.jpg[ClaimsResource パッチをレビューして受け入れる,link=self,window=blank,title="Accept patch"]
+image::module-05-mta-dls/05-05-dls-04.jpg[ClaimsResource パッチを確認して Accept,link=self,window=blank,title="Accept patch"]
 
-. 次に、Analysis panel で **`ClaimsResource`** を検索し、**Group by: Files** に設定します。**AI** メニューを開き、そのファイル上の incident に対する solution を要求します（ルール `audit-logging-0002` … `0005` は `AuditEvent.builder`、`logEvent`、`logSuccess` / `logFailure` のような呼び出し箇所で発火します）。
+. 次に Analysis パネルで **`ClaimsResource`** を検索し、**Group by: Files** を設定します。**AI** メニューを開き、そのファイル内の問題に対する解決策をリクエストします (ルール `audit-logging-0002` … `0005` は、`AuditEvent.builder`、`logEvent`、`logSuccess` / `logFailure` などの呼び出し箇所で適用されます)。
 +
-image::module-05-mta-dls/05-05-dls-05.jpg[ClaimsResource のファイルグループ化と Get Solution,link=self,window=blank,title="ClaimsResource AI"]
+image::module-05-mta-dls/05-05-dls-05.jpg[ClaimsResource のファイル別グループ化と Get Solution,link=self,window=blank,title="ClaimsResource AI"]
 
-. 追加パッチを確認します。たとえば、旧式の `logSuccess(...)` は、完全な `AuditEvent` の構築（通常は `logEventAsync`）に置き換わるはずです。差分を理解したうえで Accept するか Reject してください。
+. 追加のパッチを確認します。たとえば、レガシーな `logSuccess(...)` は、`AuditEvent` 全体の構築 (通常は `logEventAsync` の使用も含む) に置き換えられるはずです。差分を理解したうえで、承認または拒否してください。
 +
-image::module-05-mta-dls/05-05-dls-06.jpg[AuditEvent 移行パッチをレビューする,link=self,window=blank,title="AuditEvent patch"]
+image::module-05-mta-dls/05-05-dls-06.jpg[AuditEvent 移行パッチを確認,link=self,window=blank,title="AuditEvent patch"]
 
-NOTE: 各 finding の **message** を注意深く読んでください。ルール文言は、人間にも Developer Lightspeed にも分かりやすいように書かれています。つまり、「2.0.0 に更新する」「`logEventAsync` を使う」といった明確な意図があり、モデルに Parasol のポリシーをゼロから推測させる必要はありません。カスタムライブラリーのアップグレードでは、1 つのバージョン番号だけでは表せない Java レベルや API の変更が伴うことがあります。Accept する前に diff を確認してください。
+NOTE: 各検出結果の **message** をよく読んでください。ルールのテキストが、人間 *および* Developer Lightspeed に向けて書かれていることに注目してください。「2.0.0 にアップグレードする」「`logEventAsync` を使用する」といった意図が明確であり、モデルが Parasol のポリシーを一から推測する必要がありません。カスタムライブラリーのアップグレードでは、単一のバージョン番号だけでなく、Java のレベルや API も変更される場合があります。承認する前に差分を確認してください。
 
-== 何を学んだか
+== 学んだこと
 
-* **標準ルールのギャップ:** 公開されている Quarkus / Java EE のルールセットは、`audit-logging-library` のようなプロプライエタリーライブラリーを理解していません。
-* **カスタムルールの構造:** `logging.yaml` のようなルールファイルは、`when:` 条件と、MTA（および Developer Lightspeed）が実行可能なアクション指向の `message:` テキストを使います。
-* **5 つの移行領域:** 依存関係の更新、イベント構築、logger 実装、同期 → 非同期ログ記録、便利メソッドの削除。
-* **profile の配線:** MTA 分析は、アクティブな profile が `rules/` パスを指している場合にのみカスタムルールを適用します。
-* **ポートフォリオでの再利用:** 同じ `rules/` フォルダーを、audit library に依存する Parasol のすべてのサービスで共有できます。1 回書いて、何度でも分析できます。
+* **標準ルールの不足:** 公開されている Quarkus / Java EE ルールセットは、`audit-logging-library` のような独自ライブラリーを認識しません。
+* **カスタムルールの構造:** `logging.yaml` のようなルールファイルでは、MTA (および Developer Lightspeed) が実行できる `when:` 条件と実行可能なアクションを示す `message:` テキストを使います。
+* **5 つの移行領域:** 依存関係の更新、イベントの構築、ロガーの実装、同期型から非同期型へのロギングの切り替え、便利メソッドの削除です。
+* **プロファイルの設定:** MTA 分析でカスタムルールが適用されるのは、有効なプロファイルが `rules/` パスを参照している場合のみです。
+* **ポートフォリオ全体での再利用:** 同じ `rules/` フォルダーを、監査ライブラリーに依存するすべての Parasol サービスで共有できます。一度作成すれば、何度でも分析に使用できます。
 
-== Verify
+== 確認
 
-. `parasol-insurance-eap` に `rules/` ディレクトリーがあり、その中に `logging.yaml` が含まれている（必要であればこのガイドからコピーまたはダウンロード済み）。
+. `parasol-insurance-eap` に `rules/` ディレクトリーがあり、`logging.yaml` が含まれている (必要に応じてこのガイドからコピーまたはダウンロード済みである)。
 
-. 5 つの `audit-logging-****` ルールのうち、少なくとも 3 つが何を検出するのかを自分の言葉で説明できる。
+. 5 つの `audit-logging-****` ルールのうち、少なくとも 3 つが何を検出するかを自分の言葉で説明できる。
 
-. MTA profile がカスタム `rules/` パスで設定されており、その profile を使って分析を実行している。
+. MTA プロファイルにカスタムの `rules/` パスが設定され、そのプロファイルで分析を実行済みである。
 
-. `pom.xml` 内の v1 依存関係に対する `audit-logging-0001` の検出結果を特定できる。
+. `pom.xml` の v1 依存関係に対する `audit-logging-0001` の検出結果を特定できる。
