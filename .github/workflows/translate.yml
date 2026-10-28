@@ -10,11 +10,9 @@ on:
       model:
         description: 'LLM model to use for translation'
         required: false
-        default: 'translate/gpt-5.4-mini'
+        default: 'translate/gpt-6-luna'
         type: choice
         options:
-          - translate/gpt-5.4-mini
-          - translate/gpt-5.4-nano
           - translate/gpt-6-luna
       specific_file:
         description: 'Translate only this file (relative to modules/ROOT/, leave empty for all stale)'

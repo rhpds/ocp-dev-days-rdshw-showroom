@@ -4,7 +4,7 @@
     "translate": {
       "name": "Translation API",
       "env": ["OPENAI_API_KEY"],
-      "package": "@opencode/ai/providers/openai-compatible",
+      "package": "@opencode/ai/providers/openai",
       "settings": {
         "baseURL": "{env:OPENAI_BASE_URL}"
       },
@@ -15,5 +15,5 @@
       }
     }
   },
-  "model": "translate/gpt-5.4-mini"
+  "model": "translate/gpt-6-luna"
 }
