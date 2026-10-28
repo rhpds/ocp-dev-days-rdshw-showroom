@@ -387,8 +387,10 @@ for pattern in "${SKIP_PATTERNS[@]}"; do
   done < <(find "$EN_ROOT" -path "$EN_ROOT/$pattern" -type f -print0 2>/dev/null || true)
 done
 
-# Sync images
-if [[ -d "$EN_ROOT/assets" ]]; then
+# Sync images (skip if already symlinked to en)
+if [[ -L "$LANG_ROOT/assets/images" ]]; then
+  echo "    Images symlinked to en — skipping sync"
+elif [[ -d "$EN_ROOT/assets" ]]; then
   mkdir -p "$LANG_ROOT/assets"
   rsync -a --delete "$EN_ROOT/assets/" "$LANG_ROOT/assets/"
 fi

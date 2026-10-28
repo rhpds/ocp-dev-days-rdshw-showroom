@@ -119,6 +119,10 @@ yq -i ".target_languages.$LANG = {
 echo "==> [2/7] Copying content/en/ → content/$LANG/..."
 cp -r "$REPO_ROOT/content/en" "$REPO_ROOT/content/$LANG"
 
+# Replace copied images with a symlink to en to avoid duplication
+rm -rf "$REPO_ROOT/content/$LANG/modules/ROOT/assets/images"
+ln -s ../../../../en/modules/ROOT/assets/images "$REPO_ROOT/content/$LANG/modules/ROOT/assets/images"
+
 # ── 3. create antora.yml ─────────────────────────────────────────────────────
 
 echo "==> [3/7] Writing content/$LANG/antora.yml..."
