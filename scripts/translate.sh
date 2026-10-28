@@ -273,7 +273,7 @@ echo ""
 
 # ── translate new files ──────────────────────────────────────────────────────
 
-for rel_path in "${NEW_FILES[@]}"; do
+for rel_path in "${NEW_FILES[@]+"${NEW_FILES[@]}"}"; do
   en_file="content/en/modules/ROOT/$rel_path"
   target_file="content/$LANG/modules/ROOT/$rel_path"
   source_commit=$(get_source_commit "$en_file")
@@ -308,7 +308,7 @@ done
 
 # ── translate stale files ────────────────────────────────────────────────────
 
-for rel_path in "${STALE_FILES[@]}"; do
+for rel_path in "${STALE_FILES[@]+"${STALE_FILES[@]}"}"; do
   en_file="content/en/modules/ROOT/$rel_path"
   target_file="content/$LANG/modules/ROOT/$rel_path"
   source_commit=$(get_source_commit "$en_file")
