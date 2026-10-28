@@ -1,7 +1,7 @@
-= Gira OpenShift Dev Day
+= OpenShift Dev Day Roadshow
 include::partial$_attributes.adoc[]
 
-Te damos la bienvenida a la gira OpenShift Dev Day: una serie de talleres prácticos en los que podrás experimentar el desarrollo y la integración de aplicaciones modernas en Red Hat OpenShift.
+Te damos la bienvenida a OpenShift Dev Day Roadshow: una serie de talleres prácticos en los que podrás experimentar el desarrollo y la integración de aplicaciones modernas en Red Hat OpenShift.
 
 == Módulos disponibles
 
@@ -11,7 +11,7 @@ Esta gira consta de módulos independientes. Puedes completar cada módulo por s
 ****
 xref:module-01/00-intro.adoc[Módulo 1: La experiencia del desarrollador]
 
-Recorre todo el ciclo de desarrollo en OpenShift: desde la incorporación de autoservicio mediante Developer Hub, el desarrollo en la nube con Dev Spaces y la programación asistida por IA, hasta las canalizaciones CI/CD automatizadas y los despliegues en producción basados en GitOps.
+Experimenta todo el recorrido del desarrollador en OpenShift: desde la incorporación de autoservicio mediante Developer Hub y el desarrollo en la nube con Dev Spaces, hasta la programación asistida por IA, las canalizaciones CI/CD automatizadas y los despliegues en producción basados en GitOps.
 
 **Duración**: ~90 minutos
 ****
@@ -20,7 +20,7 @@ Recorre todo el ciclo de desarrollo en OpenShift: desde la incorporación de aut
 ****
 xref:module-02/00-intro.adoc[Módulo 2: Cadena de suministro de software segura]
 
-Compila y despliega aplicaciones mediante una cadena de suministro de software que cumple con SLSA de nivel 3: análisis de vulnerabilidades con RHDA y ACS, firma de commits sin claves con Sigstore, atestaciones de canalizaciones con Tekton Chains, validación de políticas con Conforma, aprobaciones de versiones firmadas y aplicación de controles en los despliegues con Policy Controller.
+Compila y despliega aplicaciones mediante una cadena de suministro de software que cumple con el nivel 3 de SLSA: análisis de vulnerabilidades con RHDA y ACS, firma de commits sin clave con Sigstore, atestaciones de canalizaciones con Tekton Chains, validación de políticas con Conforma, aprobaciones firmadas de versiones y aplicación de políticas en los despliegues con Policy Controller.
 
 **Duración**: ~90 minutos
 ****

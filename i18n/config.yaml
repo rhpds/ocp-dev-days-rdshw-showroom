@@ -20,6 +20,7 @@ skip_patterns:
   - "pages/module-*/m*/_figures/**"
 # Technical terms to preserve in English across all translations.
 preserve_terms:
+  - OpenShift Dev Day Roadshow
   - OpenShift
   - Red Hat
   - Kubernetes

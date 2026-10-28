@@ -239,7 +239,7 @@
     },
     "pages/index.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T19:33:17Z",
+      "translated_at": "2026-10-28T21:21:44Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-01/00-intro.adoc": {
