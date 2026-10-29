@@ -1,0 +1,18 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+
+== Resumen
+
+
+
+¡Felicitaciones! Has completado la fase final del taller, agregando una capa de gobernanza para administrar el consumo de IA por niveles en el análisis de perfiles de clientes.
+
+=== Puntos clave
+
+* **Las políticas de _Connectivity Link_ se asocian a recursos de _Gateway API_** (HTTPRoutes, Gateways); no se requieren cambios en el agente de IA ni en el código de la aplicación.
+* **Las políticas se complementan entre sí**; AuthPolicy extrae la información de identidad que TokenRateLimitPolicy utiliza para establecer presupuestos de tokens por nivel, lo que permite la estrategia de respaldo Gold/Silver.
+* **La limitación de velocidad basada en tokens** está diseñada específicamente para cargas de trabajo de IA/LLM y permite controlar los costos según el consumo real de tokens, en lugar de basarse simplemente en el número de solicitudes.
+* **Todo es declarativo y nativo de _Kubernetes_**; las políticas son recursos YAML que se administran con `oc`, por lo que es fácil versionarlas, revisarlas y automatizarlas.
+* **Las herramientas de integración proporcionan los cimientos para la IA**. Como has visto en todos los módulos, herramientas sólidas de conectividad como _Apache Camel_, _Kafka_, Service Interconnect y _Connectivity Link_ proporcionan los cimientos esenciales y seguros necesarios para integrar correctamente la IA en los flujos de trabajo empresariales cotidianos.

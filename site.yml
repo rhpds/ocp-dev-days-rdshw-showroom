@@ -2,17 +2,28 @@
 site:
   title: OpenShift Dev Day
   url: https://github.com/rhpds/ocp-dev-days-rdshw-showroom
-  start_page: modules::index.adoc
+  start_page: en@modules::index.adoc
 
 content:
   sources:
     - url: .
-      start_path: content
+      start_path: content/en
+      branches: HEAD
+    - url: .
+      start_path: content/ja
+      branches: HEAD
+    - url: .
+      start_path: content/es
+      branches: HEAD
+    - url: .
+      start_path: content/it
+      branches: HEAD
 
 ui:
   bundle:
     url: https://github.com/rhpds/rhdp_showroom_theme/releases/download/latest/ui-bundle.zip
     snapshot: true
+  supplemental_files: ./supplemental-ui
 
 antora:
   extensions:

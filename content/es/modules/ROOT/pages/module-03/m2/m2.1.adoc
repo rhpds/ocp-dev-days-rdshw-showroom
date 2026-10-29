@@ -1,0 +1,94 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="matrix-chat"]
+== Incorporación a la plataforma Matrix
+
+{empty} +
+
+=== Únete a tu sala de Matrix.
+
+{blank}
+
+. Abre el cliente web de _Matrix_
++
+Haz clic en el siguiente enlace para abrir la página de inicio de sesión de _Matrix_ (se abrirá en una pestaña nueva).
++
+--
+- link:{url-element}[Página de inicio de sesión de Matrix,window="_blank"]
+--
++
+{blank}
++
+Se mostrará una página de Login.
++
+{empty} +
+
+. Inicia sesión con tus credenciales
++
+Se te solicitará que introduzcas tus credenciales, como se muestra a continuación:
++
+image::module-03/m2/matrix-login-credentials.jpg[width=60%]
++
+{blank}
++
+====
+. Introduce lo siguiente:
++
+* **Username**
++
+[.copypaste.value]
+****
+{user-username}
+****
++
+* **Password**
++
+[.copypaste.value]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
++
+{empty} +
++
+. A continuación, haz clic en **_"Sign in"_**
+====
++
+{empty} +
++
+Se te pedirá que confirmes tu identidad. Para ello, introduce tu contraseña, como se muestra a continuación:
++
+image::module-03/m2/matrix-login-confirm.jpg[width=60%]
++
+{blank}
++
+Confirma haciendo clic en _"Continue"_.
++
+{empty} +
++
+Por último, verás en la pantalla de _Matrix_ una invitación pendiente para unirte a tu sala. +
+Sigue estos pasos para aceptar la invitación:
++
+image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
++
+--
+. Haz clic en tu sala.
+. A continuación, haz clic en _"Accept"_.
+--
+
+{empty} +
+
+
+[.verification]
+****
+¿Pudiste unirte correctamente a la sala de Matrix?
+****
+
+{empty} +

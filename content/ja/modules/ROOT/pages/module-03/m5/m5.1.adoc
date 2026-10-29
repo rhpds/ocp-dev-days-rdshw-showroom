@@ -1,0 +1,192 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup-lab5"]
+== Lab の作業フォルダーをセットアップする
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+
+[.indent2]
+[IMPORTANT]
+--
+前の章をスキップした場合は、以下のセクションを展開して内容を確認してください。
+
+[%collapsible]
+====
+
+* データベースへのアクセスを有効にする
++
+======
+この章ではデータベースへのアクセスが必要ですが、デフォルトでは接続できません。
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w50]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ 統合]
+        end
+    end
+
+    Camel -.-x|"❌ 接続不可"| SVC
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            %% SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style DB fill:none,stroke:none
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+
+データベースへのアクセスを有効にするには、 _Dev Spaces_ のターミナルで次のコマンドを実行します。
+
+[.copypaste]
+****
+si-setup
+****
+
+すべてのリソースで `ready OK` と表示されるはずです。
+
+[subs="attributes"]
++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
+    <span style="color: #07BC7A">✓</span> Site                    ready  OK
+    <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
+    <span style="color: #07BC7A">✓</span> Listener                ready  OK
+
+Namespace: shared-database
+    <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
+    <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
++++
+
+上記の出力は、自分の namespace とデータベースの namespace の間に Service Interconnect の link が確立されたことを示しています。
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w80]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ 統合]
+
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Camel --> SI1
+
+    SI1 -.-|"🔒 セキュアな link"| SI2
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    SI2 --> SVC
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style DB fill:none,stroke:none
+    style SI1 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SI2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+======
+====
+--
+
+{empty} +
+
+. _Dev Spaces_ のターミナルで:
+.. 実行中のプロセスがある場合は、 kbd:[Ctrl+C] で停止します。
+.. 次のコマンドを実行します。
++
+{blank}
++
+[.copypaste]
+****
+step 9
+****
++
+[TIP]
+--
+.演習をリセットするには、上記のコマンドをいつでも実行できます。
+[%collapsible]
+====
+この workshop には便利な helper script が含まれており、任意の step に移動したり、lab を既知の正常な状態にリセットしたりできます。
+
+* `step N` — lab を step N の最初にリセットします
+* `steps` — lab で利用可能なすべての step を一覧表示します
+* `start` または `restart` — 最初から開始します (`step 1` と同じ)
+* `ff` — *次の* step に進みます
+* `rw` — *前の* step に戻ります
+====
+--
++
+{empty} +
+
+. lab フォルダーを確認する
++
+上記のコマンドを実行したら、エディターのツリービューを見て、問題がないことを確認してください。前の演習で見たフォルダー構成と同じような構成になっているはずです。
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(モック入力)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(モデルのプロンプト)</small>] +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-main.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-tool-profile.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #b07219"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *PdfRenderer.java* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
+
+[.indent2]
+NOTE: このバージョンの演習では、実行を簡単にするために MCP server を使用しません。すべてのツールは Camel agentic process に直接組み込まれており、agent が検出して呼び出せる通常の Camel route として定義されています。
+--
++
+{empty} +
+
+
+
+[.verification]
+****
+期待どおりのフォルダー構成とファイルが表示されていますか?
+
+[.success]
+続行する準備ができました。
+
+[.fail]
+コマンドの構文が環境に合っていることを確認して、もう一度試してください。
+****
+
+{empty} +

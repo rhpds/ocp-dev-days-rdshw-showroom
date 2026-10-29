@@ -1,0 +1,244 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup-lab4"]
+== Configura la cartella di lavoro del lab
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+[.indent2]
+[IMPORTANT]
+--
+Se hai saltato i capitoli precedenti, espandi la sezione qui sotto per recuperare.
+
+[%collapsible]
+====
+Devono essere soddisfatti questi requisiti:
+
+. *Accesso al database*
+. *Integrazione di Kafka con Matrix* (piattaforma di messaggistica per i clienti)
+
+{blank}
+
+Seguendo i passaggi qui sotto, potrai soddisfare entrambi i requisiti.
+
+. Abilita l'accesso al database
++
+======
+Questo capitolo richiede l'accesso a un database, ma per impostazione predefinita non è raggiungibile.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w50]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integrazione]
+        end
+    end
+
+    Camel -.-x|"❌ non raggiungibile"| SVC
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            %% SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style DB fill:none,stroke:none
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+
+Per abilitare l'accesso al database, esegui il comando seguente nel terminale di _Dev Spaces_:
+
+[.copypaste]
+****
+si-setup
+****
+
+Dovresti vedere tutte le risorse con stato `ready OK`:
+
+[subs="attributes"]
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
+    <span style="color: #07BC7A">✓</span> Site                    ready  OK
+    <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
+    <span style="color: #07BC7A">✓</span> Listener                ready  OK
+
+Namespace: shared-database
+    <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
+    <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
+++++
+
+L'output qui sopra indica che è stato stabilito un collegamento Service Interconnect tra il tuo namespace e quello del database.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w80]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integrazione]
+
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Camel --> SI1
+
+    SI1 -.-|"🔒 collegamento sicuro"| SI2
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    SI2 --> SVC
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style DB fill:none,stroke:none
+    style SI1 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SI2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+======
+
+{empty} +
+
+[start=2]
+. Abilita l'integrazione di Kafka con Matrix
++
+======
+Aumenta a 1 il numero di repliche dell'integrazione di Kafka con Matrix
+
+[.copypaste]
+****
+oc scale deployment k2m --replicas=1
+****
+
+Il pod abiliterà il seguente flusso di notifiche:
+
+[.mermaid]
+----
+flowchart LR
+    AI --> KF --> |"k2m\n(pod)"| MX --> CUST
+    
+    CUST@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 80, w: 80, constraint: "on" }
+    KF@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Assistente AI", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style CUST fill:none,stroke:none
+    style MX fill:none,stroke:none
+    style KF fill:none,stroke:none
+    style AI fill:none,stroke:none
+----
+
+Per verificare che il pod sia in esecuzione, esegui il comando seguente:
+
+[.copypaste]
+****
+oc get deployment k2m
+****
+
+Dovresti vedere il deployment `Ready 1/1`:
+
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+k2m    1/1     1            1           27h</pre>
+++++
+
+======
+====
+--
+
+{empty} +
+
+. Dal terminale di _Dev Spaces_, esegui il comando seguente: +
+(prima chiudi tutte le schede di file Camel aperte: potrebbero non aggiornarsi automaticamente dopo aver eseguito questo comando)
++
+{blank}
++
+[.copypaste]
+****
+step 7
+****
++
+[TIP]
+--
+.Esegui il comando qui sopra in qualsiasi momento per reimpostare l'esercizio.
+[%collapsible]
+====
+Il workshop include utili script di supporto che consentono di passare a qualsiasi step o di reimpostare il lab a uno stato iniziale noto:
+
+* `step N` — reimposta il lab all'inizio dello step N
+* `steps` — elenca tutti gli step disponibili nel lab
+* `start` o `restart` — torna all'inizio (equivalente a `step 1`)
+* `ff` — passa rapidamente allo step *successivo*
+* `rw` — torna allo step *precedente*
+====
+--
++
+{empty} +
+
+. Controlla la cartella del lab
++
+Dopo aver eseguito i comandi qui sopra, controlla la vista ad albero dell'editor per verificare che la struttura sia corretta. Dovrebbe essere simile a questa:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent.camel.yaml* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *system.message* +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 mcp-servers pass:[<span style="color: grey;font-size: 0.8em;">(NodeJS e Camel Quarkus)</span>] +
+pass:[<mark style="padding-left: .8rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;</b></mark>] *mcp* pass:[<span style="color: grey;font-size: 0.8em;">(script di avvio)</span>] +
+
+{empty} +
+
+[.indent2]
+NOTE: `agent` e `mcp-servers` includono impostazioni preconfigurate per il tuo ambiente, tra cui la configurazione del modello AI e la connettività agli endpoint (database, storage S3 e HelpDesk). È tutto pronto: puoi concentrarti sulla creazione del flusso agentico.
+--
++
+{empty} +
+
+[.verification]
+****
+Vedi la struttura di cartelle e i file previsti?
+
+[.success]
+Puoi continuare.
+
+[.fail]
+Prova a eseguire di nuovo `step 7` e verifica che i file compaiano nell'esplora file dell'editor.
+****
+
+{empty} +

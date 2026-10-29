@@ -1,0 +1,323 @@
+:imagesdir: ../../assets/images
+:page-time: 5
+include::partial$style.adoc[]
+ 
+== Limitazione della frequenza dei token
+ 
+Con l'autenticazione configurata, il livello di controllo successivo riguarda il consumo dei token. Una **TokenRateLimitPolicy** monitora i *token effettivamente utilizzati* nelle risposte LLM, invece di limitarsi a contare le richieste come avviene con il rate limiting tradizionale.
+
+{blank}
+
+[.mermaid.mermaid-w60]
+----
+flowchart LR
+    AGT5 <--> AI5
+    AI5 <--> GW
+
+    GW --- GWp
+    GWp[" "] --> |"🥇 Rate Limit"| GP
+    GWp --> |"🥈 Rate Limit"| SP
+
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente di supporto", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Assistente AI", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Profilo Gold", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Profilo Silver", pos: "b", h: 80, w: 70, constraint: "on" }
+
+    style AGT5 fill:none,stroke:none
+    style AI5 fill:none,stroke:none
+    GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style GW fill:none,stroke:none
+    style GWp fill:none,stroke:none,width:1px,height:1px
+    style GP fill:none,stroke:none
+    style SP fill:none,stroke:none
+----
+
+Le policy di rate limiting sono un modo efficace per combinare le funzionalità AI con il controllo dei costi e delle risorse. In questo esercizio vedrai come il Customer Profile Tool usa i budget di token per decidere quale livello di analisi produrre.
+
+Ogni richiesta LLM consuma potenza di calcolo e un'analisi più approfondita ne richiede una quantità maggiore. Con la crescente adozione dell'AI, gestire i costi e la capacità dell'infrastruttura diventa fondamentale. Le policy di rate limiting aiutano le organizzazioni a controllare l'utilizzo dei token nei propri servizi.
+
+In questo esercizio, il Customer Profile Tool va oltre il semplice rate limiting con una strategia di degradazione graduale. Tenta prima un'analisi *Gold* e, quando il budget Gold è esaurito, passa a *Silver* per continuare a generare profili utili a un costo inferiore. La richiesta viene rifiutata solo quando entrambi i budget sono esauriti:
+
+[NOTE]
+====
+.Scopri come è implementato il fallback in Camel
+[%collapsible]
+=====
+La route qui sotto mostra la definizione del percorso Gold in Camel. All'interno di un blocco Circuit Breaker, recupera i dati da elaborare con LLM. Se Connectivity Link applica il rate limiting alla chiamata, restituisce un errore; Camel contrassegna il percorso come non riuscito e la route passa al percorso Silver.
+
+image::module-03/m5/kaoto-gold-fallback.png[Route Gold con fallback in Kaoto, width=100%]
+=====
+====
+
+{blank} 
+
+Il diagramma seguente illustra il flusso della strategia di fallback:
+
+{blank}
+
+[.mermaid]
+----
+flowchart TD
+    REQ(["Richiesta profilo"]) --> QA["Quota Gold disponibile?"]
+    QA -->|"✅ sì"| GOLDBox
+    QA2 -->|"✅ sì"| SILVERBox
+    QA --> |"❌ no"| QA2["Quota Silver disponibile?"]
+    QA2 -->|"❌ no"| ERR["⚠️ Riprova più tardi"]
+
+    subgraph fallback [" "]
+        direction TD
+        SILVERBox
+        ERR
+    end
+
+    GOLDBox["<div style='display:flex;align-items:center;gap:20px;min-width:280px'><img src='../../_images/module-03/common/profile-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Analisi Gold</b><br/>• Cronologia completa degli acquisti<br/>• Modelli di spesa<br/>• Stato fedeltà</div></div>"]
+
+    SILVERBox["<div style='display:flex;align-items:center;gap:20px;min-width:230px'><img src='../../_images/module-03/common/profile-silver-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Analisi Silver</b><br/>• Ordini recenti<br/>• Profilo di base</div></div>"]
+
+    style REQ fill:#f5f5f5,stroke:#EE0000,color:#333
+    style QA fill:none,stroke:none,color:#333
+    style QA2 fill:none,stroke:none,color:#333
+    style GOLDBox fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style SILVERBox fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style ERR fill:#fce4e4,stroke:#EE0000,color:#333
+    style fallback fill:none,stroke:none
+----
+
+Per mettere in pratica quanto visto, applicherai una TokenRateLimitPolicy che assegna a ogni livello il proprio budget di token. Poi testerai il fallback inviando richieste di profilo finché il budget Gold non sarà esaurito e osserverai il passaggio automatico a Silver.
+
+{empty} +
+
+=== Avvia l'integrazione agentica
+
+Verifica che l'agent sia in esecuzione nel terminale. Se l'hai arrestato dopo l'esercizio precedente, avvialo di nuovo:
+
+{blank}
+
+[.copypaste]
+****
+camel run * --local-kamelet-dir ../support/kamelets
+****
+
+[TIP]
+--
+.Cosa fa questo comando?
+[%collapsible]
+====
+* `camel run *` — esegue tutti i file delle route Camel nella directory corrente
+* `--local-kamelet-dir ../support/kamelets` — carica i Kamelet personalizzati (connector) dalla cartella di supporto +
+(include il connector di Rocket.Chat)
+====
+--
+
+{empty} +
+
+=== Applica e verifica la TokenRateLimitPolicy
+
+TokenRateLimitPolicy è una risorsa a livello di gateway. Definisce i budget di token per ciascun livello e consente al gateway di applicarli indipendentemente dall'applicazione in esecuzione.
+
+. Apri una nuova scheda del terminale in _DevSpaces_ facendo clic sull'icona kbd:[+] (lascia aperta la scheda precedente con _Camel_ in esecuzione, così potrai eseguire i test in seguito).
++
+[#terminal-tab]
+image::module-03/m5/devspace_terminal_new_tab.png[Terminale di Dev Spaces,width=70%]
++
+[.overlay]
+****
+[.target]
+terminal-tab
+
+[.arrows]
+{x: 38, y: 67, rot: -45, size: 3}
+****
++
+{empty} +
++
+NOTE: Poiché la policy opera a livello di infrastruttura, puoi applicarla mentre l'agent è in esecuzione, senza doverlo riavviare.
++
+{empty} +
+
+. Esamina i budget di token per ciascun livello, quindi applica la policy al tuo namespace:
++
+--
+La policy definisce due budget di token che riflettono il costo di ciascun livello:
+
+* *Gold* — analisi più approfondita e maggiore costo di calcolo. Un limite di token più restrittivo con una finestra di rinnovo più lunga.
+* *Silver* — analisi più leggera e costo di calcolo inferiore. Un limite di token più generoso che si rinnova più rapidamente.
+--
++
+{blank}
++
+Esamina la TokenRateLimitPolicy qui sotto e *applicala incollando* il seguente yaml nella nuova scheda del terminale:
++
+{blank}
++
+[.copypaste]
+****
+oc apply -f - <<EOF
+apiVersion: kuadrant.io/v1alpha1
+kind: TokenRateLimitPolicy
+metadata:
+  name: openai-token-limits
+  namespace: {user-username}-devspaces
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ai-proxy-route
+  limits:
+    gold:
+      rates:
+        - limit: 50
+          window: 4m
+      when:
+        - predicate: |
+            auth.identity.groups.split(",").exists(g, g == "gold")
+      counters:
+        - expression: auth.identity.userid
+    silver:
+      rates:
+        - limit: 500
+          window: 2m
+      when:
+        - predicate: |
+            auth.identity.groups.split(",").exists(g, g == "silver")
+      counters:
+        - expression: auth.identity.userid
+EOF
+****
++
+Nota come lo YAML rispecchia i budget dei livelli descritti sopra: `gold` ha un limite più restrittivo e una finestra più lunga, mentre `silver` ha un limite più generoso che si rinnova più rapidamente.
++
+[IMPORTANT]
+====
+TokenRateLimitPolicy dipende da AuthPolicy. I campi `auth.identity.groups` e `auth.identity.userid` a cui si fa riferimento qui vengono popolati dalla sezione `response.success.filters` di AuthPolicy. Senza AuthPolicy, TokenRateLimitPolicy non avrebbe alcun contesto di identità da valutare.
+====
++
+{empty} +
+
+. Verifica TokenRateLimitPolicy
++
+Dal terminale di Dev Spaces, esegui il seguente comando per verificare che TokenRateLimitPolicy sia stata creata correttamente:
++
+[.copypaste]
+****
+oc describe tokenratelimitpolicy -n {user-username}-devspaces \
+| grep -iE "Name:|target|gold:|silver:|limit:|window:|type:|status:"
+****
++
+[TIP]
+--
+.Cosa fa questo comando?
+[%collapsible]
+====
+* `oc describe tokenratelimitpolicy` — mostra tutti i dettagli della risorsa TokenRateLimitPolicy
+* `-n {user-username}-devspaces` — seleziona il tuo namespace
+* `grep -iE "Name:|target|..."` — filtra l'output per mostrare solo i campi principali (nome, target, limiti e stato)
+====
+--
++
+Dovresti vedere un output che conferma l'esistenza di TokenRateLimitPolicy, il target HTTPRoute corretto e lo stato enforced, simile a questo:
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         openai-token-limits
+    <span style="color: #F14C4B;font-weight:bold">Gold:</span>
+        <span style="color: #F14C4B;font-weight:bold">Limit:</span>   50
+        <span style="color: #F14C4B;font-weight:bold">Window:</span>  4m
+    <span style="color: #F14C4B;font-weight:bold">Silver:</span>
+        <span style="color: #F14C4B;font-weight:bold">Limit:</span>   500
+        <span style="color: #F14C4B;font-weight:bold">Window:</span>  2m
+  <span style="color: #F14C4B;font-weight:bold">Target</span> Ref:
+    <span style="color: #F14C4B;font-weight:bold">Name:</span>   ai-proxy-route
+<span style="color: #F14C4B;font-weight:bold">Status:</span>
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
+++++
++
+Quando la policy risulta *Enforced*, il gateway sta monitorando attivamente l'utilizzo dei token per entrambi i livelli. +
+È il momento di vedere la strategia di fallback in azione.
+
+{empty} +
+
+=== Testa il rate limiting dei token da Rocket.Chat
+
+. Torna in _Rocket.Chat_ e invia la stessa richiesta dell'esercizio precedente:
++
+{blank}
++
+[.copypaste.value]
+****
+Per favore, genera un profilo cliente per l'ordine 61356291
+****
++
+NOTE: Il numero d'ordine in questa richiesta è solo esemplificativo: Customer Profile Tool usa dati di input simulati provenienti dai file JSON nella cartella `data/` del progetto. Puoi esaminare questi file nel codice sorgente per vedere i dati fittizi di CRM, cronologia, audit e ticket che alimentano l'analisi.
++
+Dato che il budget di token Gold è ancora intatto, il sistema dovrebbe produrre un'analisi di livello *GOLD*, proprio come nell'esercizio precedente.
++
+{empty} +
+
+. Esegui di nuovo il test per vedere il passaggio del sistema a Silver.
++
+La richiesta precedente dovrebbe aver consumato il budget di token Gold (circa 50 token). Prova a chiedere di nuovo per vedere il passaggio del sistema a Silver: dovrebbe bastare un semplice «riprova».
++
+{blank}
++
+[.copypaste.value]
+****
+Per favore, riprova
+****
++
+Ora dovresti vedere un'analisi di livello *SILVER* invece di Gold. La risposta è più breve e contiene solo due sezioni (Profilo cliente e Problemi aperti), in linea con il livello di analisi più leggero:
++
+{blank}
++
+:fig-time: 11:21 AM
+include::_figures/rc-silver-profile.adoc[]
++
+{blank}
++
+Questo conferma che la strategia di fallback è in funzione: la prima richiesta ha esaurito il budget Gold, quindi il sistema è passato automaticamente a Silver.
++
+{empty} +
+
+. Continua a inviare richieste di profilo. Il budget Silver è più generoso, quindi dovresti ricevere diverse analisi Silver prima che si esaurisca. Continua a chiedere finché il sistema non sarà più in grado di generare un profilo:
++
+{blank}
++
+[.copypaste.value]
+****
+Per favore, riprova
+****
++
+{empty} +
+
+. Una volta esauriti entrambi i budget, il sistema non avrà più capacità disponibile. Dovresti vedere un *AVVISO DI SERVIZIO* con lo stato `429 Too Many Requests`, a conferma che la policy di rate limiting dei token è applicata completamente:
++
+{blank}
++
+:fig-time: 11:25 AM
+:fig-user-msg: Per favore, riprova
+:fig-status: 429 Too Many Requests
+:fig-action: Il servizio Intelligence è momentaneamente in pausa a causa dell'elevato traffico.
+:fig-notice: Riprova a inviare la richiesta tra qualche istante.
+include::_figures/rc-service-notice.adoc[]
+
+{empty} +
+
+NOTE: I budget di token non sono permanenti. Si basano su una finestra temporale, quindi vengono ripristinati dopo un certo periodo. Se aspetti qualche minuto e riprovi, il sistema riprenderà a generare profili seguendo la stessa strategia di fallback: prima Gold, poi Silver.
+
+{empty} +
+
+[.verification]
+****
+Hai visto Gold per primo, poi Silver dopo l'esaurimento del budget Gold e infine un errore 429 quando si sono esauriti entrambi i budget?
+
+[.success]
+Hai applicato correttamente il rate limiting dei token a livelli con una strategia di degradazione graduale.
+
+[.fail]
+Verifica che AuthPolicy e TokenRateLimitPolicy mostrino entrambe lo stato Enforced. Attendi il rinnovo dei budget di token e riprova.
+****

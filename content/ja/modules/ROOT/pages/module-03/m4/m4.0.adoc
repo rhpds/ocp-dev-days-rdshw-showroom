@@ -1,0 +1,88 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id='lab4-ai-customer-support']
+== ラボ 4 - AI カスタマーサポート
+
+自然言語チャットを通じてバックエンドのアクションをオーケストレーションする AI エージェントを使用します。Agentic Apache Camel と Model-as-a-Service (MaaS) を活用しています。
+
+{empty} +
+
+*ビジネス上の必要性*
+
+お客様から保険契約の申請について問い合わせがあった場合、詳細の更新、補償範囲の変更、差異の解消などに対応するため、サポート担当者は従来、複数のバックエンドデータベースやファイルシステムを手作業で行き来する必要がありました。これは時間がかかり、ミスが起こりやすく、担当者にもお客様にも負担です。こうしたケースに、より迅速かつスムーズに対応する方法が必要です。
+
+{empty} +
+
+*技術的な解決策*
+
+サポート担当者は、Rocket.Chat のウィンドウ内で自然言語を使い、AI ボットと直接やり取りします。Agentic Apache Camel と Model-as-a-Service (MaaS) により、AI はスマートなアシスタントとして機能します。担当者の依頼を解釈し、呼び出すツールを自律的に判断してデータベースを更新し、S3 ストレージ内の修正済み保険契約書類を再生成します。これにより解決時間が大幅に短縮され、サポートチームが複数のシステムを手作業で切り替える必要がなくなります。
+
+{empty} +
+
+*仕組み*
+
+[.mermaid]
+----
+flowchart LR
+
+    Agent -->|① メッセージ| RC <-->|② 転送| INTLabel
+
+    INTLabel -- ⑤ 返信--> RC
+
+    RC -- ⑥ 応答 --> Agent
+
+    INTLabel <--> |"③ 推論"| MaaSLabel
+    INTLabel --> |"④ ツール呼び出し\n(MCP)"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>エージェント統合\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI 推論<br>• ツール呼び出し<br>• 統合</div></div>\n]
+
+    subgraph ToolsLabel ["MCP とバックエンドシステム&nbsp;&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph MaaSLabel [" "]
+        MaaS
+    end
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 80, w: 80, constraint: "on" }
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI モデル", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "ヘルプデスク", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style MaaS fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style MaaSLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+
+AI エージェントは推論ループに従います。MaaS を介して LLM に相談し、どのアクションを取るかを決定します。次に Camel が *MCP* を通じて適切なツールを実行し（データベースの更新、S3 内の PDF 保険契約書類の再生成）、その結果を LLM に返して、最終的な回答を Rocket.Chat のサポート担当者に返します。
+
+[NOTE]
+====
+*MCP とは何ですか?* Model Context Protocol (MCP) は、AI エージェントがデータベース、API、ファイルストレージなどの外部システムと、一貫したツールセットを使って連携できるようにするオープン標準です。このラボでは、Apache Camel が MCP サーバーを実装し、バックエンドのアクション（例: データベースの更新、S3 へのアップロード）を呼び出し可能なツールとして公開します。AI モデルは、ユーザーの自然言語リクエストに基づいて、どのツールを呼び出すかを決定します。
+====
+
+{empty} +
+
+*このラボで行うこと:*
+
+. *環境をセットアップする* — 作業フォルダーを準備し、AI エージェントを設定します。
+. *エージェントを開発する* — 基本ルートから、ツールを備えた完全な構成まで、AI エージェントを段階的に有効化します。
+. *フローを完成させる* — Rocket.Chat、AI エージェント、データベース、S3 ストレージを結ぶ統合を仕上げます。
+. *フローをテストする* — お客様/担当者のやり取りをシミュレーションし、結果を検証します。
+
+{empty} +

@@ -1,0 +1,277 @@
+= Avance a las siguientes etapas
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+La imagen de su sandbox está limpia: se corrigieron las vulnerabilidades, se reforzó la imagen base y se firmó el commit. Ahora es momento de avanzar sus cambios por las etapas de la canalización segura: verificación de la solicitud de fusión, compilación posterior a la fusión y promoción a producción basada en etiquetas.
+
+A diferencia del sandbox, estas canalizaciones **aplican** las políticas de seguridad. Los commits sin firmar, las infracciones de políticas y la falta de aprobaciones bloquearán la promoción.
+
+[#section-1]
+== Sección 1: Solicitud de fusión
+
+=== Ejercicio 1: Crear una solicitud de fusión
+
+. Abra GitLab y vaya a su rama del sandbox en el repositorio `parasol-insurance-secured`.
++
+Puede encontrarla rápidamente haciendo clic en **View Source** en el componente del sandbox en Developer Hub.
++
+image::m02-rhdh-sandbox-view-source.png[View Source en la página del componente del sandbox,link=self,window=blank,width=700]
+
+. Haga clic en **Create merge request** (o vaya a **Merge Requests** → **New merge request**).
++
+image::m02-gitlab-create-mr.png[Botón Create merge request en GitLab,link=self,window=blank,width=700]
+
+. Establezca la rama de origen como su rama del sandbox y la rama de destino como `main`.
++
+image::m02-gitlab-new-mr-form.png[Formulario de nueva solicitud de fusión con las ramas de origen y destino,link=self,window=blank,width=700]
+
+. Asigne un título descriptivo a la solicitud de fusión:
++
+[source,role="copypaste"]
+----
+Sec-fix done, security posture improved
+----
++
+Elimine el campo "Description" y haga clic en **Create merge request**.
+
+=== Ejercicio 2: Observar la canalización de verificación de la MR
+
+. Después de crear la solicitud de fusión, se activa automáticamente una canalización de verificación. «¿Se puede compilar esto en preproducción? ¿La compilación se completará correctamente? ¿Cumple con nuestros estándares?». Si falla, no se podrá fusionar la rama con los cambios. Esta es la **canalización de verificación de la solicitud de fusión**; se ejecuta en el espacio de nombres de compilación segura de Parasol, no en su sandbox.
++
+image::m02-gitlab-mr-pipeline-running.png[Canalización de verificación de MR en ejecución con la fusión bloqueada,link=self,window=blank,width=700]
+
+. Abra la vista de la canalización en GitLab y haga clic en una de las tareas. Se abrirá la ejecución de la canalización de verificación de la MR en Developer Hub.
++
+image::m02-gitlab-mr-pipeline-jobs.png[Canalización de MR de GitLab con la verificación del commit y los trabajos de ACS,link=self,window=blank,width=700]
+
+. Observe el componente: ahora es `Parasol Insurance (Secured)`, ya no su sandbox.
++
+image::m02-rhdh-mr-check-pipeline.png[Canalización de verificación de MR en Developer Hub en Parasol Insurance Secured,link=self,window=blank,width=700]
+
+. La canalización de verificación de la MR:
+* **Verifica la firma del commit**: con `ENFORCE=true`, los commits sin firmar harán que **falle la canalización**
+* **Compila la imagen** desde la rama de la MR
+* **Analiza y verifica** la imagen según las políticas de ACS
+* **Informa los resultados** a GitLab como estados del commit y un comentario detallado en la MR
+
+. Espere a que finalice la canalización.
+
+. Vuelva a la página de la solicitud de fusión en GitLab
+* El botón "Merge" se ha activado, así que puede fusionar; pero antes de hacerlo
+* Desplácese hacia abajo hasta la entrada más reciente en la actividad, donde se publica un comentario **🔀 Merge Request Check Results** con el estado de la firma, los resultados de las políticas de ACS y el número de vulnerabilidades
+* Si la verificación previa se completó correctamente, esto no resulta tan interesante como revisar qué salió mal y cómo corregirlo. En su caso, es solo informativo (ya que se completó correctamente)
++
+image::m02-gitlab-mr-ready-to-merge.png[Solicitud de fusión lista para fusionarse con la canalización aprobada,link=self,window=blank,width=700]
++
+image::m02-gitlab-mr-results.png[Resultados de verificación de la solicitud de fusión con la validación de firma y ACS,link=self,window=blank,width=700]
+
+=== Ejercicio 3: Fusionar la solicitud
+
+. Si se aprueban todas las verificaciones, el botón **Merge** estará disponible.
++
+NOTE: Si falla la canalización (por ejemplo, por un commit sin firmar), se bloqueará la fusión. GitLab está configurado con `onlyMergeWhenPipelineSucceeds` para aplicar esta regla.
+
+. Haga clic en **Merge**.
++
+Esto activa la **canalización de compilación posterior a la fusión**: la **__imagen final__** se compila desde `main`, Tekton Chains la firma y certifica, se almacena en Quay y se implementa en el entorno de preproducción.
++
+image::m02-rhdh-post-merge-pipeline.png[Canalización de compilación posterior a la fusión en Developer Hub,link=self,window=blank,width=700]
+
+'''
+
+[#section-2]
+== Sección 2: Promocionar a producción
+
+La compilación posterior a la fusión creó una imagen firmada desde la rama `main`. Para promocionarla a producción, debe crear una **etiqueta de Git**; esto activa la canalización de promoción por etiqueta.
+
+=== Ejercicio 1: Crear una etiqueta
+
+. En GitLab, vaya a **Repository** → **Tags**.
+
+. Haga clic en **New tag**.
+
+. Introduzca un nombre para la etiqueta (por ejemplo, `v2.0`) y seleccione la rama `main` como origen.
++
+image::m02-gitlab-create-tag.png[Creación de una etiqueta en GitLab,link=self,window=blank,width=700]
+
+. Haga clic en **Create tag**.
+
+=== Ejercicio 2: Observar la canalización de promoción por etiqueta
+
+. La etiqueta activa la **canalización de promoción por etiqueta**. Esta canalización:
+* Recupera el SHA de la imagen del registro
+* Ejecuta la **validación de Conforma/Enterprise Contract** en la certificación de la imagen
+* Genera una **SBOM** y la carga en TPA
+* Copia la imagen al registro con una versión etiquetada
+* Abre una **solicitud de fusión** en el repositorio de manifiestos de GitOps para actualizar la implementación de producción
+
+. Vaya al componente **Parasol Insurance (Secured)** en Developer Hub y haga clic en la pestaña **CI**.
++
+Busque la ejecución de la canalización `parasol-insurance-secured-tag-promote`.
++
+image::m02-rhdh-tag-promote-failed.png[Canalización de promoción por etiqueta fallida en Developer Hub, con un error en ec-validate,link=self,window=blank,width=700]
+
+. **La canalización fallará.** Abra su salida para ver por qué.
++
+image::m02-rhdh-tag-promote-view-output.png[Botón View output en la canalización de promoción por etiqueta fallida,link=self,window=blank,width=700]
++
+image::m02-rhdh-ec-validation-failed.png[Validación de Enterprise Contract con una regla de aprobación fallida,link=self,window=blank,width=700]
+
+=== Ejercicio 3: Comprender la infracción de la política de Conforma
+
+. La validación de **Conforma (ec)** verifica la certificación firmada de la imagen según un conjunto de políticas. Debería ver lo siguiente:
+* ✅ **Verificación de la firma de la imagen**: Tekton Chains firmó la imagen
+* ✅ **Verificación de la firma de la certificación**: la certificación está firmada y es válida
+* ✅ **El commit debe estar firmado**: la certificación de SLSA demuestra que el commit se firmó
+* ✅ **Verificaciones de ACS aprobadas**: los resultados del análisis de la imagen y de la verificación de políticas están en la certificación
+* ✅ **Puerta de calidad de SonarQube**: las métricas de calidad del código están en la certificación
+* ❌ **Parasol Release Approved**: no se encontró ninguna certificación de aprobación de lanzamiento
++
+
+
+. La canalización bloquea correctamente la promoción porque la imagen no se aprobó para su lanzamiento. No hay ninguna **certificación firmada de aprobación del lanzamiento** asociada a la imagen.
+
+=== Ejercicio 4: Aprobar el lanzamiento
+
+. En la página de descripción general del componente de RHDH, haga clic en el enlace **Release Approval** (el icono de sobre en la sección Links).
++
+image::m02-rhdh-approval-link.png[Enlace Release Approval en la sección Links de la página del componente,link=self,window=blank,width=700]
+
+. La aplicación Release Approval muestra la imagen implementada actualmente en preproducción.
++
+image::m02-approval-process.png[Aplicación Release Approval con la implementación en preproducción y el botón Approve,link=self,window=blank,width=700]
++
+Muestra que la etiqueta `latest` (1) se implementó en preproducción (2), que el estado de la implementación es "ready" (3), pero que no tiene una certificación de lanzamiento (4).
+
+
+
+
+. Haga clic en **Approve** e introduzca un mensaje de aprobación:
++
+[source,role="copypaste"]
+----
+Approved for production release. All ACS policy checks passed, vulnerabilities remediated, commit signature verified. Risk assessment: low.
+----
++
+image::m02-approval-submit.png[Cuadro de diálogo Release Approval con el motivo y el botón Submit,link=self,window=blank,width=500]
++
+La aprobación se registra como una **certificación firmada** en la imagen del contenedor: se firma con su identidad, igual que la firma de su commit.
++
+image::m02-approval-success.png[Lanzamiento aprobado correctamente con el índice del registro de transparencia,link=self,window=blank,width=500]
++
+El índice del registro de transparencia identifica dónde se almacena el evento de firma en la base de datos del registro para verificar posteriormente las firmas sin clave.
+
+. Haga clic en el icono de marca de verificación para ver los detalles de la certificación: la aprobación ahora está asociada criptográficamente a la imagen (y se recupera y verifica al hacer clic).
++
+image::m02-approval-attestation.png[Detalles de la certificación de aprobación con la identidad del firmante y el motivo,link=self,window=blank,width=400]
+
+=== Ejercicio 5: Volver a ejecutar la canalización de promoción por etiqueta
+
+. Vuelva a GitLab y cree una etiqueta nueva (por ejemplo, `v2.1`) o vuelva a ejecutar la canalización desde el espacio de nombres secured-build en la consola de OpenShift.
+
+. Esta vez, la tarea `ec-validate` encontrará la certificación de aprobación y la canalización se completará correctamente.
+
+. En la salida de la canalización, ahora podrá ver:
+* Todas las políticas de Conforma aprobadas, incluida la aprobación del lanzamiento
+* Advertencias con el número de vulnerabilidades y las métricas de SonarQube
+* Un **enlace a la SBOM** que apunta a la SBOM cargada en TPA y muestra nuestra versión (etiqueta)
++
+image::m02-rhdh-ec-validation-passed.png[Validación de Enterprise Contract con todas las políticas aprobadas,link=self,window=blank,width=700]
++
+image::m02-rhdh-tag-promote-sbom.png[Canalización de promoción por etiqueta completada correctamente con el botón View SBOM,link=self,window=blank,width=700]
++
+image::m02-tpa-sbom-details.png[Detalles de la SBOM en Trusted Profile Analyzer,link=self,window=blank,width=700]
+
+. La canalización también:
+* Copia la imagen con la etiqueta de versión al registro
+* Abre una **solicitud de fusión** en el repositorio de manifiestos de GitOps
+
+=== Ejercicio 6: Completar la implementación en producción
+
+. En el registro de la canalización para `open-prod-pr`, busque el enlace a la solicitud de fusión y haga clic en él.
++
+image::m02-rhdh-tag-promote-open-prod-pr.png[Canalización de promoción por etiqueta con la tarea open-prod-pr,link=self,window=blank,width=700]
++
+image::m02-rhdh-open-prod-pr-log.png[Registro de la canalización con el enlace a la solicitud de fusión del repositorio de manifiestos,link=self,window=blank,width=700]
++
+La MR en el repositorio de manifiestos muestra todos los resultados de validación de Conforma, incluido un enlace a la imagen en Quay.
++
+image::m02-gitlab-prod-mr.png[MR de producción en el repositorio de manifiestos con los resultados de validación de Conforma,link=self,window=blank,width=700]
++
+image::m02-gitlab-prod-mr-merge.png[Botón Merge en la MR de producción,link=self,window=blank,width=700]
+
+. Apruebe y fusione la MR en el repositorio de manifiestos.
+
+. Argo CD detectará el cambio e implementará la nueva imagen firmada, certificada, validada y aprobada en el espacio de nombres `secured-prod`.
+
+=== ¿Por qué es importante?
+
+La imagen implementada en producción ahora cuenta con una **cadena completa de procedencia de SLSA**:
+
+* **Commit firmado**: rastreable hasta la identidad verificada de un desarrollador
+* **Certificación de SLSA**: demuestra que se ejecutó la canalización de compilación, qué tareas se ejecutaron y qué resultados produjeron
+* **Resultados del análisis de ACS**: evaluación de vulnerabilidades incorporada en la certificación
+* **Resultados de SonarQube**: métricas de calidad del código en la certificación
+* **Aprobación firmada**: autorización humana explícita para el lanzamiento
+* **SBOM**: inventario completo de los componentes de la imagen, almacenado en TPA para la búsqueda continua de vulnerabilidades coincidentes
+
+Esto no es solo un ejercicio para marcar casillas: cada elemento de evidencia está firmado criptográficamente y se puede verificar de forma independiente.
+
+=== ¿Cómo se hizo?
+
+Para que el ejercicio sea fácil de leer, agregamos los detalles a continuación. Expanda la sección para saber cómo se hizo.
+
+.**Abrir para ver los detalles de implementación**
+[%collapsible]
+====
+**Tekton Chains** firma automáticamente los artefactos de la canalización mediante la firma sin clave de Sigstore:
+
+* Después de cada ejecución de la canalización, Chains solicita a **Fulcio** un certificado de corta duración utilizando la identidad de la cuenta de servicio de la canalización
+* Crea una **certificación de procedencia de SLSA** que contiene todos los resultados de las tareas
+* La certificación y la firma se registran en **Rekor** (registro de transparencia) y se asocian a la imagen en el registro
+
+**Conforma (Enterprise Contract)** valida la certificación según un conjunto de políticas de Rego almacenadas en el repositorio {gitlab_url}/parasol/conforma-policies[`conforma-policies` de GitLab^]. Las políticas del paquete `parasol-software-supply-chain` comprueban lo siguiente:
+
+* Se ejecutaron las tareas obligatorias (verify-commit-signature, acs-image-scan, acs-image-check, sonar-scan)
+* El estado de la firma del commit es `SIGNED` (no es un commit sin firmar ni un commit de bot)
+* Se aprobó la verificación de políticas de ACS
+* Se aprobó la puerta de calidad de SonarQube
+* Existe en la imagen una certificación firmada de aprobación del lanzamiento
+
+image::m02-gitlab-conforma-policies.png[Repositorio de políticas de Conforma en GitLab,link=self,window=blank,width=700]
+
+La **certificación de aprobación** es una certificación in-toto personalizada con el tipo de predicado `https://parasol-insurance.com/releases/v1`. Está firmada con la identidad de quien aprueba (mediante Fulcio) y asociada a la imagen junto con la certificación de Chains.
+
+Si desea inspeccionar las certificaciones firmadas asociadas a la imagen que ahora está en producción, vuelva a la aplicación **Release Approval** (a través del componente **Parasol Insurance (Secured)** en Developer Hub):
+
+image::m02-rhdh-release-approval-link.png[Enlace Release Approval en el componente Parasol Insurance Secured de Developer Hub,link=self,window=blank,width=400]
+
+Haga clic en una etiqueta para inspeccionar las certificaciones firmadas asociadas a esa imagen:
+
+image::m02-approval-inspect-attestations.png[Inspección de certificaciones al hacer clic en una etiqueta,link=self,window=blank,width=500]
+
+Aquí puede ver la identidad del firmante de la certificación personalizada, así como las certificaciones generadas automáticamente y firmadas por Tekton Chains:
+
+image::m02-approval-attestation-details.png[Detalles de las certificaciones con Release Approval y SLSA Provenance e identidades de los firmantes,link=self,window=blank,width=700]
+
+En la sección **Attestation Detail** puede inspeccionar la certificación almacenada con la imagen:
+
+image::m02-approval-attestation-json.png[Attestation Detail con la declaración in-toto y el predicado y sujeto,link=self,window=blank,width=700]
+
+La **SBOM** se genera con **syft** y se carga en TPA con etiquetas que identifican al desarrollador y la etiqueta de versión. TPA compara continuamente las SBOM con los datos de vulnerabilidades incorporados y ofrece visibilidad continua del estado de seguridad de las imágenes implementadas.
+====
+
+=== Verificación
+
+En este punto, debería haber:
+
+* Fusionado una MR firmada y observado que la compilación posterior a la fusión se completó correctamente
+* Creado una etiqueta y observado que la canalización de promoción por etiqueta falló por falta de aprobación
+* Aprobado el lanzamiento y observado que la validación de Conforma se aprobó
+* Verificado la implementación en producción con una cadena completa de procedencia de SLSA
+
+'''
+
+== Próximos pasos
+
+Continúe con xref:module-02/05-namespace-security.adoc[Protección de sus espacios de nombres] para ver cómo el Policy Controller impide que se implementen imágenes no autorizadas.

@@ -1,0 +1,280 @@
+= セクション 7: Quarkus ブランチを確認して OpenShift にデプロイする
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== 目標
+
+`parasol-insurance-eap` を `quarkus` ブランチに切り替えます。これは EAP → Quarkus の移行が完了したものです。そのうえで、次の作業を行います。
+
+* 以前のセクションで修正した内容と、近代化されたコードを照らし合わせて確認する
+* 必要に応じてアプリをローカルで実行する
+* OpenShift にビルドしてデプロイし、Parasol の UI と API を検証する
+
+前のセクションでは、MTA の分析と Developer Lightspeed を使って、**レガシー** アプリケーションの一部（MDB メッセージング、カスタム監査ルール、Stateless EJB）を移行しました。このリポジトリーには、近代化がエンドツーエンドで適用済みの **`quarkus`** ブランチも含まれています。このラボではその流れを完結させます。対象のアーキテクチャを確認し、クラスターにリリースしましょう。
+
+== 演習 1: `quarkus` ブランチをチェックアウトする
+
+. Dev Spaces でターミナルを開き、git コマンドを実行できるようにします。メニューから **Terminal → New Terminal** を選択します。
++
+image::module-05-mta-dls/05-07-dls-01.jpg[Dev Spaces で新しいターミナルを開く,link=self,window=blank,title="New Terminal"]
+
+. `parasol-insurance-eap` プロジェクトのルートにいることを確認します。
+
+. 移行済みのブランチを fetch してチェックアウトします。
++
+[.console-input]
+[source,bash]
+----
+git fetch origin
+git reset --hard
+git checkout quarkus
+git pull origin quarkus
+----
+
+. 正しいブランチにいることを確認します。
++
+[.console-input]
+[source,bash]
+----
+git branch --show-current
+git log -2 --oneline
+----
++
+現在のブランチが `quarkus` であることが表示されるはずです。
+
+TIP: ブランチ切り替え後に Dev Spaces からウィンドウの再読み込みを求められたら、再読み込みを受け入れてください。Java / Quarkus のツールが新しい `pom.xml` を認識します。
+
+== 演習 2: 移行されたコードを確認する
+
+以前触ったクラスを同じようにたどり、Quarkus 実装と比較します。
+
+=== パッケージングと依存関係
+
+. `quarkus` ブランチの `pom.xml` を開きます。EAP / Java EE WAR から Quarkus への移行を確認してください。
+* パッケージングは **`jar`** です（`war` ではありません）
+* 依存関係は **Quarkus BOM** に由来します（`quarkus-rest`、`quarkus-hibernate-orm`、`quarkus-messaging`、`quarkus-scheduler`、JDBC ドライバーなど）
+* `jboss-eap-javaee8` BOM や `javax.*` の EJB / JMS API スタックはありません
+
+. `src/main/resources/application.properties` を開きます。次の点を確認してください。
+* **Dev** プロファイルはインメモリーの **H2** を使用します
+* **`%prod`** プロファイルは **PostgreSQL** を `POSTGRESQL_*` 環境変数経由で使用します（OpenShift が注入します）
+
+=== メッセージング: `EmailIntakeMDB`
+
+. `src/main/java/com/parasol/mdb/EmailIntakeMDB.java` を開きます。
++
+第 4 セクションでの移行結果を確認してください。
+* `@MessageDriven` ではなく `@ApplicationScoped`
+* `@EJB` ではなく `@Inject`
+* JMS `MessageListener` / activation config ではなく `@Incoming("email-intake")`
+* `jakarta.*` の import
+
+=== ビジネスサービス: `ClaimService`
+
+. `src/main/java/com/parasol/ejb/ClaimService.java` を開きます。
++
+第 6 セクションでの移行結果を確認してください。
+* `@Stateless` の代わりに `@ApplicationScoped` + `@Transactional`
+* `@PersistenceContext` の代わりに `@Inject EntityManager`
+* `javax.ejb` の使用なし
+
+=== スケジューリング: `EmailGeneratorBean`
+
+. `src/main/java/com/parasol/ejb/EmailGeneratorBean.java` を開きます。
++
+古い EJB タイマー / JMS プロデューサーの経路が、Quarkus ネイティブに変わっていることに注目してください。
+* `TimerService` / `@Timeout` の代わりに `@Scheduled(...)`
+* JMS `ConnectionFactory` / `Queue` の代わりに `@Channel("email-intake") Emitter<String>`
+* それでも `@ApplicationScoped` のままで、MDB が消費する同じ `email-intake` チャネルへ送信している
+
+=== REST レイヤー
+
+. `ClaimsResource` と `InboxResource` を開きます。サービスの CDI `@Inject`（`@EJB` なし）と `jakarta.ws.rs` API を確認してください。
+
+[cols="2,2,2"]
+|===
+| 項目 | レガシー（`main`） | Quarkus ブランチ
+
+| パッケージング | WAR + EAP BOM | JAR + Quarkus BOM
+| API | `javax.*` | `jakarta.*`
+| Claims サービス | `@Stateless` EJB | `@ApplicationScoped` + `@Transactional`
+| Email intake | JMS `@MessageDriven` | `@Incoming("email-intake")`
+| Email generator | EJB timer + JMS | `@Scheduled` + `@Channel` Emitter
+| データソース（prod） | `java:jboss/datasources/...` | Quarkus JDBC + 環境変数
+|===
+
+== 演習 3: Quarkus をローカルで実行する（任意のスモークテスト）
+
+デプロイする前に、Dev Spaces / ローカル JVM 上でスモークテストできます。
+
+. プロジェクトのルートから実行します。
++
+[.console-input]
+[source,bash]
+----
+mvn quarkus:dev
+----
+
+. Quarkus がポート **8080** で待ち受けを開始すると、Dev Spaces に一連のポート転送ダイアログが表示されます。アプリをブラウザーで開くため、順に受け入れてください。**yes** （redirect を追加） → **Open In New Tab** → **Open** を選択します。
++
+image::module-05-mta-dls/05-07-dls-02.jpg[8080 上の Quarkus に対する Dev Spaces のポート転送ダイアログ,link=self,window=blank,title="Open forwarded port"]
++
+NOTE: ポート **5005**（Quarkus のリモートデバッグ用ポート）でも同様のダイアログが表示されることがあります。この演習ではそれらを閉じるか無視してかまいません。使用するのは **8080** の HTTP UI のみで、デバッガーは接続しません。
+
+. Parasol の **Dashboard** が表示されるはずです。
++
+image::module-05-mta-dls/05-07-dls-03.png[Parasol の Quarkus ダッシュボード,link=self,window=blank,width=700]
+
+. **Claims** を開き、初期データの claims が API / UI から読み込まれることを確認します。
++
+image::module-05-mta-dls/05-07-dls-04.png[Parasol の Quarkus claims 一覧,link=self,window=blank,width=700]
+
+. claim の詳細を開きます（たとえば claims テーブルから）。ページが正しく描画されることを確認します。
++
+image::module-05-mta-dls/05-07-dls-05.png[Parasol の Quarkus claim 詳細,link=self,window=blank,width=700]
+
+. **Inbox** を開きます。スケジュールされたジェネレーターが、プロセス内の `email-intake` チャネルへサンプルメールを送信します。最初のメッセージには数分かかることがあり（スケジューラーの遅延）、その後は約 45 秒ごとに新しいメッセージが届きます。それまでは UI に **Waiting for emails...** と表示されます。
++
+image::module-05-mta-dls/05-07-dls-06.png[Parasol の Quarkus inbox,link=self,window=blank,width=700]
+
+. 終わったら `Ctrl+C` で Dev モードのプロセスを停止します。
+
+== 演習 4: OpenShift にデプロイする
+
+`quarkus` ブランチから、`openshift/` 配下のマニフェストとクラスター側のバイナリー Docker ビルドを使ってデプロイします。以下の手順では、`oc` にログイン済みで、{user}-ai-mta namespace が選択済みであること（`oc project`）を前提とします。
+
+OpenShift へのデプロイを開始するため、まずプロジェクト namespace {user}-ai-mta に移動します。
+
+[.console-input]
+[source,bash]
+----
+oc project {user}-ai-mta
+----
+
+また、モダナイズしたアプリケーションにはデータベースのバックエンドが必要です。ここでは PostgreSQL を使用します。
+
+=== PostgreSQL を用意する
+
+. デモ用のエフェメラルな PostgreSQL インスタンスを作成します。
++
+[.console-input]
+[source,bash]
+----
+oc new-app --template=postgresql-ephemeral \
+  -p DATABASE_SERVICE_NAME=parasol-db \
+  -p POSTGRESQL_USER=parasol \
+  -p POSTGRESQL_PASSWORD=parasol \
+  -p POSTGRESQL_DATABASE=parasol \
+  -p POSTGRESQL_VERSION=12-el8
+----
+
+. データベースの準備ができるまで待ちます。
++
+[.console-input]
+[source,bash]
+----
+oc rollout status deploymentconfig/parasol-db 2>/dev/null \
+  || oc rollout status deployment/parasol-db
+oc get pods -l name=parasol-db
+----
+
+=== Quarkus アプリケーションをビルドする
+
+. アプリをローカルで（または Dev Spaces のターミナルで）パッケージ化します。
++
+[.console-input]
+[source,bash]
+----
+mvn clean package -DskipTests
+----
++
+これにより `target/quarkus-app/` が生成されます。
+
+. バイナリーのビルドコンテキストを組み立て、OpenShift の Docker ビルドを開始します。
++
+[.console-input]
+[source,bash]
+----
+rm -rf /tmp/parasol-build
+mkdir -p /tmp/parasol-build
+cp src/main/docker/Dockerfile.jvm /tmp/parasol-build/Dockerfile
+cp -R target/quarkus-app /tmp/parasol-build/
+
+oc new-build --name=parasol-insurance --binary --strategy=docker -l app=parasol-insurance
+oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
+----
+
+=== デプロイマニフェストを適用する
+
+. アプリケーションをデプロイします（image namespace は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
++
+[.console-input]
+[source,bash]
+----
+sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+oc apply -f openshift/service.yaml
+oc apply -f openshift/route.yaml
+oc rollout status deployment/parasol-insurance
+----
+
+. Route URL を取得し、ブラウザーで開きます。
++
+[.console-input]
+[source,bash]
+----
+ROUTE=$(oc get route parasol-insurance -o jsonpath='{.spec.host}')
+echo "https://${ROUTE}/"
+----
+
+. ターミナルから API を検証します。
++
+[.console-input]
+[source,bash]
+----
+curl -sk "https://${ROUTE}/api/claims"
+curl -sk "https://${ROUTE}/api/inbox"
+----
+
+. OpenShift コンソールで、プロジェクトの **Topology** （または **Workloads → Deployments**）を開き、アプリケーションが動作していることを確認します。
++
+image::module-05-mta-dls/05-07-dls-07.jpg[parasol-insurance の Quarkus デプロイと Route を示す OpenShift Topology,link=self,window=blank,title="OpenShift Topology"]
++
+以下のような topology が表示されるはずです。
++
+* **`parasol-insurance`** — Quarkus アプリケーション（**Quarkus** のアプリケーションバッジを確認してください）。ノードの周りの青いリングは、pod が正常 / 実行中であることを示します。
+* **`parasol-db`** — `%prod` プロファイルが接続する PostgreSQL インスタンスです。Topology によっては、アプリからデータベースへの接続線が描画されます。
+* 場合によっては、以前のデモから同じプロジェクトにレガシーな **`parasol-insurance-eap`** ワークロードが残って見えることがあります。今デプロイしたのは Quarkus のノードです。
++
+**`parasol-insurance`** を選択し、**Resources** サイドパネルを開いて次を確認します。
++
+* **Pods** — 少なくとも 1 つの pod が **Running** 状態
+* **Services** — `parasol-insurance`
+* **Routes** — アプリの公開 URL（クリックするとブラウザーで Parasol UI が開きます。前の手順の `oc get route` の host と同じです）
++
+また、Deployment の env vars も確認し、`openshift/deployment.yaml` から適用した内容（Secret `parasol-db` 由来の `POSTGRESQL_*`）と一致していることを確認してください。
+
+== 演習 5: 本番設定で何が変わったかを確認する
+
+. `openshift/deployment.yaml` を再度開き、`application.properties` の `%prod` 設定と対応付けます。
+* `POSTGRESQL_HOST=parasol-db`
+* Secret `parasol-db` からの認証情報
+* `/api/claims` への HTTP probe
+
+. これをレガシーな EAP のアプローチ（`java:jboss/datasources/ParasolDS`、`jboss-all.xml` の JMS queue 定義）と比較してください。Quarkus ではランタイムの接続設定が **application config + Kubernetes env** に移り、GitOps で扱いやすく、環境間でプロモートしやすくなります。
+
+== 学んだこと
+
+* **`quarkus`** ブランチは、MTA / DLS で練習したパターンの移行完了版です。
+* メッセージング、CDI サービス、スケジューリング、REST はすべて Quarkus / MicroProfile の流儀（`@Incoming`、`@Channel`、`@Scheduled`、`@ApplicationScoped`）を使っています。
+* ローカルの **`quarkus:dev`**（H2）は、素早い UI 検証に最適です。**OpenShift** では `%prod` プロファイルを通じて PostgreSQL を使用します。
+* コンテナのデプロイは標準的なバイナリー build + Deployment / Service / Route です。EAP 固有の subsystem XML は不要です。
+
+== まとめ
+
+Red Hat Developer Lightspeed for Migration Toolkit for Applications は、Red Hat Migration Toolkit for Applications のアドオンで、IDE 内でソースコードのリファクタリングをインテリジェントに自動化します。ワークフロー効率のため、修正を適用する前に、コードリファクタリングのプロセス全体で説明や推奨されるコード変更を確認できます。
+
+従来のコーディングアシスタントとは異なり、Migration Toolkit for Applications 向け Lightspeed は MTA の静的コード分析と過去の移行に基づいて、最初から正確なコード解決策を提案し、さらに時間の経過とともに改善していきます。これにより、開発者はアプリケーションをより速く、予測可能にリファクタリングできます。
+
+必要に応じて、“agent mode” を有効にして、組み込みの AI エージェントにアプリケーションを分析させ、コード変更後に発生する可能性のある新しい問題を検索して修正することもできます。これにより機能の維持に役立ちます。
+
+このアドオンは Red Hat Advanced Developer Suite サブスクリプションに含まれています。詳細は https://www.redhat.com/en/products/advanced-developer-suite[Red Hat Advanced Developer Suite,window=_blank] を参照してください。

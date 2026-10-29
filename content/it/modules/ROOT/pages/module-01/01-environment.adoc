@@ -1,0 +1,82 @@
+= Dettagli dell'ambiente
+include::partial$_attributes.adoc[]
+
+== Ambiente del workshop
+
+È già tutto predisposto. L'ambiente di laboratorio include:
+
+* Un cluster OpenShift con Developer Hub, Dev Spaces, Pipelines e GitOps preconfigurati
+* Un account utente con accesso a tutte le risorse del workshop
+* Un'applicazione di esempio (Parasol Insurance) a cui aggiungerai una nuova funzionalità
+
+Le tue credenziali di accesso (usale per Developer Hub, GitLab e tutti i servizi del workshop):
+
+* **Username**: `{user}`
+* **Password**: `{password}`
+
+TIP: Tieni queste credenziali a portata di mano -- ti serviranno più volte durante il workshop.
+
+== Accesso all'ambiente
+
+Il tuo ambiente di laboratorio include:
+
+* **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
+* **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
+* **Dev Spaces**: {devspaces_url}[{devspaces_url}^]
+* **GitLab**: {gitlab_url}[{gitlab_url}^]
+* **Argo CD**: {argocd_url}[{argocd_url}^]
+
+NOTE: Tutti gli URL e le credenziali sono disponibili anche nel pannello a destra di questa interfaccia di laboratorio. Usa le schede in alto per passare da OpenShift Console, Terminal e GitLab.
+
+== Durata
+
+Questo workshop prevede **90 minuti** di attività pratica.
+
+[cols="2,1,3",options="header"]
+|===
+| Sezione | Durata | Attività
+
+| Conoscere la piattaforma
+| 10 min
+| Accedi a Developer Hub ed esplora il catalogo software, le API e l'assistente IA
+
+| La tua missione
+| 10 min
+| Trova l'attività che ti è stata assegnata e crea un ambiente di sviluppo usando un template self-service
+
+| Sviluppare la funzionalità
+| 25 min
+| Apri Dev Spaces, esplora l'IDE e implementa una funzionalità con un assistente di programmazione IA
+
+| Consegnarla
+| 15 min
+| Esegui il push del codice, visualizza la pipeline CI in Developer Hub e individua la causa del fallimento di un quality gate
+
+| Chiedere aiuto all'IA
+| 10 min
+| Usa un assistente IA agentico per correggere i code smell, esegui il push della correzione e verifica che la pipeline venga superata
+
+| Andare in produzione
+| 15 min
+| Esegui il merge in main, crea un tag di release, approva la promozione GitOps e verifica la funzionalità in produzione
+|===
+
+== Stack tecnologico
+
+Questo workshop utilizza i seguenti prodotti Red Hat e progetti upstream:
+
+* **Red Hat OpenShift** -- Piattaforma per container
+* **Red Hat Developer Hub** -- Portale interno per sviluppatori (basato su Backstage)
+* **Red Hat OpenShift Dev Spaces** -- Ambienti di sviluppo cloud (basati su Eclipse Che)
+* **Red Hat OpenShift Pipelines** -- Pipeline CI/CD (basate su Tekton)
+* **Red Hat OpenShift GitOps** -- Deployment gestiti con GitOps (basati su Argo CD)
+* **SonarQube** -- Analisi statica e scansione della qualità del codice
+* **Parasol Insurance** -- Applicazione Quarkus di esempio utilizzata durante tutto il workshop
+
+== Autori
+
+Team Red Hat Developer Experience
+
+== Prossimi passaggi
+
+Prosegui con xref:module-01/02-developer-experience.adoc[L'esperienza degli sviluppatori] per iniziare i laboratori pratici.

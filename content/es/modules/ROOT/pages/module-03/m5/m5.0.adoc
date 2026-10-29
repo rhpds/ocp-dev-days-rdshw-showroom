@@ -1,0 +1,213 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id='lab5-govern-ai-consumption']
+== Laboratorio 5 - Gobernanza de LLM
+
+Coloque una capa de gobernanza delante del endpoint de LLM mediante Connectivity Link. Aplique autenticación con clave de API y límites de velocidad basados en tokens en varios niveles de servicio.
+
+{empty} +
+
+=== El escenario
+
+En los laboratorios anteriores, creó un agente de IA que resuelve problemas de atención al cliente mediante lenguaje natural. El agente consulta la base de datos, actualiza registros y vuelve a generar documentos de pólizas, todo desde la interfaz de chat.
+
+Ahora quiere ampliarlo con una nueva capacidad: **análisis del perfil del cliente**. Cuando un agente de soporte pregunta por un cliente, la IA analiza sus datos y devuelve un resumen estructurado. Hay dos niveles de análisis disponibles:
+
+* **Oro** -- historial completo de pólizas, historial de reclamaciones y estado de fidelidad.
+* **Plata** -- pólizas recientes e información básica del perfil.
+
+[.mermaid.mermaid-w60]
+----
+flowchart LR
+    AGT5 <--> AI5
+    AI5 <--> GW
+
+    GW <--> GWp
+    %%GWp[" "] --> |"🥇 Límite de velocidad"| GP
+    %%GWp --> |"🥈 Límite de velocidad"| SP
+    GWp[" "] --- GP --- GWp2[" "] <--> LLM
+    GWp --- SP --- GWp2
+
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente de soporte", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Asistente de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Perfil Oro", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Perfil Plata", pos: "b", h: 80, w: 70, constraint: "on" }
+    GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style AGT5 fill:none,stroke:none
+    style AI5 fill:none,stroke:none
+    style GW fill:none,stroke:none
+    style GWp fill:none,stroke:none,width:1px,height:1px
+    style GWp2 fill:none,stroke:none,width:1px,height:1px
+    style GP fill:none,stroke:none
+    style SP fill:none,stroke:none
+    style LLM fill:none,stroke:none
+----
+
+El nivel Oro consume más tokens porque el análisis es más profundo y la respuesta más completa. El nivel Plata requiere menos. El sistema está diseñado con una estrategia de respaldo: si se agota el presupuesto de tokens del nivel Oro, el servicio recurre al nivel Plata. Si también se agota el de Plata, la solicitud se aplaza.
+
+Pero antes de que todo esto funcione, necesita gobernanza. ¿Quién puede acceder al endpoint de LLM? ¿Cuántos tokens puede consumir cada nivel? Sin controles, nada impide que un consumo descontrolado agote el presupuesto de API de la organización.
+
+En este laboratorio, colocará una **capa de gobernanza** delante del endpoint de LLM mediante link:https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[*_Red Hat Connectivity Link_*,window=_blank]. Implementará dos políticas:
+
+* **AuthPolicy** -- Controlar _quién_ puede acceder al endpoint mediante autenticación con clave de API y autorización basada en grupos.
+* **TokenRateLimitPolicy** -- Controlar _cuánto_ puede consumir cada nivel al aplicar límites de velocidad basados en el uso real de tokens.
+
+{empty} +
+
+=== ¿Por qué Connectivity Link?
+
+Este es exactamente el tipo de problema para el que se diseñó _Red Hat Connectivity Link_. Basado en el proyecto link:https://kuadrant.io/[_Kuadrant_,window=_blank], incorpora gobernanza consciente de la IA a *Kubernetes*:
+
+* **Limitación de velocidad consciente de los tokens** -- los límites se basan en los tokens realmente consumidos, no en el número de solicitudes. Esto es lo que hace viables los servicios de IA por niveles: cada nivel obtiene su propio presupuesto de tokens, aplicado en la puerta de enlace.
+* **Sin cambios de código** -- las políticas se aplican en el nivel de infraestructura. El agente de IA y el código de integración no se modifican.
+* **Nativo de Kubernetes** -- las políticas son CRD estándar, se aplican con `oc apply`, se almacenan en Git y se revisan en PR. No se necesita una consola de administración independiente ni un plano de control de proveedor.
+* **Componible** -- una política extrae la identidad y otra la utiliza para los presupuestos de tokens por nivel. Se superponen de forma declarativa.
+
+Estas capacidades provienen de la forma en que Connectivity Link se basa en el estándar _Kubernetes Gateway API_. Antes de empezar a configurar políticas, veamos el modelo de Gateway API.
+
+{empty} +
+
+=== El modelo de Gateway API
+
+Connectivity Link se basa en _Kubernetes Gateway API_, el estándar para administrar el enrutamiento del tráfico en _Kubernetes_. Comprender este modelo hará que los ejercicios siguientes resulten intuitivos.
+
+Estos son los componentes básicos:
+
+* **GatewayClass + Gateway** -- pertenecen al equipo de la plataforma. Definen _cómo_ entra el tráfico al clúster. Ya están aprovisionados.
+* **HTTPRoute** -- pertenece al equipo de la plataforma o de desarrollo. Define _adónde_ se dirige el tráfico (en este caso, a la API de LLM).
+
+[.text-center]
+[.mermaid]
+[subs="attributes"]
+----
+---
+title: El modelo de Gateway API
+config:
+    flowchart:
+        titleTopMargin: -200
+---
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph yoursLabel [" "]
+        subgraph yours ["OpenShift"]
+            GC[GatewayClass]
+            GT[Gateway]
+            HTTP[HTTPRoute]
+        end
+    end
+
+    GC -->|define| GT -->|enruta mediante| HTTP
+
+    style yoursLabel fill:none,stroke:none
+    style yours fill:#e8eaf6,stroke:#7986cb
+    style GC fill:#fff,stroke:#7986cb
+    style GT fill:#fff,stroke:#7986cb
+    style HTTP fill:#fff,stroke:#7986cb
+----
+
+// ++++
+// <p style="text-align: center; margin-top: -2rem; padding-right: 12rem; font-style: italic; color: #555">El modelo de Gateway API</p>
+// ++++
+
+[.mermaid-hints-simple]
+****
+GC | GatewayClass | Pertenece al equipo de la plataforma. Define qué implementación de controlador administra el Gateway y su configuración (grupos de IP, límites de recursos). +
+GT | Gateway | El punto de entrada al clúster: un balanceador de carga o servicio que dirige el tráfico a los destinos correctos. +
+HTTP | HTTPRoute | Las reglas de enrutamiento: asignan las solicitudes del Gateway a los servicios de backend (LLM) según las rutas URL, los encabezados o los hosts.
+****
+TIP: Pase el cursor sobre cada componente del diagrama para conocer su función.
+
+{empty} +
+
+Aquí es donde entra Connectivity Link. En lugar de incorporar la gobernanza en la aplicación, adjunta **políticas** directamente a estos recursos de Gateway API. Authentication Policy y TokenRateLimit Policy se aplican a HTTPRoute y se hacen cumplir en el nivel de infraestructura, de manera invisible para los servicios:
+
+[.mermaid]
+----
+---
+config:
+  markdownAutoWrap: false
+---
+flowchart LR
+    Client([Aplicación])
+    Gateway[Gateway]
+
+    subgraph S1 ["HTTPRoute"]
+        direction LR
+        subgraph S2 [" "]
+            direction LR
+            Auth[Política de autenticación]
+            RateLimit[Política de límite de velocidad de tokens]
+            Auth ~~~ RateLimit
+        end
+        
+        A@{ shape: braces, label: "<i>Las políticas de Connectivity Link se adjuntan a los recursos de Gateway API</i>" }
+    end
+
+    Service[Servicio]
+    Pod1[Pod]
+    Pod2[Pod]
+
+    Client -.->|Solicitud HTTP| Gateway --> S2 -->|regla de enrutamiento| Service
+    Service --> Pod1
+    Service --> Pod2
+
+
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S1 fill:none,stroke:none
+    style Client fill:#f5f5f5,stroke:#ccc
+    style Gateway fill:#fff,stroke:#7986cb
+    style Auth fill:#fff3e0,stroke:#fb8c00
+    style RateLimit fill:#fff3e0,stroke:#fb8c00
+    style Service fill:#fff,stroke:#7986cb
+    style Pod1 fill:#336,color:#fff
+    style Pod2 fill:#336,color:#fff
+----
+
+=== Flujo de solicitudes de extremo a extremo
+
+Ahora que comprende el modelo, veamos cómo se aplica a su configuración. El agente de soporte interactúa con el asistente de IA, que envía solicitudes a través de la puerta de enlace y la capa de gobernanza antes de llegar al LLM:
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Agent --> Bot
+    Bot -->|clave de API| Gateway
+    Gateway --> S2
+    Auth -->|ID de usuario + grupo| Token
+    S2 --> LLM
+
+    subgraph S2 ["HTTPRoute"]
+        subgraph S3 ["Connectivity Link"]
+            Auth[Política de autenticación]
+            Token[Límite de velocidad de tokens]
+        end
+    end
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente de soporte", pos: "b", h: 80, w: 80, constraint: "on" }
+    Bot@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Asistente de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S3 fill:#e3f2fd,stroke:#7986cb
+    style Bot fill:none,stroke:none
+    style Gateway fill:#fff,stroke:#7986cb
+    style LLM fill:none,stroke:none
+    style Auth fill:#fff3e0,stroke:#fb8c00
+    style Token fill:#fff3e0,stroke:#fb8c00
+----
+
+La misma arquitectura se aplica independientemente de cómo se conecte el agente de soporte: mediante Rocket.Chat, un chatbot interno o cualquier otra aplicación.
+
+
+
+
+
+
+

@@ -1,0 +1,599 @@
+:imagesdir: ../../assets/images
+:page-time: 7
+include::partial$style.adoc[]
+
+[id='lab3-flow-implementation']
+== フローの実装
+
+取り込みフロー全体を理解したところで、ここからは手順に沿って構築していきましょう。作業する Camel route は次のとおりです。
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-service-x12-route.png[width=90%]
+
+`sql` と `store-pdf-s3` がグレー表示されていることに注目してください。これらは route で無効になっているため、実行時に Camel はスキップします。まずは小さく始め、最初のステップが動くことを確認してから、進行に合わせて次のステップを有効にしていきます。
+
+{empty} +
+
+=== EDI から XML への変換
+
+有効なステップ（`platform-http` と `transform-x12`）を使うと、route は EDI 形式の保険申込を受け取り、XML として返します。
+
+TIP: 下の図の _Policy Application_ ノードと _Policy Document_ ノードにカーソルを合わせると、EDI と XML の形式を確認できます。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    PO["📄 保険申込\n(EDI)"] -->|HTTP リクエスト| Camel((Camel)) -->|レスポンス| XML["📄 保険証券\n(XML)"]
+----
+
+++++
+<div id="xml-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:520px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">XML 保険証券（出力）</div>
+  <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px">&lt;<span style="color:#ff6188">PolicyDocument</span>&gt;
+  &lt;<span style="color:#ff6188">PolicyNumber</span>&gt;61356291&lt;/<span style="color:#ff6188">PolicyNumber</span>&gt;
+  &lt;<span style="color:#ff6188">DateOfIssue</span>&gt;20120906&lt;/<span style="color:#ff6188">DateOfIssue</span>&gt;
+  &lt;<span style="color:#ff6188">Insurer</span>&gt;
+    &lt;<span style="color:#ff6188">Name</span>&gt;Parasol Insurance&lt;/<span style="color:#ff6188">Name</span>&gt;
+    &lt;<span style="color:#ff6188">Address</span>&gt;...&lt;/<span style="color:#ff6188">Address</span>&gt;
+    &lt;<span style="color:#ff6188">TaxId</span>&gt;939988477&lt;/<span style="color:#ff6188">TaxId</span>&gt;
+    &lt;<span style="color:#ff6188">IBAN</span>&gt;GB50ACIE59715038217063&lt;/<span style="color:#ff6188">IBAN</span>&gt;
+  &lt;/<span style="color:#ff6188">Insurer</span>&gt;
+  &lt;<span style="color:#ff6188">Policyholder</span>&gt;
+    &lt;<span style="color:#ff6188">Name</span>&gt;Alex Morgan&lt;/<span style="color:#ff6188">Name</span>&gt;
+    &lt;<span style="color:#ff6188">Address</span>&gt;
+      &lt;<span style="color:#ff6188">Street</span>&gt;742 Maple Avenue&lt;/<span style="color:#ff6188">Street</span>&gt;
+      &lt;<span style="color:#ff6188">City</span>&gt;Austin&lt;/<span style="color:#ff6188">City</span>&gt;
+      &lt;<span style="color:#ff6188">State</span>&gt;TX&lt;/<span style="color:#ff6188">State</span>&gt;
+      &lt;<span style="color:#ff6188">PostalCode</span>&gt;78701&lt;/<span style="color:#ff6188">PostalCode</span>&gt;
+    &lt;/<span style="color:#ff6188">Address</span>&gt;
+  &lt;/<span style="color:#ff6188">Policyholder</span>&gt;
+  &lt;<span style="color:#ff6188">Items</span>&gt;
+    &lt;<span style="color:#ff6188">Item</span>&gt;
+      &lt;<span style="color:#ff6188">Description</span>&gt;Personal Liability – Standard Plan | Bodily injury &amp;amp; property damage | Limit: $100,000/occurrence&lt;/<span style="color:#ff6188">Description</span>&gt;
+    &lt;/<span style="color:#ff6188">Item</span>&gt;
+  &lt;/<span style="color:#ff6188">Items</span>&gt;
+&lt;/<span style="color:#ff6188">PolicyDocument</span>&gt;</pre>
+</div>
+<div id="edi-popover" style="display:none; position:absolute; z-index:9999; background:#272822; border-radius:8px; padding:16px 22px; max-width:600px; box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="color:#aaa; font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px">EDI 保険申込 (X12 850)</div>
+  <pre style="background:#363630 !important; color:white !important; font-family:monospace; font-size:12px; line-height:1.5; margin:0; white-space:pre-wrap; padding:12px 16px; border-radius:4px"><span style="color:#ff6188">ISA</span>*00*          *00*          *01*939988477    *01*949849105    *120906*1200*U*00401*000000001*0*P*:~
+<span style="color:#ff6188">GS</span>*PO*939988477*949849105*20120906*1200*1*X*004010~
+<span style="color:#ff6188">ST</span>*850*0001~
+<span style="color:#ff6188">BEG</span>*00*SA*61356291**20120906~
+<span style="color:#ff6188">N1</span>*BY*Rodriguez-Stevens*91*939988477~
+<span style="color:#ff6188">N3</span>*2280 Angela Plain~
+<span style="color:#ff6188">N4</span>*Hortonshire*MS*93248~
+<span style="color:#ff6188">N1</span>*SE*Chapman, Kim and Green*91*949849105~
+<span style="color:#ff6188">N3</span>*64731 James Branch~
+<span style="color:#ff6188">N4</span>*Smithmouth*NC*26872~
+<span style="color:#ff6188">N9</span>*IB*GB50ACIE59715038217063~
+<span style="color:#ff6188">PO1</span>*1*5*EA*12.00*QT*SK*LIAB-STD01~
+<span style="color:#ff6188">PID</span>*F****Personal Liability Coverage – Standard Plan~
+<span style="color:#ff6188">CTT</span>*4*11~
+<span style="color:#ff6188">AMT</span>*TT*212.09~
+<span style="color:#ff6188">SE</span>*15*0001~
+<span style="color:#ff6188">GE</span>*1*1~
+<span style="color:#ff6188">IEA</span>*1*000000001~</pre>
+  <div style="color:#888; font-size:10px; margin-top:10px; border-top:1px solid #555; padding-top:6px"><span style="color:#ff6188">ISA/GS</span>=ヘッダー &nbsp; <span style="color:#ff6188">BEG</span>=注文 &nbsp; <span style="color:#ff6188">N1</span>=名称 &nbsp; <span style="color:#ff6188">N3/N4</span>=住所 &nbsp; <span style="color:#ff6188">PO1/PID</span>=明細 &nbsp; <span style="color:#ff6188">AMT</span>=合計 &nbsp;·&nbsp; <code style="color:#fff">*</code> はフィールドを区切り、<code style="color:#fff">~</code> はセグメントを終了します</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var pop = document.getElementById('edi-popover');
+  var check = setInterval(function() {
+    var node = document.querySelector('[id*="flowchart-PO-"]');
+    if (!node) return;
+    clearInterval(check);
+    node.style.cursor = 'pointer';
+    node.addEventListener('mouseenter', function(e) {
+      var rect = node.getBoundingClientRect();
+      pop.style.display = 'block';
+      var left = (rect.left + pop.offsetWidth > window.innerWidth) ? 0 : rect.left;
+      pop.style.left = left + 'px';
+      pop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+    });
+    node.addEventListener('mouseleave', function(e) {
+      var to = e.relatedTarget;
+      if (to && (to === pop || pop.contains(to))) return;
+      pop.style.display = 'none';
+    });
+    pop.addEventListener('mouseleave', function() {
+      pop.style.display = 'none';
+    });
+    var xmlPop = document.getElementById('xml-popover');
+    var xmlNode = document.querySelector('[id*="flowchart-XML-"]');
+    if (xmlNode) {
+      xmlNode.style.cursor = 'pointer';
+      xmlNode.addEventListener('mouseenter', function(e) {
+        var rect = xmlNode.getBoundingClientRect();
+        xmlPop.style.display = 'block';
+        var left = rect.right - xmlPop.offsetWidth;
+        if (left < 0 || left + xmlPop.offsetWidth > window.innerWidth) left = 0;
+        xmlPop.style.left = left + 'px';
+        xmlPop.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+      });
+      xmlNode.addEventListener('mouseleave', function(e) {
+        var to = e.relatedTarget;
+        if (to && (to === xmlPop || xmlPop.contains(to))) return;
+        xmlPop.style.display = 'none';
+      });
+      xmlPop.addEventListener('mouseleave', function() {
+        xmlPop.style.display = 'none';
+      });
+    }
+  }, 200);
+});
+</script>
+++++
+
+route を実行する前に、XML 出力の Insurer に Parasol Insurance が含まれるよう、データマッピングを設定しましょう。
+
+{empty} +
+
+=== データマッピングを確認して変更する
+
+`transform-x12` ステップでは Kaoto data mapper を使って、EDI のフィールドを XML に変換します。マッピングの仕組みを確認し、Parasol Insurance の情報で Insurer の住所を設定しましょう。
+
+`transform-x12` route に切り替えます。
+
+. *Routes* ドロップダウンをクリックします
+. `transform-x12` を選択します
+
+{empty} +
+
+[#kaoto-routes-transform]
+[.bordered]
+image::module-03/m1/kaoto-routes-transform.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes-transform
+
+[.arrows]
+{x: 27, y: 22, rot: 220, size: 1} +
+{x: 21, y: 85, rot: 230, size: .9}
+
+[.numbers]
+{x: 42, y: -15, size: 1.5} +
+{x: 38, y: 57, size: 1.5}
+****
+
+{empty} +
+
+`transform-x12` route が表示されます。
+
+{blank}
+
+[.bordered]
+[#kaoto-transform-x12-route]
+image::module-03/m1/kaoto-transform-x12-route.png[width=80%]
+
+[.overlay]
+****
+[.target]
+kaoto-transform-x12-route
+
+[.numbers]
+{x: 25.7, y: 37, size: 1.3}
+{x: 52.7, y: 26.5, size: 1.3}
+{x: 77.5, y: 37, size: 1.3}
+****
+
+route を左から右に見ると、次の処理が行われます。
+
+[.indent2]
+--
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `unmarshal` — X12-850 schema を使って生の EDI データを構造化形式に解析します
+
+{blank}
+
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] — EDI から XML へのフィールドマッピングを定義する `kaoto-datamapper` ステップが含まれています
+
+
+{blank}
+
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">3</span>] `get policyid` —（set variable ステップ）後続処理で使うため、生成された XML から保険証券番号を取得します
+--
+
+// * `unmarshal` — X12-850 schema を使って生の EDI データを構造化形式に解析します
+// * pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] — EDI から XML へのフィールドマッピングを定義する `kaoto-datamapper` ステップが含まれています
+// * `get policyid` —（set variable ステップ）後続処理で使うため、生成された XML から保険証券番号を取得します
+
+{empty} +
+
+// ==== *Data Mapper ビュー*
+
+// これが data mapper の画面です。左側は *Source*（データの取得元）、右側は *Target*（データのマッピング先）です。
+
+// {blank}
+
+// image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+
+// {empty} +
+
+==== データマッピングを開いて確認する
+
+. *次の手順でデータマッピングの定義を開きます。*
++
+[.bordered]
+[#kaoto-datamapper-configure-open]
+image::module-03/m1/kaoto-datamapper-configure-open.png[width=100%]
++
+[.overlay]
+****
+[.target]
+kaoto-datamapper-configure-open
+
+[.arrows]
+{x: 32.4, y: 62, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 32.4, y: 107, size: 1.2, color: "red"}
+{x: 78.5, y: 107, size: 1.2, color: "red"}
+****
++
+{empty} +
++
+[.indent2]
+--
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Update&nbsp;</code>] コンテナー内の `kaoto-datamapper` ステップをクリックします
+
+{blank}
+
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>] ボタンをクリックして data mapper を開きます
+--
++
+{empty} +
++
+左側の EDI source フィールド（X12_850）が、右側の XML target フィールド（PolicyDocument）に接続されたマッピングが表示されます。
++
+[TIP]
+--
+.data mapper UI の概要
+[%collapsible]
+====
+これが data mapper の画面です。左側は *Source*（データの取得元）、右側は *Target*（データのマッピング先）です。
+
+{blank}
+
+image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+====
+--
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-datamapper-mappings.png[width=90%]
++
+{empty} +
+
+. *マッピングを確認する*
++
+右側の（Target）上部付近にある *Insurer > Address* セクションを探します。各住所フィールドは XPath expression を使って、元の EDI データから値を取り出すようにマッピングされています。
++
+{empty} +
+
+. *Insurer 情報を設定する*
++
+マッピングされたフィールドを Parasol の固定値に置き換えます。*Target* 内の次のフィールドに固定値を設定してください。
++
+--
+... `Name` — 保険会社の名前
++
+[.copypaste.value]
+****
+"Parasol Insurance"
+****
++
+... `Street` — 住所の番地 +
++
+[.copypaste.value]
+****
+"One Parasol Plaza"
+****
++
+... `City` — 市区町村名
++
+[.copypaste.value]
+****
+"Atlanta"
+****
++
+... `State` — 州
++
+[.copypaste.value]
+****
+"GA"
+****
++
+... `PostalCode` — 郵便番号
++
+[.copypaste.value]
+****
+"30313"
+****
++
+IMPORTANT: 文字列値は二重引用符で囲む必要があります（例: `"Atlanta"`）。引用符がないと、data mapper は値をリテラル文字列ではなく XPath expression として扱います。
+--
++
+{blank}
++
+data mapper に Insurer フィールドの Parasol Insurance 固定値が表示されます。
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-datamapper-personalized.png[width=90%]
++
+{empty} +
++
+キャンバスに戻るには、*Design* タブをクリックします。
++
+image::module-03/common/kaoto-design-tab.png[width=50%]
++
+{empty} +
+
+. *route を実行してテストする*
++
+Dev Spaces 内の VS Code terminal で、route を実行します。
++
+{blank}
++
+[.copypaste]
+****
+camel run * --dev
+****
++
+[TIP]
+--
+.このコマンドの動作
+[%collapsible]
+====
+* `camel run` — JBang を使って Camel integration を実行します
+* `*` — 現在のディレクトリーにあるすべての source file（route、properties、サポートコード）を含めます
+* `--dev` — dev mode を有効にします。Camel はファイル変更を監視し、route を自動的に再読み込みします
+====
+--
++
+Dev Spaces が port 8080 の open を検出すると通知が表示されます。*Open In New Tab* をクリックして、ブラウザーで埋め込み Test Portal を開きます。
++
+{blank}
++
+[.bordered]
+image::module-03/m1/devspaces-port-notification.png[width=50%]
++
+Test Portal で次の操作をします。
++
+{blank}
++
+[#testshop-order]
+[.bordered]
+image::module-03/m1/testshop-order.png[width=60%]
++
+[.overlay]
+****
+[.target]
+testshop-order
+
+[.numbers]
+{x: 82, y: 12, size: 1.5}
+{x: 35, y: 88, size: 1.5}
+{x: 68, y: 60, size: 1.5}
+****
++
+{blank}
++
+--
+. 補償内容を選択します — 合計金額をメモしておきます
+. *EDI X12 850 Preview* を展開して、生の EDI message を確認します。すべてを理解する必要はありませんが、データ内の補償内容名、数量、合計金額を見つけられるでしょう
+. *Submit Application* をクリックします — portal が保険申込を Camel route に送信します
+--
++
+処理が完了すると、Camel は変換された XML を返し、Test Portal に表示します。Insurer に、元の EDI データではなく Parasol Insurance の固定値が表示されていることを確認してください。
++
+{blank}
++
+++++
+<pre style="background-color: #e8f0f8; padding: 14px 20px; line-height: 1.5; white-space: pre; font-family: monospace; font-size: 13px; color: #333; border-radius: 6px">&lt;<span style="color:#555">Insurer</span>&gt;
+    &lt;<span style="color:#555">Name</span>&gt;<span style="background-color: #d4e4f4">Parasol Insurance</span>&lt;/<span style="color:#555">Name</span>&gt;
+    &lt;<span style="color:#555">Address</span>&gt;
+        &lt;<span style="color:#555">Street</span>&gt;<span style="background-color: #d4e4f4">One Parasol Plaza</span>&lt;/<span style="color:#555">Street</span>&gt;
+        &lt;<span style="color:#555">City</span>&gt;<span style="background-color: #d4e4f4">Atlanta</span>&lt;/<span style="color:#555">City</span>&gt;
+        &lt;<span style="color:#555">State</span>&gt;<span style="background-color: #d4e4f4">GA</span>&lt;/<span style="color:#555">State</span>&gt;
+        &lt;<span style="color:#555">PostalCode</span>&gt;<span style="background-color: #d4e4f4">30313</span>&lt;/<span style="color:#555">PostalCode</span>&gt;
+    &lt;/<span style="color:#555">Address</span>&gt;
+    &lt;<span style="color:#555">TaxId</span>&gt;939988477&lt;/<span style="color:#555">TaxId</span>&gt;
+    &lt;<span style="color:#555">IBAN</span>/&gt;
+&lt;/<span style="color:#555">Insurer</span>&gt;</pre>
+++++
++
+ここで *Check Database* をクリックします。route では `sql` ステップがまだ無効なので、保険証券データは保存されていません。次のように表示されます。
++
+{blank}
++
+++++
+<div style="display: flex; align-items: center; gap: 14px; padding: 8px 0">
+  <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg> Check Database
+  </div>
+  <span style="display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 20px; white-space: nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> No record found (Policy Document 19462522)</span>
+</div>
+++++
++
+これは想定どおりです。次にデータベースのステップを有効にします。
+
+{empty} +
+
+=== SQL ステップを有効にする
+
+変換が動作したので、route の次のステップを有効にして、保険証券データをデータベースに保存しましょう。
+
+*Design* ビューになっていることを確認します。
+
+image::module-03/common/kaoto-design-tab.png[width=50%]
+
+{empty} +
+
+. *メインフローに戻る*
++
+*Routes* ドロップダウンから pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] を選択します。
++
+{empty} +
+
+. *`sql` ステップを有効にする*
++
+--
+. `sql` ステップにカーソルを合わせると、その上に toolbar が表示されます
+. *Enable step* ボタン（チェックアイコン）をクリックします
+
+{empty} +
+
+[#kaoto-enable-step]
+[.bordered]
+image::module-03/m1/kaoto-enable-step.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-enable-step
+
+[.arrows]
+{x: 35, y: 15, rot: -130, size: 1}
+
+[.numbers]
+{x: 40, y: 68, size: 2.5}
+{x: 60, y: -18, size: 2.5}
+****
+
+Camel は `--dev` mode で実行中なので、新しいステップを有効にすると route が自動的に再読み込みされます。
+--
++
+{empty} +
+
+. *新しい注文を作成する*
++
+Test Portal に戻り、新しい保険申込を送信します。これで route は EDI を変換し、データベースにデータを挿入します。
++
+{empty} +
+
+. *データベースを確認する*
++
+今度は *Check Database* をクリックします。保険証券データが保存されているはずです。
++
+{blank}
++
+++++
+<div style="display: flex; align-items: center; gap: 14px; padding: 8px 0">
+  <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg> Check Database
+  </div>
+  <span style="display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 20px; white-space: nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Record found (Policy Document 71960809)</span>
+</div>
+++++
+
+{empty} +
+
+=== S3 storage ステップを有効にする
+
+route の最後のステップでは、XML から保険証券 PDF を生成し、S3 object storage にアップロードします。
+
+{empty} +
+
+. *`store-pdf-s3` ステップを有効にする*
++
+これまでと同じように、`store-pdf-s3` ステップにカーソルを合わせ、*Enable step* ボタン（チェックアイコン）をクリックします。route が自動的に再読み込みされます。
++
+{empty} +
++
+すべてのステップが有効になり、取り込みフロー全体が実行可能になりました。
++
+{blank}
++
+[.bordered]
+image::module-03/m1/kaoto-service-x12-all-enabled.png[width=90%]
++
+[TIP]
+--
+. `store-pdf-s3` の動作
+[%collapsible]
+====
+*Routes* ドロップダウンからこのステップを選択すると、sub-route を確認できます。ここでは XSLT template を適用して XML の保険証券から PDF を生成し、S3 object storage にアップロードした後、ドキュメントへの presigned link を返します。
+
+[.bordered]
+image::module-03/m1/kaoto-store-pdf-s3-route.png[width=90%]
+====
+--
++
+{empty} +
+
+. *新しい注文を作成する*
++
+Test Portal に戻り、別の保険申込を送信します。今度は変換、データベースへの挿入、PDF の生成、S3 へのアップロードという一連のフローが実行されます。Test Portal に確認メッセージと、生成された保険証券への link が表示されます。
++
+{blank}
++
+++++
+<div style="background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 12px; max-width: 480px; font-family: sans-serif; overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 8px; color: #3a7d44; font-weight: 700; font-size: 17px; padding: 16px 24px; border-bottom: 1px solid #e0e0e0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    Policy Document Generated
+  </div>
+  <div style="padding: 24px; text-align: center">
+    <p style="color: #555; font-size: 15px; margin: 0 0 20px 0">Your application has been processed and a policy document is ready.</p>
+    <div style="display: inline-flex; align-items: center; gap: 8px; background: #3a7d44; color: white; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: 8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      View Policy Document (PDF)
+    </div>
+    <div style="color: #aaa; font-size: 13px; font-family: monospace; margin-top: 10px">invoice_66507812.pdf</div>
+    <div style="margin-top: 16px">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: 8px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+        データベースを確認
+      </div>
+    </div>
+  </div>
+</div>
+++++
++
+*View Policy Document (PDF)* をクリックして、ブラウザーで開きます。Insurer セクションに Parasol Insurance の情報が表示されているはずです。
++
+{blank}
++
+++++
+<div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 20px 28px; max-width: 380px; font-family: sans-serif; color: #222; line-height: 1.6">
+  <div style="display: flex; align-items: center; margin-bottom: 8px; margin-left: 38px">
+    <div style="width: 28px; height: 14px; background: #aaa; border-radius: 2px; margin-right: 10px; margin-left: -38px"></div>
+    <span style="font-weight: bold; font-size: 15px">保険会社:</span>
+  </div>
+  <div style="font-size: 14px; margin-left: 38px">
+    Parasol Insurance<br/>
+    One Parasol Plaza<br/>
+    Atlanta, GA 30313
+  </div>
+</div>
+++++
+
+{empty} +
+
+完了したら、terminal で kbd:[Ctrl+C] を押して Camel を停止します。
+
+{empty} +
+
+[.verification]
+****
+Insurer セクションに Parasol Insurance が表示されていますか？
+
+[.success]
+取り込みフロー全体が動作しています。EDI 変換、データベースへの保存、PDF 生成がすべて接続されました。deploy の準備ができました。
+
+[.fail]
+data mapper の値を確認し、保存後に Camel が再読み込みされたことを確かめてください。もう一度リクエストを送信してみてください。
+****

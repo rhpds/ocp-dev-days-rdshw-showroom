@@ -1,0 +1,155 @@
+++++
+
+<style>
+.sidebarblock.overlay { display: none; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function getText(block, role) {
+    var el = block.querySelector('.paragraph.' + role);
+    if (!el) return '';
+    var p = el.querySelector('p');
+    return p ? p.textContent.trim() : '';
+  }
+
+  function parseItems(block, role) {
+    var el = block.querySelector('.paragraph.' + role);
+    if (!el) return [];
+    var p = el.querySelector('p');
+    if (!p) return [];
+    var text = p.textContent.trim().replace(/\}\s*\{/g, '}, {');
+    try { return eval('[' + text + ']'); } catch(e) { return []; }
+  }
+
+  function drawOverlay(overlaySvg, iw, ih, arrows, numbers, labelData) {
+    if (!iw || !ih) return;
+
+    var overflow = 50;
+    overlaySvg.setAttribute('viewBox', '0 0 ' + iw + ' ' + (ih + overflow * 2));
+    overlaySvg.innerHTML = '';
+
+    var shaft = iw * 0.003, head = iw * 0.008, headLen = ih * 0.075, len = ih * 0.5;
+    arrows.forEach(function(a) {
+      var x = a.x / 100 * iw, y = a.y / 100 * ih + overflow;
+      var pts = (-shaft)+','+len+' '+(shaft)+','+len+' '+(shaft)+','+(headLen)+' '+(head)+','+(headLen)+' 0,0 '+(-head)+','+(headLen)+' '+(-shaft)+','+(headLen);
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      p.setAttribute('points', pts);
+      p.setAttribute('fill', a.color || 'red');
+      p.setAttribute('opacity', '0.85');
+      p.setAttribute('transform', 'translate(' + x + ',' + y + ') rotate(' + (a.rot||0) + ') scale(' + (a.size||1) + ')');
+      overlaySvg.appendChild(p);
+    });
+
+    var r = iw * 0.012, fontSize = r * 1.4;
+    var numCounter = 1;
+    numbers.forEach(function(n) {
+      if (n.n !== undefined) numCounter = n.n;
+      var x = n.x / 100 * iw, y = n.y / 100 * ih + overflow, s = n.size || 1;
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r * s);
+      c.setAttribute('fill', n.color || 'red');
+      overlaySvg.appendChild(c);
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y);
+      t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'central');
+      t.setAttribute('fill', 'white'); t.setAttribute('font-size', fontSize * s);
+      t.setAttribute('font-weight', 'bold'); t.setAttribute('font-family', 'sans-serif');
+      t.textContent = numCounter;
+      overlaySvg.appendChild(t);
+      numCounter++;
+    });
+
+    var labelSize = iw * 0.014;
+    labelData.forEach(function(l) {
+      var x = l.x / 100 * iw, y = l.y / 100 * ih + overflow;
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y);
+      t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'central');
+      t.setAttribute('fill', l.color || 'red'); t.setAttribute('font-size', labelSize * (l.size||1));
+      t.setAttribute('font-weight', 'bold'); t.setAttribute('font-family', 'sans-serif');
+      if (l.rot) t.setAttribute('transform', 'rotate(' + l.rot + ',' + x + ',' + y + ')');
+      t.textContent = l.text;
+      overlaySvg.appendChild(t);
+    });
+  }
+
+  var overlays = [];
+  var overlaysInitialized = false;
+
+  function initOverlays() {
+    if (overlaysInitialized) return;
+    overlaysInitialized = true;
+
+    document.querySelectorAll('.sidebarblock.overlay').forEach(function(block) {
+      var targetId = getText(block, 'target');
+      var targetBlock = targetId ? document.getElementById(targetId) : null;
+      if (!targetBlock) return;
+
+      var arrows = parseItems(block, 'arrows');
+      var numbers = parseItems(block, 'numbers');
+      var labels = parseItems(block, 'labels');
+
+      var img = targetBlock.querySelector('img');
+      var pre = targetBlock.tagName === 'PRE' ? targetBlock : targetBlock.querySelector('pre');
+      var mermaidEl = targetBlock.querySelector('svg[id^="mermaid"]');
+      var target = img || pre || mermaidEl || targetBlock;
+
+      var overlayParent = target.parentElement || targetBlock;
+      overlayParent.style.position = 'relative';
+      overlayParent.style.overflow = 'visible';
+
+      var overlaySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      overlaySvg.style.cssText = 'position: absolute; pointer-events: none; overflow: visible; z-index: 999;';
+      overlayParent.appendChild(overlaySvg);
+
+      var entry = { svg: overlaySvg, target: target, parent: overlayParent, arrows: arrows, numbers: numbers, labels: labels };
+      overlays.push(entry);
+
+      function positionAndDraw() {
+        var rect = entry.target.getBoundingClientRect();
+        var parentRect = entry.parent.getBoundingClientRect();
+        var tw = rect.width, th = rect.height;
+        var tl = rect.left - parentRect.left, tt = rect.top - parentRect.top;
+        if (!tw || !th) return;
+        var overflow = 50;
+        entry.svg.style.left = tl + 'px';
+        entry.svg.style.top = (tt - overflow) + 'px';
+        entry.svg.style.width = tw + 'px';
+        entry.svg.style.height = (th + overflow * 2) + 'px';
+        drawOverlay(entry.svg, tw, th, entry.arrows, entry.numbers, entry.labels);
+      }
+      entry.redraw = positionAndDraw;
+
+      if (img) {
+        if (img.complete) positionAndDraw();
+        else img.onload = positionAndDraw;
+      } else if (mermaidEl) {
+        setTimeout(positionAndDraw, 100);
+      } else {
+        positionAndDraw();
+      }
+    });
+  }
+
+  // Redraw all overlays on resize
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      overlays.forEach(function(entry) { entry.redraw(); });
+    }, 150);
+  });
+
+  // Mermaid renders async — wait for it, then init overlays
+  var mermaidCheck = setInterval(function() {
+    if (document.querySelector('svg[id^="mermaid"]') || !document.querySelector('.mermaid')) {
+      clearInterval(mermaidCheck);
+      setTimeout(initOverlays, 200);
+    }
+  }, 100);
+  setTimeout(initOverlays, 2000);
+});
+</script>
+
+++++

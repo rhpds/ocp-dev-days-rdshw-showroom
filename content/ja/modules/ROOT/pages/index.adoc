@@ -1,0 +1,48 @@
+= OpenShift Dev Day Roadshow
+include::partial$_attributes.adoc[]
+
+OpenShift Dev Day Roadshow へようこそ。Red Hat OpenShift で、最新のアプリケーション開発と統合を体験できる実践的なワークショップを集めました。
+
+== 利用可能なモジュール
+
+このロードショーは、独立したモジュールで構成されています。各モジュールは単独で完了できます。また、複数のモジュールに取り組むことで、OpenShift の機能を幅広く理解できます。
+
+[.tile]
+****
+xref:module-01/00-intro.adoc[モジュール 1: 開発者の体験]
+
+Developer Hub を通じたセルフサービスのオンボーディング、Dev Spaces でのクラウドベース開発、AI 支援コーディング、自動化された CI/CD pipeline、GitOps を活用した本番環境への deploy まで、OpenShift での開発者の一連の流れを体験します。
+
+**所要時間** : 約 90 分
+****
+
+[.tile]
+****
+xref:module-02/00-intro.adoc[モジュール 2: セキュアなソフトウェアサプライチェーン]
+
+SLSA Level 3 に準拠したソフトウェアサプライチェーンを通じて、アプリケーションを build、deploy します。RHDA と ACS による脆弱性スキャン、Sigstore による鍵を使わない commit 署名、Tekton Chains による pipeline の証明、Conforma によるポリシー検証、署名付きリリース承認、Policy Controller による deploy の適用を行います。
+
+**所要時間** : 約 90 分
+****
+
+[.tile]
+****
+xref:module-03/index.adoc[モジュール 3: AI のためのアプリケーション接続]
+
+Red Hat の統合テクノロジーを使って AI のデータフローを構築します。Service Interconnect による EDI の取り込み、Kafka と Matrix/Rocket.Chat によるイベント駆動型メッセージング、AI カスタマーサポート向けの Agentic Apache Camel、Connectivity Link による LLM ガバナンスを体験します。
+
+**所要時間** : ラボによって異なります
+****
+
+[.tile]
+****
+xref:module-05/module-05-01-goals.adoc[モジュール 5: MTA を使った AI 駆動型の移行]
+
+Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA) を使って、レガシーな Java EE / EAP アプリケーションを Quarkus に向けてモダナイズします。静的解析、AI 支援によるリファクタリング、カスタムルール、OpenShift への deploy を行います。
+
+**所要時間** : 約 30 分
+****
+
+== はじめに
+
+開始するには、上のモジュールを選択してください。各モジュールには、それぞれの概要、環境の詳細、学習目標が用意されています。

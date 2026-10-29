@@ -1,0 +1,108 @@
+= Sezione 6: da EJB stateless a CDI (`ClaimService`)
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== Obiettivo
+
+Usa Developer Lightspeed per rifattorizzare `ClaimService`, passando da un EJB `@Stateless` a un bean CDI `@ApplicationScoped` compatibile con Quarkus e usando `@Transactional`:
+
+* Esamina Get Solution e MTA Resolution Details
+* Facoltativamente, usa il supporto dell'agente per risolvere i problemi correlati di build e configurazione
+
+Gli Enterprise JavaBeans (EJB) erano un modo comune per incapsulare la logica di business e le transazioni gestite dal container su EAP. Non sono supportati in Quarkus. In **parasol-insurance-eap**, `com.parasol.ejb.ClaimService` è un **session bean locale `@Stateless`** (non un EJB remoto) che usa JPA `EntityManager` per elencare e cercare i claim. Il livello JAX-RS (`ClaimsResource`) espone già HTTP; questo esercizio si concentra sulla modernizzazione del **bean di servizio stesso**.
+
+In questo lab trasformeremo `ClaimService` da `@Stateless` a `@ApplicationScoped` + `@Transactional`, affinché i confini delle transazioni e l'injection CDI funzionino secondo le modalità di Quarkus.
+
+== Il cambio di paradigma: da EJB gestito dal container a CDI
+
+Su EAP, `@Stateless` forniva un bean pooled, transazioni gestite dal container e wiring compatibile con `@EJB` / JNDI. Quarkus non esegue un container EJB. Si usano invece:
+
+* **`@ApplicationScoped`** (o un altro scope CDI) per il ciclo di vita del bean
+* **`@Transactional`** (Jakarta Transactions / Quarkus) per definire esplicitamente le transazioni, prima fornite implicitamente da `@Stateless`
+* **`@Inject`** / CDI per i componenti collaboratori, al posto di `@EJB`
+
+Si tratta di una modernizzazione del livello di servizio, non di una riscrittura da interfaccia remota o da RMI a REST. `ClaimService` non ha un'interfaccia `@Remote`; i client lo chiamano già in-process da JAX-RS.
+
+== Vantaggi dell'approccio cloud-native
+
+* **Modello di programmazione più semplice:** elimina il ciclo di vita EJB e usa un semplice bean CDI.
+* **Transazioni esplicite:** `@Transactional` rende visibili nel codice i confini delle transazioni.
+* **Compatibilità con il framework:** si allinea ai pattern Quarkus / CDI / Hibernate usati nell'applicazione Parasol modernizzata.
+
+== Esercizio 1: esamina l'analisi di ClaimService
+
+. Nella casella di ricerca del pannello Analysis, digita il nome della classe `ClaimService`. Prima di iniziare, verifica che l'interruttore **Agent Mode** sia impostato su **On**.
++
+image::module-05-mta-dls/05-06-dls-01.jpg[Analisi di ClaimService con Agent Mode attivo,link=self,window=blank,title="Agent Mode"]
+
+Esaminiamo i problemi segnalati (la formulazione può variare leggermente in base alla versione del ruleset):
+
+* `@Stateless` non è supportato in Quarkus.
+  Gli Enterprise JavaBeans (EJB) non sono supportati in Quarkus. È necessario usare CDI. Sostituisci `@Stateless` con un'annotazione di scope CDI, ad esempio `@ApplicationScoped`.
+* Le transazioni gestite dal container richiedono un'alternativa esplicita.
+  Per impostazione predefinita, i session bean stateless partecipano alle transazioni gestite dal container. In Quarkus, annota il bean o i metodi di business con `@Transactional` affinché le query sui claim continuino a essere eseguite in una transazione.
+* Le importazioni `javax.ejb` non sono supportate.
+  Rimuovi `javax.ejb.Stateless` e usa `jakarta.enterprise.context.ApplicationScoped` (e, se necessario, `jakarta.transaction.Transactional`).
+* Il package `javax` è stato sostituito da `jakarta`.
+  Aggiorna le importazioni per la persistenza (ad esempio, `javax.persistence.*` → `jakarta.persistence.*`) in base alle segnalazioni dell'analizzatore.
+
+== Esercizio 2: genera e accetta una soluzione AI
+
+. Ora che abbiamo compreso la migrazione da Java EE a Quarkus per questo session bean locale, chiedi al LLM di generare correzioni selezionate.
++
+Con i risultati raggruppati per **Files** e filtrati su `ClaimService`, apri il menu a discesa **AI** del file e scegli **Get solution for N incidents** (oppure **Get solution**).
++
+image::module-05-mta-dls/05-06-dls-02.jpg[Get Solution per le segnalazioni del file ClaimService,link=self,window=blank,title="Get Solution"]
+
+. I risultati vengono visualizzati nella scheda **MTA Resolution Details**. Esamina la patch generata: dovresti vedere `@Stateless` sostituito con `@ApplicationScoped`, il wiring della persistenza aggiornato per usare CDI (`@Inject`) e le importazioni correlate convertite da `javax` a `jakarta`. Usa **Review in Editor**, **Reject** oppure **Accept**. Se l'agente chiede se vuoi continuare a correggere altre modifiche, scegli **Yes** o **No** in base alle tue preferenze.
++
+image::module-05-mta-dls/05-06-dls-03.jpg[Revisione della patch di ClaimService e scelta se continuare le correzioni,link=self,window=blank,title="Accept and continue"]
+
+Il risultato dovrebbe avere una struttura simile a questa:
+
+[.console-input]
+[source,java,subs="+attributes,macros+"]
+----
+@ApplicationScoped
+@Transactional
+public class ClaimService {
+
+    @Inject
+    EntityManager entityManager;
+
+    public List<Claim> findAll() { /* ... */ }
+
+    public Claim findByClaimNumber(String claimNumber) { /* ... */ }
+}
+----
+
+== Esercizio 3: continua con le correzioni assistite dall'agente
+
+. Con **Agent Mode** attivo, l'agente potrebbe continuare a correggere problemi correlati (ad esempio dipendenze Quarkus in `pom.xml`, configurazione della persistenza o altri componenti dipendenti). Esamina ogni suggerimento e scegli **Accept**, **Reject** oppure **Apply All** / **Stop** in base alle tue preferenze.
++
+image::module-05-mta-dls/05-06-dls-04.jpg[Interventi successivi dell'agente su pom.xml e correzioni correlate,link=self,window=blank,title="Agent follow-up"]
+
+. Il ciclo dell'agente è il seguente: genera una correzione, identifica le modifiche aggiuntive, ti consente di accettare o rifiutare e poi recupera la diagnostica dagli strumenti dell'IDE per correggere eventualmente altri problemi.
++
+image::module-05-mta-dls/05-06-dls-05.jpg[Workflow dell'agente — generazione della correzione, diagnostica, accettazione o rifiuto,link=self,window=blank,title="Agent workflow"]
++
+Esamina il ciclo usando `ClaimService` come esempio concreto:
++
+* **Genera una correzione (LLM)** — Dalla segnalazione dell'analisi (ad esempio «sostituisci `@Stateless` con uno scope CDI»), Developer Lightspeed propone una prima patch: annotazioni, importazioni e aggiornamenti più ovvi dei punti di chiamata in `ClaimService.java`.
+* **Identifica modifiche aggiuntive (LLM)** — Spesso una modifica ne implica altre. Dopo aver rimosso `@Stateless`, l'agente potrebbe anche sostituire `@PersistenceContext` con `@Inject`, aggiornare le importazioni `javax.*` → `jakarta.*` o intervenire sui chiamanti come `ClaimsResource` che si aspettano ancora un wiring in stile EJB.
+* **Accetta / Rifiuta (tu)** — Mantieni il controllo. Accetta la patch se ti sembra corretta, rifiutala se l'agente è andato oltre il necessario oppure esaminala nell'editor prima di decidere. Nulla viene applicato in modo definitivo senza la tua scelta.
+* **Recupera la diagnostica dagli strumenti (IDE)** — Dopo l'applicazione di una modifica, l'agente chiede all'IDE nuovi riscontri: errori del language server, tipi non risolti, coordinate Maven errate, estensioni Quarkus mancanti e altri problemi simili. È così che rileva lacune non elencate nella segnalazione MTA originale.
+* **Correggere altri problemi? (tu + LLM)** — Se rimangono problemi diagnostici (ad esempio, manca la dipendenza `quarkus-hibernate-orm` in `pom.xml` oppure manca `application.properties` per le impostazioni del datasource), l'agente chiede se vuoi continuare. Scegli **Yes** per consentirgli di generare la patch successiva; scegli **No** / **Stop** per terminare il ciclo.
+* **Ripeti** — Ogni correzione accettata può far emergere nuovi problemi diagnostici, quindi il ciclo continua finché lo workspace non è sufficientemente pulito oppure finché non lo interrompi.
++
+In breve: **MTA individua il problema di migrazione → il LLM propone una correzione → tu la approvi → la diagnostica dell'IDE rivela il problema successivo → puoi decidere di correggerlo.** Ecco perché Agent Mode è utile per gestire gli effetti a cascata dopo una modifica da EJB a CDI e perché è comunque importante leggere ogni diff.
+
+Gli agenti cercheranno di correggere i potenziali problemi una volta applicata una correzione.
+Ad esempio, dopo aver spostato `EmailIntakeMDB` a Reactive Messaging o `ClaimService` a CDI, l'agente potrebbe dover ancora modificare `pom.xml`, la configurazione della persistenza o altri componenti dipendenti. L'agente comprende il contesto e i problemi che derivano dalla correzione. Usa strumenti come il server LSP, gli strumenti di build, la compilazione e così via.
+
+L'agente continuerà anche a correggere i problemi man mano che li rileva e, a ogni passaggio, chiederà all'utente se desidera risolvere gli eventuali problemi individuati durante il processo. L'utente può interrompere in qualsiasi momento.
+
+[IMPORTANT]
+====
+Prova alcune delle correzioni proposte dagli agenti e premi pure **No** se non vuoi continuare con le modifiche dell'agente. Puoi anche accettare o rifiutare i suggerimenti dell'agente in base alle tue preferenze.
+====

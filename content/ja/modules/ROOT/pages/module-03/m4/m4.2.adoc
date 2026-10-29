@@ -1,0 +1,831 @@
+:imagesdir: ../../assets/images
+:page-time: 11
+include::partial$style.adoc[]
+
+[id='lab4-agentic-flow']
+== AI アシスタントの開発
+
+=== Camel ルートを開く
+
+エディタのファイルエクスプローラーで次のファイルをクリックします。Kaoto が自動的に開き、ルートを視覚的な図として表示します。
+
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent.camel.yaml* +
+--
+
+[TIP]
+--
+.Kaoto は初めてですか？
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+
+Kaoto がファイルを開き、含まれているすべてのルート定義を表示します。このファイルにはいくつかのルートがありますが、ここで注目するのはメインのエージェントフローです。以下のように進めます。
+
+// ルートが縦向きに表示される場合があります。読みやすくするには、キャンバス下部の中央のボタンをクリックして横向きのレイアウトに切り替えます。
+
+// [.bordered]
+// image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+
+// {empty} +
+
+. 画面左上のツールバーで *Routes* ドロップダウンをクリックします
+. 一覧から `rocketchat-to-agent` を選択します
++
+{empty} +
++
+[#kaoto-routes-m4]
+[.bordered]
+image::module-03/m4/kaoto-routes-dropdown.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes-m4
+
+[.arrows]
+{x: 24, y: 24, rot: 210, size: .8}
+{x: 30, y: 63, rot: 230, size: .8}
+
+[.numbers]
+{x: 33, y: -8, size: 1.5}
+{x: 45, y: 39, size: 1.5}
+****
+
+{empty} +
+
+キャンバスの中央にルートを表示するには、下部の *Reset View* ボタンをクリックします。
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-reset-view.png[width=50%]
+
+TIP: マウスホイールでキャンバスを拡大・縮小し、クリックしてドラッグすると表示を移動できます。
+
+{empty} +
+
+これで、これから作業するルート、つまり顧客サポートフローの開始点が表示されるはずです。
+
+{blank}
+
+[#kaoto-agent-route]
+[.bordered]
+image::module-03/m4/kaoto-agent-route.png[width=90%]
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
+
+{empty} +
+
+左から右へ読むと、このルートは _Rocket.Chat_ からのメッセージを受け取り、テキストを抽出しますが、フローは未完成です。`set system prompt` ステップは無効になっており、pass:[<code style="background-color: #4494E5; color: white;">To do: Agent</code>] ブロックには、ユーザーが何を言っても "Hello World" を返す `dummy response` しかありません。
+
+この演習では、次の手順でこのフローを段階的に完成させます。
+
+[.indent2]
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] `set system prompt` ステップを有効にします。これにより、AI エージェントの振る舞いを指示します +
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] `Dummy response` を MaaS を利用した AI エージェントに置き換え、実際の顧客要求に対応できるようにツールを順次追加していきます
+
+// . `set system prompt` ステップを有効にして、AI エージェントの振る舞いを指示します
+// . `dummy response` を MaaS を利用した AI エージェントに置き換え、実際の顧客要求に対応できるようにツールを順次追加します
+
+{empty} +
+
+=== 開発ループを開始する
+
+ここからは、素早い開発サイクルで作業します。_Camel JBang_ は dev モードで動作するため、ルートに加えた変更はすぐに反映されます。フローを修正してファイルを保存すると、再起動せずに新しい動作をすぐ確認できます。
+
+まずは、プレースホルダーの動作を確認するために、現在のまま Camel ルートを実行します。
+
+{blank}
+
+[.copypaste]
+****
+camel run agent --dev
+****
+
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+* `camel run agent` — `agent` ディレクトリ配下のリソースを読み込み、その中で定義されたルートを実行します。
+* `--dev` — dev モード。ソースファイルを保存すると自動的に再読み込みされます。
+====
+--
+
+_Camel_ が完全に起動するまで待ちます。ターミナルに `...(agent) started...` が表示されるはずです。
+
+_Rocket.Chat_ のウィンドウに切り替えます。
+
+TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] の手順に従ってください（新しいタブで開きます）。
+
+左サイドバーで、ユーザー識別子に一致する `ai-support` チャンネルを探して選択します。
+
+[subs=attributes]
+++++
+<div style="display: inline-flex; align-items: center; gap: 8px; background: #2f343d; border-radius: 4px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 8px 0;">
+  <span style="width: 32px; height: 32px; background: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">A</span>
+  <span style="color: #ccc; font-size: 15px;">&#x2317; <b>ai-support<span id="rc-channel-num"></span></b></span>
+</div>
+<script>
+(function() {
+  var el = document.getElementById('rc-channel-num');
+  function resolve() {
+    var name = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    if (!name) {
+      var uv = document.querySelector('.uservar');
+      if (uv) name = uv.textContent;
+    }
+    var num = (name || '').replace(/\D/g, '');
+    el.textContent = num || 'N';
+  }
+  if (document.readyState === 'complete') resolve();
+  else window.addEventListener('load', resolve);
+})();
+</script>
+++++
+
+次に、簡単なメッセージを入力します。
+
+{blank}
+
+[.copypaste.value]
+****
+Hi
+****
+
+Camel のボットがメッセージを受け取り、`Hello World` と応答します。これでルートがエンドツーエンドで動作していることが確認できます。
+
+{blank}
+
+:fig-time: 5:05 PM
+:fig-user-msg: こんにちは
+:fig-bot-msg: こんにちは
+include::_figures/rc-interaction.adoc[]
+
+これは想定どおりです。ルートはまだハードコードされたダミー応答を使っています。次の手順で、推論して自然に応答できる本物の AI エージェントに置き換えます。
+
+{empty} +
+
+=== AI エージェントを接続する
+
+次に、ダミー応答を本物の AI エージェントに置き換えます。_Kaoto_ キャンバスに戻り、以下の手順に従ってください。
+
+{empty} +
+
+. *system prompt を有効にする*
++
+`set system prompt` ステップは現在無効です。AI エージェントがまだいなかったため、グレー表示になっています。
++
+[caption=]
+.有効化します:
+[cols="3a,6a"]
+|===
+|
+[.bordered]
+[#kaoto-enable-step]
+image::module-03/m4/kaoto-enable-step.png[width=100%]
+
+[.overlay]
+****
+[.target]
+kaoto-enable-step
+
+[.numbers]
+{x: 92, y: 11, size: 3}
+
+[.arrows]
+{x: 82.5, y: 75, rot: 0, size: .8}
+****
+|
+. ステップにカーソルを合わせ、{btn-enable} ボタンをクリックします。
+|===
+
+. *dummy response を Agent に置き換える*
++
+`Dummy response` ステップはプレースホルダーで、常に "Hello World" を返します。これを MaaS に接続する _LangChain4j Agent_ コンポーネントに置き換えます。
++
+1. `Dummy response` ステップにカーソルを合わせ、フローティングの {nbsp}{btn-replace}{nbsp} ボタンをクリックします。
+1. {ui-filter} に `lang` と入力して _LangChain4j Agent_ コンポーネントを見つけ、選択します。
+1. _LangChain4j Agent_ ステップをクリックして設定パネルを開きます。
+1. `Required` 設定タブを選択します。
+1. `Agent Id` を次のように設定します。
++
+{blank}
++
+[.copypaste.value]
+****
+myagent
+****
++
+image::module-03/m4/kaoto-agent-steps.png[width=100%]
++
+{empty} +
++
+dev モードで実行しているため、_Camel_ は自動的にホットリロードされます。ターミナルを見て、エージェントが実行中であることをログで確認してください。
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: #818181">2026-03-24 18:14:11.113  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> : <span style="color:#fff">Routes reloaded summary</span> (total:<span style="color:#0FBC7A">2</span> started:<span style="color:#0FBC7A">2</span>)
+2026-03-24 18:14:11.115  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">rocketchat-to-agent</span> (platform-http:///ai-support)
+2026-03-24 18:14:11.116  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">to-rocketchat</span> (direct://to-rocketchat)</pre>
+++++
++
+{empty} +
+
+. *更新されたフローを確認する*
++
+これで system prompt が有効になり (1)、AI エージェントがダミー応答に置き換わりました (2)。ルートは次のようになっているはずです。
++
+{blank}
++
+[.bordered]
+[#kaoto-agent-route-complete]
+image::module-03/m4/kaoto-agent-route-complete.png[width=90%]
++
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route-complete
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
++
+{empty} +
+
+. *エージェントとやり取りする*
++
+_Rocket.Chat_ のウィンドウに戻り、次のように入力します。
++
+{blank}
++
+[.copypaste.value]
+****
+もう一度、こんにちは
+****
++
+AI エージェントはメッセージを処理します。MaaS を通じて LLM に送信され、LLM がそれを推論して自然言語の応答を返します。次のような表示が見えるはずです。
++
+{blank}
++
+:fig-time: 5:06 PM
+:fig-user-msg: もう一度、こんにちは
+:fig-bot-msg: こんにちは。どのようにお手伝いできますか？
+include::_figures/rc-interaction.adoc[]
++
+{empty} +
++
+ボットは応答していますが、実際の作業もできるでしょうか。+
+*まだできません*。MCP サーバーとツールは演習内に存在しますが、まだ有効ではありません。
++
+{blank}
++
+具体的な要求をしてみましょう。
++
+{blank}
++
+[.copypaste.value]
+****
+保険証券 61356291 を表示してもらえますか？
+****
++
+NOTE: このラボには、使用できるサンプルの保険証券 (`61356291`) が用意されています。上のコマンドで参照しているのはこの保険証券です。
++
+TIP: 取り込みラボで生成した保険証券を取得することもできます。以前の演習で使った任意の保険証券番号を試してみてください。
++
+{empty} +
++
+ボットは次のように応答します。
++
+{blank}
++
+:fig-time: 5:07 PM
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
+include::_figures/rc-interaction.adoc[]
++
+予想どおり、ボットは要求を拒否します。
++
+--
+.なぜそのように応答したのでしょうか？
+[caption=]
+====
+AI エージェントは必要なツールにアクセスできません。MCP サーバーがまだ接続されていないためです。
+
+`system.message` ファイルには、AI エージェントの振る舞いを指示する system prompt が入っています。そのルールの 1 つは、適切なツールがない場合に拒否するよう明示的に指示しています。
+
+----
+# CRITICAL CONSTRAINTS
+* **NO TOOL, NO URL:** If there is no tool fit for the job (missing),
+  you MUST return Pattern 2 with the text: "I'm sorry, I don't have 
+  the capability to retrieve that PDF right now."
+----
+
+ツールを登録すると、エージェントはそれを自動的に見つけて使用します。
+====
+--
+
+{empty} +
+
+=== MCP サーバーを接続する
+
+このプロジェクトには、Camel のエージェントフローに必要なツールを提供する MCP サーバーが含まれていますが、エージェントはまだそれを知りません。エージェントフローに接続する必要があります。
+
+下の図は、Agentic Integration（MCP が有効になった後）が AI モデルからのツール呼び出しをどのようにルーティングするかを示しています。2 つの MCP サーバーが、Node.js と Camel Quarkus の異なるツール群を提供します。AI モデルがツールを必要とすると、Agentic Integration は要求を適切な MCP サーバーにルーティングし、そこでバックエンドシステムに対してツールを実行して結果を返します。
+
+[.mermaid]
+----
+flowchart LR
+
+    MaaS <-->|Tool calls| INTLabel
+
+    INTLabel <--> |"Toolset 1"| NodeJSLabel
+    INTLabel <--> |"Toolset 2"| CamelQuarkusLabel
+    NodeJSLabel --> |"Integrations"| ToolsInner
+    CamelQuarkusLabel --> |"Integrations"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Agentic Integration\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI reasoning<br>• Tool calling<br>• Integrations</div></div>\n]
+
+    subgraph ToolsLabel ["<br><br><br>Backend Systems&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph NodeJSLabel [" "]
+        NodeJS
+    end
+
+  subgraph CamelQuarkusLabel [" "]
+        CamelQuarkus
+    end
+
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI Model", pos: "b", h: 80, w: 80, constraint: "on" }
+    NodeJS@{ img: "../../_images/module-03/common/nodejs-icon.svg", label: "MCP NodeJS", pos: "b", h: 80, w: 80, constraint: "on" }
+    CamelQuarkus@{ img: "../../_images/module-03/common/camel-quarkus-icon.svg", label: "MCP Camel Quarkus", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "HelpDesk", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style MaaS fill:none,stroke:none
+    style NodeJS fill:none,stroke:none
+    style CamelQuarkus fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style NodeJSLabel fill:none,stroke:none
+    style CamelQuarkusLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+NOTE: Agentic Integration は、異なる言語で実装された MCP サーバーと連携できます。このラボには Node.js の MCP サーバーと Camel Quarkus の MCP サーバーが含まれており、それぞれが AI モデルに異なるツールを提供します。
+
+
+[TIP]
+--
+MCP サーバーを使わなくても、Camel ではツールを定義できます。`langchain4j-tools` コンポーネントで始まる通常のルートとして直接定義できます。ルートが何をするかを説明すると、エージェントがタグを通じて自動的に見つけ、必要に応じて呼び出します。
+
+たとえば、ある保険証券の PDF URL を取得するローカルツールは次のように定義できます。
+
+image::module-03/m4/kaoto-tool-route.png[width=50%]
+
+ルートは `langchain4j-tools` ソースから始まり、一連のステップでリクエストを処理して、結果を LLM に返します。特別な接続設定は不要です。Camel はタグを使ってエージェントとツールを対応付けます。エージェントのタグがツールのタグと一致すると、そのツールを呼び出せます。
+--
+
+{empty} +
+
+. *MCP サーバーを接続する*（Node.js と Camel Quarkus）
++
+[loweralpha]
+1. ターミナルで実行中のプロセスを kbd:[CTRL+C] で停止します。
+1. エージェントの設定ファイルを開きます。
++
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties*
++
+1. MCP サーバー用のプロパティのコメントを外します。次のようになっているはずです。
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #689956"># MCP server (Node JS)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.url<span style="color: #FFD800">]</span>=http://localhost:9090/mcp
+
+<span style="color: #689956"># MCP server (Camel MCP)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>camel.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>camel.url<span style="color: #FFD800">]</span>=http://localhost:9091/mcp</pre>
+++++
++
+{blank}
++
+1. 次に、`mcp` スクリプトを使って MCP サーバーを次のように起動します。
++
+{blank}
++
+[.copypaste]
+****
++++./mcp start+++
+****
++
+{blank}
++
+ターミナルで MCP サーバーの起動が表示されるはずです。
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Installing dependencies...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server started (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Starting Camel MCP server...
+Running Camel Main: mcp-camel in background with PID: 89891 (waiting to startup)
+Camel Main: mcp-camel (state: Starting)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Server started
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
++
+[TIP]
+--
+.MCP サーバーのログを監視する方法
+[%collapsible]
+====
+`logs` コマンドにサーバー名（`camel` または `node`）を渡すと、どちらかの MCP サーバーのログをリアルタイムで追跡できます。
+
+{blank}
+
+[.copypaste]
+****
++++./mcp logs camel -f+++
+****
+
+{blank}
+
+たとえば、Camel MCP サーバーのログには、MCP ツールとして登録された 5 つのルートが表示されます。
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">...AbstractCamelContext : Routes startup (total:5 started:5 kamelets:1)
+...AbstractCamelContext :     Started route1 (ai-tool://amend-policy-document)
+...AbstractCamelContext :     Started get-policy-document-data (direct://get-policy-document-data)
+...AbstractCamelContext :     Started route2 (ai-tool://create-ticket)
+...AbstractCamelContext :     Started store-pdf-s3 (direct://store-pdf-s3)
+...AbstractCamelContext :     Started route3 (ai-tool://share-ticket)
+...AbstractCamelContext : <span style="background-color: #F5F541; color: #1F1F1F; padding: 2px 4px;">Apache Camel 4.22.0 (mcp-camel) started in 6s719ms</span></pre> ...
+++++
+
+====
+--
++
+[TIP]
+--
+.MCP サーバーが実行中かどうかを確認するには？
+[%collapsible]
+====
+次のコマンドを実行すれば、いつでも MCP サーバーの状態を確認できます。
+
+{blank}
+
+[.copypaste]
+****
++++./mcp status+++
+****
+
+{blank}
+
+次のような出力が表示されるはずです。
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> Checking MCP servers status...
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89867)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
+====
+--
++
+{empty} +
+
+. *Camel エージェントを再起動する*
++
+MCP サーバーは起動済みで、エージェントの設定も完了しました。新しい設定を反映するため、再起動します。
++
+{blank}
++
+[.copypaste]
+****
+camel run agent
+****
++
+{empty} +
+
+. *試してみる*
++
+_Rocket.Chat_ に戻り、もう一度尋ねます。
++
+{blank}
++
+[.copypaste.value]
+****
+保険証券 61356291 を表示してもらえますか？
+****
++
+[TIP]
+--
+.それでも AI が助けられないと言ったら？
+[%collapsible]
+====
+このワークショップでは、小さな LLM を使っているため、応答が不安定になることがあります。system prompt では、応答する前にツールを再評価するよう指示していますが、ツールがないかのように返答してしまうことがあります。たとえば、次のようになります。
+
+{blank}
+
+:fig-time: 5:10 PM
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
+include::_figures/rc-interaction.adoc[]
+
+その場合は、次の 1 つまたは両方を試してください。
+
+1. より具体的な要求を送ります。
++
+{blank}
++
+[.copypaste.value]
+****
+ツールを使って保険証券を取得し、もう一度試してください。
+****
++
+これにより LLM は正しいツールに向きやすくなり、たいていはこれで動作します。
++
+{blank}
+2. kbd:[CTRL+C] でプロセスを停止し、再起動します。再起動すると LLM に新しいツール一覧が与えられます。
+
+====
+--
++
+順調にいけば、今度は LLM がツールを見つけて呼び出し、保険証券を返します。
++
+{blank}
++
+:fig-time: 6:47 PM
+:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
+:fig-bot-msg: ご依頼の保険証券はこちらです。
+:fig-attach-title: Policy Document 61356291 PDF ▾
+:fig-attach-desc: Click to view or download
+include::_figures/rc-interaction-attach.adoc[]
++
+{blank}
++
+ボットは正しいツールを見つけ、保険証券を取得し、サポート担当者にダウンロードリンクを返しました。リンクをクリックすると PDF が新しいタブで開きます。
++
+{blank}
++
+.サンプルの保険証券を見る
+[%collapsible]
+=====
+{blank}
+
+include::_figures/invoice-pdf.adoc[]
+=====
+
+{empty} +
+
+=== 保険証券を修正する
+
+AI ボットはデータを取得するだけではありません。データに対して操作することもできます。たとえば、顧客が考えを変えて補償項目を削除したい場合、AI アシスタントに保険証券の修正を依頼できます。
+
+{blank}
+
+[.copypaste.value]
+****
+顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
+****
+
+エージェントシステムは保険証券を調べ、該当する補償項目を見つけ、必要なツールを起動してデータベースを更新し、変更内容の要約を返します。
+
+{blank}
+
+:fig-time: 6:49 PM
+:fig-user-msg: 顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
+:fig-bot-msg: データベースの記録を更新しました。ロードサイドアシスタンス補償（項目 4）を削除し、集計値を再計算しました。新しい保険証券を確認しますか？
+include::_figures/rc-interaction.adoc[]
+
+エージェントシステムは自律的に動作しました。保険証券を確認し、補償項目を特定し、データベースの記録を更新し、合計を再計算し、変更を確認しました。すべて 1 回の自然言語リクエストから行われています。
+
+ボットの応答に注目してください。更新された保険証券を見るよう提案することがあります（LLM は予測不能なので、文言は変わる場合があります）。その場合は `yes` と返します。そうでなければ、修正後の保険証券を見るよう依頼します。
+
+{blank}
+
+[.copypaste.value]
+****
+更新された保険証券を表示してもらえますか？
+****
+
+どちらの場合でも、ボットは更新済み PDF のリンクを返します。
+
+{blank}
+
+:fig-time: 6:50 PM
+:fig-bot-msg: 保険証券 61356291 の更新済み PDF はこちらです。
+:fig-attach-title: Policy Document 61356291 PDF ▾
+:fig-attach-desc: Click to view or download
+include::_figures/rc-bot-attach.adoc[]
+
+リンクをクリックして再生成された保険証券を開きます。
+
+{blank}
+
+.修正後の保険証券のサンプルを見る
+[%collapsible]
+====
+{blank}
+
+include::_figures/invoice-pdf-amended.adoc[]
+====
+
+NOTE: 文書の右上に赤い *Amended* タグが表示されていることに注目してください。これは保険証券が元の内容から変更されていることを示します。
+
+文書を確認し、変更が正しいことを検証してください。ロードサイドアシスタンス補償（項目 4）が削除され、合計もそれに応じて再計算されているはずです。
+
+{empty} +
+
+=== チケットを起票する
+
+顧客サポートのプロセスは、1 つのアクションだけで終わることはほとんどありません。保険証券の修正には複数の部門が関わります。変更内容の確認、返金処理、保険証券の記録の更新、顧客への通知です。これらを手作業で個別に処理する代わりに、AI エージェントにチケットを起票させ、すべてを調整させます。
+
+{blank}
+
+[.copypaste.value]
+****
+チケットを起票してもらえますか？説明した詳細を含め、適切な部門に保険証券の修正処理を依頼してください。
+****
+
+エージェントシステムは会話の文脈を集め、HelpDesk システムにチケットを作成し、確認メッセージを返します。
+
+{blank}
+
+:fig-time: 6:52 PM
+:fig-user-msg: チケットを起票してもらえますか？説明した詳細を含め、適切な部門に顧客への返金を依頼してください。
+:fig-bot-msg: ID 1025 のチケットを作成しました。このチケットを顧客と共有しますか？
+include::_figures/rc-interaction.adoc[]
+
+{empty} +
+
+IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済みで、ルーム招待を受諾していることを確認してください。チケットはそこで顧客と共有されます。_Matrix_ は顧客側を表し、_Rocket.Chat_ はサポート担当者が作業する場所です。まだの場合は、xref:module-03/m2/m2.1.adoc[Matrix プラットフォームのオンボーディング,window=_blank] の手順に従ってください。
+
+上のやり取りは単純なリクエストと応答を示していますが、LLM は非決定的なので、ボットの応答は異なる可能性があります。想定されるケースと対処方法は次のとおりです。
+
+* **ボットがチケット共有を尋ねてくる**（上の例のように） — 次のように返答します。
++
+{blank}
++
+[.copypaste.value]
+****
+はい、顧客と共有してください。
+****
++
+{blank}
+
+* **ボットが共有についてまったく触れない** — 明示的に依頼します。
++
+{blank}
++
+[.copypaste.value]
+****
+チケットを顧客と共有してもらえますか？
+****
++
+{blank}
++
+* **ボットが自動でチケットを共有する** — 操作は不要です。そのまま進みます。
++
+
+{empty} +
+
+どちらの場合でも最終結果は同じです。ボットがチケットを共有し、顧客は HelpDesk システムへのリンクを受け取ります。
+
+{blank}
+
+:fig-time: 6:53 PM
+:fig-user-msg: はい、顧客と共有してください。
+:fig-bot-msg: チケット #1025 を顧客と共有しました。顧客には HelpDesk システムへのリンクが送信されます。
+include::_figures/rc-interaction.adoc[]
+
+覚えておいてください。顧客は _Matrix_ メッセージングプラットフォームからやり取りします。ボットがチケットを共有したと示したということは、顧客がチケット参照付きのメッセージを受け取っているはずです。_Matrix_ のウィンドウに切り替えて確認してください。
+
+次のようなメッセージが表示されるはずです。
+
+{blank}
+
+:fig-time: 11:05
+:fig-sender: ai@rocketchat:
+:fig-msg: pass:[&#x1F4C4; Ticket <span style="color: #6D28D9; font-weight: bold;">#1025</span> created.<br>(Click to open in HelpDesk)]
+include::_figures/matrix-message.adoc[]
+
+{empty} +
+
+=== 顧客の視点でチケットを確認する
+
+今度は顧客の立場になってみましょう。顧客は _Matrix_ で _Parasol HelpDesk_ のチケットシステムへのリンク付きメッセージを受け取りました。_Matrix_ ウィンドウのチケットリンクをクリックします。
+
+新しいタブが開き、_Parasol HelpDesk_ のログインページが表示されます。
+
+{blank}
+
+include::_figures/helpdesk-login.adoc[]
+
+以下の資格情報でログインします。
+
+* *Username*:
++
+[.copypaste.value]
+****
+{user-username}
+****
+
+* *Password*:
++
+[.copypaste.value]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
+
+{empty} +
+
+ログインすると、_Parasol HelpDesk_ に開いているチケットの一覧が表示されます。AI エージェントが作成したチケットが見えるはずです。
+
+{blank}
+
+include::_figures/helpdesk-tickets.adoc[]
+
+チケットをクリックして詳細を確認します。AI エージェントは会話内容からチケット本文を作成しており、変更内容の要約と更新済み保険証券へのリンクが含まれています。
+
+{blank}
+
+include::_figures/helpdesk-ticket-detail.adoc[]
+
+これで一連の流れが完了しました。AI アシスタントは保険証券を取得して修正し、関連情報をすべて含んだチケットを起票して、メッセージングプラットフォームを通じて顧客に共有しました。すべて自然な会話から行われています。
+
+終わったら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
+
+{empty} +
+
+[.verification]
+****
+_Parasol HelpDesk_ でチケットの詳細と更新済み保険証券へのリンクを確認できましたか？
+
+[.success]
+よくできました。データの取得、推論、変更、チケット起票、部門間の調整を自然な会話で行えるエージェントフローを構築できました。
+
+[.fail]
+手順を見直してください。エージェントフローでツールが有効（`Tags` = `all`）になっていることと、system prompt が有効であることを確認します。_Matrix_ ウィンドウで正しいルームを確認してください。
+****
+
+{empty} +

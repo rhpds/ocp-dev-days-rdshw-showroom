@@ -1,0 +1,355 @@
+:imagesdir: ../../assets/images
+:page-time: 5
+include::partial$style.adoc[]
+
+== Probar la autenticación
+
+En la sección anterior implementaste una AuthPolicy que protege el endpoint del LLM. Así es como la capacidad de análisis del perfil del cliente encaja en la arquitectura y dónde actúa la AuthPolicy image:module-03/common/guardrail-icon.svg[width=40]:
+
+[#auth-diagram.mermaid]
+----
+flowchart LR
+    Agent <--> RC
+    RC <--> Integration
+
+    subgraph Integration ["⚙️ Integración agéntica&nbsp;"]
+        Steps["<div style='text-align:left'>① Razonamiento de IA<br/>② Invocación de herramientas</div>"]
+    end
+
+    subgraph ProfileLabel ["🔧 Herramienta de perfil del cliente&nbsp;&nbsp;"]
+        subgraph ProfileInner [" "]
+            direction LR
+            DB -->|datos<br/>del cliente| ProfileAgent
+        end
+    end
+
+    subgraph ModelLabel [" "]
+        Model
+    end
+
+    Integration <-->|①| Model
+    Integration <-->|②| ProfileInner
+    ProfileAgent --> Gateway --> ProfileModel
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente de soporte", pos: "b", h: 80, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 80, w: 80, constraint: "on" }
+    Model@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "Modelo de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    ProfileModel@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Almacenes del sistema", pos: "b", h: 70, w: 70, constraint: "on" }
+    ProfileAgent@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Agente de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    Gateway@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "AuthPolicy", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style Model fill:none,stroke:none
+    style ProfileModel fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style ProfileAgent fill:none,stroke:none
+    style Gateway fill:none,stroke:none
+    style Integration fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Steps fill:#fce4e4,stroke:#EE0000,color:#333
+    style ModelLabel fill:none,stroke:none
+    style ProfileLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ProfileInner fill:#fce4e4,stroke:#EE0000
+----
+
+[.overlay]
+****
+[.target]
+auth-diagram
+
+[.numbers]
+{x: 54, y: 5}
+{x: 96.2, y: 55}
+****
+
+[NOTE]
+====
+La integración usa dos modelos de IA distintos:
+
+* pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] *Modelo de IA* -- proporciona razonamiento e invoca herramientas.
+* pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] *LLM* -- impulsa la Herramienta de perfil del cliente para generar análisis de clientes.
+
+En este ejercicio, la AuthPolicy image:module-03/common/guardrail-icon.svg[width=40] que implementaste se aplica solo al segundo modelo, sin afectar al modelo principal de razonamiento.
+====
+
+{empty} +
+
+
+=== Probar sin una clave de API
+
+La AuthPolicy que implementaste no se limita a bloquear o permitir solicitudes; también distingue entre niveles de servicio. Así es como la Herramienta de perfil del cliente enruta las solicitudes a través de la puerta de enlace:
+
+[.mermaid.mermaid-w60]
+----
+flowchart LR
+    AGT5 <--> AI5
+    AI5 <--> |🥇 Clave Oro<br>🥈 Clave Plata|GW
+
+    GW --- GWp
+    GWp[" "] --> GP
+    GWp --> SP
+
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "Agente de soporte", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Asistente de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Perfil Oro", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Perfil Plata", pos: "b", h: 80, w: 70, constraint: "on" }
+
+    style AGT5 fill:none,stroke:none
+    style AI5 fill:none,stroke:none
+    GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style GW fill:none,stroke:none
+    style GWp fill:none,stroke:none,width:1px,height:1px
+    style GP fill:none,stroke:none
+    style SP fill:none,stroke:none
+----
+
+{empty} +
+
+Tanto el perfil Oro como el Plata los genera el mismo LLM. La AuthPolicy valida la clave de API incluida en cada solicitud para determinar qué nivel de servicio proporcionar.
+
+Esto se refleja en el archivo `application.properties`: hay dos definiciones de agente que apuntan al mismo endpoint, cada una con su propia clave de API:
+
+[#config-snippet]
+[source,properties, subs="attributes"]
+----
+# Gold agent - model configuration
+forage.profile-gold.agent.model.kind=openai
+forage.profile-gold.agent.model.name=qwen3-14b
+forage.profile-gold.agent.base.url=http://internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local/{username}/v1
+forage.profile-gold.agent.api.key=EMPTY
+
+# Silver agent - model configuration
+forage.profile-silver.agent.model.kind=openai
+forage.profile-silver.agent.model.name=qwen3-14b
+forage.profile-silver.agent.base.url=http://internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local/{username}/v1
+forage.profile-silver.agent.api.key=EMPTY
+----
+
+[.overlay]
+****
+[.target]
+config-snippet
+
+[.arrows]
+{x: 32.2, y: 42, rot: -80} +
+{x: 34, y: 88, rot: -80}
+****
+
+Por ahora, ambas claves tienen el valor `EMPTY`. La puerta de enlace rechazará cualquier solicitud que active la Herramienta de perfil del cliente.
+
+{empty} +
+
+Confirmémoslo solicitando un análisis del perfil de un cliente.
+
+. Ejecuta la aplicación del agente Camel
++
+{blank}
++
+[.copypaste]
+****
+camel run * --local-kamelet-dir ../support/kamelets
+****
++
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `camel run *` — ejecuta todos los archivos de rutas de Camel del directorio actual
+* `--local-kamelet-dir ../support/kamelets` — carga Kamelets (conectores) personalizados desde la carpeta de soporte +
+(incluye el conector de Rocket.Chat)
+====
+--
++
+{empty} +
+
+. Cambia a la ventana de _Rocket.Chat_.
++
+TIP: Si todavía no iniciaste sesión, sigue las instrucciones de xref:module-03/m2/m2.2.adoc[incorporación a la plataforma Rocket.Chat,window=_blank] (se abren en una pestaña nueva).
++
+{empty} +
+
+. En la barra lateral izquierda, busca y selecciona el canal `ai-support` que coincida con tu identificador de usuario:
++
+[subs=attributes]
+++++
+<div style="display: inline-flex; align-items: center; gap: 8px; background: #2f343d; border-radius: 4px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 8px 0;">
+  <span style="width: 32px; height: 32px; background: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">A</span>
+  <span style="color: #ccc; font-size: 15px;">&#x2317; <b>ai-support<span id="rc-channel-num"></span></b></span>
+</div>
+<script>
+(function() {
+  var el = document.getElementById('rc-channel-num');
+  function resolve() {
+    var name = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    if (!name) {
+      var uv = document.querySelector('.uservar');
+      if (uv) name = uv.textContent;
+    }
+    var num = (name || '').replace(/\D/g, '');
+    el.textContent = num || 'N';
+  }
+  if (document.readyState === 'complete') resolve();
+  else window.addEventListener('load', resolve);
+})();
+</script>
+++++
++
+{empty} +
+
+. Envía el siguiente mensaje en el chat. Como la clave de API está vacía, la AuthPolicy debería rechazar la solicitud:
++
+{blank}
++
+[.copypaste.value]
+****
+Por favor, genera un perfil de cliente para el pedido 61356291
+****
++
+{empty} +
+
+. El asistente de IA debería responder con un *SERVICE NOTICE* que muestre el estado `401 Unauthorized`. Esto confirma que la AuthPolicy está bloqueando la solicitud porque no se proporcionó una clave de API válida.
++
+{blank}
++
+:fig-time: 6:49 PM
+:fig-user-msg: Por favor, genera un perfil de cliente para el pedido 61356291
+:fig-status: 401 Unauthorized
+:fig-action: Error de autenticación: la clave de API no es válida o no se proporcionó.
+:fig-notice: Verifica tu clave de API e inténtalo de nuevo.
+include::_figures/rc-service-notice.adoc[]
++
+{empty} +
+
+=== Probar con claves de API válidas
+
+Ahora que confirmaste que se rechazan las solicitudes no autenticadas, configuremos ambas claves de API para que la Herramienta de perfil del cliente pueda acceder al LLM.
+
+{empty} +
+
+. Detén el agente presionando kbd:[CTRL+C] en la terminal
++
+{empty} +
+
+. Ejecuta el comando (⏩ Fast-Forward) para configurar automáticamente ambas claves de API:
++
+{blank}
++
+[.copypaste]
+****
+ff
+****
++
+Esto completa las claves de API Oro y Plata en `application.properties` con valores válidos de los secretos del clúster.
++
+[TIP]
+--
+.Comandos de navegación del laboratorio
+[%collapsible]
+====
+El taller proporciona un conjunto de comandos auxiliares para navegar por el laboratorio:
+
+* `ff` — avanza rápidamente al siguiente paso (configura automáticamente lo necesario)
+* `rw` — vuelve al paso anterior
+* `step N` — salta a un paso específico
+* `steps` — muestra todos los pasos disponibles
+* `start` o `restart` — vuelve al inicio
+====
+--
++
+{empty} +
+
+. Abre `application.properties` y verifica que las claves de API ya estén completadas. pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] La clave Oro y pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] la clave Plata ya no deberían tener el valor `EMPTY`; cada una debería contener una clave de API válida.
++
+[#config-snippet-2]
+[source,properties, subs="attributes"]
+----
+# Gold agent - model configuration
+forage.profile-gold.agent.model.kind=openai
+forage.profile-gold.agent.model.name=qwen3-14b
+forage.profile-gold.agent.base.url=http://internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local/{username}/v1
+forage.profile-gold.agent.api.key=
+
+# Silver agent - model configuration
+forage.profile-silver.agent.model.kind=openai
+forage.profile-silver.agent.model.name=qwen3-14b
+forage.profile-silver.agent.base.url=http://internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local/{username}/v1
+forage.profile-silver.agent.api.key=
+----
++
+[.overlay]
+****
+[.target]
+config-snippet-2
+
+[.numbers]
+{x: 30.5, y: 42.8}
+{x: 32.1, y: 88.2}
+****
++
+{empty} +
+
+. Reinicia el agente:
++
+{blank}
++
+[.copypaste]
+****
+camel run * --local-kamelet-dir ../support/kamelets
+****
++
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `camel run *` — ejecuta todos los archivos de rutas de Camel del directorio actual
+* `--local-kamelet-dir ../support/kamelets` — carga Kamelets (conectores) personalizados desde la carpeta de soporte +
+(incluye el conector de Rocket.Chat)
+====
+--
++
+{empty} +
+
+. Vuelve a _Rocket.Chat_ y envía la misma solicitud:
++
+{blank}
++
+[.copypaste.value]
+****
+Por favor, genera un perfil de cliente para el pedido 61356291
+****
++
+NOTE: El número de pedido de esta solicitud es solo ilustrativo: la Herramienta de perfil del cliente usa datos de entrada simulados de archivos JSON en la carpeta `data/` de tu proyecto. Puedes explorar estos archivos en el código fuente para ver los datos ficticios de CRM, historial, auditoría y tickets que alimentan el análisis.
++
+{empty} +
+
+. Esta vez, la solicitud debería completarse correctamente. Con ambas claves configuradas, el sistema usa Oro de forma predeterminada, el nivel de análisis más completo de los dos. Deberías ver un *ANÁLISIS DE NIVEL ORO* con un perfil completo del cliente, similar a este:
++
+{blank}
++
+:fig-time: 6:49 PM
+include::_figures/rc-gold-profile.adoc[]
+
+{empty} +
+
+NOTE: Como las respuestas del LLM no son deterministas, la redacción exacta puede diferir del ejemplo anterior. Lo importante es el banner *ANÁLISIS DE NIVEL ORO* y las cuatro secciones: Perfil del cliente, Sentimiento y riesgo, Problemas abiertos y Acción recomendada.
+
+{empty} +
+
+En este punto, la autenticación está habilitada. Las claves Oro y Plata están configuradas, y la AuthPolicy las valida antes de permitir el acceso al LLM. En el siguiente ejercicio, descubrirás cómo la puerta de enlace controla cuánto puede consumir cada nivel y qué ocurre cuando un nivel alcanza su límite.
+
+{empty} +
+
+[.verification]
+****
+¿Apareció un error 401 cuando las claves estaban vacías y un análisis de nivel Oro después de configurar claves válidas?
+
+[.success]
+La AuthPolicy funciona según lo previsto: se bloquean las solicitudes no autenticadas y las claves válidas generan un perfil del cliente.
+
+[.fail]
+Comprueba que ambas claves de API en `application.properties` estén completadas (no tengan el valor `EMPTY`) y que el agente Camel se haya reiniciado correctamente.
+****

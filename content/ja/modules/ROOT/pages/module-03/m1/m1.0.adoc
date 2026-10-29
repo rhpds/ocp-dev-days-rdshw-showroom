@@ -1,0 +1,75 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='lab1-introduction']
+== はじめに
+
+
+
+顧客データを取り込み、バックエンドデータベースに保存して、PDF の保険証券を生成します。これらすべてを Apache Camel でオーケストレーションし、{rhsi} を利用してクラスター間の安全な接続を実現します。
+
+{empty} +
+
+*ビジネスニーズ*
+
+顧客は EDI 形式の保険契約申込書をプラットフォームに送信します。申込書を取り込んで変換し、バックエンドデータベースに保存したうえで、アーカイブ用の PDF 保険証券として生成する必要があります。データベースは別のインフラストラクチャ上にあり、OpenShift から直接アクセスできないため、安全な接続ソリューションが必要です。
+
+{empty} +
+
+*構築する技術ソリューション*
+
+Apache Camel インテグレーションで API エンドポイントを公開し、EDI 形式の保険契約申込書を受信します。フローでは EDI データを XML 形式に変換して {rhsi} 経由でバックエンドデータベースに保存し、PDF 保険証券を生成して S3 オブジェクトストレージ（OpenShift Data Foundation）にアップロードします。
+
+{rhsi} により、データベースをパブリックネットワークに公開することなく、OpenShift クラスターとリモートのバックエンドデータベース間に安全な接続を確立できます。
+
+{empty} +
+
+*アーキテクチャの概要*
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+
+    Customer --> Portal -->|"EDI メッセージ"| Camel
+
+    subgraph LocalEnvironment [OpenShift]
+        Portal
+        Camel --> |"① XML データ"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② PDF 保険証券"|Storage
+    end
+
+    subgraph RemoteEnvironment [リモート環境]
+        ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
+    end
+
+    ServiceInterconnect --- |"🔒 セキュアな接続"| ServiceInterconnect2{{"Service\nInterconnect"}}
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel インテグレーション", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style LocalEnvironment fill:#fce4e4,stroke:#EE0000
+    style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Portal fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style Database fill:none,stroke:none
+----
+
+{empty} +
+
+*このラボで行うこと:*
+
+. *接続を有効にする* — {rhsi} を設定して、バックエンドデータベースへの安全なリンクを確立します。
+. *フローを完成させる* — 保険契約申込書を取り込み、変換、保存し、証券を生成する Camel インテグレーションを実装します。
+. *テストして検証する* — フローをローカルで実行し、結果を検証します。
+
+{empty} +

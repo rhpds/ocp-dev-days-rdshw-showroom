@@ -1,0 +1,244 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup-lab4"]
+== Lab 作業フォルダーを設定する
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+[.indent2]
+[IMPORTANT]
+--
+前の章を飛ばした場合は、以下のセクションを展開して追いついてください。
+
+[%collapsible]
+====
+満たす必要がある要件は次のとおりです。
+
+. *データベースへのアクセス*
+. *Kafka と Matrix の統合* （お客様向けメッセージングプラットフォーム）
+
+{blank}
+
+以下の手順を実行すると、両方の要件が有効になります。
+
+. データベースへのアクセスを有効にする
++
+======
+この章ではデータベースへのアクセスが必要ですが、デフォルトでは到達できません。
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w50]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ 統合]
+        end
+    end
+
+    Camel -.-x|"❌ 到達不可"| SVC
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            %% SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style DB fill:none,stroke:none
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+
+データベースへのアクセスを有効にするには、 _Dev Spaces_ のターミナルで次のコマンドを実行します。
+
+[.copypaste]
+****
+si-setup
+****
+
+すべてのリソースが `ready OK` と表示されるはずです。
+
+[subs="attributes"]
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
+    <span style="color: #07BC7A">✓</span> Site                    ready  OK
+    <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
+    <span style="color: #07BC7A">✓</span> Listener                ready  OK
+
+Namespace: shared-database
+    <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
+    <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
+++++
+
+上記の出力は、あなたの namespace とデータベース namespace の間に Service Interconnect リンクが確立されたことを示しています。
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w80]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ 統合]
+
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Camel --> SI1
+
+    SI1 -.-|"🔒 安全なリンク"| SI2
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    SI2 --> SVC
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style DB fill:none,stroke:none
+    style SI1 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SI2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+======
+
+{empty} +
+
+[start=2]
+. Kafka と Matrix の統合を有効にする
++
+======
+Matrix との Kafka 統合をスケールアップします。
+
+[.copypaste]
+****
+oc scale deployment k2m --replicas=1
+****
+
+この pod により、次の通知フローが有効になります。
+
+[.mermaid]
+----
+flowchart LR
+    AI --> KF --> |"k2m\n(pod)"| MX --> CUST
+    
+    CUST@{ img: "../../_images/module-03/common/customer-icon.svg", label: "お客様", pos: "b", h: 80, w: 80, constraint: "on" }
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 80, w: 80, constraint: "on" }
+    KF@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style CUST fill:none,stroke:none
+    style MX fill:none,stroke:none
+    style KF fill:none,stroke:none
+    style AI fill:none,stroke:none
+----
+
+pod が実行中であることを確認するには、次のコマンドを実行します。
+
+[.copypaste]
+****
+oc get deployment k2m
+****
+
+deployment が `Ready 1/1` になっていることを確認してください。
+
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+k2m    1/1     1            1           27h</pre>
+++++
+
+======
+====
+--
+
+{empty} +
+
+. _Dev Spaces_ のターミナルで、次のコマンドを実行します。 +
+（このコマンドを実行する前に、開いている Camel のファイルタブを閉じてください。コマンド実行後に自動更新されない場合があります）
++
+{blank}
++
+[.copypaste]
+****
+step 7
+****
++
+[TIP]
+--
+上記のコマンドは、いつでも実行して演習をリセットできます。
+[%collapsible]
+====
+ワークショップには、任意のステップへ移動したり、既知の正常な状態にラボをリセットしたりできる便利なヘルパースクリプトが含まれています。
+
+* `step N` — ラボを step N の開始時点にリセットする
+* `steps` — ラボで利用可能なすべてのステップを一覧表示する
+* `start` または `restart` — 最初の状態に戻る（ `step 1` と同等）
+* `ff` — *次の* ステップへ早送りする
+* `rw` — *前の* ステップへ巻き戻す
+====
+--
++
+{empty} +
+
+. ラボフォルダーを確認する
++
+上記のコマンドを実行したら、エディターのツリービューを見て、正常な構造になっていることを確認してください。次のようになっているはずです。
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent.camel.yaml* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *system.message* +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 mcp-servers pass:[<span style="color: grey;font-size: 0.8em;">(NodeJS and Camel Quarkus)</span>] +
+pass:[<mark style="padding-left: .8rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;</b></mark>] *mcp* pass:[<span style="color: grey;font-size: 0.8em;">(launcher script)</span>] +
+
+{empty} +
+
+[.indent2]
+NOTE: `agent` と `mcp-servers` には、AI モデル設定やエンドポイント接続（database、S3 storage、HelpDesk）を含む、あなたの環境向けの事前設定が含まれています。すぐに使える状態なので、エージェントのフロー作成に集中できます。
+--
++
+{empty} +
+
+[.verification]
+****
+期待どおりのフォルダー構造とファイルが見えますか？
+
+[.success]
+続行できます。
+
+[.fail]
+もう一度 `step 7` を実行し、ファイルがエディターのファイルエクスプローラーに表示されるか確認してください。
+****
+
+{empty} +

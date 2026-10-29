@@ -1,0 +1,83 @@
+= Módulo 1: La experiencia del desarrollador
+include::partial$_attributes.adoc[]
+
+== Lo que aprenderás
+
+En este taller podrás:
+
+* Explorar Red Hat Developer Hub como portal interno de desarrolladores de autoservicio
+* Usar el catálogo de software para descubrir aplicaciones, API y documentación
+* Iniciar un entorno de desarrollo en la nube preconfigurado con Red Hat OpenShift Dev Spaces
+* Crear una funcionalidad con un asistente de programación con IA
+* Enviar código a través de un pipeline de CI/CD automatizado con OpenShift Pipelines
+* Implementar en producción mediante GitOps con Red Hat OpenShift GitOps (Argo CD)
+* Depurar y monitorear aplicaciones desde Developer Hub y la consola de OpenShift
+
+== A quién está dirigido
+
+Este taller está diseñado para desarrolladores, ingenieros de plataformas y responsables de la toma de decisiones de TI que quieran comprender la experiencia unificada para desarrolladores que ofrece OpenShift, desde el código hasta la producción.
+
+**Nivel de experiencia**: De principiante a intermedio. No se requiere experiencia previa con OpenShift.
+
+== Tiempo estimado
+
+Completar este taller lleva aproximadamente **90 minutos**.
+
+Puedes avanzar a tu propio ritmo.
+
+== Tu rol y misión
+
+Eres un nuevo desarrollador en **Parasol Insurance**.
+
+Parasol está creciendo rápidamente. Nuevas líneas de productos, nuevos equipos y nuevos desarrolladores, pero el equipo de plataformas no logra seguir el ritmo. Cada equipo nuevo necesita una configuración de CI/CD personalizada, el aprovisionamiento de su propio espacio de nombres y un proceso de incorporación que lleva semanas. Los desarrolladores pasan más tiempo creando tickets y esperando acceso que escribiendo código. Los entornos locales suelen fallar o desviarse de la configuración esperada, lo que reduce la productividad. Los contratistas que se incorporan ocasionalmente tardan mucho en encontrar información pertinente y prácticas recomendadas.
+
+¿Te resulta familiar?
+
+El equipo de ingeniería de plataformas de Parasol lleva tiempo trabajando en una solución: una plataforma de aplicaciones unificada basada en Red Hat OpenShift que ofrece herramientas para desarrolladores, CI/CD, implementaciones impulsadas por GitOps y un portal interno de desarrolladores de autoservicio, todo en un mismo lugar.
+
+**Hoy es tu primer día.** Te dieron acceso a la plataforma y te asignaron tu primera tarea. Al finalizar este taller, habrás llevado una funcionalidad a producción sin crear un solo ticket.
+
+== Lo que lograrás
+
+Al finalizar este taller, tendrás experiencia práctica con:
+
+* **Red Hat Developer Hub** -- Explorar el catálogo de software, descubrir API y documentación, y usar el asistente de IA para obtener respuestas sobre la plataforma
+* **Plantillas de autoservicio** -- Crear un entorno de desarrollo aislado con su propio pipeline de CI/CD mediante una plantilla de ruta de oro
+* **Red Hat OpenShift Dev Spaces** -- Escribir código en un IDE en la nube preconfigurado con un asistente de programación con IA, sin instalar nada localmente
+* **OpenShift Pipelines** -- Enviar código y observar cómo un pipeline de CI/CD automatizado compila, prueba y analiza tus cambios
+* **OpenShift GitOps** -- Ver cómo Argo CD implementa tus cambios automáticamente en producción
+* **Consola de OpenShift** -- Usar la consola web para depurar en profundidad y monitorear aplicaciones
+
+== El recorrido del desarrollador
+
+Este taller sigue una historia continua:
+
+. **Conoce la plataforma** -- Iniciar sesión en Developer Hub, explorar el catálogo de software y familiarizarte con la plataforma
+. **Tu misión** -- Encontrar la tarea que te asignaron y configurar tu entorno de desarrollo
+. **Crear la funcionalidad** -- Abrir Dev Spaces, escribir código y probarlo localmente
+. **Publicarla** -- Enviar tu código a través del pipeline de CI/CD y superar un control de calidad
+. **Pide ayuda a la IA** -- Usar un asistente de IA agéntico para corregir el código, volver a enviarlo y superar el pipeline
+. **Ponerla en marcha** -- Combinar tus cambios, crear una versión y verificar la funcionalidad en producción
+
+Sin tener que cambiar de contexto entre herramientas desconectadas. Un flujo continuo desde la idea hasta la producción.
+
+== Público objetivo
+
+Este taller está diseñado para:
+
+* Desarrolladores de software que buscan flujos de trabajo de desarrollo más rápidos y coherentes
+* Responsables de la toma de decisiones de TI que evalúan las capacidades de las plataformas de aplicaciones
+* Ingenieros de plataformas que quieren comprender la experiencia para desarrolladores que hacen posible
+* Cualquier persona interesada en adquirir experiencia práctica con las herramientas para desarrolladores de OpenShift
+
+== Requisitos previos
+
+Deberías tener:
+
+* Conocimientos básicos de aplicaciones web y API
+* Facilidad para usar un navegador web y un editor de código
+* Disposición para aprender; no se requiere experiencia previa con OpenShift ni con contenedores
+
+== Próximos pasos
+
+Continúa en la página xref:module-01/01-environment.adoc[Detalles del entorno] para acceder a tu entorno de laboratorio y consultar el cronograma del taller.

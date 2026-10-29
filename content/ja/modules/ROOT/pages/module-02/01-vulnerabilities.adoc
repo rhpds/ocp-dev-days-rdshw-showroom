@@ -1,0 +1,278 @@
+= 脆弱性に早期に対処する
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+従来のセキュリティ対策では、パイプラインの最後、あるいはそれより悪い場合はデプロイ後にスキャンを行います。その時点で脆弱性を修正すると、手戻りや遅延、緊急パッチが必要になります。より良い方法は、 **シフトレフト** です。開発者がコードを書いている間に、できるだけ早く脆弱性を特定して修正できるツールを提供します。
+
+このセクションでは、セキュリティが強化された開発環境をセットアップし、Red Hat Dependency Analytics を使って、コミットをプッシュする前にアプリケーションの依存関係にある脆弱性を見つけて修正します。
+
+NOTE: このモジュールでは、Red Hat Developer Hub のすべての機能や、日々の開発者のワークフローをどのように支援するかについては扱いません。開発者エクスペリエンスについては、xref:module-01/00-intro.adoc[モジュール 1: 開発者エクスペリエンス] を参照してください。ここでは、開発プロセスに追加されたセキュリティガードレールに焦点を当てます。
+
+[#section-1]
+== セクション 1: コンポーネントを理解する
+
+=== 演習 1: Developer Hub でアプリケーションコンポーネントを確認する
+
+. {rhdh_url}[{rhdh_url}^] で **Red Hat Developer Hub** を開き、認証情報を使ってログインします。
++
+--
+ユーザー名:
+[source,subs="attributes",role="copypaste"]
+----
+{user}
+----
+パスワード:
+[source,subs="attributes",role="copypaste"]
+----
+{password}
+----
+--
+
+. 左側のサイドバーで **Catalog** をクリックします。
++
+image::m02-rhdh-catalog-secured.png[Parasol Insurance Secured コンポーネントを表示する Developer Hub カタログ,link=self,window=blank,width=700]
+
+
+. **Parasol Insurance (Secured)** を見つけてクリックします。
++
+これは、セキュリティが強化されたビルドパイプラインを使用する Parasol Insurance アプリケーションのバージョンです。モジュール 1 を実施した場合は、同じアプリケーションだと分かるでしょう。
++
+image::m02-rhdh-secured-component.png[Developer Hub の Parasol Insurance Secured コンポーネント,link=self,window=blank,width=700]
++
+コンポーネントページを少し確認してみましょう。
++
+* **Topology** タブには、アプリケーションのデプロイメントとその関係を示すビジュアルマップが表示されます。
+* **CI** タブには、ビルド、セキュリティスキャン、昇格パイプラインなどのパイプライン実行が表示されます。このモジュールでは、このタブを頻繁に使用します。
+* **CD** タブには、preprod および secured-prod デプロイメントの Argo CD 同期ステータスが表示されます。
++
+次の演習で開発用の完全に独立したサンドボックス環境を作成した後、これらのタブに戻ります。
+
+=== 演習 2: セキュリティが強化されたサンドボックス環境を作成する
+
+モジュール 1 と同様に、分離された開発環境を作成します。ただし今回は、パイプラインに追加のセキュリティチェックが含まれる *セキュリティ強化済み* テンプレートを使用します。
+
+. ページ上部にある **Self-Service** ボタン（**+** アイコン）をクリックします。
++
+image::m02-rhdh-self-service-button.png[Developer Hub の Self-Service ボタン,link=self,window=blank,width=700]
+
+. **Secured Parasol Insurance Development Environment** テンプレートを選択します。
++
+image::m02-rhdh-secured-template.png[セキュリティが強化された開発環境テンプレート,link=self,window=blank,width=700]
+
+. サンドボックスのブランチ名を入力します。例: `sec-fix`
++
+TIP: ブランチ名は短くしてください。名前空間名と OpenShift Routes で使用されます。
+
+. **Review** をクリックしてから **Create** をクリックし、プロビジョニングの進行状況を確認します。
+* セキュリティが強化されたソースリポジトリーにフィーチャーブランチが作成されます。
+* 独自の CI/CD パイプラインを持つサンドボックス名前空間が作成されます。
+* 新しいコンポーネントが Developer Hub に登録されます。
+* 初回ビルドが自動的に開始されます。
+
+. プロビジョニングが完了したら、**Open in Catalog** をクリックして、新しいサンドボックスコンポーネントを確認します。
++
+image::m02-rhdh-provisioning-complete.png[Open in Catalog ボタンが表示されたプロビジョニング完了画面,link=self,window=blank,width=700]
++
+または、カタログで **Parasol Insurance Secured Dev (your-branch-name)** を探すこともできます。これは分離されたサンドボックス開発環境です。
++
+image::m02-rhdh-catalog-sandbox.png[Developer Hub カタログのサンドボックスコンポーネント,link=self,window=blank,width=700]
+
+. 開いて **CI** タブをクリックし、初回ビルドパイプラインが開始されていることを確認します。
++
+image::m02-rhdh-sandbox-initial-build.png[Developer Hub で実行中のサンドボックス初回ビルド,link=self,window=blank,width=700]
++
+NOTE: このスクリーンショットではパイプラインの実行が成功していますが、完了まで待つ必要はありません。次に進みましょう。
+
+=== 確認
+
+この時点で、次の作業が完了しているはずです。
+
+* Developer Hub で Parasol Insurance (Secured) コンポーネントを確認した
+* 独自のパイプラインを持つ、セキュリティが強化されたサンドボックス環境を作成した
+* 初回ビルドが開始されたことを確認した
+
+'''
+
+[#section-2]
+== セクション 2: Red Hat Dependency Analytics
+
+Red Hat Dependency Analytics (RHDA) は、アプリケーションの依存関係をリアルタイムで分析する IDE 拡張機能です。既知の脆弱性を特定し、修正の推奨事項を提示します。また、Red Hat の Trusted Profile Analyzer (TPA) と連携して脆弱性データを拡充します。これには、公開データベースでは入手できない Lightwell のバックポート修正も含まれます。
+
+=== 演習 1: Dev Spaces を開いて分析を実行する
+
+. Developer Hub のサンドボックスコンポーネントページで（**Overview Tab** をクリック）、**Dev Spaces** リンクをクリックしてクラウド開発環境を開きます。
++
+image::m02-rhdh-devspaces-link.png[サンドボックスコンポーネントページの Dev Spaces リンク,link=self,window=blank,width=700]
+
+. ワークスペースの起動には少し時間がかかります。プロンプトが表示されたら、セキュリティに関する確認を承認し、ワークスペースを信頼します。
++
+TIP: 作成者を信頼するかどうかを尋ねるポップアップが表示された場合は、**Yes, I trust the authors** をクリックします。
++
+.**詳細 -- 起動シーケンス**
+[%collapsible]
+====
+Dev Spaces の起動にはいくつかの手順があります。以下のスクリーンショットに沿って進めてください。
+
+. OpenShift でログインします。
++
+image::m02-devspaces-login.png[OpenShift でログイン,link=self,window=blank,width=400]
+
+. 権限を付与します。
++
+image::m02-devspaces-authorize.png[Dev Spaces へのアクセスを承認,link=self,window=blank,width=400]
+
+. 作成者を信頼します（必要に応じて、他のリポジトリーも許可します）。
++
+image::m02-devspaces-trust-authors.png[このリポジトリーの作成者を信頼,link=self,window=blank,width=700]
+
+. 求められた場合は、`{user}` / `{password}` を使って GitLab にログインします。
++
+image::m02-devspaces-gitlab-login.png[GitLab のログインプロンプト,link=self,window=blank,width=400]
+
+. DevSpaces を承認します。
++
+image::m02-devspaces-authorize-gitlab.png[GitLab へのアクセスを DevSpaces に許可,link=self,window=blank,width=400]
+
+. 拡張機能の発行元を信頼します。
++
+image::m02-devspaces-trust-publishers.png[発行元を信頼してインストール,link=self,window=blank,width=400]
+
+. ワークスペースを信頼します。
++
+image::m02-devspaces-trust-workspace.png[ワークスペースを信頼してインストール,link=self,window=blank,width=400]
+
+. gitsign ヘルパー（gitsign login）の実行をワークスペースに許可します。
++
+image::m02-devspaces-gitsign-task.png[gitsign login タスクの実行を許可,link=self,window=blank,width=400]
++
+タスクのプロンプトを見逃した場合は、左上の **Burger Menu** を開き、**Terminal** -> **Run Task...** を選択します。
++
+image::m02-devspaces-run-task.png[Run Task オプションが表示された Terminal メニュー,link=self,window=blank,width=400]
++
+次に **gitsign login** を実行します。
++
+image::m02-devspaces-gitsign-select.png[gitsign login タスクを選択,link=self,window=blank,width=700]
+====
+
+. Java 環境が安定するまで待ちます。拡張機能の読み込み中は、下部のステータスバーに進行状況が表示されます。「Welcome」パネルと右側のチャットパネルをすべて閉じると、IDE を整理できます。下部に **Java: Ready** というメッセージが表示されていることを確認してください。
++
+image::m02-devspaces-java-ready.png[Java Ready ステータスが表示された Dev Spaces IDE,link=self,window=blank,width=700]
+
+. ファイルエクスプローラーで **pom.xml** をクリックして開きます。
++
+image::m02-devspaces-open-pom.png[ファイルエクスプローラーで pom.xml を開く,link=self,window=blank,width=700]
+
+. 数秒待ちます（初回起動時は初期化に少し時間がかかります）。Red Hat Dependency Analytics が自動的にファイルの分析を開始します。次のように表示されます。
+
+* 下部のステータスバーに、分析の進行中を示す通知が表示されます。
++
+image::m02-rhda-analysis-progress.png[ステータスバーに表示された RHDA 分析の進行状況,link=self,window=blank,width=700]
++
+* 依存関係のエントリーに色付きの下線が引かれ、脆弱性の重大度が示されます。また、レポートのポップアップも表示されます。
++
+image::m02-rhda-pom-analysis.png[脆弱性が強調表示されレポートのポップアップが表示された RHDA による pom.xml の分析,link=self,window=blank,width=700]
+
+. 分析が完了したら、**RHDA Report** 通知をクリックして完全なレポートを開きます。右上にある円グラフのアイコンをクリックして開くこともできます。
++
+image::m02-rhda-pie-chart.png[RHDA レポートを開く円グラフアイコン,link=self,window=blank,width=300]
++
+レポートには次の情報が表示されます。
++
+--
+* 重大度別に整理された直接依存関係および推移的依存関係の脆弱性
+* Lightwell の修正に関する推奨事項（バックポートやドロップイン置換）。利用可能かつ該当する場合
+* アップストリームの修正に関する推奨事項（バージョンの更新）
+--
++
+image::m02-rhda-report.png[Lightwell の修正が表示された RHDA 脆弱性レポート,link=self,window=blank,width=700]
+
+=== 演習 2: フレームワークの脆弱性を修正する
+
+. `pom.xml` に戻り、脆弱性のある依存関係に赤い波線が表示されていることを確認します。
+
+. 強調表示された依存関係にカーソルを合わせ、電球アイコンが表示されたら **Quick Fix** をクリックします。
++
+image::m02-rhda-quickfix-hover.png[脆弱性のある依存関係にカーソルを合わせて Quick Fix オプションを表示,link=self,window=blank,width=500]
++
+image::m02-rhda-quickfix.png[脆弱性のある依存関係に対する Quick Fix の提案,link=self,window=blank,width=500]
++
+IMPORTANT: フレームワークの依存関係（Quarkus など）では、単一の依存関係に Quick Fix を適用すると、フレームワークの他の部分とバージョンが一致しなくなる可能性があります。以下に示すように、フレームワーク全体のバージョンを更新してください。
+
+. `pom.xml` で Quarkus プラットフォームのバージョン（`quarkus.platform.version` を検索）を見つけ、より新しいバージョンに更新します。3.20.5 は **直接的な脆弱性** を修正する最新バージョンでした。
++
+[source,xml,role="copypaste"]
+----
+<quarkus.platform.version>3.20.5</quarkus.platform.version>
+----
+
+. VSCode はファイルを自動保存します。RHDA は自動的に再分析します。レポートを確認してください。フレームワークの直接的な脆弱性がなくなり、その他の脆弱性も減っているはずです。
+
+. **直接的な脆弱性** が見つからないため、警告は表示されません。ステータスバーの盾ボタン、または右上の円グラフをクリックしてください。
++
+image::m02-rhda-shield-button.png[RHDA レポートを開くステータスバーの盾ボタン,link=self,window=blank,width=700]
+
+. `quarkus-rest` 依存関係の周囲にあった波線が消えていることも確認してください。
+
+
+
+. 次に、フレームワークを最新バージョンに更新します。
++
+[source,xml,role="copypaste"]
+----
+<quarkus.platform.version>3.40.1</quarkus.platform.version>
+----
+
+. 自動保存後、分析が完了するまで待ちます。脆弱性の数が数件程度まで減るはずです。
++
+image::m02-rhda-report-after-fix.png[フレームワークを最新バージョンに更新した後の RHDA レポート,link=self,window=blank,width=700]
+
+=== なぜ重要なのか?
+
+開発者がコードを書いている間に、可能な限り早い段階で脆弱性情報を提供すれば、十分な情報に基づいて判断できます。開発者は次のことができます。
+
+* パイプラインを実行する前に、フレームワークのバージョンを更新するか判断する
+* Lightwell のバックポート（依存関係のバージョンを変更しない、そのまま適用できる修正）とアップストリームの修正（破壊的変更をもたらす可能性のあるバージョン更新）の違いを理解する
+* 重大度と悪用可能性に基づいて、修正する脆弱性の優先順位を決める
+
+これが **シフトレフトセキュリティ** の本質です。CI/CD の失敗から数時間後に問題を発見するのではなく、開発者が情報とツールを持ち、自ら対処できます。
+
+=== どのように実現したのか?
+
+演習を読みやすくするため、以下に詳細を記載しています。展開して実装方法を確認してください。
+
+.**展開して実装の詳細を表示**
+[%collapsible]
+====
+Red Hat Dependency Analytics は、 **{tpa_url}[Trusted Profile Analyzer (TPA)^]** というバックエンドサービスに問い合わせます。この環境では TPA がクラスター上にデプロイされ、複数のソースから脆弱性データを取り込んでいます。
+
+* **CVE List v5** -- 業界標準の脆弱性データベース
+* **GitHub Security Advisories (GHSA)** -- オープンソースコミュニティからの脆弱性レポート
+* **Lightwell** -- Red Hat の商用脆弱性インテリジェンスサービス。公開データベースでは入手できないバックポート修正やドロップイン置換を提供します。
+
+RHDA は VS Code（および IntelliJ）の拡張機能で、ワークスペースの設定を通じて、このクラスターの TPA インスタンスを使用するように構成されています。
+
+[source,json]
+----
+"redHatDependencyAnalytics.backendUrl": "https://rhda.{subdomain}"
+----
+
+`pom.xml`（または `package.json`、`go.mod` など）を開くと、RHDA は依存関係ツリーをバックエンドに送信します。バックエンドは取り込まれた脆弱性データと照合し、Lightwell の修正を含む拡充された結果を返します。
+
+Dependency Analytics レポートから Trusted Profile Analyzer を直接開くこともできます。
+
+image::m02-rhda-tpa-link.png[RHDA レポートから TPA を開く Take me there ボタン,link=self,window=blank,width=700]
+====
+
+=== 確認
+
+この時点で、次のことができるはずです。
+
+* pom.xml を開き、RHDA が脆弱性のある依存関係を強調表示することを確認する
+* 重大度の内訳と修正方法が示された RHDA レポートを開く
+* フレームワークのバージョンを更新し、脆弱性が減少したことを確認する
+
+'''
+
+== 次のステップ
+
+xref:module-02/02-commit-signing.adoc[コミットへの署名] に進み、脆弱性の修正をコミットして、自分のアイデンティティで署名します。

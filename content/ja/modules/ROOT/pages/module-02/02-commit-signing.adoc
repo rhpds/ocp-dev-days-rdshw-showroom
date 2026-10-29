@@ -1,0 +1,117 @@
+= コミットに署名する
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+すべてのコミットには物語があります。しかし、その物語が真実だとどうすれば分かるのでしょうか。コミットの作成者は `git config` コマンドひとつで偽装できます。リポジトリーへのアクセスが侵害されることもあります。SSH や GPG の鍵は、紛失したり、盗まれたり、共有されたりする可能性があります。従来のコード署名は、開発者が管理、ローテーション、保護しなければならない長期間有効な鍵ペアに依存しています。しかし、多くの開発者はこうした管理を実際には行っていません。
+
+ここでは、クラスターのインフラストラクチャーコンポーネントとしてデプロイされた **Red Hat Trusted Artifact Signer (RHTAS)** による **Sigstore の鍵レス署名** を使います。署名を鍵ペアではなく開発者の *アイデンティティー* に結び付けることで、この問題を解決します。コミットに署名する際は、組織の ID プロバイダー（この演習では Keycloak SSO）で認証します。Fulcio（RHTAS の認証局）が短期間有効な証明書を発行し、署名は Rekor の透明性ログに記録されます。証明書は数分以内に有効期限が切れるため、管理、紛失、ローテーションする鍵はありません。
+
+このセクションでは、先ほど行った脆弱性の修正をコミットし、自分のアイデンティティーで署名します。
+
+[#section-1]
+== セクション 1: コミットして署名する
+
+=== 演習 1: 変更をコミットする
+
+. Dev Spaces で、 **Source Control** パネルを開きます（左側のサイドバーにあるブランチアイコンをクリックするか、 `Ctrl+Shift+G` を押します）。
+
+. 変更一覧に、変更された `pom.xml` が表示されているはずです。
+
+. 分かりやすいコミットメッセージを入力します。
++
+[source,role="copypaste"]
+----
+Cleared most of the application vulnerabilities
+----
+
+. **Commit** ボタン（チェックマークのアイコン）をクリックします。
++
+image::m02-devspaces-commit.png[Source Control パネルで変更をコミットする,link=self,window=blank,width=700]
+
+. 変更を正しくステージングしていなかったため、 **Yes** をクリックして直接コミットします。
++
+image::m02-devspaces-stage-commit.png[ステージングとコミットの確認プロンプト,link=self,window=blank,width=400]
+
+. VSCode から Keycloak SSO の Web サイトを開くか尋ねられたら、 **Open** をクリックします。
++
+image::m02-devspaces-open-keycloak.png[Keycloak SSO の Web サイトを開くよう求める VSCode のプロンプト,link=self,window=blank,width=700]
++
+ブラウザーのタブまたはポップアップが開き、成功コードが表示されます。これは Sigstore の OIDC ログインフローです。
+
+. コピーアイコンをクリックして成功コードをコピーします。
++
+image::m02-gitsign-login-prompt.png[Keycloak SSO からの成功コード,link=self,window=blank,width=400]
+
+. コードを **gitsign login** ターミナルに貼り付け、 **Return** を押します。
++
+NOTE: これは Linux ターミナルです。ブラウザーや環境によっては、 `Ctrl+V` ではなく kbd:[Ctrl+Shift+V] で貼り付ける必要があります。
++
+image::m02-gitsign-code-paste.png[gitsign ターミナルに検証コードを貼り付ける,link=self,window=blank,width=700]
++
+これで、コミットに自分のアイデンティティーで署名できました。
+
+. **Sync Changes**（または push アイコン）をクリックして、署名済みコミットを GitLab に push します。
++
+image::m02-devspaces-sync-changes.png[Source Control パネルの Sync Changes ボタン,link=self,window=blank,width=300]
+
+. Developer Hub で Sandbox Component に戻り、コンポーネントページの **View Source** をクリックするか、 {gitlab_url}[{gitlab_url}^] に移動して、コミットを見つけます。コミットの横に署名バッジ（未検証）が表示されているはずです。
++
+image::m02-rhdh-view-source.png[サンドボックスコンポーネントページの View Source リンク,link=self,window=blank,width=700]
++
+バッジをクリックして証明書の詳細を確認します。 **Certificate Issuer** に `CN=CISO-office,O=Parasol` と表示されていることに注目してください。 **Certificate Subject** が空なのは、GitLab が現在、署名者のアイデンティティーを別の署名リーフ（Subject Alternative Name）に格納する Sigstore/RHTAS 署名の構造を理解していないためです。また、GitLab は（現時点では）Sigstore 署名を検証できません。公開鍵が透明性データベースに格納され、新しい一時証明書が発行されるたびに変わるためです。
++
+image::m02-gitlab-signed-commit.png[証明書の詳細を表示する GitLab の署名済みコミット,link=self,window=blank,width=700]
+
+=== なぜ重要なのか？
+
+* **説明責任** : すべてのコミットが、Git の設定に記載された名前だけでなく、検証済みのアイデンティティーに暗号学的に結び付けられます
+* **改ざんの検知** : 署名済みコミットが変更されると、署名が無効になります
+* **鍵管理が不要** : 開発者が署名鍵を生成、保管、ローテーションする必要はありません
+* **透明性** : すべての署名が公開の透明性ログ（Rekor）に記録され、監査可能な履歴が作られます
+* **パイプラインでの強制** : 後続のパイプライン段階で、ビルド前にコミットが署名されていることを検証します
+
+=== どのように実装されているのか？
+
+演習を読みやすくするため、実装の詳細を以下に記載しています。展開して確認してください。
+
+.**実装の詳細を表示するには開いてください**
+[%collapsible]
+====
+Git は、署名プログラムとして **gitsign** を使うように設定されています。Dev Spaces ワークスペースの起動時に、devfile の `postStart` コマンドによって自動的に設定されます。
+
+[source,bash]
+----
+git config --global gpg.format x509
+git config --global gpg.x509.program gitsign
+git config --global commit.gpgsign true
+git config --global gitsign.fulcio "https://fulcio-server-trusted-artifact-signer.{subdomain}"
+git config --global gitsign.rekor "https://rekor-server-trusted-artifact-signer.{subdomain}"
+git config --global gitsign.issuer "https://sso.{subdomain}/realms/sso"
+----
+
+**Sigstore の鍵レスフロー** は次のように動作します。
+
+. 開発者がコミットを開始します
+. Gitsign が認証のため OIDC プロバイダー（Keycloak）にリダイレクトします
+. 認証後、gitsign が **Fulcio** （認証局）に短期間有効な証明書を要求します
+. Fulcio が、開発者のメールアドレスを Subject Alternative Name として埋め込んだ証明書を発行します
+. Gitsign がこの証明書でコミットに署名します
+. 監査可能性を確保するため、署名が **Rekor** （透明性ログ）に記録されます
+. 証明書は数分以内に有効期限が切れますが、Rekor のエントリーによって、署名時点で署名が有効だったことを証明できます
+
+Dev Spaces はローカルブラウザーのないコンテナー内で実行されるため、 **gitsign-credential-cache** デーモンが OIDC フローを処理し、開発者に検証コードを提示します。開発者はそのコードをターミナルに貼り付けます。ローカル IDE では、gitsign がブラウザーを直接開きます。
+====
+
+=== 確認
+
+この時点で、次のことが完了しているはずです。
+
+* `pom.xml` の変更を署名付きコミットとしてコミットした
+* コミットを GitLab に push した
+* GitLab に署名バッジが表示されることを確認した
+
+'''
+
+== 次のステップ
+
+xref:module-02/03-sandbox-pipeline.adoc[Sandbox Pipeline の確認] に進み、パイプラインがどのように署名を検証し、イメージをスキャンするかを確認してください。

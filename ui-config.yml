@@ -1,6 +1,9 @@
 ---
 type: showroom
 
+antora:
+  version: en
+
 default_width: 30
 persist_url_state: true
 

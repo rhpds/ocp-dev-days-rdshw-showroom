@@ -1,0 +1,47 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="whats-next"]
+== Qué sigue
+
+Ahora tienes abiertas y listas ambas plataformas de mensajería: *Matrix* del lado del cliente y *Rocket.Chat* del lado del agente de soporte. Pero, por ahora, están completamente separadas. Un mensaje enviado en una no puede llegar a la otra.
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    C([Cliente]) --> MX
+    MX ~~~ Gap
+    Gap ~~~ RC
+    RC --> A([Agente de soporte])
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    Gap["❓"]
+
+    style MX fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style Gap fill:#fff3e0,stroke:#fb8c00,color:#e65100,font-size:24px
+----
+
+{empty} +
+
+En el próximo laboratorio, crearás la integración que las conecta: usarás *Apache Camel* para transformar los mensajes y *Apache Kafka* como columna vertebral de streaming que conecta todos los componentes.
+
+{empty} +
+
+[.verification]
+****
+¿Has iniciado sesión en Matrix y Rocket.Chat?
+
+[.success]
+Ya está todo listo. Continúa con el siguiente módulo para empezar a crear la integración.
+
+[.fail]
+Vuelve atrás y asegúrate de poder acceder a ambas plataformas antes de continuar.
+****
+
+{empty} +

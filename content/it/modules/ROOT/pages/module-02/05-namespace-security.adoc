@@ -1,0 +1,168 @@
+= Proteggere i namespace
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+La pipeline protetta garantisce che vengano *create* solo immagini firmate, analizzate e approvate correttamente. Ma cosa impedisce a qualcuno di aggirare completamente la pipeline e fare direttamente il deploy di un'immagine non firmata con `oc` o `kubectl`? È qui che entra in gioco **Sigstore Policy Controller**.
+
+Policy Controller è un controller di ammissione Kubernetes che intercetta le richieste di creazione dei pod e verifica le firme e le attestazioni delle immagini dei container *prima* di consentire l'esecuzione del pod. Nel namespace di produzione protetto di Parasol, è necessario soddisfare tre criteri:
+
+* L'immagine deve essere **firmata** (da Tekton Chains o Red Hat)
+* L'attestazione SLSA dell'immagine deve contenere la **prova di un commit firmato**
+* L'immagine deve avere un'attestazione di **approvazione della release firmata**
+
+[#section-1]
+== Sezione 1: Testare l'applicazione dei criteri
+
+=== Esercizio 1: Provare a fare il deploy di un'immagine non firmata
+
+. Apri Dev Spaces (va bene qualsiasi workspace: ti serve solo un terminale). In Dev Spaces, fai clic su **New Terminal**:
++
+image::m02-devspaces-new-terminal.png[Apertura di un nuovo terminale in Dev Spaces,link=self,window=blank,width=700]
+
+. Nel terminale, prova a fare il deploy di un'immagine non firmata nel namespace di produzione protetto:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod
+----
+
+. Il deploy viene **rifiutato** dall'admission webhook. L'output è prolisso: filtralo per visualizzare solo i criteri violati:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-image-signature-required
+failed policy: parasol-signed-commit-required
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unsigned.png[Terminale che mostra il mancato superamento di tutti e tre i criteri per un'immagine non firmata,link=self,window=blank,width=700]
+
+Tutti e tre i criteri non sono stati soddisfatti: l'immagine nginx non è firmata da Chains o Red Hat, non ha un'attestazione SLSA e non è approvata.
+
+=== Esercizio 2: Provare a fare il deploy di un'immagine firmata ma non approvata
+
+. Ora prova a fare il deploy dell'immagine temporanea creata durante il controllo della MR (firmata da Chains, ma non approvata):
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod
+----
+
+. Anche questo deploy viene **rifiutato**. Filtra di nuovo l'output:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unapproved.png[Terminale che mostra il mancato superamento del solo criterio di approvazione per un'immagine firmata ma non approvata,link=self,window=blank,width=700]
++
+Il controllo della firma dell'immagine viene superato (è stata firmata da Chains), ma il criterio di approvazione della release non viene soddisfatto: l'immagine del controllo MR non è mai stata approvata per la produzione.
+
+=== Esercizio 3: Verificare che il deploy legittimo funzioni
+
+. Verifica che il deploy in produzione (quello eseguito tramite la pipeline tag-promote) sia in esecuzione:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc get pods -n {user}-secured-prod
+----
++
+Dovresti vedere i pod `parasol-insurance` e `parasol-db` in esecuzione regolarmente: queste immagini hanno superato tutti e tre i criteri.
+
+. Rimuovi i deploy di test non riusciti:
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc delete deployment test-unsigned test-no-approval -n {user}-secured-prod 2>/dev/null
+----
+
+=== Perché è importante?
+
+Le pipeline sono un controllo di sicurezza fondamentale, ma possono essere aggirate: chiunque abbia accesso al namespace potrebbe usare `oc apply` per fare il deploy di qualsiasi immagine. Policy Controller colma questa lacuna:
+
+* Opera al **livello di ammissione Kubernetes**, al di sotto della pipeline
+* Verifica firme e attestazioni al **momento del deploy**, non durante la build
+* Si applica alla **creazione di tutti i pod**, indipendentemente da come è stato avviato il deploy (ArgoCD, `oc`, Helm, YAML manuale e così via)
+* Crea una **difesa in profondità**: anche se la pipeline viene compromessa, non possono essere eseguite immagini non firmate o prive delle attestazioni richieste (e dei relativi valori)
+
+=== Come è stato realizzato?
+
+Per mantenere leggibile l'esercizio, abbiamo aggiunto i dettagli qui sotto. Espandi la sezione per scoprire come è stato realizzato.
+
+.**Apri per visualizzare i dettagli dell'implementazione**
+[%collapsible]
+====
+**Sigstore Policy Controller** viene installato tramite l'operator RHTAS e configurato con risorse personalizzate `ClusterImagePolicy`.
+
+Tre criteri vengono applicati a ogni immagine su cui viene fatto il deploy nel namespace `{user}-secured-prod`:
+
+[cols="1,2",options="header"]
+|===
+| Criterio | Controllo eseguito
+
+| `parasol-image-signature-required`
+| L'immagine deve essere firmata da Tekton Chains (senza chiave, tramite Fulcio/Rekor) oppure da Red Hat (chiave pubblica release3)
+
+| `parasol-signed-commit-required`
+| L'attestazione di provenienza SLSA deve contenere un'attività `verify-commit-signature` con `SIGNATURE_STATUS: SIGNED`
+
+| `parasol-release-approval-required`
+| Deve esistere un'attestazione personalizzata (`parasol-insurance.com/releases/v1`) con `release.approved: true`, firmata da un'identità `*@demo.redhat.com`
+|===
+
+Ogni criterio ha **due autorità** (logica OR):
+
+* **Tekton Chains / identità utente**: verifica le firme provenienti dall'infrastruttura Sigstore del cluster (Fulcio + Rekor)
+* **Firmato da Red Hat**: verifica le firme usando la chiave pubblica release3 di Red Hat, consentendo alle immagini di base Red Hat (come il database PostgreSQL) di superare il controllo senza firme Chains
+
+L'applicazione dei criteri al namespace viene attivata con l'etichetta:
+
+[source,yaml]
+----
+metadata:
+  labels:
+    policy.rhtas.com/include: "true"
+----
+
+Solo i namespace con questa etichetta sono soggetti ai criteri. I namespace di build e sandbox, così come gli ambienti non di produzione, non hanno questa etichetta e non ne sono interessati.
+====
+
+=== Verifica
+
+A questo punto dovresti aver:
+
+* Provato a fare il deploy di un'immagine non firmata e visto che veniva rifiutata da tutti e tre i criteri
+* Provato a fare il deploy di un'immagine firmata ma non approvata e visto che veniva rifiutata dal criterio di approvazione
+* Verificato che il deploy legittimo in produzione è in esecuzione
+* Compreso come Policy Controller fornisca una difesa in profondità che va oltre le pipeline
+
+'''
+
+== Congratulazioni!
+
+Hai completato il modulo sulla supply chain software protetta. Hai seguito l'intero percorso, dal rilevamento delle vulnerabilità alla distribuzione in produzione, con protezioni di sicurezza in ogni fase:
+
+[cols="1,2",options="header"]
+|===
+| Fase | Controllo di sicurezza
+
+| **Codice** | Red Hat Dependency Analytics identifica le vulnerabilità nell'IDE
+| **Commit** | La firma Sigstore senza chiave collega ogni commit a un'identità verificata
+| **Build in sandbox** | L'analisi ACS e il controllo dei criteri forniscono un riscontro iniziale (a titolo informativo)
+| **Merge request** | La verifica delle firme è obbligatoria; i criteri ACS bloccano il merge in caso di violazioni
+| **Build dopo il merge** | Tekton Chains firma l'immagine e genera attestazioni SLSA
+| **Promozione del tag** | Conforma convalida l'intera catena di attestazioni; la SBOM viene caricata su TPA
+| **Approvazione** | Prima della produzione è richiesta un'autorizzazione umana firmata
+| **Deploy** | Policy Controller verifica firme e attestazioni al momento dell'ammissione
+|===
+
+Ogni elemento di prova è firmato crittograficamente, archiviato in un registro di trasparenza e verificabile in modo indipendente. Questa è una supply chain software conforme a **SLSA Level 3**.

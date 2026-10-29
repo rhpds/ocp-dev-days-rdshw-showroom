@@ -1,0 +1,168 @@
+= 名前空間のセキュリティ保護
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+セキュリティで保護されたパイプラインにより、適切に署名、スキャン、承認されたイメージだけが *ビルド* されます。しかし、誰かがパイプラインを完全に迂回し、 `oc` や `kubectl` を使って署名されていないイメージを直接デプロイするのを、どうすれば防げるでしょうか。その役割を担うのが **Sigstore Policy Controller** です。
+
+Policy Controller は Kubernetes のアドミッションコントローラーで、Pod の作成リクエストを捕捉し、Pod の実行が許可される *前に* コンテナイメージの署名とアテステーションを検証します。Parasol のセキュリティで保護された本番名前空間では、次の 3 つのポリシーを満たす必要があります。
+
+* イメージは **署名済み** でなければならない（Tekton Chains または Red Hat による署名）
+* イメージの SLSA アテステーションには、 **署名済みコミットの証明** が含まれていなければならない
+* イメージには **署名済みリリース承認** のアテステーションが必要
+
+[#section-1]
+== セクション 1: ポリシー適用のテスト
+
+=== 演習 1: 署名されていないイメージをデプロイしてみる
+
+. Dev Spaces を開きます（どのワークスペースでもかまいません。必要なのはターミナルだけです）。Dev Spaces で **New Terminal** をクリックします。
++
+image::m02-devspaces-new-terminal.png[Dev Spaces で新しいターミナルを開く,link=self,window=blank,width=700]
+
+. ターミナルで、署名されていないイメージをセキュリティで保護された本番名前空間にデプロイしてみます。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod
+----
+
+. デプロイはアドミッション Webhook によって **拒否** されます。出力は長いため、違反したポリシーだけが表示されるように絞り込みます。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-unsigned --image=docker.io/library/nginx:latest -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-image-signature-required
+failed policy: parasol-signed-commit-required
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unsigned.png[署名されていないイメージに対して 3 つすべてのポリシーが失敗したことを示すターミナル,link=self,window=blank,width=700]
+
+3 つすべてのポリシーが失敗しました。nginx イメージは Chains または Red Hat によって署名されておらず、SLSA アテステーションも承認もありません。
+
+=== 演習 2: 署名済みだが未承認のイメージをデプロイしてみる
+
+. 次に、MR チェック中にビルドされた一時イメージ（Chains によって署名されていますが、承認はされていません）をデプロイしてみます。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod
+----
+
+. このデプロイも **拒否** されます。もう一度、出力を絞り込みます。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc create deployment test-no-approval --image=quay.{subdomain}/{user}/parasol-insurance-secured:mr-1 -n {user}-secured-prod 2>&1 | grep "failed policy:"
+----
++
+----
+failed policy: parasol-release-approval-required
+----
++
+image::m02-policy-controller-reject-unapproved.png[署名済みだが未承認のイメージに対して承認ポリシーのみが失敗したことを示すターミナル,link=self,window=blank,width=700]
++
+イメージの署名チェックには合格しています（Chains によって署名されているため）が、リリース承認ポリシーには合格しません。MR チェックのイメージは本番環境用に承認されていないためです。
+
+=== 演習 3: 正規のデプロイが動作することを確認する
+
+. 本番デプロイ（tag-promote パイプライン経由でデプロイされたもの）が実行中であることを確認します。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc get pods -n {user}-secured-prod
+----
++
+`parasol-insurance` と `parasol-db` の Pod が正常に実行されているはずです。これらのイメージは 3 つすべてのポリシーに合格しています。
+
+. 失敗したテストデプロイをクリーンアップします。
++
+[source,bash,subs="attributes",role="copypaste"]
+----
+oc delete deployment test-unsigned test-no-approval -n {user}-secured-prod 2>/dev/null
+----
+
+=== なぜ重要なのか?
+
+パイプラインは重要なセキュリティ制御ですが、迂回される可能性があります。名前空間へのアクセス権を持つ人が `oc apply` を使えば、どんなイメージでもデプロイできてしまいます。Policy Controller はこの抜け道をふさぎます。
+
+* パイプラインより下位の **Kubernetes アドミッション層** で動作します
+* 署名とアテステーションを **ビルド時ではなくデプロイ時** に検証します
+* デプロイの開始方法（Argo CD、 `oc` 、Helm、手動の YAML など）にかかわらず、 **すべての Pod 作成** に適用されます
+* **多層防御** を実現します。パイプラインが侵害された場合でも、署名のないイメージや必須のアテステーション（およびそこに含まれる値）が欠けたイメージは実行できません
+
+=== どのように実現したのか?
+
+演習を読みやすくするため、実装の詳細を以下にまとめました。展開して、どのように実現したかを確認してください。
+
+.**実装の詳細を表示**
+[%collapsible]
+====
+**Sigstore Policy Controller** は RHTAS Operator 経由でインストールされ、 `ClusterImagePolicy` カスタムリソースを通じて設定されます。
+
+`{user}-secured-prod` 名前空間にデプロイされるすべてのイメージに、次の 3 つのポリシーが適用されます。
+
+[cols="1,2",options="header"]
+|===
+| ポリシー | 検証内容
+
+| `parasol-image-signature-required`
+| イメージは Tekton Chains（keyless、Fulcio/Rekor 経由）または Red Hat（release3 公開鍵）のいずれかによって署名されている必要があります
+
+| `parasol-signed-commit-required`
+| SLSA provenance アテステーションには `verify-commit-signature` タスクが含まれ、 `SIGNATURE_STATUS: SIGNED` である必要があります
+
+| `parasol-release-approval-required`
+| カスタムアテステーション（ `parasol-insurance.com/releases/v1` ）が存在し、 `release.approved: true` を含み、 `*@demo.redhat.com` の ID によって署名されている必要があります
+|===
+
+各ポリシーには **2 つの認証元** があります（OR ロジック）。
+
+* **Tekton Chains / ユーザー ID** -- クラスターの Sigstore インフラストラクチャ（Fulcio + Rekor）からの署名を検証します
+* **Red Hat 署名** -- Red Hat release3 公開鍵を使って署名を検証します。これにより、Red Hat のベースイメージ（PostgreSQL データベースなど）は Chains の署名がなくてもポリシーに合格できます
+
+名前空間には、次のラベルを付けてポリシー適用の対象にします。
+
+[source,yaml]
+----
+metadata:
+  labels:
+    policy.rhtas.com/include: "true"
+----
+
+このラベルが付いた名前空間だけがポリシーの対象になります。ビルド用名前空間、サンドボックス名前空間、本番以外の環境にはラベルが付いていないため、影響を受けません。
+====
+
+=== 確認
+
+ここまでで、次のことを実施できているはずです。
+
+* 署名されていないイメージのデプロイを試み、3 つすべてのポリシーによって拒否されることを確認した
+* 署名済みだが未承認のイメージのデプロイを試み、承認ポリシーによって拒否されることを確認した
+* 正規の本番デプロイが実行中であることを確認した
+* Policy Controller がパイプラインに加えて多層防御を提供する仕組みを理解した
+
+'''
+
+== おめでとうございます!
+
+セキュリティで保護されたソフトウェアサプライチェーンのモジュールを完了しました。脆弱性の検出から本番デプロイまで、各段階にセキュリティガードレールを設けた一連の流れを体験しました。
+
+[cols="1,2",options="header"]
+|===
+| 段階 | セキュリティ制御
+
+| **コード** | Red Hat Dependency Analytics が IDE で脆弱性を特定します
+| **コミット** | Sigstore の keyless 署名により、すべてのコミットが検証済み ID に結び付けられます
+| **サンドボックスビルド** | ACS スキャンとポリシーチェックが早期フィードバックを提供します（情報提供のみ）
+| **マージリクエスト** | 署名検証が強制され、違反があると ACS ポリシーがマージをブロックします
+| **マージ後のビルド** | Tekton Chains がイメージに署名し、SLSA アテステーションを生成します
+| **タグ昇格** | Conforma がアテステーションの完全な連鎖を検証し、SBOM が TPA にアップロードされます
+| **承認** | 本番環境へのデプロイ前に、人による署名付きの承認が必要です
+| **デプロイ** | Policy Controller がアドミッション時に署名とアテステーションを検証します
+|===
+
+すべての証拠は暗号学的に署名され、透明性ログに保存され、個別に検証できます。これは **SLSA Level 3** に準拠したソフトウェアサプライチェーンです。

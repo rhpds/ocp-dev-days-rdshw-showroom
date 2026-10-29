@@ -1,0 +1,251 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id="lab3-ingestion-flow"]
+== El flujo de ingesta
+
+Con la conectividad a la base de datos establecida mediante {rhsi}, ya puedes implementar el flujo de ingesta completo. La integración de Camel gestionará todo el ciclo de vida de una solicitud de póliza entrante, desde su recepción hasta su archivado.
+
+{empty} +
+
+*Descripción general del flujo de datos*
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+
+    Customer --> Portal -->|"Mensaje EDI"| Camel
+
+    subgraph LocalEnvironment [OpenShift]
+        Portal
+        Camel --> |"① datos XML"|ServiceInterconnect{{"Service\nInterconnect"}}
+        Camel --> |"② documentos de póliza PDF"|Storage
+    end
+
+    subgraph RemoteEnvironment [Entorno remoto]
+        ServiceInterconnect2{{"Service\nInterconnect"}} --> Database
+    end
+
+    ServiceInterconnect --- |"🔒 enlace seguro"| ServiceInterconnect2{{"Service\nInterconnect"}}
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Integración de Camel", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "Portal", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "Base de datos", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style LocalEnvironment fill:#fce4e4,stroke:#EE0000
+    style RemoteEnvironment fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Portal fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style Database fill:none,stroke:none
+----
+
+{empty} +
+
+*Secuencia de operaciones*
+
+El siguiente diagrama de secuencia detalla cada paso que realiza la integración de Camel al procesar una solicitud de póliza:
+
+{blank}
+
+[.mermaid]
+----
+sequenceDiagram
+    actor Customer
+    participant Camel
+    participant ServiceInterconnect as Service Interconnect
+    participant DB@{ "type": "database", "alias": "Base de datos" }
+    participant S3Bucket@{ "type": "collections", "alias": "Bucket de S3" }
+    Customer->>Camel: Enviar solicitud de póliza (EDI)
+    Camel->>Camel: Transformar EDI → XML
+    Camel->>ServiceInterconnect: Enviar datos XML
+    ServiceInterconnect->>DB: Almacenar datos
+    DB-->>ServiceInterconnect: Confirmación
+    ServiceInterconnect-->>Camel: Datos guardados
+    Camel->>Camel: Generar PDF a partir de XML
+    Camel->>S3Bucket: Cargar PDF
+    S3Bucket-->>Camel: Carga completada
+----
+
+{empty} +
+
+=== Preparar la carpeta de trabajo
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+. En la terminal de _Dev Spaces_, ejecuta el siguiente comando: +
+(cierra primero las pestañas abiertas de archivos Camel; es posible que no se actualicen automáticamente después de ejecutar este comando)
++
+{blank}
++
+[.copypaste]
+****
+step 2
+****
++
+[TIP]
+--
+.Ejecuta el comando anterior en cualquier momento para restablecer el ejercicio.
+[%collapsible]
+====
+El taller incluye prácticos scripts de ayuda que te permiten saltar a cualquier paso o restablecer el laboratorio a un estado conocido y funcional:
+
+* `step N` — restablece el laboratorio al inicio del paso N
+* `steps` — muestra todos los pasos disponibles en el laboratorio
+* `start` o `restart` — vuelve al principio (equivale a `step 1`)
+* `ff` — avanza rápidamente al *siguiente* paso
+* `rw` — retrocede al *paso anterior*
+====
+--
++
+{empty} +
+
+. Revisa la carpeta del laboratorio
++
+Después de ejecutar los comandos anteriores, revisa la vista de árbol del editor para confirmar que todo esté en orden. Debería verse así:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;&lt;&gt;</b></mark>] *index.html* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *kaoto-datamapper-e6fb3e6b-4288.xsl* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;≋&nbsp;&nbsp;</b></mark>] *X12-850.dfdl.xsd* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *x12.java* +
+
+TIP: El archivo `index.html` es una aplicación sencilla de portal que simula el envío de solicitudes de póliza por parte de un cliente. Camel JBang puede servir HTML estático junto con tus rutas; por eso, en las siguientes secciones lo usarás para iniciar envíos y probar la integración de extremo a extremo.
+--
++
+{empty} +
+
+. Revisa la configuración
++
+El archivo `application.properties` ya está preconfigurado con las credenciales de los dos backends que utiliza el flujo de ingesta:
++
+--
+* *Base de datos* — configuración de conexión a la base de datos PostgreSQL (accesible mediante Service Interconnect)
+* *Almacenamiento de objetos S3* — clave de acceso, secreto y endpoint para cargar los documentos PDF de póliza generados
+--
++
+{blank}
++
+[.mermaid]
+----
+flowchart LR
+    X[ ] -->|"✅ configurado"| DB[(Base de datos)] ~~~ Y[ ] -->|"✅ configurado"| S3[(S3 / ODF)]
+
+    style DB fill:#e8f5e9,stroke:#66bb6a
+    style S3 fill:#e8f5e9,stroke:#66bb6a
+    style X fill:none,stroke:none
+    style Y fill:none,stroke:none
+----
++
+{empty} +
+
+=== Abrir el flujo de ingesta en Kaoto
+
+[TIP]
+--
+.Despliega esta sección para obtener una descripción rápida de Kaoto.
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+En el explorador de archivos del editor, haz clic en el siguiente archivo. Kaoto lo abrirá automáticamente y mostrará la ruta de ingesta como un diagrama visual.
+
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;&nbsp;!&nbsp;&nbsp;</i></b></mark>] *ingest.camel.yaml* +
+--
+
+Kaoto abrirá el archivo y mostrará todas las definiciones de rutas que contiene. El archivo incluye varias rutas, pero nos centraremos en el flujo de ingesta principal. Sigue estos pasos:
+
+// De forma predeterminada, Kaoto muestra las rutas apiladas verticalmente. Para facilitar la lectura, cambia al diseño horizontal haciendo clic en el botón central de la parte inferior del lienzo:
+
+// [.bordered]
+// image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+
+// {empty} +
+
+// El archivo contiene varias rutas. Para centrarte en el flujo de ingesta principal:
+
+. Haz clic en el menú desplegable *Routes* de la barra de herramientas, en la esquina superior izquierda
+. Selecciona `service-x12` en la lista
+
+{empty} +
+
+[#kaoto-routes]
+[.bordered]
+image::module-03/m1/kaoto-routes-dropdown.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes
+
+[.arrows]
+{x: 25, y: 25, rot: 210, size: .8} +
+{x: 19, y: 70, rot: 230, size: .8}
+
+[.numbers]
+{x: 34, y: -10, size: 1.5} +
+{x: 35, y: 43, size: 1.5}
+****
+
+{empty} +
+
+Kaoto mostrará ahora solo la ruta `service-x12`. Para centrarla en el lienzo, haz clic en el botón *Reset View* de la parte inferior:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-reset-view.png[width=50%]
+
+TIP: Usa la rueda del ratón para acercar y alejar el lienzo; haz clic y arrastra para desplazarte por la vista.
+
+{empty} +
+
+Ahora deberías ver la ruta `service-x12`, el flujo de ingesta principal:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-service-x12-route.png[width=90%]
+
+De izquierda a derecha, cada paso de la canalización gestiona una etapa del ciclo de vida de la solicitud de póliza:
+
+* `platform-http` — el endpoint de API que recibe las solicitudes de póliza
+* `transform-x12` — transforma los datos EDI en XML
+* `sql` — almacena los datos en la base de datos backend
+* `store-pdf-s3` — genera un documento PDF de póliza y lo carga en S3
+
+NOTE: Observa los dos bloques azules *To do: Enable*: son pasos deshabilitados que activarás en el siguiente ejercicio. Al terminar, todo el flujo estará conectado y funcionará correctamente.
+
+{empty} +
+
+[.verification]
+****
+¿Puedes ver los archivos fuente en el explorador de archivos y el flujo de ingesta `service-x12` en Kaoto?
+
+[.success]
+Todo está listo. Continúa con el siguiente ejercicio para completar el flujo.
+
+[.fail]
+Asegúrate de haber ejecutado el comando `step 2`, haber abierto `ingest.camel.yaml` y haber seleccionado la ruta `service-x12`.
+****

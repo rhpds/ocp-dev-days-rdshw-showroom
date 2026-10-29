@@ -1,0 +1,48 @@
+= OpenShift Dev Day Roadshow
+include::partial$_attributes.adoc[]
+
+Te damos la bienvenida a OpenShift Dev Day Roadshow: una serie de talleres prácticos en los que podrás experimentar el desarrollo y la integración de aplicaciones modernas en Red Hat OpenShift.
+
+== Módulos disponibles
+
+Esta gira consta de módulos independientes. Puedes completar cada módulo por separado o realizar varios para obtener una visión completa de las capacidades de OpenShift.
+
+[.tile]
+****
+xref:module-01/00-intro.adoc[Módulo 1: La experiencia del desarrollador]
+
+Experimenta todo el recorrido del desarrollador en OpenShift: desde la incorporación de autoservicio mediante Developer Hub y el desarrollo en la nube con Dev Spaces, hasta la programación asistida por IA, las canalizaciones CI/CD automatizadas y los despliegues en producción basados en GitOps.
+
+**Duración**: ~90 minutos
+****
+
+[.tile]
+****
+xref:module-02/00-intro.adoc[Módulo 2: Cadena de suministro de software segura]
+
+Compila y despliega aplicaciones mediante una cadena de suministro de software que cumple con el nivel 3 de SLSA: análisis de vulnerabilidades con RHDA y ACS, firma de commits sin clave con Sigstore, atestaciones de canalizaciones con Tekton Chains, validación de políticas con Conforma, aprobaciones firmadas de versiones y aplicación de políticas en los despliegues con Policy Controller.
+
+**Duración**: ~90 minutos
+****
+
+[.tile]
+****
+xref:module-03/index.adoc[Módulo 3: Conectividad de aplicaciones para la IA]
+
+Desarrolla flujos de datos de IA con las tecnologías de integración de Red Hat: ingesta de EDI con Service Interconnect, mensajería basada en eventos con Kafka y Matrix/Rocket.Chat, Apache Camel agéntico para la atención al cliente con IA y gobernanza de LLM con Connectivity Link.
+
+**Duración**: Varía según el laboratorio
+****
+
+[.tile]
+****
+xref:module-05/module-05-01-goals.adoc[Módulo 5: Migración con IA mediante MTA]
+
+Moderniza una aplicación heredada de Java EE / EAP y llévala a Quarkus con Red Hat Developer Lightspeed para Migration Toolkit for Applications (MTA): análisis estático, refactorización asistida por IA, reglas personalizadas y despliegue en OpenShift.
+
+**Duración**: ~30 minutos
+****
+
+== Primeros pasos
+
+Selecciona uno de los módulos anteriores para comenzar. Cada módulo incluye una introducción, detalles del entorno y objetivos de aprendizaje.

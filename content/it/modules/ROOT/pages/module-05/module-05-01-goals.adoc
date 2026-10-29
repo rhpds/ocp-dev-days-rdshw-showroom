@@ -1,0 +1,28 @@
+= Sezione 1: Obiettivi del laboratorio
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+Sperimenta la modernizzazione end-to-end delle applicazioni con Red Hat Developer Lightspeed for MTA (DLS) in Red Hat OpenShift Dev Spaces. In questo laboratorio userai:
+
+* L’estensione MTA per l’analisi statica
+* Developer Lightspeed (IA generativa) per il refactoring guidato del codice
+* L’applicazione legacy Java EE / EAP Parasol Insurance (`parasol-insurance-eap`)
+* Un percorso di migrazione verso Quarkus e Jakarta EE
+* Regole personalizzate per librerie proprietarie, come l’API di registrazione degli audit aziendali
+
+image::module-05-mta-dls/05-01-dls-01.jpg[Panoramica di Developer Lightspeed — analisi del codice Java legacy, migrazione con LLM, deploy di applicazioni modernizzate su OpenShift,link=self,window=blank,width=800]
+Con l’accelerazione del percorso verso il cloud delle grandi aziende, una delle sfide più significative che devono affrontare è modernizzare le applicazioni Java legacy per eseguirle su piattaforme moderne come Red Hat OpenShift. L’approccio tradizionale al refactoring del codice richiede molto tempo, è soggetto a errori e presuppone una conoscenza approfondita sia delle tecnologie legacy sia di quelle di destinazione.
+
+L’obiettivo di questo laboratorio è scoprire come Red Hat Developer Lightspeed for Migration Toolkit for Applications (MTA) rivoluziona la modernizzazione delle applicazioni combinando l’analisi statica del codice con l’IA generativa per accelerare la migrazione di un’applicazione Java EE 8 / EAP 7 a Quarkus.
+
+== Obiettivi di apprendimento
+
+Al termine di questo modulo, sarai in grado di:
+
+* Configurare l’estensione MTA in Red Hat Dev Spaces, incluso Developer Lightspeed (migrazione assistita dall’IA)
+* Analizzare `parasol-insurance-eap` e ricevere suggerimenti di refactoring del codice basati sull’IA
+* Modernizzare `EmailIntakeMDB` (JMS MDB → Reactive Messaging)
+* Creare e applicare regole MTA personalizzate per la libreria proprietaria `audit-logging-library` (v1 → v2)
+* Modernizzare `ClaimService` (`@Stateless` EJB → `@ApplicationScoped` + `@Transactional`)
+* Eseguire il checkout del branch `quarkus` completato, esaminare il codice migrato e farne il deploy su OpenShift
+* Applicare correzioni intelligenti e migrare l’applicazione verso Quarkus e Jakarta EE

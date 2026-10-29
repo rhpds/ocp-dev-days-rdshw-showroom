@@ -1,0 +1,27 @@
+{
+  "name": "showroom-v2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "antora site.yml",
+    "serve": "http-server www -c-1 -p 8080 --cors",
+    "watch": "nodemon --watch content --watch supplemental-ui --ext adoc,yml,js,css,hbs --exec 'antora --fetch local-site.yml'",
+    "dev": "concurrently -n antora,server -c cyan,green \"npm run watch\" \"npm run serve\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@antora/cli": "3.1",
+    "@antora/site-generator": "3.1",
+    "@sntke/antora-mermaid-extension": "0.0.13",
+    "concurrently": "9.2.4",
+    "http-server": "14.1.1",
+    "nodemon": "^3.1.7"
+  }
+}

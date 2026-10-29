@@ -1,0 +1,17 @@
+= logging.yaml
+include::partial$_attributes.adoc[]
+
+`audit-logging-library` v1 の使用を検出し、v2 への移行を案内するカスタム MTA **ルール** です。このファイルを `parasol-insurance-eap` 内の `rules/logging.yaml` として保存してください。
+
+[.button]
+* link:{attachmentsdir}/module-05-rules/logging.yaml[Download logging.yaml,download=logging.yaml,window=_blank,role=button]
+
+TIP: 上のダウンロードリンクを使用するか、以下の YAML をコピーして、ローカルの rules ディレクトリーにたとえば `rules/logging.yaml` として保存してください。
+
+[.console-input]
+[source,yaml]
+----
+include::example$module-05-rules/logging.yaml[]
+----
+
+xref:module-05/module-05-05-custom-rules-audit-logging.adoc[セクション 5: カスタムルール（監査ログ）] に戻る。

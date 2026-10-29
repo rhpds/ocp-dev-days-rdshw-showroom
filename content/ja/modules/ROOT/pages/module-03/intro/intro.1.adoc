@@ -1,0 +1,204 @@
+:imagesdir: ../../assets/images/module-03
+:page-time: 2
+include::partial$style.adoc[]
+
+[id="workshop-journey"]
+== ワークショップの流れ
+
+あなたは Parasol Insurance の統合開発者として、ワークショップのラボを通じて、保険契約の申込を取り込む統合を構築し、カスタマーサポートのためにメッセージングシステムを連携させ、エージェントが問題を解決できるよう AI を組み込み、さらにガバナンスを追加します。これらすべてを、アプリケーション統合および接続ツールを使って実現します。
+
+[TIP]
+--
+.手順を全画面表示にする
+[%collapsible]
+====
+このモジュールでは、手順のフレームを全画面表示にすることをおすすめします。次の手順で設定できます。
+
+. 右端にあるパネルのハンドルをクリックします
++
+[.bordered]
+[#showroom-expand-btn]
+image::module-03/intro/showroom-split-view.png[width=80%]
++
+[.overlay]
+****
+[.target]
+showroom-expand-btn
+
+[.arrows]
+{x: 98, y: 50, rot: 90, size: 1}
+
+[.numbers]
+{x: 78, y: 50, size: 1.5}
+****
++
+{blank}
+
+. *Instructions* オプションを選択します
++
+image::module-03/intro/showroom-expand-options.png[width=50%]
+====
+
+--
+
+{empty} +
+
+=== アプリケーション接続と AI の融合
+
+これまで、統合と AI は別々の課題でした。一方にはデータフローがあり、もう一方には AI モデルがありました。それが変わりつつあります。このワークショップでは、両者を単一のプラットフォーム上で組み合わせます。
+
+統合エンジンは、システム間のデータ移動、変換の適用、複数ステップのプロセスのオーケストレーションなど、データフローを処理します。接続レイヤーは、クラスターの外部にあるデータベースへのセキュアなアクセスを提供します。イベントブローカーは、メッセージングプラットフォームを疎結合にして、イベント駆動型アーキテクチャを実現します。AI サービスは、大規模言語モデルをエージェント型統合フローで利用できるようにします。また、ゲートウェイは LLM の前段に配置され、認証を強制し、トークン消費をレート制限します。
+
+ラボを進めながら、これらすべてを実際に扱います。
+
+{empty} +
+
+=== ビジネスシナリオ
+
+あなたの会社は Parasol Insurance です。顧客が保険契約を申し込むと、システムが申込を取り込み、データを変換してデータベースに保存し、保険契約書を生成します。顧客が契約書に問題を見つけた場合、インスタントメッセージングプラットフォームを通じてサポートに連絡します。サポート担当者が調査して問題を修正し、契約書を再生成します。
+
+課題は、関係するシステム同士が連携していないことです。データベースは別のインフラストラクチャ上にあります。メッセージングプラットフォームも互いに接続されていません。サポートチームはシステム間を行き来しながら、すべての手順を手作業で処理して問題を修正しています。AI はプロセスに組み込まれておらず、仮に組み込まれていたとしても、AI を制御する仕組みがありません。
+
+このワークショップの各ラボでは、こうした課題の 1 つに取り組みます。
+
+{empty} +
+
+=== 構築するもの
+
+各ラボは一連のストーリーに沿って進みます。それぞれのフェーズで問題を解決し、次のフェーズにつなげます。
+
+{blank}
+
+[#journey-diagram.mermaid]
+----
+flowchart LR
+    A["保険契約の申込\nを取り込む"] -->|"顧客が問題に\n気づく"| B["マルチチャネル\nコミュニケーション"]
+    B -->|"担当者が解決の\n支援を必要とする"| C["AI 支援による\nサポート"]
+    C -->|"AI の利用を\n制御する必要がある"| D["AI 消費を\nガバナンスする"]
+
+    style A fill:#e8f5e9,stroke:#66bb6a,color:#000
+    style B fill:#e3f2fd,stroke:#42a5f5,color:#000
+    style C fill:#fff3e0,stroke:#fb8c00,color:#000
+    style D fill:#fce4ec,stroke:#ef5350,color:#000
+----
+
+[.overlay]
+****
+[.target]
+journey-diagram
+
+[.numbers]
+{x: 8.6, y: 96} +
+{x: 38, y: 96} +
+{x: 66, y: 96} +
+{x: 92, y: 96}
+****
+
+[.mermaid-hints-simple]
+****
+A | ① セキュアなデータ取り込み | 顧客ポータルは保険契約の申込を EDI 形式で送信します。Camel フローは EDI を XML に変換し、バックエンドデータベースにデータを保存します。データベースは別のインフラストラクチャ上にあるため、Service Interconnect がパブリックネットワークに何も公開することなく、セキュアな接続を提供します。このフローでは PDF の契約書も生成し、S3 ストレージに送信します。 +
+B | ② マルチチャネルコミュニケーション | 顧客が契約書を確認して誤りに気づきます。サポートに連絡しますが、顧客とサポートチームは異なるメッセージングプラットフォームを使用しています。 +
+両方を接続し、一方のプラットフォームのメッセージがもう一方にも表示されるようにします。担当者は顧客がどのプラットフォームを使っているかを気にせず、自分のポータルから返信できます。 +
+C | ③ AI 支援による問題解決 | サポート担当者は、契約内容を調べ、データベースで修正し、契約書を再生成する必要があります。手作業で行う代わりに、担当者はメッセージングポータル内で AI ボットと会話します。 +
+統合レイヤーはリクエストを LLM に送信します。LLM が実行内容（データベースへの問い合わせ、レコードの更新、PDF の再生成）を判断し、結果を返します。すべて自然言語で行われます。 +
+D | ④ AI 消費のガバナンス | AI をワークフローに組み込んだら、制御が必要です。誰が LLM を呼び出せるのでしょうか。消費できるトークン数はいくつでしょうか。 +
+ゲートウェイを AI サービスの前段に配置し、認証とトークンベースのレート制限を適用します。それぞれ異なるトークン予算を持つ複数のサービス階層を用意します。ある階層の予算がなくなると、システムは次の階層にフォールバックします。
+****
+TIP: 図の各フェーズにカーソルを合わせると、詳細を確認できます。
+
+{empty} +
+
+=== 全体像
+
+以下の図は、アーキテクチャを非常に高いレベルで示し、各コンポーネントとその相互作用を表しています。
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+
+    chatInner ~~~ Customer
+    chatInner ~~~ SupportAgent
+
+    Customer --> Portal -->|"EDI メッセージ"| Camel
+
+    Camel --> ServiceInterconnect{{"Service\nInterconnect"}} --> Database
+
+    Camel --- spacer1[" "]
+
+    SupportAgent --- spacer2[" "] --> AgenticCamel <--> ConnectivityLink --> LLM
+
+    AgenticCamel --- spacer1[" "] --> Storage
+    AgenticCamel --> ServiceInterconnect
+
+    subgraph chatOuter ["カスタマーサポートプラットフォーム"]
+        subgraph chatInner [" "]
+        direction LR
+        ChatCustomer --- |Camel| Kafka --- |Camel| ChatAgent
+        end
+    end
+
+    chatOuter ~~~ SupportAgent
+    chatOuter ~~~ Customer
+
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel 統合", pos: "b", h: 80, w: 80, constraint: "on" }
+    Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
+    Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
+    Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
+    SupportAgent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "MaaS / LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+    Database@{ img: "../../_images/module-03/common/database-icon.svg", label: "データベース", pos: "b", h: 70, w: 70, constraint: "on" }
+    AgenticCamel@{ img: "../../_images/module-03/common/ai-icon.svg", label: "エージェント型 Camel", pos: "b", h: 80, w: 80, constraint: "on" }
+    ConnectivityLink@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+    ChatCustomer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
+    ChatAgent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    Kafka@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 80, w: 80, constraint: "on" }
+
+
+    style ChatCustomer fill:none,stroke:none
+    style ChatAgent fill:none,stroke:none
+    style Kafka fill:none,stroke:none
+    style chatOuter fill:none,stroke:none
+    style chatInner fill:#fce4e4,stroke:#EE0000
+    style ServiceInterconnect fill:#f8b4b4,stroke:#EE0000,color:#333
+    style Customer fill:none,stroke:none
+    style Camel fill:none,stroke:none,font-weight:bold
+    style Portal fill:none,stroke:none
+    style Storage fill:none,stroke:none
+    style spacer1 fill:none,stroke:none,width:1px,height:1px
+    style spacer2 fill:none,stroke:none,width:1px,height:1px
+    style SupportAgent fill:none,stroke:none
+    style LLM fill:none,stroke:none
+    style Database fill:none,stroke:none
+    style AgenticCamel fill:none,stroke:none
+    style ConnectivityLink fill:none,stroke:none
+----
+
+NOTE: 各ラボには、より細かいレベルのアーキテクチャ図が含まれています。この図は、各要素がエンドツーエンドでどのように連携するかを示したものです。
+
+{empty} +
+
+=== 技術スタック全体
+
+ワークショップを通じて使用する技術スタックを以下に示します。これらを組み合わせることで、アジャイルでスケーラブルな統合ソリューションの可能性を引き出し、コンテナ化されたワークフローのシームレスなオーケストレーション、パイプライン全体にわたる回復力のあるデータ永続化、イベント駆動型マイクロサービスの迅速なデプロイを実現します。これにより、複雑さを最小限に抑えながら、ハイブリッドクラウドアーキテクチャをモダナイズできます。
+
+* https://www.redhat.com/en/products/application-foundations[Red Hat Application Foundations,window=_blank]: アプリケーションの構築、デプロイ、運用を支援するために設計されたコンポーネント群です。以下をはじめとする製品が含まれており、ワークショップで使用します。
+
+** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: アプリケーション統合を効率化する汎用性の高いツールキットです。Quarkus と Spring Boot の両方のランタイムで動作し、多様なシステムを接続する手法を簡素化して標準化します。
+
+** https://developers.redhat.com/products/streams-for-apache-kafka[Red Hat Streams for Apache Kafka,window=_blank]: Apache Kafka プロジェクトを基盤とする Streams for Apache Kafka は、マイクロサービスやその他のアプリケーションが極めて高いスループットと極めて低いレイテンシーでデータを共有できる、分散型バックボーンを提供します。
++
+{blank}
+
+* https://developers.redhat.com/products/openshift-dev-spaces[Red Hat OpenShift Dev Spaces,window=_blank]: OpenShift ワークスペースとブラウザー内 IDE を提供し、クラウドアプリケーションを迅速に開発できる、Kubernetes ネイティブのコラボレーション開発ソリューションです。
+
+* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: ハイブリッドクラウドインフラストラクチャを自由に選択し、アプリケーションを大規模に構築、モダナイズ、デプロイできる統合アプリケーション開発プラットフォームです。
+
+* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Red Hat OpenShift と統合され、最適化された、永続的なソフトウェア定義ストレージと不可欠なデータサービスです。
+
+* https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: ネットワーク境界を越えてアプリケーションを接続する、セキュアでスケーラブルなソリューションです。異なる環境で実行されるサービス間のシームレスな通信を可能にします。
+
+* https://www.redhat.com/en/technologies/cloud-computing/service-interconnect[Red Hat Service Interconnect,window=_blank]: OpenShift 上で実行されるアプリケーションが、クラスター外にあるデータベースやその他のサービスを、パブリックネットワークに公開することなく利用できるようにする、セキュアな接続ソリューションです。
+
+{empty} +

@@ -1,0 +1,47 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="whats-next"]
+== 次のステップ
+
+これで、両方のメッセージングプラットフォームが開いて準備完了です。顧客側では *Matrix* 、サポート担当者側では *Rocket.Chat* を使います。しかし現時点では、これらは完全に分かれています。一方で送信したメッセージが、もう一方に届く方法はありません。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    C([顧客]) --> MX
+    MX ~~~ Gap
+    Gap ~~~ RC
+    RC --> A([サポート担当者])
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    Gap["❓"]
+
+    style MX fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style Gap fill:#fff3e0,stroke:#fb8c00,color:#e65100,font-size:24px
+----
+
+{empty} +
+
+次のラボでは、メッセージを変換するために *Apache Camel* を使い、すべてをつなぐストリーミング基盤として *Apache Kafka* を使って、両者をつなぐ統合を構築します。
+
+{empty} +
+
+[.verification]
+****
+Matrix と Rocket.Chat の両方にログインしていますか？
+
+[.success]
+準備完了です。次のモジュールに進んで、統合の構築を始めましょう。
+
+[.fail]
+前の手順に戻り、先に進む前に両方のプラットフォームにアクセスできることを確認してください。
+****
+
+{empty} +

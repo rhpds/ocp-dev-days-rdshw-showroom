@@ -1,0 +1,52 @@
+:imagesdir: ../../assets/images
+:page-time: 2
+include::partial$style.adoc[]
+
+[id='messaging-access']
+== Lab 2 - メッセージングへのアクセス
+
+このワークショップで使用する 2 つのメッセージングプラットフォーム、Matrix と Rocket.Chat に慣れ、両方にログインして、これから行う統合演習に備えましょう。
+
+{empty} +
+
+=== メッセージングのシナリオ
+
+保険申込を提出したお客様は、苦情や補償内容に関する質問、既存の保険契約の変更などについて、カスタマーサポートに問い合わせることがあります。一方、サポート担当者はお客様を支援する準備ができています。
+
+ここで興味深いのは、お客様とサポート担当者が *異なる* メッセージングプラットフォームを使用していることです。
+
+* *Matrix* — お客様が問い合わせを送るために利用するプラットフォーム
+* *Rocket.Chat* — サポート担当者が業務を行い、お客様に対応するプラットフォーム
+
+[TIP]
+--
+.プラットフォームの概要
+[%collapsible]
+====
+Matrix と Rocket.Chat は、Slack、Telegram、WhatsApp に似たメッセージングプラットフォームです。このワークショップでは、OpenShift 上にセルフホストできるため、これらを使用します。外部アカウントは必要ありません。
+
+*Matrix* は、リアルタイムの分散型通信を実現するオープン標準であり、通信プロトコルです。異なるサービスプロバイダー間でもシームレスに通信できます。
+
+*Rocket.Chat* は、厳格なデータ保護基準を備えたオープンソースのコミュニケーションプラットフォームです。Web、デスクトップ、モバイルデバイスから、同僚や他社、お客様とリアルタイムに会話できます。
+====
+--
+
+以降のモジュールでは、Apache Camel と Kafka を使用して、両方のプラットフォームをつなぐ統合を構築します。一方のプラットフォームで送信したメッセージが、もう一方にもシームレスに表示されるようにします。
+
+[.mermaid]
+----
+flowchart LR
+    C([Customer]) --> MX
+    MX <-->|"messages"| Integration(Integrations) <-->|"messages"| RC
+    RC --> A([Support Agent])
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    style MX fill:none,stroke:none
+    style RC fill:none,stroke:none
+----
+
+どちらのプラットフォームもWebアクセス可能な状態で OpenShift にデプロイされているため、ブラウザーから直接操作できます。次のページでは、それぞれにログインする手順を説明します。統合の作業を始める準備をしましょう。
+
+{empty} +

@@ -1,0 +1,36 @@
+= Sezione 2: Introduzione a Developer Lightspeed per MTA
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+Migration Toolkit for Applications è da tempo la soluzione leader del settore per valutare e analizzare le applicazioni destinate alla migrazione al cloud. **Developer Lightspeed** (**DLS**) è la funzionalità di **refactoring del codice basato sull'IA** di MTA, non un'estensione separata. Porta la migrazione assistita dall'IA generativa direttamente nell'IDE degli sviluppatori, trasformando il modo in cui le organizzazioni affrontano la modernizzazione delle applicazioni.
+
+
+
+== Le sfide della modernizzazione delle applicazioni
+
+Le aziende devono affrontare diverse sfide critiche quando modernizzano il proprio portfolio di applicazioni:
+
+* **Problemi di sicurezza** - Le applicazioni e i framework obsoleti introducono rischi significativi per le attività aziendali e possono causare violazioni dei dati e problemi di conformità.
+* **Complessità dei sistemi legacy** - Spesso le codebase legacy non sono compatibili con le piattaforme moderne, hanno dipendenze strettamente accoppiate e possono risultare poco familiari agli attuali team di sviluppo.
+* **Priorità concorrenti** - Le organizzazioni devono conciliare l'urgenza della modernizzazione con risorse limitate e spesso danno la precedenza alle nuove funzionalità rispetto al miglioramento delle applicazioni esistenti.
+* **Scalabilità e coerenza** - Le grandi aziende possono avere centinaia di applicazioni che richiedono modifiche simili, rendendo impraticabile una migrazione manuale.
+
+Developer Lightspeed semplifica la migrazione delle applicazioni con l'analisi statica e l'IA generativa, seguendo una metodologia semplice in 6 passaggi.
+
+image::module-05-mta-dls/05-02-dls-01.jpg[Workflow di Developer Lightspeed — checkout, configurazione dei target, analisi statica, richiesta di correzione, generazione della patch, applicazione o rifiuto,link=self,window=blank,width=800]
+
+== Come Developer Lightspeed trasforma la modernizzazione
+
+**Red Hat Developer Lightspeed for MTA** indica la modernizzazione di MTA che utilizza sia l'analisi statica sia **Developer Lightspeed** (IA generativa). Nell'IDE, l'**estensione MTA** per Visual Studio Code mette a disposizione l'analisi statica di MTA e Developer Lightspeed in un'unica soluzione. Questa combinazione affronta le sfide descritte:
+
+* **Accelera la modernizzazione delle applicazioni con GenAI** - L'estensione MTA combina la comprovata analisi statica del codice di MTA con l'IA generativa di Developer Lightspeed per individuare i problemi di migrazione e proporre soluzioni sensibili al contesto. L'IA genera consigli sul codice su misura direttamente nell'IDE, evitando di passare da un contesto all'altro e permettendo agli sviluppatori di concentrarsi sul proprio lavoro. Il sistema gestisce automaticamente gli effetti a cascata delle modifiche al codice e ne preserva l'integrità durante tutto il processo di refactoring. Inoltre, tiene traccia delle metriche di migrazione e apprende dalle soluzioni precedenti, migliorando continuamente i consigli nel tempo.
+
+* **Suggerimenti di refactoring utili e affidabili per gli sviluppatori** - Il sistema usa un'analisi basata su regole per indicare all'LLM quali problemi di migrazione cercare e come risolverli, assicurando che i consigli si basino su pattern di migrazione collaudati. Ogni suggerimento include spiegazioni chiare delle modifiche necessarie e delle relative motivazioni, aiutando gli sviluppatori a comprendere il ragionamento alla base di ogni correzione proposta. I dati diagnostici dell'IDE in tempo reale assicurano che le correzioni risolvano problemi effettivi di compilazione e runtime, anziché problemi ipotetici. Durante tutto il processo, gli sviluppatori esaminano e approvano le modifiche, mantenendo il pieno controllo del refactoring e garantendo la qualità del codice.
+
+* **Modernizza le tecnologie personalizzate e proprietarie** - Developer Lightspeed consente di creare regole personalizzate che definiscono condizioni e azioni per i framework specifici di un'organizzazione, permettendo all'IA di comprenderli e utilizzarli. Questa funzionalità automatizza la trasformazione del codice per le applicazioni che utilizzano librerie proprietarie o aziendali non incluse nelle regole di migrazione standard. Estendi i percorsi di migrazione disponibili fin da subito con le conoscenze dell'organizzazione, adattando lo strumento alle specifiche esigenze aziendali.
+
+* **Estendi la modernizzazione a tutto il portfolio** - Developer Lightspeed apprende dalle modifiche apportate durante la migrazione e accumula conoscenze istituzionali che migliorano nel tempo. Quando rileva pattern simili tra le applicazioni, prevede e genera con precisione soluzioni per applicazioni analoghe in tutto il portfolio. Questa capacità di apprendimento consente di eseguire il refactoring di più applicazioni in modo prevedibile ed efficiente, con una qualità costante, rendendo possibile la modernizzazione su scala di portfolio.
+
+* **Integrazione fluida nei workflow di sviluppo** - Tutte le analisi e le operazioni di refactoring vengono eseguite direttamente in Red Hat Dev Spaces, così gli sviluppatori possono lavorare nel loro ambiente abituale. I problemi dettagliati, le soluzioni proposte e le differenze nel codice sono visibili senza cambiare contesto o passare da uno strumento all'altro. Una volta completato il refactoring, invia il codice aggiornato attraverso le pipeline CI/CD esistenti per eseguire test e deploy automatici, integrando senza problemi l'applicazione modernizzata nei processi di sviluppo già in uso.
+
+* **Scegli un modello di IA** - Developer Lightspeed supporta l'uso di un LLM personalizzato, pubblico o self-hosted, senza necessità di fine-tuning, evitando così il vincolo a un singolo vendor. L'architettura RAG apprende dalle soluzioni precedenti e le archivia in una knowledge base, migliorando continuamente i consigli sulla base della cronologia delle migrazioni dell'organizzazione. Il sistema è compatibile con diversi provider LLM tramite API compatibili con OpenAI, tra cui Red Hat OpenShift AI (builder di modelli e server di inferenza per le aziende), Red Hat Enterprise Linux AI (server di inferenza per le aziende) e vLLM (diffuso server di inferenza per le aziende). Questa flessibilità permette di bilanciare prestazioni, costi e privacy dei dati in base ai requisiti specifici.

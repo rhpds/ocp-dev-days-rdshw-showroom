@@ -1,0 +1,71 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="rocketchat-chat"]
+== Onboarding alla piattaforma Rocket.Chat
+
+{empty} +
+
+=== Accedi alla tua stanza Rocket.Chat.
+
+{blank}
+
+. Apri il client web di _Rocket.Chat_:
++
+Fai clic sul link qui sotto per aprire la pagina Login di _Rocket.Chat_ (si aprirà una nuova scheda).
++
+--
+- link:{url-rocketchat}[Rocket.Chat Login page,window="_blank"]
+--
++
+{empty} +
+
+. Ti verrà chiesto di inserire le tue credenziali, come mostrato qui sotto:
++
+image::module-03/m2/rchat-login-credentials.png[width=50%]
++
+{blank}
++
+====
+. Inserisci quanto segue:
++
+* **Email or username**
++
+[.copypaste.value]
+****
+{user-username}
+****
++
+* **Password**
++
+[.copypaste.value]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
++
+{empty} +
++
+. Quindi, clicca su **_"Login"_**
+====
++
+{empty} +
+
+. Dopo aver effettuato l'accesso, vedrai la tua pagina iniziale in _Rocket.Chat_ e la tua stanza nel pannello a sinistra dello schermo, come mostrato qui sotto:
++
+image::module-03/m2/rchat-room.png[width=60%]
+
+{empty} +
+
+[.verification]
+****
+Sei riuscito ad accedere alla stanza _Rocket.Chat_?
+****
+
+{empty} +

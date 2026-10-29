@@ -1,0 +1,53 @@
+= Módulo 2: Cadena de suministro de software segura
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== Qué aprenderás
+
+En este módulo:
+
+* Comprenderás cómo se incorporan medidas de seguridad en cada etapa del ciclo de vida del desarrollo
+* Usarás Red Hat Dependency Analytics para identificar y corregir vulnerabilidades antes de que lleguen a una canalización
+* Firmarás los commits con tu identidad mediante la firma sin clave de Sigstore
+* Observarás cómo las canalizaciones automatizadas verifican firmas, analizan imágenes y aplican políticas
+* Promoverás una versión mediante comprobaciones de merge requests, validación de Conforma/Enterprise Contract y un proceso de aprobación firmado
+* Verás cómo Sigstore Policy Controller impide las implementaciones no autorizadas en el nivel del espacio de nombres
+
+== A quién está dirigido
+
+Este módulo examina el proceso de desarrollo y publicación desde una perspectiva de seguridad. Está diseñado para desarrolladores, ingenieros de seguridad e ingenieros de plataforma que quieran comprender cómo se puede complementar un flujo de trabajo de desarrollo tradicional con medidas de seguridad en cada etapa -- desde el código hasta la producción.
+
+**Nivel de experiencia**: Intermedio. Es útil tener familiaridad con Git, las canalizaciones de CI/CD y las imágenes de contenedores.
+
+== Tiempo estimado
+
+Completar este módulo lleva aproximadamente **60-90 minutos**.
+
+== Tu rol y misión
+
+Eres desarrollador en **Parasol Insurance**. El flujo de trabajo de desarrollo que usas a diario -- programar, confirmar cambios, compilar e implementar -- se ha complementado con medidas de seguridad del equipo de plataforma. Tu tarea es corregir las vulnerabilidades de la aplicación, publicar este cambio mediante el proceso reforzado y conocer cada control de seguridad.
+
+La oficina del CISO de Parasol ha dispuesto que todas las implementaciones en producción deben:
+
+* Compilarse a partir de **commits firmados** que se puedan rastrear hasta la identidad verificada de un desarrollador
+* Superar el **análisis de vulnerabilidades** y las **comprobaciones de políticas** antes de su promoción
+* Incluir una **atestación firmada** que demuestre que la canalización de compilación se ejecutó correctamente
+* Recibir una **aprobación explícita** antes de llegar a producción
+* Ser verificadas por un **controlador de admisión** durante la implementación
+
+
+
+== El recorrido de desarrollo seguro
+
+Este módulo sigue una historia continua:
+
+. **Conocer la plataforma** -- Explorar los componentes protegidos en Developer Hub y crear un entorno de pruebas aislado
+. **Abordar las vulnerabilidades desde el inicio** -- Usar el análisis de dependencias para encontrar y corregir vulnerabilidades antes de que lleguen a una canalización
+. **Firmar tus commits** -- Usar la firma sin clave de Sigstore para asociar cada commit con tu identidad
+. **Canalización del entorno de pruebas** -- Observar cómo las comprobaciones automatizadas verifican tu firma, analizan tu imagen y aplican las políticas de ACS
+. **Promover a producción** -- Hacer el merge, compilar, validar con las políticas de Conforma, aprobar la versión e implementarla
+. **Seguridad de espacios de nombres** -- Ver cómo Policy Controller impide que se ejecuten imágenes no autorizadas
+
+== Próximos pasos
+
+Continúa en la página xref:module-02/01a-environment.adoc[Detalles del entorno] para consultar los enlaces de acceso y las credenciales; después, ve a xref:module-02/01-vulnerabilities.adoc[Cómo abordar las vulnerabilidades desde el inicio].

@@ -1,0 +1,277 @@
+= Passaggio alle fasi successive
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+L'immagine del tuo ambiente sandbox è pulita: le vulnerabilità sono state risolte, l'immagine di base è stata rafforzata e il commit è firmato. Ora è il momento di far passare le modifiche attraverso le fasi protette della pipeline: verifica della richiesta di merge, build post-merge e promozione in produzione basata su tag.
+
+A differenza dell'ambiente sandbox, queste pipeline **applicano** le policy di sicurezza. I commit non firmati, le violazioni delle policy e le approvazioni mancanti bloccheranno la promozione.
+
+[#section-1]
+== Sezione 1: Richiesta di merge
+
+=== Esercizio 1: Crea una richiesta di merge
+
+. Apri GitLab e vai al branch sandbox nel repository `parasol-insurance-secured`.
++
+Puoi trovarlo rapidamente facendo clic su **View Source** sul componente sandbox in Developer Hub.
++
+image::m02-rhdh-sandbox-view-source.png[View Source nella pagina del componente sandbox,link=self,window=blank,width=700]
+
+. Fai clic su **Create merge request** (oppure vai a **Merge Requests** → **New merge request**).
++
+image::m02-gitlab-create-mr.png[Pulsante Create merge request in GitLab,link=self,window=blank,width=700]
+
+. Imposta come branch di origine il tuo branch sandbox e come branch di destinazione `main`.
++
+image::m02-gitlab-new-mr-form.png[Modulo New merge request con i branch di origine e destinazione,link=self,window=blank,width=700]
+
+. Assegna alla richiesta di merge un titolo descrittivo:
++
+[source,role="copypaste"]
+----
+Sec-fix done, security posture improved
+----
++
+Rimuovi "Description" e fai clic su **Create merge request**.
+
+=== Esercizio 2: Osserva la pipeline di verifica della MR
+
+. Dopo aver creato la richiesta di merge, viene avviata automaticamente una pipeline di verifica. "Questa build può essere eseguita in preprod? La verifica verrà superata? È conforme ai nostri standard?" Se la verifica non viene superata, il branch con le modifiche non può essere unito. Questa è la **pipeline di verifica della richiesta di merge**: viene eseguita nel namespace di build protetto di Parasol, non nel tuo ambiente sandbox.
++
+image::m02-gitlab-mr-pipeline-running.png[Pipeline di verifica della MR in esecuzione con merge bloccato,link=self,window=blank,width=700]
+
+. Apri la vista della pipeline in GitLab e fai clic su una delle attività. Si aprirà l'esecuzione della pipeline di verifica della MR in Developer Hub.
++
+image::m02-gitlab-mr-pipeline-jobs.png[Pipeline MR di GitLab con le attività di verifica del commit e ACS,link=self,window=blank,width=700]
+
+. Nota il componente: è `Parasol Insurance (Secured)`, non più il tuo ambiente sandbox.
++
+image::m02-rhdh-mr-check-pipeline.png[Pipeline di verifica della MR in Developer Hub su Parasol Insurance Secured,link=self,window=blank,width=700]
+
+. La pipeline di verifica della MR:
+* **Verifica la firma del commit**: con `ENFORCE=true`, i commit non firmati **causeranno il fallimento della pipeline**
+* **Crea l'immagine** dal branch della MR
+* **Esegue la scansione e verifica** dell'immagine in base alle policy ACS
+* **Invia i risultati** a GitLab come stati del commit e commento dettagliato sulla MR
+
+. Attendi il completamento della pipeline.
+
+. Torna alla pagina della richiesta di merge in GitLab
+* Il pulsante "Merge" è stato attivato, quindi puoi unire le modifiche, ma prima di farlo
+* Scorri verso il basso fino alla voce più recente in Activity, dove è stato pubblicato un commento **🔀 Merge Request Check Results** con lo stato della firma, i risultati delle policy ACS e il numero di vulnerabilità
+* Se la verifica preliminare viene superata, questi risultati sono meno interessanti che in caso di problemi e relative soluzioni. Per te, sono solo informativi (dato che la verifica è stata superata)
++
+image::m02-gitlab-mr-ready-to-merge.png[Richiesta di merge pronta per il merge dopo il superamento della pipeline,link=self,window=blank,width=700]
++
+image::m02-gitlab-mr-results.png[Risultati della verifica della richiesta di merge con convalida della firma e di ACS,link=self,window=blank,width=700]
+
+=== Esercizio 3: Unisci la richiesta
+
+. Se tutti i controlli vengono superati, il pulsante **Merge** diventa disponibile.
++
+NOTA: Se la pipeline non viene superata (ad esempio, a causa di un commit non firmato), il merge viene bloccato. GitLab è configurato con `onlyMergeWhenPipelineSucceeds` per applicare questo vincolo.
+
+. Fai clic su **Merge**.
++
+In questo modo viene avviata la **pipeline di build post-merge**: da `main` viene creata la **__versione finale dell'immagine__**, firmata e attestata da Tekton Chains, archiviata in Quay e distribuita nell'ambiente preprod.
++
+image::m02-rhdh-post-merge-pipeline.png[Pipeline di build post-merge in Developer Hub,link=self,window=blank,width=700]
+
+'''
+
+[#section-2]
+== Sezione 2: Promuovi in produzione
+
+La build post-merge ha creato dal branch `main` un'immagine firmata. Per promuoverla in produzione, crea un **tag Git**: in questo modo viene avviata la pipeline di promozione tramite tag.
+
+=== Esercizio 1: Crea un tag
+
+. In GitLab, vai a **Repository** → **Tags**.
+
+. Fai clic su **New tag**.
+
+. Inserisci un nome per il tag (ad esempio, `v2.0`) e seleziona il branch `main` come origine.
++
+image::m02-gitlab-create-tag.png[Creazione di un tag in GitLab,link=self,window=blank,width=700]
+
+. Fai clic su **Create tag**.
+
+=== Esercizio 2: Osserva la pipeline di promozione tramite tag
+
+. Il tag avvia la **pipeline di promozione tramite tag**. Questa pipeline:
+* Recupera lo SHA dell'immagine dal registry
+* Esegue la **convalida Conforma/Enterprise Contract** sull'attestazione dell'immagine
+* Genera una **SBOM** e la carica in TPA
+* Copia l'immagine in una versione con tag nel registry
+* Apre una **richiesta di merge** nel repository dei manifest GitOps per aggiornare la distribuzione in produzione
+
+. Vai al componente **Parasol Insurance (Secured)** in Developer Hub e fai clic sulla scheda **CI**.
++
+Cerca l'esecuzione della pipeline `parasol-insurance-secured-tag-promote`.
++
+image::m02-rhdh-tag-promote-failed.png[Pipeline di promozione tramite tag non riuscita in Developer Hub con errore di ec-validate,link=self,window=blank,width=700]
+
+. **La pipeline fallirà.** Apri l'output della pipeline per capire il motivo.
++
+image::m02-rhdh-tag-promote-view-output.png[Pulsante View output nella pipeline di promozione tramite tag non riuscita,link=self,window=blank,width=700]
++
+image::m02-rhdh-ec-validation-failed.png[Convalida Enterprise Contract con regola di approvazione non superata,link=self,window=blank,width=700]
+
+=== Esercizio 3: Comprendi la violazione delle policy Conforma
+
+. La convalida **Conforma (ec)** verifica l'attestazione firmata dell'immagine rispetto a un insieme di policy. Dovresti vedere:
+* ✅ **Verifica della firma dell'immagine**: l'immagine è firmata da Tekton Chains
+* ✅ **Verifica della firma dell'attestazione**: l'attestazione è firmata e valida
+* ✅ **Il commit deve essere firmato**: l'attestazione SLSA dimostra che il commit è stato firmato
+* ✅ **Controlli ACS superati**: i risultati della scansione dell'immagine e della verifica delle policy sono inclusi nell'attestazione
+* ✅ **Quality gate SonarQube**: le metriche di qualità del codice sono incluse nell'attestazione
+* ❌ **Parasol Release Approved**: non è stata trovata alcuna attestazione di approvazione della release
++
+
+
+. La pipeline blocca correttamente la promozione perché l'immagine non è stata approvata per la release. All'immagine non è associata alcuna **attestazione firmata di approvazione della release**.
+
+=== Esercizio 4: Approva la release
+
+. Nella pagina di panoramica del componente RHDH, fai clic sul link **Release Approval** (l'icona della busta nella sezione Links).
++
+image::m02-rhdh-approval-link.png[Link Release Approval nella sezione Links della pagina del componente,link=self,window=blank,width=700]
+
+. L'applicazione Release Approval mostra l'immagine attualmente distribuita in preprod.
++
+image::m02-approval-process.png[Applicazione Release Approval con la distribuzione preprod e il pulsante Approve,link=self,window=blank,width=700]
++
+Mostra che il tag `latest` (1) è stato distribuito in preprod (2), che la distribuzione ha lo stato "ready" (3), ma che non dispone di un'attestazione di release (4).
+
+
+
+
+. Fai clic su **Approve** e inserisci un messaggio di approvazione:
++
+[source,role="copypaste"]
+----
+Approved for production release. All ACS policy checks passed, vulnerabilities remediated, commit signature verified. Risk assessment: low.
+----
++
+image::m02-approval-submit.png[Finestra di dialogo Release Approval con il motivo e il pulsante Submit,link=self,window=blank,width=500]
++
+L'approvazione viene registrata come **attestazione firmata** sull'immagine del container: viene firmata con la tua identità, proprio come la firma del tuo commit.
++
+image::m02-approval-success.png[Release approvata correttamente con indice nel log di trasparenza,link=self,window=blank,width=500]
++
+L'indice del log di trasparenza indica dove viene archiviato l'evento di firma nel database del log, per consentire la successiva verifica delle firme keyless.
+
+. Fai clic sull'icona del segno di spunta per visualizzare i dettagli dell'attestazione: l'approvazione è ora associata crittograficamente all'immagine (e viene recuperata e verificata quando fai clic).
++
+image::m02-approval-attestation.png[Dettagli dell'attestazione di approvazione con firmatario e motivo,link=self,window=blank,width=400]
+
+=== Esercizio 5: Esegui di nuovo la pipeline di promozione tramite tag
+
+. Torna a GitLab e crea un nuovo tag (ad esempio, `v2.1`) oppure esegui di nuovo la pipeline dal namespace secured-build nella OpenShift Console.
+
+. Questa volta, l'attività `ec-validate` troverà l'attestazione di approvazione e la pipeline verrà completata correttamente.
+
+. Nell'output della pipeline, ora puoi vedere:
+* Tutte le policy Conforma superate, inclusa l'approvazione della release
+* Avvisi con il numero di vulnerabilità e le metriche SonarQube
+* Un **link SBOM** che rimanda alla SBOM caricata in TPA e mostra la nostra versione (tag)
++
+image::m02-rhdh-ec-validation-passed.png[Convalida Enterprise Contract con tutte le policy superate,link=self,window=blank,width=700]
++
+image::m02-rhdh-tag-promote-sbom.png[Pipeline di promozione tramite tag completata correttamente con il pulsante View SBOM,link=self,window=blank,width=700]
++
+image::m02-tpa-sbom-details.png[Dettagli della SBOM in Trusted Profile Analyzer,link=self,window=blank,width=700]
+
+. La pipeline inoltre:
+* Copia l'immagine con il tag di versione nel registry
+* Apre una **richiesta di merge** nel repository dei manifest GitOps
+
+=== Esercizio 6: Completa la distribuzione in produzione
+
+. Nel log della pipeline per `open-prod-pr`, trova il link alla richiesta di merge e fai clic.
++
+image::m02-rhdh-tag-promote-open-prod-pr.png[Pipeline di promozione tramite tag con l'attività open-prod-pr,link=self,window=blank,width=700]
++
+image::m02-rhdh-open-prod-pr-log.png[Log della pipeline con il link alla richiesta di merge per il repository dei manifest,link=self,window=blank,width=700]
++
+La MR nel repository dei manifest mostra tutti i risultati della convalida Conforma, incluso un link all'immagine in Quay.
++
+image::m02-gitlab-prod-mr.png[MR di produzione nel repository dei manifest con i risultati della convalida Conforma,link=self,window=blank,width=700]
++
+image::m02-gitlab-prod-mr-merge.png[Pulsante Merge nella MR di produzione,link=self,window=blank,width=700]
+
+. Approva e unisci la MR nel repository dei manifest.
+
+. Argo CD rileverà la modifica e distribuirà la nuova immagine firmata, attestata, convalidata e approvata nel namespace `secured-prod`.
+
+=== Perché è importante?
+
+L'immagine ora distribuita in produzione include una **catena di provenienza SLSA** completa:
+
+* **Commit firmato**: tracciabile fino all'identità verificata di uno sviluppatore
+* **Attestazione SLSA**: dimostra che la pipeline di build è stata eseguita, quali attività sono state eseguite e quali risultati hanno prodotto
+* **Risultati della scansione ACS**: valutazione delle vulnerabilità incorporata nell'attestazione
+* **Risultati SonarQube**: metriche di qualità del codice nell'attestazione
+* **Approvazione firmata**: autorizzazione esplicita di una persona per la release
+* **SBOM**: inventario completo dei componenti nell'immagine, archiviato in TPA per il confronto continuo con le vulnerabilità
+
+Non si tratta solo di spuntare una casella: ogni elemento di prova è firmato crittograficamente e verificabile in modo indipendente.
+
+=== Come è stato fatto?
+
+Per rendere l'esercizio più leggibile, abbiamo aggiunto i dettagli qui sotto. Espandi la sezione per scoprire come è stato fatto.
+
+.**Apri per visualizzare i dettagli dell'implementazione**
+[%collapsible]
+====
+**Tekton Chains** firma automaticamente gli artefatti della pipeline usando la firma keyless di Sigstore:
+
+* Dopo ogni esecuzione della pipeline, Chains richiede un certificato di breve durata a **Fulcio**, usando l'identità del service account della pipeline
+* Crea un'**attestazione di provenienza SLSA** contenente tutti i risultati delle attività
+* L'attestazione e la firma vengono registrate in **Rekor** (log di trasparenza) e associate all'immagine nel registry
+
+**Conforma (Enterprise Contract)** convalida l'attestazione rispetto a un insieme di policy Rego archiviate nel repository {gitlab_url}/parasol/conforma-policies[`conforma-policies` repository su GitLab^]. Le policy nel bundle `parasol-software-supply-chain` verificano che:
+
+* Siano state eseguite le attività obbligatorie (verify-commit-signature, acs-image-scan, acs-image-check, sonar-scan)
+* Lo stato della firma del commit sia `SIGNED` (non `UNSIGNED` né un commit del bot)
+* Il controllo delle policy ACS sia stato superato
+* Il quality gate SonarQube sia stato superato
+* Esista sull'immagine un'attestazione firmata di approvazione della release
+
+image::m02-gitlab-conforma-policies.png[Repository delle policy Conforma in GitLab,link=self,window=blank,width=700]
+
+L'attestazione di approvazione è un'attestazione in-toto personalizzata con tipo di predicato `https://parasol-insurance.com/releases/v1`. È firmata tramite l'identità di chi approva (attraverso Fulcio) e associata all'immagine insieme all'attestazione di Chains.
+
+Se vuoi esaminare le attestazioni firmate associate all'immagine ora in produzione, torna all'app **Release Approval** (tramite il componente **Parasol Insurance (Secured)** in Developer Hub):
+
+image::m02-rhdh-release-approval-link.png[Link Release Approval sul componente Parasol Insurance Secured,link=self,window=blank,width=400]
+
+Fai clic su un tag per esaminare le attestazioni firmate associate a quell'immagine:
+
+image::m02-approval-inspect-attestations.png[Esamina le attestazioni facendo clic su un tag,link=self,window=blank,width=500]
+
+Qui puoi vedere l'identità del firmatario per l'attestazione personalizzata e le attestazioni generate automaticamente e firmate da Tekton Chains:
+
+image::m02-approval-attestation-details.png[Dettagli delle attestazioni con Release Approval e SLSA Provenance e le identità dei firmatari,link=self,window=blank,width=700]
+
+Nella sezione **Attestation Detail** puoi esaminare l'attestazione archiviata insieme all'immagine:
+
+image::m02-approval-attestation-json.png[Attestation Detail con l'istruzione in-toto e predicate e subject,link=self,window=blank,width=700]
+
+La **SBOM** viene generata con **syft** e caricata in TPA con etichette che identificano lo sviluppatore e il tag di versione. TPA confronta continuamente le SBOM con i dati sulle vulnerabilità acquisiti, fornendo visibilità costante sulla postura di sicurezza delle immagini distribuite.
+====
+
+=== Verifica
+
+A questo punto, dovresti aver:
+
+* Unito una MR firmata e verificato il completamento corretto della build post-merge
+* Creato un tag e verificato il fallimento della pipeline di promozione tramite tag a causa dell'approvazione mancante
+* Approvato la release e verificato il superamento della convalida Conforma
+* Verificato la distribuzione in produzione con una catena di provenienza SLSA completa
+
+'''
+
+== Passaggi successivi
+
+Continua con xref:module-02/05-namespace-security.adoc[Protezione dei namespace] per scoprire come Policy Controller impedisce la distribuzione di immagini non autorizzate.

@@ -1,0 +1,80 @@
+= 環境の詳細
+include::partial$_attributes.adoc[]
+
+== ワークショップ環境
+
+必要な環境はすべて準備済みです。ラボ環境には以下が含まれています。
+
+* Developer Hub、Dev Spaces、Pipelines、GitOps、および Sigstore スタック一式が事前設定された OpenShift クラスタ
+* すべてのワークショップリソースにアクセスできるユーザーアカウント
+* 保護し、セキュリティを強化した pipeline を通じて昇格させるサンプルアプリケーション（Parasol Insurance -- Secured）
+
+ログイン認証情報（Developer Hub、GitLab、およびすべてのワークショップサービスで使用します）：
+
+* **ユーザー名**: `{user}`
+* **パスワード**: `{password}`
+
+TIP: これらの認証情報はすぐ使えるようにしておいてください。ワークショップ中に何度も必要になります。
+
+== 環境へのアクセス
+
+ラボ環境には以下のサービスがあります。
+
+* **OpenShift Console**: {openshift_console_url}[{openshift_console_url}^]
+* **Red Hat Developer Hub**: {rhdh_url}[{rhdh_url}^]
+* **Dev Spaces**: {devspaces_url}[{devspaces_url}^]
+* **GitLab**: {gitlab_url}[{gitlab_url}^]
+* **Argo CD**: {argocd_url}[{argocd_url}^]
+* **ACS Console**: {acs_url}[{acs_url}^]
+* **Trusted Profile Analyzer**: {tpa_url}[{tpa_url}^]
+
+NOTE: URL と認証情報は、このラボインターフェースの右側パネルでも確認できます。上部のタブを使って、OpenShift Console、Terminal、GitLab を切り替えてください。
+
+== 所要時間
+
+このモジュールのハンズオン作業には **60〜90 分** かかります。
+
+[cols="2,1,3",options="header"]
+|===
+| セクション | 所要時間 | 内容
+
+| 脆弱性への早期対応
+| 15 分
+| セキュリティ強化済みコンポーネントを確認し、サンドボックスを作成して、RHDA で依存関係の脆弱性を検出・修正する
+
+| commit への署名
+| 10 分
+| Sigstore のキーレス署名で commit に署名し、GitLab で署名を検証する
+
+| サンドボックスの pipeline を確認
+| 15 分
+| pipeline のセキュリティチェック、署名検証、ACS スキャン結果を確認し、ベースイメージを修正する
+
+| 次のステージへ進む
+| 25 分
+| merge request を作成し、タグを使って昇格させ、署名済みの承認で Conforma のポリシー違反を解決する
+
+| namespace を保護
+| 10 分
+| 署名のないイメージと未承認のイメージを deploy し、Policy Controller による適用をテストする
+|===
+
+== 技術スタック
+
+このモジュールでは、モジュール 1 の技術に加え、セキュリティ関連の以下の技術も使用します。
+
+* **Red Hat Trusted Artifact Signer (RHTAS)** -- Sigstore ベースの署名インフラストラクチャ（Fulcio、Rekor、TUF）
+* **gitsign** -- OIDC を通じて開発者の ID と紐付ける、Sigstore のキーレス commit 署名
+* **Tekton Chains** -- pipeline 成果物への自動署名と SLSA provenance attestation
+* **Conforma (Enterprise Contract)** -- 署名済み attestation を Rego ポリシーに照らして検証するポリシーエンジン
+* **Sigstore Policy Controller** -- deploy 時にイメージ署名と attestation を検証する Kubernetes admission controller
+* **Red Hat Advanced Cluster Security (ACS)** -- イメージの脆弱性スキャンとセキュリティポリシーの適用
+* **Red Hat Dependency Analytics (RHDA)** -- 依存関係の脆弱性をリアルタイムに分析する IDE 拡張機能
+* **Trusted Profile Analyzer (TPA)** -- Lightwell の修正データを備え、SBOM を管理する脆弱性インテリジェンスバックエンド
+* **Quay** -- 署名と attestation を保存できるコンテナイメージレジストリ
+* **SonarQube** -- 静的解析とコード品質スキャン
+* **Parasol Insurance (Secured)** -- サプライチェーンセキュリティを全面的に適用した、サンプル Quarkus アプリケーションの強化版
+
+== 次のステップ
+
+xref:module-02/01-vulnerabilities.adoc[脆弱性への早期対応] に進み、セキュリティ強化済みの開発環境をセットアップして、脆弱性の修正を始めましょう。

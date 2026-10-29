@@ -1,0 +1,150 @@
+= Sezione 3: Accedere a Dev Spaces e configurare l'estensione MTA
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+[IMPORTANT]
+====
+In questo lab useremo **Migration Toolkit for Applications**, l'estensione per Visual Studio Code nota come **estensione MTA**, in un ambiente Red Hat Dev Spaces che fornisce una GUI basata su VS Code.
+
+**Developer Lightspeed** non è un'estensione separata. È la funzionalità di refactoring del codice basata sull'AI di MTA. Nell'IDE viene installata **l'estensione MTA**, che include sia l'analisi statica del codice MTA sia Developer Lightspeed (AI generativa).
+====
+
+== Obiettivo
+
+Prepara il workspace OpenShift Dev Spaces (`mta-lab`) e l'estensione MTA per il resto del lab:
+
+* Apri il progetto `parasol-insurance-eap` (clonato dal tuo account GitLab)
+* Crea un profilo di migrazione (tecnologie di origine e di destinazione)
+* Verifica che Developer Lightspeed possa raggiungere l'LLM del lab tramite GenAI / `provider-settings.yaml`
+
+Inizieremo aprendo l'ambiente di sviluppo preconfigurato e configurando l'estensione MTA, incluse le impostazioni di Developer Lightspeed (AI), per modernizzare l'applicazione `parasol-insurance-eap` di Parasol Insurance.
+
+== Esercizio 1: Aprire Dev Spaces ed effettuare l'accesso
+
+. Passa a Red Hat OpenShift Dev Spaces facendo clic sulla scheda **OpenShift Dev Spaces** nell'interfaccia del workshop.
+
+. Accedi a Dev Spaces usando le credenziali OpenShift:
++
+NOTE: La pagina iniziale è la pagina di accesso SSO di Keycloak
++
+--
+Username:
+[source,subs="attributes",role="copypaste"]
+----
+{user}
+----
+Password:
+[source,subs="attributes",role="copypaste"]
+----
+{password}
+----
+--
+
+. Dopo aver effettuato l'accesso, se viene richiesto di __Authorize Access__
++
+* Fai clic sul pulsante **Allow selected permissions**
++
+image::module-05-mta-dls/05-03-dls-01.jpg[Accesso a DevSpaces,link=self,window=blank,title="Logging In"]
++
+CAUTION: Se un messaggio indica che è necessario autenticarsi di nuovo, torna alla scheda **OpenShift Dev Spaces** nell'interfaccia del workshop (non fare clic sull'icona di aggiornamento del browser). Tornerai all'elenco dei workspace, da cui potrai riaprire **mta-lab**.
+
+. Apri il workspace **mta-lab**
++
+* Dopo aver effettuato l'accesso, si apre l'elenco dei workspace che mostra la voce **mta-lab** (provisionata per il tuo utente)
+* Fai clic sul link **Open** sul lato destro dell'elenco dei workspace
++
+image::module-05-mta-dls/05-03-dls-02.jpg[Apri workspace,link=self,window=blank,title="Open Workspace"]
+
+. Attendi che il workspace venga inizializzato e aperto:
++
+Il repository **parasol-insurance-eap** (dal tuo progetto GitLab) viene caricato in Dev Spaces e l'ambiente di sviluppo è pronto.
++
+Il workspace si apre in una nuova scheda del browser.
++
+* Se ti viene chiesto di considerare attendibili gli autori o il workspace, conferma. (Figura 3)
+* Se viene visualizzato un pannello introduttivo per la configurazione, scegli il tema **Light** per ottenere il miglior contrasto nelle fasi successive del lab, quindi fai clic su **Mark Done**. Il pannello introduttivo si chiuderà; fai quindi clic sull'icona delle estensioni sul lato sinistro dello schermo per aprire il pannello delle estensioni installate, come mostrato nel passaggio 2 dell'immagine seguente. (Figura 4)
++
+image::module-05-mta-dls/05-03-dls-05.png[Scheda VSCode,link=self,window=blank,title="Manage profiles"]
++
+image::module-05-mta-dls/05-03-dls-03.png[Scheda VSCode,link=self,window=blank,title="Mark done"]
+
+In alcuni casi l'installazione delle estensioni potrebbe richiedere del tempo. Se vedi il pulsante **Reload Window**, fai clic su di esso. La scheda del browser verrà ricaricata automaticamente.
+
+image::module-05-mta-dls/05-03-dls-04.png[Scheda VSCode,link=self,window=blank,title="Trust the Authors"]
+
+
+== Esercizio 2: Configurare i profili MTA e il provider GenAI
+
+Ottimo! Sei arrivato all'esercizio 2; questo significa che ora abbiamo un ambiente funzionante in cui configurare i profili di analisi.
+
+La gestione di più profili è una funzionalità potente dell'estensione MTA. Ti consente di passare facilmente da un profilo di analisi all'altro. Puoi creare un nuovo profilo facendo clic sul pulsante "New Profile", come mostrato nel passaggio 3 dell'immagine seguente.
+
+Inizieremo creando il nostro primo profilo, `quarkus-profile`, per migrare l'applicazione a Quarkus. In xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Sezione 5: Regole personalizzate (audit logging)] esploreremo le regole personalizzate per l'audit logging.
+
+Fai clic sul pulsante `Manage Profiles` per aprire il pannello di gestione dei profili.
+
+image::module-05-mta-dls/05-03-dls-06.png[Scheda VSCode,link=self,window=blank,title="VSCode Tab"]
+
+- Crea un nuovo profilo `quarkus-profile`
+- Nome profilo: `quarkus-profile`
+- Tecnologie di destinazione: `quarkus`, `quarkus3+`, `jakarta-ee`
+
+image::module-05-mta-dls/05-03-dls-07.png[Scheda VSCode,link=self,window=blank,title="Review profiles"]
+
+Poiché questo è il primo profilo, l'estensione DLS lo imposterà automaticamente come attivo.
+
+Verifica che i dettagli siano corretti come indicato sopra e chiudi questa scheda.
+
+
+Nella schermata sopra, individua il controllo accanto a **Open Analysis** e fai clic; quindi segui le istruzioni seguenti.
+Apri le impostazioni del provider GenAI dal pannello MTA, come mostrato nell'immagine successiva.
+
+- *1* Fai clic sull'icona delle impostazioni `⚙︎`.
+- *2* Fai clic su `Configure GenAI Settings`
+
+image::module-05-mta-dls/05-03-dls-08.png[Scheda VSCode,link=self,window=blank,title="Gen-AI Provider Settings"]
+
+Si dovrebbe aprire la configurazione delle impostazioni del provider. MTA usa **provider-settings.yaml** per connettersi all'LLM.
+
+Il workspace del lab è preconfigurato con le impostazioni del provider e le credenziali LiteLLM. Verifica che il modello **OpenShift** sia attivo e che i campi URL di base / chiave API siano compilati (dovrebbero già corrispondere all'ambiente del lab).
+
+TIP: Normalmente le impostazioni del provider sono già compilate per questo lab. Usa lo YAML seguente solo se il file è vuoto o incompleto (ad esempio, dopo un reset del workspace): è una procedura di ripristino, non un errore previsto.
+
+[.console-input]
+[source,yaml,subs="+attributes,macros+"]
+----
+models:
+  OpenShift: &active
+    environment:
+      OPENAI_API_KEY: "{litellm_virtual_key}"
+    provider: ChatOpenAI
+    args:
+      model: "qwen3-235b"
+      configuration:
+        baseURL: "{litellm_api_base_url}"
+active: *active
+----
+
+Verifica che i campi delle impostazioni contengano i valori seguenti.
+
+- `OPENAI_API_KEY` : è la chiave LLM per il modello ospitato su OpenShift AI
+- `model` : il nome del modello in uso
+- `baseURL` : l'URL/route su cui il modello è in ascolto per ricevere richieste tramite l'API Chat Completions.
+- `active` : infine, assicurati che questo profilo sia attivo. MTA può essere configurato con più LLM, ma solo uno può essere attivo alla volta.
+
+image::module-05-mta-dls/05-03-dls-09.png[Scheda VSCode,link=self,window=blank,title="VSCode Tab"]
+
+== Verifica
+
+Verifica che l'ambiente Dev Spaces e l'estensione MTA (incluso Developer Lightspeed) siano configurati correttamente.
+
+. Verifica che l'estensione MTA sia configurata correttamente
+* Con l'icona dell'estensione MTA selezionata e la scheda MTA Analysis View attiva:
+* Fai clic sull'icona a forma di ingranaggio sul lato destro dello schermo
+* Il pannello **Get Ready to Analyze** si aprirà sul lato destro dello schermo
+* Tutte e quattro le caselle dei messaggi dovrebbero presentare segni di spunta verdi e risultare completate
+
+. Verifica che il workspace Dev Spaces punti al repository corretto
+* Fai clic sull'icona del file sul lato sinistro dell'ambiente Dev Spaces
+* File _EXPLORER_ mostra la directory **parasol-insurance-eap** (la tua copia GitLab, non un esempio condiviso)
+* Se necessario, espandi le directory usando le frecce di File Explorer: dovresti vedere package come `com.parasol.mdb` (`EmailIntakeMDB`) e `com.parasol.ejb` (`ClaimService`)

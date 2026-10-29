@@ -1,0 +1,467 @@
+:imagesdir: ../../assets/images
+:page-time: 8
+include::partial$style.adoc[]
+
+[id="kafka-to-rocketchat"]
+== Kafka から Rocket.Chat へ
+
+_Matrix_ と _Rocket.Chat_ を双方向でつなぐには、4 つのフローが必要です（イントロで説明したとおりです）。サポート担当者まで顧客メッセージを届ける経路だけでも 2 つ必要です。
+
+* *フロー 1* — Matrix から Kafka へ _(事前構成済み)_
+* *フロー 2* — Kafka から Rocket.Chat へ ✏️ _(これを作成します)_
+
+NOTE: 4 つのフローはすべて同じパターンに従います。1 つ作れば、他もほぼ同じです。ラボを短く保つため、手作業で作成するのはフロー 2 のみです。残りの 3 つは最後に利用可能になり、有効化されます。
+
+[.mermaid]
+----
+flowchart LR
+    MX -->|"フロー 1"| K --> F2 --> RC
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    K@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    F2["✏️ フロー 2"]
+
+    style MX fill:none,stroke:none
+    style K fill:none,stroke:none
+    style RC fill:none,stroke:none
+    style F2 fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#e65100,font-size:14px
+
+    linkStyle 0 stroke:#ccc,stroke-width:1px
+    linkStyle 1 stroke:#d32f2f,stroke-width:2px
+    linkStyle 2 stroke:#d32f2f,stroke-width:2px
+----
+
+ここではリスナー側を作成します。_Kafka_ からイベントを取得し、_Rocket.Chat_ に届けるフローです。これができれば、_Kafka_ トピックに届いたメッセージはすべて自動的にサポート担当者へ届きます。
+
+{empty} +
+
+
+=== Camel ルートを開く
+
+ディレクトリツリーから次のリソースを探してください。
+
+* `k2r.camel.yaml`
++
+クリックして _Kaoto_ で開きます。
++
+[TIP]
+--
+.Kaoto は初めてですか？
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+{empty} +
+
+フローはすでに用意されています。あとは 3 つの領域を埋めるだけです。
+
+. _Kafka_ をソースシステムとして定義する
+. ループバックイベントを防ぐフィルターを定義する
+. _Kafka_ のイベントを _Rocket.Chat_ 用に変換するデータマッピングを定義する
+
+{blank}
+
+下の図で注目箇所を示しています。
+
+// image::m3/flow-k2r-todo.jpg[width=80%]
+
+{empty} +
+
+[#flow-k2r-todo-new]
+[.bordered]
+image::module-03/m3/flow-k2r-todo-new.png[width=90%]
+
+[.overlay]
+****
+[.target]
+flow-k2r-todo-new
+
+[.arrows]
+{x: 10, y: 72, rot: 0, size: 1, color: "red"}
+{x: 33, y: 26, rot: 220, size: 1, color: "red"}
+{x: 61.5, y: 68, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 10, y: 117, size: 1.2, color: "red"} +
+{x: 40.5, y: -8, size: 1.2, color: "red"} +
+{x: 61.5, y: 117, size: 1.2, color: "red"}
+****
+
+
+{empty} +
+{empty} +
+
+[NOTE]
+--
+*ループバックイベントとは何ですか？*
+
+すべてのシステムが 1 つの _Kafka_ トピックに公開し、そこから購読します。つまり、_Rocket.Chat_ から送信されたメッセージも、このフローが消費しているのと同じトピックに入るため、そのまま戻ってきてしまう可能性があります。
+
+[.mermaid]
+----
+flowchart LR
+    RC -->|"メッセージ"| K -->|"❌ 同じイベント"| RC
+
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+    K@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka トピック", pos: "b", h: 100, w: 80, constraint: "on" }
+
+    style RC fill:none,stroke:none
+    style K fill:none,stroke:none
+
+    linkStyle 0 stroke:#66bb6a,stroke-width:2px
+    linkStyle 1 stroke:#d32f2f,stroke-width:2px,stroke-dasharray:5
+----
+
+これから定義するフィルターは、各イベントの `source` フィールドを確認し、_Rocket.Chat_ に由来するものをブロックすることでこれを防ぎます。
+--
+
+{empty} +
+
+=== Kafka をソースシステムとして定義する
+
+フローの最初のステップでは、イベントの到着元として _Kafka_ を定義します。
+
+NOTE: あなたの _OpenShift_ namespace には、すでに使用可能な _Streams for Apache Kafka_ クラスタ（_Kafka_）が含まれています。
+
+1. pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] ステップにカーソルを合わせ、浮動する {nbsp}{btn-replace}{nbsp} ボタン（replace step）をクリックします。
+1. {ui-filter} に `Kafka` と入力して見つけ、_Kafka_ コンポーネントを選択します。
+1. _Kafka_ ステップをクリックして設定パネルを開きます。
+1. `All` 設定タブを選択します。
+1. 次の 2 つのプロパティを設定します。
++
+(各項目は上部の {ui-filter} で素早く見つけられます)
++
+image::module-03/m3/kaoto-kafka-steps.png[width=100%]
++
+`Topic`:
++
+[.copypaste.value]
+****
+myroom
+****
++
+`Brokers`:
++
+[.copypaste.value]
+****
+my-cluster-kafka-bootstrap:9092
+****
++
+{empty} +
++
+TIP: 設定パネルの外側をクリックすると閉じられます。
+
+{empty} +
+
+=== フィルターを定義する
+
+_Kafka_ から到着するイベントは、どのソースシステムからでも発生し得ます。フィルターがないと、もともと _Rocket.Chat_ から送られたメッセージが _Kafka_ を通って再び _Rocket.Chat_ に押し戻され、ループが発生します。
+
+  * _Rocket.Chat -> Kafka -> Rocket.Chat_ ⟵ ループバック！
+
+{blank}
+
+フィルターは、イベントがどこから来たかを確認することでこれを防ぎます。
+
+[cols="3a,6a"]
+|===
+|
+[.bordered]
+[#kaoto-datamapper-configure]
+image::module-03/m3/kaoto-filter-config.png[width=100%]
+
+[.overlay]
+****
+[.target]
+kaoto-datamapper-configure
+
+[.numbers]
+{x: 43, y: 41, size: 4}
+{x: 80, y: 29, size: 4}
+{x: 80, y: 86, size: 4}
+****
+|
+
+1. バー pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Filter&nbsp;</code>] をクリックします。
+
+1. `Required` タブが選択されていることを確認します。既定で `JQ` 式言語が選ばれているはずです。
++
+{blank}
++
+1. 次の式をコピーして貼り付けます。
++
+{blank}
++
+[.copypaste.value]
+****
+pass:[.source \| test("rocketchat")]
+****
++
+NOTE: この式は _Kafka_ イベントから `source` フィールドを取り出し、そのイベントが _Rocket.Chat_ に由来するかを確認します。_Rocket.Chat_ からのイベントは、ループバックを防ぐために除外されます。
+
+|===
+
+{empty} +
+
+=== データ変換を定義する
+
+_Kafka_ から到着するデータは共通スキーマを使っています。これを _Rocket.Chat_ が期待する形式にマッピングする必要があります。
+
+{empty} +
+
+. Camel ルートに Kaoto のデータ変換ステップを含める
++
+--
+Kaoto で次を実行します。
+
+. pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Map...&nbsp;</code>] ステップ内の kbd:[+] ボタンをクリックする
+. {ui-filter} に `mapper` と入力して _Kaoto DataMapper_ を見つける
+. _Kaoto DataMapper_ タイルをクリックする
+. mapper をクリックして設定パネルを開く
+. pass:a[<span {btn-stl-blue}>{map-wrench}  Configure</span>] ボタンをクリックする
++
+image::module-03/m3/kaoto-datamapper-steps.png[width=100%]
+
+--
++
+[TIP]
+--
+.データマッパー UI の概要
+[%collapsible]
+====
+これがデータマッパーの見た目です。左が *Source*（データの取得元）、右が *Target*（データのマッピング先）です。
+
+{blank}
+
+image::module-03/m1/kaoto-datamapper-overview.png[width=100%]
+====
+--
++
+{empty} +
+
+. 次に、入力と出力を定義する
++
+--
+DataMapper エディタで、ソース（左）とターゲット（右）を定義します。
+
+[cols="1a,1a", options="header"]
+|===
+| Source (left panel)
+| Target (right panel)
+
+|
+. **Body** で kbd:[{map-att}]（Attach schema）をクリックする
+. pass:a[<span {btn-stl-blue-outline}>{map-upload} Upload schema file(s)</span>] をクリックする
+. {ui-filter} に `common` と入力する
+. `support/schemas/*common.json*` にチェックを入れ、pass:[<code style="background-color: #4494E5; color: white;">OK</code>] をクリックする
+. pass:a[<span {btn-stl-blue}>Attach</span>] をクリックする
+
+|
+. kbd:[{map-att}]（Attach schema）をクリックする
+. pass:a[<span {btn-stl-blue-outline}>{map-upload} Upload schema file(s)</span>] をクリックする
+. {ui-filter} に `rocket` と入力する
+. `support/schemas/*rocketchat-out.json*` にチェックを入れ、pass:[<code style="background-color: #4494E5; color: white;">OK</code>] をクリックする
+. pass:a[<span {btn-stl-blue}>Attach</span>] をクリックする
+
+|===
+--
++
+{empty} +
+
+. データマッピングルールを定義する
++
+*Target* に以下の値をコピーして貼り付け、指定されたフィールド項目を定義します。
++
+... `string[@key = channel]`:
++
+[.copypaste.value]
+****
+[.path]
+/roomid
+
+[.default]
+room11
+
+"REPLACE"
+****
++
+--
+.値を貼り付けるには:
+[caption=]
+====
+下の図のように、kbd:[⠇] をクリックして kbd:[Add value selector (value-of)] を選択します。
+
+[.bordered]
+[#mapper-add-expression]
+image::module-03/m3/mapper-add-expression.png[width=50%]
+
+[.overlay]
+****
+[.target]
+mapper-add-expression
+
+[.arrows]
+{x: 96.5, y: 28, rot: -90, size: 1}
+{x: 94.0, y: 41, rot: -90, size: 1}
+
+[.numbers]
+{x: 120, y: 28, size: 2}
+{x: 120, y: 41, size: 2}
+****
+
+// image::module-03/m3/mapper-add-expression.jpg[width=70%]
+====
+--
++
+{blank}
++
+... `string[@key = text]`:
++
+[.copypaste.value]
+****
++++concat("*",/fn:map/fn:string[@key='user'], "@", /fn:map/fn:string[@key='source'],":* ", /fn:map/fn:string[@key='text'])+++
+****
++
+マッピングのレンダリングは次のようになっているはずです。
++
+[.bordered]
+image::module-03/m3/mapping-kafka-rocketchat.png[width=80%]
++
+{empty} +
+
+キャンバスに戻るには、*Design* タブをクリックします。
+
+image::module-03/common/kaoto-design-tab.png[width=50%]
+
+{empty} +
+
+完成したフローは次のようになります。
+
+[.bordered]
+image::module-03/m3/flow-k2r-complete.png[width=90%]
+
+{empty} +
+
+=== フローをローカルでテストする
+
+_Camel JBang_ を使ってプロセスをバックグラウンドで実行します。
+
+{blank}
+
+[.copypaste]
+****
+labrun k2r --background
+****
+
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+`labrun` は、Camel JBang を裏で実行するラボ用ヘルパーです。上のコマンドは次と同等です。
+
+* `camel run --name k2r` — `k2r` という名前のインテグレーションを実行する
+* `--source-dir k2r` — `k2r` ディレクトリからルートファイルを読み込む
+* `--local-kamelet-dir ../support/kamelets` — Rocket.Chat 用を含むカスタム Kamelet（コネクタ）を読み込む
+* `--background` — ターミナルで作業を続けられるようにバックグラウンドで実行する
+====
+--
+
+{empty} +
+
+プロセスが実行中であることを確認します。
+
+{blank}
+
+[.copypaste]
+****
+camel get
+****
+
+{blank}
+
+`Running` 状態でプロセスが表示されるはずです。
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">  PID   NAME  CAMEL   PLATFORM  PROFILE  READY  STATUS   RELOAD  AGE  ROUTE  MSG/S  TOTAL  FAIL  INFLIGHT  LAST  SINCE-LAST
+ 16763  k2r   4.18.0  Camel     dev       1/1   Running     0/0  16s    1/1   0.00      0     0         0             -/-/-</pre>
+++++
+
+{empty} +
+
+テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの利用開始,window=_blank] の手順に従ってください。
+
+準備ができたら、テストメッセージを _Kafka_ に送信します。
+
+{blank}
+
+[.copypaste]
+****
++++camel cmd send k2r --body \
+'{
+  "user":   "test",
+  "source": "test",
+  "text":   "test message"
+}'+++
+****
+
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+* `camel cmd send` — 実行中の Camel プロセスにメッセージを送信する
+* `k2r` — 送信先プロセスの名前
+* `--body '{...}'` — Kafka イベントをシミュレートする JSON ペイロード。必要なのは `user`、`source`、`text` のみです。送信先チャネルはマッピング内で固定されています。
+====
+--
+
+{empty} +
+
+_Rocket.Chat_ のルームを開き、受信メッセージを確認します。次のように表示されるはずです。
+
+{empty} +
+
+:fig-avatar: U
+:fig-sender: {username}
+:fig-time: 3:42 PM
+:fig-msg: pass:[<b>test@test:</b> test message]
+include::_figures/rc-message.adoc[]
+
+{empty} +
+
+メッセージを確認できたら、バックグラウンドプロセスを停止します。
+
+{blank}
+
+[.copypaste]
+****
+camel stop
+****
+
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+* `camel stop` — _Camel JBang_ で開始されたすべての実行中の Camel プロセスを停止する
+* `camel get` で何も実行されていないことを確認できます
+====
+--
+
+{empty} +
+
+[.verification]
+****
+_Rocket.Chat_ のルームでテストメッセージを確認できましたか？
+
+[.success]
+フローは動作しています。_Kafka_ から _Rocket.Chat_ へのルートがイベントを受け取り、配信できています。ローカルでフローの検証が完了したので、次は _OpenShift_ にデプロイします。
+
+[.fail]
+Camel ルート定義を見直し、ターミナルのエラーを確認してください。
+****

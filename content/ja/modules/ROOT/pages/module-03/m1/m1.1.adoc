@@ -1,0 +1,926 @@
+:imagesdir: ../../assets/images
+:page-time: 8
+include::partial$style.adoc[]
+
+[id='lab3-service-interconnect']
+== データベース接続を有効にする
+
+統合フローからデータベースにアクセスする必要がありますが、まだ接続できません。原因を確認し、接続を有効にしましょう。
+
+NOTE: この演習では要点に集中できるよう単一の cluster を使用しますが、Service Interconnect は network policy では対応しきれない、複数の cluster、リージョン、クラウドプロバイダーにまたがるマルチサイト mesh に対応するよう設計されています。最後に、より広い用途を示す実例を簡単に紹介します。
+
+{empty} +
+
+=== データベースに接続できないのはなぜですか？
+
+バックエンドデータベースは、厳格な network policy が適用された隔離 namespace (*shared-database*) でホストされています。他の namespace からの直接アクセスは許可されていません。
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB クライアント]
+        end
+    end
+
+    Client -.-x|"❌ 接続不可"| SVC
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+試してみましょう — _Dev Spaces_ の terminal からデータベースに簡単な query を実行します。
+
+{blank}
+
+// [.copypaste]
+// ****
+// curl postgres.shared-database.svc:5432 \
+// -v --connect-timeout 3
+// ****
+
+// [TIP]
+// --
+// .この command は何をしますか？
+// [%collapsible]
+// ====
+// * `postgres.shared-database.svc:5432` — 接続先のサービス、namespace、PostgreSQL ポート
+// * `-v` — 詳細表示を有効にし、接続試行を表示します
+// * `--connect-timeout 3` — 接続待ちを続けず、3 秒後にタイムアウトします
+// ====
+// --
+
+[.copypaste]
+****
+sql postgres.shared-database.svc:5432 \
+"SELECT count(*) FROM policies"
+****
+
+[TIP]
+--
+.この command は何をしますか？
+[%collapsible]
+====
+* `sql` — PostgreSQL データベースに接続してクエリーを実行するラボ用ヘルパースクリプト
+* `postgres.shared-database.svc:5432` — データベースアドレス（サービス、namespace、ポート）
+* `"SELECT count(*) FROM policies"` — データベース内のレコード数を数えます
+====
+--
+
+接続は timeout になります。データベースには namespace から直接アクセスできません。
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres.shared-database.svc:5432 (timeout: 5s)...</span>
+
+<span style="color: #f4796d">ERROR: Cannot connect to postgres.shared-database.svc:5432</span></pre>
+++++
+
+{empty} +
+
+=== Service Interconnect で namespace 間を接続する
+
+{rhsi}（オープンソースプロジェクト https://skupper.io[Skupper.io,window=_blank] を基に構築）は、namespace 間にアプリケーションレベルの暗号化接続を作成することでこの問題を解決します。VPN や firewall rule は不要で、サービスをパブリックネットワークに公開する必要もありません。
+
+設定が完了すると、namespace 内に local service が作成され、remote database に traffic が透過的に転送されます。
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB クライアント]
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Client --> SI1
+
+    SI1 -.-|"🔒 暗号化 link"| SI2
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    SI2 --> SVC
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style DB fill:#336,color:#fff
+----
+
+アプリケーションから見ると、データベースは local service として扱われます。特別な設定は必要ありません。
+
+{empty} +
+
+//NOTE: この演習では、基本概念の学習に集中できるよう、同じ cluster 上の 2 つの namespace を接続します。簡単な network policy で解決できることに、なぜ Service Interconnect が必要なのか疑問に思うかもしれません。答えは規模です。Service Interconnect は、複数の cluster、リージョン、クラウドプロバイダーにサービスがまたがり、多数の接続が同じ secure mesh を共有するマルチサイトネットワーク向けに設計されています。ここで学ぶ内容は、実際のシナリオにそのまま応用できます。演習の最後に簡単な例を紹介します。
+
+//{empty} +
+
+=== 内部の仕組み
+
+Service Interconnect は、一連の resource を使って接続を確立、管理します。先ほどの図を構成要素ごとに見てみましょう。
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces"]
+        subgraph yours [" "]
+            Client[DB クライアント]
+            SVC2((svc))
+            subgraph S2 ["Site (アプリ)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 暗号化 link"| S1
+
+    subgraph sharedLabel [shared-database]
+        subgraph shared [" "]
+            subgraph S1 ["Site (DB)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel fill:none,stroke:none
+    style sharedLabel fill:none,stroke:none
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S1 fill:#e8eaf6,stroke:#7986cb
+    style Grant fill:#fff,stroke:#7986cb
+    style Listener fill:#fff,stroke:#7986cb
+    style Token fill:#fff,stroke:#7986cb
+    style Connector fill:#fff,stroke:#7986cb
+    style DB fill:#336,color:#fff
+----
+
+[.mermaid-hints-simple]
+****
+S2 | Site | Skupper network の基盤です。参加する各 namespace で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
+S1 | Site | Skupper network の基盤です。参加する各 namespace で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
+Grant | AccessGrant | 接続を受け入れる側で作成します。remote Site が接続するための credential を生成します。ネットワークへの招待状と考えてください。 +
+Token | AccessToken | grant の詳細を使って接続元で作成します。2 つの Site 間に暗号化 link を確立します。 +
+Listener | Listener | namespace 内で remote service を local に公開します。routing key で相手側の Connector と対応付け、remote service を local service のように扱えるようにします。 +
+Connector | Connector | local service を Skupper network に接続します。service を公開し、他の namespace にある対応する Listener からアクセスできるようにします。 +
+SVC2 | Service (自動作成) | Listener を作成すると、Service Interconnect がローカル Kubernetes service を自動作成します。アプリケーションはデータベースがローカルにあるかのようにこの service に接続します。
+****
+
+TIP: 図の各構成要素にカーソルを合わせると、その役割が表示されます。
+
+データベースは安全に隔離された環境にあり、受信 port は公開されていません。それを維持するため、link はデータベース側 *から* あなたの Site *へ向けて* 開始します。このため、あなた側で AccessGrant を作成します。これにより、データベース Site があなたに接続し、双方向の通信 link を確立する許可を得ます。悪用される可能性のある入口を、その環境で開く必要はありません。
+
+{empty} +
+
+=== この演習で行うこと
+
+Service Interconnect の構成はすべて 2 段階で行います。まず、環境を接続する secure mesh で *network を確立* し、次にその network 経由で *service を公開* します。network の準備ができたら、新しい service の追加は Listener と Connector を組み合わせるだけです。network の変更は必要ありません。
+
+{empty} +
+
+[.mermaid]
+----
+flowchart LR
+    subgraph netLabel ["① network を確立"]
+        subgraph net [" "]
+            direction LR
+            S1@{ shape: processes, label: "Site" } -.-|"🔒 暗号化 link"| S2@{ shape: processes, label: "Site" }
+        end
+    end
+
+    subgraph svcLabel ["② service を公開"]
+        subgraph svc [" "]
+            direction LR
+            LA@{ shape: processes, label: "Listener" } --- CA@{ shape: processes, label: "Connector" }
+        end
+    end
+
+    netLabel ~~~ svcLabel
+
+    style netLabel fill:none,stroke:none
+    style svcLabel fill:none,stroke:none
+    style net fill:#e8eaf6,stroke:#7986cb
+    style svc fill:#e8f5e9,stroke:#66bb6a
+    style S1 fill:#fff,stroke:#7986cb
+    style S2 fill:#fff,stroke:#7986cb
+    style LA fill:#fff,stroke:#66bb6a
+    style CA fill:#fff,stroke:#66bb6a
+----
+
+この演習では、次の手順になります。
+
+*ネットワークを確立* — namespace 間にセキュアリンクを作成します。
+
+[start=0]
+. `shared-database` namespace には *Site* がすでにあります _(事前設定済み)_
+. `linkAccess` を有効にして、namespace に *Site* を作成します
+. データベース namespace が接続できるように *AccessGrant* を生成します
+. link を確立するため、データベース namespace に *AccessToken* を作成します
+
+*データベース service を公開* — remote database に local（`{username}-devspaces` 内）からアクセスできるようにします。
+
+[start=4]
+. Skupper network と port `5432` の PostgreSQL を接続する *Connector* はすでにあります _(事前設定済み)_
+. remote database を local service として公開する *Listener* を作成します
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel2 ["{username}-devspaces"]
+        subgraph yours2 [" "]
+            Client[DB クライアント]
+            SVC2((svc))
+            subgraph S2 ["✏️ Site (アプリ)"]
+                Listener(("✏️ Listener"))
+                Grant["✏️ AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 暗号化 link"| S1
+
+    subgraph sharedLabel2 [shared-database]
+        subgraph shared2 [" "]
+            subgraph S1 ["✅ Site (DB)"]
+                Connector(("✅ Connector"))
+                Token["✏️ AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel2 fill:none,stroke:none
+    style sharedLabel2 fill:none,stroke:none
+    style S2 fill:#ffe0b2,stroke:#fb8c00
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Listener fill:#fff3e0,stroke:#fb8c00
+    style Grant fill:#fff3e0,stroke:#fb8c00
+    style Token fill:#fff3e0,stroke:#fb8c00
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+[.indent2]
+✅ platform team による設定済み +
+✏️ あなたの作業
+
+{empty} +
+
+=== 手順 0: サーバー側を確認する（任意）
+
+`shared-database` namespace には read-only access があります。platform team が設定した内容を確認してみましょう。
+
+Skupper resource を表示します。
+
+{blank}
+
+[.copypaste]
+****
+oc get site,connector -n shared-database
+****
+
+次のような出力が表示されます。
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: white">NAME                            STATUS   SITES IN NETWORK   MESSAGE
+site.skupper.io/database-site   Ready    1                  OK
+
+NAME                            ROUTING KEY   PORT   HOST   SELECTOR       STATUS    HAS MATCHING LISTENER   MESSAGE
+connector.skupper.io/postgres   postgres      5432          app=postgres   Pending                           No matching listeners</pre>
+++++
+
+Connector の status が `Pending` で、`No matching listeners` と表示されています。これは想定どおりです。この演習の後半で対応する Listener を作成します。
+
+これらは図にある 2 つの事前設定済み resource です。残りの作業は次のとおりです。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ 設定済み</b><br/>• Site (DB)<br/>• Connector</div>"]
+
+    Progress["33%（事前設定済み）<br/>████████░░░░░░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ 残り</b><br/>• Site (アプリ)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== network を確立する
+
+最初に、namespace とデータベース namespace の間に secure network を設定します。Site、AccessGrant、AccessToken を作成し、これらを組み合わせて 2 つの環境間に暗号化 link を確立します。
+
+{empty} +
+
+==== 手順 1: namespace に Site を作成する
+
+`linkAccess` を有効にした Site を作成します。これにより namespace は、データベースからの接続を受け入れられる *listening site* になります。
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Site
+metadata:
+  name: {username}-site
+  namespace: {username}-devspaces
+spec:
+  linkAccess: route
+EOF
+****
+
+Site の準備ができたことを確認します。
+
+{blank}
+
+[.copypaste]
+****
+oc get site {username}-site -n {username}-devspaces
+****
+
+`STATUS` 列が `Ready` になるまで待ちます。
+
+{blank}
+
+[subs=attributes]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME         STATUS   SITES IN NETWORK   MESSAGE
+{username}-site   Ready    1                  OK</pre>
+++++
+
+Site の準備ができました。進捗を確認しましょう。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ 完了</b><br/>• Site (DB)<br/>• Connector<br/>• Site (アプリ)</div>"]
+
+    Progress["50% 完了<br/>█████████████░░░░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ 残り</b><br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== 手順 2: AccessGrant を作成する
+
+始める前に、link は Site (DB)（データベース） *から* Site (アプリ)（あなたの Site） *へ* 開始することを覚えておいてください。grant と token が連携して、どのようにこれを実現するかを見てみましょう。
+
+{blank}
+
+[.mermaid]
+----
+sequenceDiagram
+    actor A as 管理者<br/>(あなた)
+    participant S2 as Site (アプリ)
+    participant S1 as Site (DB)
+
+    A-->>S2: AccessGrant を作成
+
+    Note over S2: AccessGrant
+
+    A-->>S1: AccessToken を作成
+
+    Note over S1: AccessToken
+
+    S1-->>S2: token を redeem
+    S2-->>S1: link の詳細を転送
+    S1->>S2: link を作成
+
+    Note over S2,S1: 🔒 暗号化 link を確立
+----
+
+Site (アプリ) に AccessGrant を作成し、Site (DB) に AccessToken を作成します。次にデータベース Site が token を redeem し、あなた側へのセキュアリンクを確立します。
+
+{blank}
+
+それでは、AccessGrant を作成します。
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessGrant
+metadata:
+  name: grant-{username}
+  namespace: {username}-devspaces
+spec:
+  redemptionsAllowed: 1
+  expirationWindow: 168h
+EOF
+****
+
+AccessGrant の準備ができるまで待ち、その詳細を取得します。
+
+{blank}
+
+[.copypaste]
+****
+oc get accessgrant grant-{username} -n {username}-devspaces
+****
+
+`STATUS` 列が `Ready` になるまで待ちます。
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            REDEMPTIONS ALLOWED   REDEMPTIONS MADE   EXPIRATION             STATUS   MESSAGE
+grant-userN     1                                        2026-03-27T11:29:08Z   Ready    OK</pre>
+++++
+
+AccessGrant の準備ができました。進捗を確認しましょう。
+
+{blank}
+
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ 完了</b><br/>• Site (DB)<br/>• Connector<br/>• Site (アプリ)<br/>• AccessGrant</div>"]
+
+    Progress["67% 完了<br/>████████████████░░░░░░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ 残り</b><br/>• AccessToken<br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+==== 手順 3: データベース namespace に AccessToken を作成する
+
+データベースから namespace への link を確立するため、`shared-database` namespace に AccessToken を作成します。token 名は `token-{username}` にする必要があります。
+
+grant の詳細を取り出して、AccessToken を作成します。
+
+{blank}
+
+[.copypaste]
+****
+URL=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.url}')
+CODE=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.code}')
+CA=$(oc get accessgrant grant-{username} -n {username}-devspaces -o jsonpath='{.status.ca}' | sed 's/^/    /')
+
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: AccessToken
+metadata:
+  name: token-{username}
+  namespace: shared-database
+spec:
+  url: "${URL}"
+  code: "${CODE}"
+  ca: |
+${CA}
+EOF
+****
+
+しばらくすると、`shared-database` に *Link* resource が自動作成されます。確認しましょう。
+
+{blank}
+
+[.copypaste]
+****
+oc get link token-{username} -n shared-database
+****
+
+link の status が `Ready` になるまで待ちます。
+
+{blank}
+
+[subs="attributes"]
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME            STATUS   REMOTE SITE    MESSAGE
+token-{username}     Ready    {username}-site     OK</pre>
+++++
+
+あと少しです。残りの resource は 1 つです。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ 完了</b><br/>• Site (DB)<br/>• Connector<br/>• Site (アプリ)<br/>• AccessGrant<br/>• AccessToken</div>"]
+
+    Progress["83% 完了<br/>█████████████████████░░░░░"]
+
+    Right["<div style='text-align:left'><b>✏️ 残り</b><br/>• Listener</div>"]
+
+    Left --- Progress --- Right
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#f1f8e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+    style Right fill:#fff3e0,stroke:#fb8c00,stroke-width:3px,color:#e65100,rx:10,ry:10
+----
+
+{empty} +
+
+=== データベース service を公開する
+
+network の準備ができ、namespace とデータベース namespace が暗号化 link で接続されました。しかし、network だけではデータベースにアクセスできません。Service Interconnect に、namespace へ公開する *service* を指定する必要があります。
+
+ここで Listener と Connector を使います。データベース側の Connector はすでに設定済みです（Step 0 で確認しました）。次に、あなた側で対応する Listener を作成します。
+
+{empty} +
+
+==== 手順 4: Listener を作成してデータベースを local に公開する
+
+Listener は namespace 内に local service を作成し、暗号化 link 経由で remote PostgreSQL データベース に traffic を転送します。
+
+{blank}
+
+[.copypaste]
+****
+cat <<EOF | oc apply -f -
+apiVersion: skupper.io/v2alpha1
+kind: Listener
+metadata:
+  name: postgres-listener
+  namespace: {username}-devspaces
+spec:
+  routingKey: postgres
+  host: postgres
+  port: 5432
+EOF
+****
+
+IMPORTANT: `routingKey` は `shared-database` namespace の Connector に設定された値と一致する必要があります。platform team は `postgres` に設定しています。
+
+Listener の準備ができたことを確認します。
+
+{blank}
+
+[.copypaste]
+****
+oc get listener postgres-listener -n {username}-devspaces
+****
+
+次のような出力が表示されます。
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME                ROUTING KEY   PORT   HOST       STATUS   HAS MATCHING CONNECTOR   MESSAGE
+postgres-listener   postgres      5432   postgres   Ready    true                     OK</pre>
+++++
+
+Listener を作成すると、Service Interconnect はバックエンド service を環境内の local service として自動的に公開します。
+
+{blank}
+
+[.mermaid]
+----
+flowchart RL
+
+    subgraph S2 [" "]
+        Listener((Listener))
+    end
+    Listener -.->|作成| SVC2((svc))
+
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+----
+
+`postgres` service が利用可能であることを確認します。
+
+{blank}
+
+[.copypaste]
+****
+oc get svc postgres -n {username}-devspaces
+****
+
+service が local で利用可能になっているはずです。
+
+{blank}
+
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+postgres   ClusterIP   172.31.121.30   &lt;none&gt;        5432/TCP   21s</pre>
+++++
+
+すべての resource が揃いました。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Left["<div style='text-align:left'><b>✅ 完了</b><br/>• Site (DB)<br/>• Connector<br/>• Site (アプリ)<br/>• AccessGrant<br/>• AccessToken<br/>• Listener</div>"]
+
+    Progress["100% 完了<br/>██████████████████████████"]
+
+    Left --- Progress
+
+    style Left fill:#e8f5e9,stroke:#66bb6a,stroke-width:3px,color:#1b5e20,rx:10,ry:10
+    style Progress fill:#e8f5e9,stroke:#66bb6a,stroke-width:10px,color:#2e7d32,font-size:17px,rx:10,ry:10
+----
+
+{empty} +
+
+==== 手順 5: 接続を確認する
+
+// 接続が機能することを確認しましょう。データベースの認証情報は `application.properties` に設定済みです。Camel の `cmd` ツール を使ってデータベースに query を実行します。
+
+// {blank}
+
+// [.copypaste]
+// ****
+// camel cmd send \
+// --uri "sql:SELECT count(*) FROM invoices" \
+// --properties application.properties \
+// --reply
+// ****
+
+// [TIP]
+// --
+// .この command は何をしますか？
+// [%collapsible]
+// ====
+// * `camel cmd send` — command line から Camel endpoint に message を送信します
+// * `--uri "sql:SELECT count(*) FROM invoices"` — 設定済みデータベースに SQL query を実行します
+// * `--properties application.properties` — データベース接続設定を読み込みます
+// * `--reply` — 応答を待って表示します
+// ====
+// --
+
+// 次のような出力が表示されます。
+
+// {blank}
+
+// ++++
+// <pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #818181">2026-03-23 10:14:08.939  <span style="color:#A649A6">11530</span> ---   <span style="color:#10A9CD">sql://SELECT%20count(*)%20FROM%20invoice</span> : <span style="color:#0FBC7A">Reply received</span> <span style="color:#0FBC7A">(success)</span> <span style="color:#fff">(304ms)</span>
+//  <span style="color:#fff">Endpoint</span>  <span style="color:#fff">sql://SELECT%20count(*)%20FROM%20invoices</span>
+//  <span style="color:#fff">Exchange</span>  (DefaultExchange)  <span style="color:#6F416E">InOut</span>   <span style="color:#fff">E3D444D7E02ADCD-0000000000000000</span>
+//  <span style="color:#fff">Message</span>   (DefaultMessage)
+//  <span style="color:#fff">Header</span>    (Integer)             <span style="color:#fff">CamelSqlRowCount  1</span>
+//  <span style="color:#fff">Body</span>      (ArrayList) (size: 1 bytes: 11)
+//  <span style="background-color: yellow; color: black">[{count=1}]</span></pre>
+// ++++
+
+接続が機能することを確認しましょう。先ほどと同じ query を、今度は local service に対して実行します。_Service Interconnect_ によって、namespace からデータベースに接続できるようになりました。
+
+{blank}
+
+[.copypaste]
+****
+sql postgres:5432 \
+"SELECT count(*) FROM policies"
+****
+
+[TIP]
+--
+.この command は何をしますか？
+[%collapsible]
+====
+* `sql` — PostgreSQL データベースに接続してクエリーを実行するラボ用ヘルパースクリプト
+* `postgres:5432` — _Service Interconnect_ によって local に公開されたデータベース service
+* `"SELECT count(*) FROM policies"` — データベース内のレコード数を数えます
+====
+--
+
+次のような出力が表示されます。
+
+{blank}
+
+++++
+<pre id="sql-count-output" style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color:rgb(243, 243, 47)">Connecting to postgres:5432 (timeout: 5s)...</span>
+<span style="color: #0FBC7A">count</span>
+<span style="color: #0FBC7A">-----</span>
+<span style="color: #0FBC7A">1</span>
+
+<span style="color: #0FBC7A">(1 row(s))</span></pre>
+++++
+
+[.overlay]
+****
+[.target]
+sql-count-output
+
+[.arrows]
+{x: 9, y: 88, rot: -45, size: .8, color: "red"}
+****
+
+NOTE: lab 環境ではサンプルエントリーがデータベースにあらかじめ読み込まれているため、count は `1` です。
+
+{empty} +
+
+=== まとめ
+
+構築した内容の全体像を確認しましょう。
+
+{blank}
+
+[.mermaid]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel3 ["{username}-devspaces"]
+        subgraph yours3 [" "]
+            Client[DB クライアント]
+            SVC2((svc))
+            subgraph S2 ["✅ Site (アプリ)"]
+                Listener((Listener))
+                Grant["🪪 AccessGrant"]
+            end
+        end
+    end
+
+    Client --> SVC2 --> Listener
+    S2 ~~~ S1
+    S2 -.-|"🔒 暗号化 link"| S1
+
+    subgraph sharedLabel3 [shared-database]
+        subgraph shared3 [" "]
+            subgraph S1 ["✅ Site (DB)"]
+                Connector((Connector))
+                Token["🔑 AccessToken"]
+            end
+            SVC((svc))
+            SVC --- DB[(PostgreSQL)]
+        end
+    end
+
+    Connector --> SVC
+    Grant ~~~ Token
+
+    style yoursLabel3 fill:none,stroke:none
+    style sharedLabel3 fill:none,stroke:none
+    style S2 fill:#c8e6c9,stroke:#66bb6a
+    style S1 fill:#c8e6c9,stroke:#66bb6a
+    style Grant fill:#e8f5e9,stroke:#66bb6a
+    style Listener fill:#e8f5e9,stroke:#66bb6a
+    style SVC2 fill:#e8f5e9,stroke:#66bb6a
+    style Token fill:#e8f5e9,stroke:#66bb6a
+    style Connector fill:#e8f5e9,stroke:#66bb6a
+    style DB fill:#336,color:#fff
+----
+
+次の作業が完了しました。
+
+* *network を確立* — namespace に Site と AccessGrant を作成し、データベース namespace に AccessToken を作成して、暗号化 link を確立しました。
+* *service を公開* — Listener を作成し、network 経由で remote database に local からアクセスできるようにしました。
+* *接続を確認* — script を使い、暗号化 link 経由でデータベースに query を実行しました。
+
+データベースは安全に隔離された環境にあります。暗号化された Skupper link を通じて、接続はデータベース側 *から* あなた側 *へ* 開始されました。network policy の変更、VPN、昇格した権限はいずれも不要です。
+
+確立した link は引き続き有効です。次の演習ではこの link を使って、policy application の取り込み、データベースへの保存、PDF policy document の生成という一連の data flow を実装します。
+
+{empty} +
+
+=== この演習の先へ：大規模環境での Service Interconnect
+
+この lab では、概念を説明するために同じ cluster 上の 2 つの namespace を接続しました。実環境で Service Interconnect の真価が発揮されるのは、複数の cluster、リージョン、クラウドプロバイダーにまたがる service を、同じ secure mesh で接続するときです。
+
+各地域に店舗があり、それぞれで AI を活用した service を実行する小売企業を考えてみましょう。edge site では学習データを収集し、local に deploy された model で inference を実行します。冗長化された on-prem data center が、新しい AI/ML model の学習や更新版の店舗への配信といった大規模な処理を担います。地域 hub は、近隣の edge から traffic を集約して core に転送します。
+
+{blank}
+
+[.text-center]
+[.mermaid]
+----
+flowchart LR
+    subgraph left [" "]
+        direction TB
+        subgraph E1L ["ロンドン"]
+            E1["AI データ →\nAI モデル ←"]
+        end
+        subgraph E2L ["ベルリン"]
+            E2["AI データ →\nAI モデル ←"]
+        end
+    end
+
+    HL((ハブ\nフランクフルト))
+
+    subgraph coreLabel [" "]
+        direction TB
+        subgraph DC1 ["データセンター 1"]
+            AI1(AI モデルのトレーニング)
+        end
+        subgraph DC2 ["データセンター 2"]
+            AI2(AI モデルのトレーニング)
+        end
+    end
+
+    HR((ハブ\nシンガポール))
+
+    subgraph right [" "]
+        direction TB
+        subgraph E3L ["東京"]
+            E3["← AI データ\n→ AI モデル"]
+        end
+        subgraph E4L ["シドニー"]
+            E4["← AI データ\n→ AI モデル"]
+        end
+    end
+
+    E1 -.-|"🔒 N 本のリンク"| HL
+    E2 -.-|"🔒 N 本のリンク"| HL
+    HL -.-|"🔒 N 本のリンク"| AI1
+    HL -.-|"🔒 N 本のリンク"| AI2
+    AI1 -.-|"🔒 N 本のリンク"| HR
+    AI2 -.-|"🔒 N 本のリンク"| HR
+    HR -.-|"🔒 N 本のリンク"| E3
+    HR -.-|"🔒 N 本のリンク"| E4
+
+    style left fill:none,stroke:none
+    style right fill:none,stroke:none
+    style E1L fill:none,stroke:none
+    style E2L fill:none,stroke:none
+    style E3L fill:none,stroke:none
+    style E4L fill:none,stroke:none
+    style coreLabel fill:none,stroke:none
+    style DC1 fill:#e8eaf6,stroke:#7986cb
+    style DC2 fill:#e8eaf6,stroke:#7986cb
+    style AI1 fill:#fff,stroke:#7986cb
+    style AI2 fill:#fff,stroke:#7986cb
+    style HL fill:#e8eaf6,stroke:#7986cb
+    style HR fill:#e8eaf6,stroke:#7986cb
+    style E1 fill:#f5f5f5,stroke:#ccc
+    style E2 fill:#f5f5f5,stroke:#ccc
+    style E3 fill:#f5f5f5,stroke:#ccc
+    style E4 fill:#f5f5f5,stroke:#ccc
+----
+
+各 edge site は学習データを core に送信し、更新済み model を受信します。Site 間に複数の link を設けて冗長な routing を実現するため、経路の 1 つに障害が発生しても、traffic は別の経路を流れます。hub はさらに resilience を高めます。Frankfurt hub が停止した場合、edge は Singapore 経由で再 routing できます。冗長化された data center により、メンテナンス中や障害時も AI pipeline の可用性を保てます。
+
+ここでも、学んだ 2 段階のパターンをそのまま適用できます。Site と link が network を形成し、Listener と Connector が両端で特定の service を公開します。異なるのは規模です。1 つの cluster 上の 2 つの namespace ではなく、複数のリージョン、hub、data center にまたがります。基本要素は同じです。
+
+{empty} +
+
+[.verification]
+****
+command の出力に `[{count=1}]` が表示され、データベース query の成功を確認できましたか？
+
+[.success]
+よくできました — データベース接続の準備ができました。次の演習に進んでください。
+
+[.fail]
+Service Interconnect resource を確認し、command を再実行する前に link の status が `Ready` であることを確かめてください。
+****

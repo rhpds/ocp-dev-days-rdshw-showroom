@@ -1,0 +1,834 @@
+:imagesdir: ../../assets/images
+:page-time: 11
+include::partial$style.adoc[]
+
+[id='lab4-agentic-flow']
+== Desarrollo del asistente de IA
+
+=== Abrir la ruta de Camel
+
+En el explorador de archivos de tu editor, haz clic en el siguiente archivo. Kaoto lo abrirá automáticamente y mostrará la ruta como un diagrama visual.
+
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent.camel.yaml* +
+--
+
+[TIP]
+--
+.¿Es la primera vez que usas Kaoto?
+[%collapsible]
+====
+include::../_shared/kaoto-intro.adoc[]
+====
+--
+
+
+Kaoto abrirá el archivo y mostrará todas las definiciones de ruta que contiene. El archivo incluye varias rutas, pero nos centraremos en el flujo agéntico principal. Sigue estos pasos:
+
+// Es posible que las rutas aparezcan en vertical. Para mejorar la legibilidad, cambia al diseño horizontal haciendo clic en el botón central de la parte inferior del lienzo:
+
+// [.bordered]
+// image::module-03/m1/kaoto-horizontal-layout.png[width=50%]
+
+// {empty} +
+
+. Haz clic en el menú desplegable *Routes* de la barra de herramientas de la esquina superior izquierda.
+. Selecciona `rocketchat-to-agent` de la lista.
++
+{empty} +
++
+[#kaoto-routes-m4]
+[.bordered]
+image::module-03/m4/kaoto-routes-dropdown.png[width=50%]
+
+[.overlay]
+****
+[.target]
+kaoto-routes-m4
+
+[.arrows]
+{x: 24, y: 24, rot: 210, size: .8}
+{x: 30, y: 63, rot: 230, size: .8}
+
+[.numbers]
+{x: 33, y: -8, size: 1.5}
+{x: 45, y: 39, size: 1.5}
+****
+
+{empty} +
+
+Para centrar la ruta en el lienzo, haz clic en el botón *Reset View* de la parte inferior:
+
+{blank}
+
+[.bordered]
+image::module-03/m1/kaoto-reset-view.png[width=50%]
+
+TIP: Usa la rueda del ratón para acercar o alejar el lienzo, y haz clic y arrastra para desplazarte por la vista.
+
+{empty} +
+
+Ahora deberías ver la ruta con la que trabajarás: el punto de partida del flujo de atención al cliente:
+
+{blank}
+
+[#kaoto-agent-route]
+[.bordered]
+image::module-03/m4/kaoto-agent-route.png[width=90%]
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
+
+{empty} +
+
+De izquierda a derecha, la ruta escucha los mensajes de _Rocket.Chat_ y extrae el texto, pero el flujo está incompleto. El paso `set system prompt` está deshabilitado y el bloque pass:[<code style="background-color: #4494E5; color: white;">To do: Agent</code>] solo contiene una `dummy response` que devuelve "Hello World" sin importar lo que diga el usuario.
+
+Durante este ejercicio, completarás este flujo paso a paso:
+
+[.indent2]
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] Activarás el paso `set system prompt`, que indicará al agente de IA cómo debe comportarse. +
+pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] Reemplazarás `Dummy response` por un agente de IA con tecnología de MaaS y, progresivamente, lo equiparás con herramientas para gestionar solicitudes reales de clientes.
+
+// . Activarás el paso `set system prompt`, que indicará al agente de IA cómo debe comportarse.
+// . Reemplazarás `dummy response` por un agente de IA con tecnología de MaaS y, progresivamente, lo equiparás con herramientas para gestionar solicitudes reales de clientes.
+
+{empty} +
+
+=== Iniciar el ciclo de desarrollo
+
+Desde este momento, trabajarás en un ciclo de desarrollo rápido: _Camel JBang_ se ejecuta en modo de desarrollo, lo que significa que cada cambio que hagas en la ruta se detecta y aplica de inmediato. Puedes modificar el flujo, guardar el archivo y observar el nuevo comportamiento al instante, sin reiniciar.
+
+Empieza ejecutando la ruta de Camel tal como está para ver el comportamiento del marcador de posición:
+
+{blank}
+
+[.copypaste]
+****
+camel run agent --dev
+****
+
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `camel run agent`: carga los recursos del directorio `agent` y ejecuta la ruta definida en él.
+* `--dev`: modo de desarrollo; recarga automáticamente al guardar cambios en cualquier archivo de origen.
+====
+--
+
+Espera a que _Camel_ termine de iniciarse. Deberías ver `...(agent) started...` en la terminal.
+
+Cambia a la ventana de _Rocket.Chat_.
+
+TIP: Si todavía no has iniciado sesión, sigue las instrucciones de xref:module-03/m2/m2.2.adoc[incorporación a la plataforma Rocket.Chat,window=_blank] (se abren en una nueva pestaña).
+
+En la barra lateral izquierda, busca y selecciona el canal `ai-support` que corresponda a tu identificador de usuario:
+
+[subs=attributes]
+++++
+<div style="display: inline-flex; align-items: center; gap: 8px; background: #2f343d; border-radius: 4px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 8px 0;">
+  <span style="width: 32px; height: 32px; background: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">A</span>
+  <span style="color: #ccc; font-size: 15px;">&#x2317; <b>ai-support<span id="rc-channel-num"></span></b></span>
+</div>
+<script>
+(function() {
+  var el = document.getElementById('rc-channel-num');
+  function resolve() {
+    var name = document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    if (!name) {
+      var uv = document.querySelector('.uservar');
+      if (uv) name = uv.textContent;
+    }
+    var num = (name || '').replace(/\D/g, '');
+    el.textContent = num || 'N';
+  }
+  if (document.readyState === 'complete') resolve();
+  else window.addEventListener('load', resolve);
+})();
+</script>
+++++
+
+Luego escribe un mensaje sencillo:
+
+{blank}
+
+[.copypaste.value]
+****
+Hola
+****
+
+El bot de Camel recibe el mensaje y responde `Hello World`, lo que confirma que la ruta funciona de principio a fin:
+
+{blank}
+
+:fig-time: 5:05 PM
+:fig-user-msg: Hola
+:fig-bot-msg: Hello World
+include::_figures/rc-interaction.adoc[]
+
+Es lo esperado: la ruta sigue usando la respuesta ficticia codificada de forma fija. En los siguientes pasos, la reemplazarás por un agente de IA real que pueda razonar y responder con naturalidad.
+
+{empty} +
+
+=== Conectar el agente de IA
+
+Ahora reemplaza la respuesta ficticia por un agente de IA real. Vuelve al lienzo de _Kaoto_ y sigue estos pasos:
+
+{empty} +
+
+. *Activar el mensaje del sistema*
++
+El paso `set system prompt` está deshabilitado — aparece atenuado porque no había ningún agente de IA que pudiera usarlo.
++
+[caption=]
+.Actívalo:
+[cols="3a,6a"]
+|===
+|
+[.bordered]
+[#kaoto-enable-step]
+image::module-03/m4/kaoto-enable-step.png[width=100%]
+
+[.overlay]
+****
+[.target]
+kaoto-enable-step
+
+[.numbers]
+{x: 92, y: 11, size: 3}
+
+[.arrows]
+{x: 82.5, y: 75, rot: 0, size: .8}
+****
+|
+. Pasa el cursor sobre el paso y haz clic en el botón {btn-enable}.
+|===
+
+. *Reemplazar la respuesta ficticia por un Agent*
++
+El paso `Dummy response` es un marcador de posición: siempre devuelve "Hello World". Reemplázalo por el componente _LangChain4j Agent_, que se conecta a MaaS.
++
+1. Pasa el cursor sobre el paso `Dummy response` y haz clic en el botón flotante {nbsp}{btn-replace}{nbsp}.
+1. Escribe `lang` en {ui-filter} para encontrar el componente _LangChain4j Agent_ y selecciónalo.
+1. Haz clic en el paso _LangChain4j Agent_ para abrir el panel de configuración.
+1. Selecciona la pestaña de configuración `Required`.
+1. Establece `Agent Id` en:
++
+{blank}
++
+[.copypaste.value]
+****
+myagent
+****
++
+image::module-03/m4/kaoto-agent-steps.png[width=100%]
++
+{empty} +
++
+Como estás ejecutando en modo de desarrollo, _Camel_ recarga automáticamente. Observa la terminal: los registros deberían confirmar que el agente se está ejecutando:
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 12px; color: #818181">2026-03-24 18:14:11.113  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> : <span style="color:#fff">Routes reloaded summary</span> (total:<span style="color:#0FBC7A">2</span> started:<span style="color:#0FBC7A">2</span>)
+2026-03-24 18:14:11.115  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">rocketchat-to-agent</span> (platform-http:///ai-support)
+2026-03-24 18:14:11.116  <span style="color:#A649A6">INFO</span> <span style="color:#10A9CD">camel.support.RouteWatcherReloadStrategy</span> :     Started <span style="color:#0FBC7A">to-rocketchat</span> (direct://to-rocketchat)</pre>
+++++
++
+{empty} +
+
+. *Comprobar el flujo actualizado*
++
+El mensaje del sistema ya está activo (1) y el agente de IA ha reemplazado (2) la respuesta ficticia. La ruta debería verse así:
++
+{blank}
++
+[.bordered]
+[#kaoto-agent-route-complete]
+image::module-03/m4/kaoto-agent-route-complete.png[width=90%]
++
+
+[.overlay]
+****
+[.target]
+kaoto-agent-route-complete
+
+[.arrows]
+{x: 35.5, y: 72, rot: 0, size: 1, color: "red"}
+{x: 52.5, y: 72, rot: 0, size: 1, color: "red"}
+
+[.numbers]
+{x: 35.5, y: 117, size: 1.2, color: "red"}
+{x: 52.5, y: 117, size: 1.2, color: "red"}
+****
++
+{empty} +
+
+. *Interactuar con el agente*
++
+Vuelve a la ventana de _Rocket.Chat_ y escribe:
++
+{blank}
++
+[.copypaste.value]
+****
+Hola de nuevo
+****
++
+El agente de IA procesa tu mensaje: lo envía al LLM mediante MaaS, que lo analiza y devuelve una respuesta en lenguaje natural. Deberías ver algo parecido a esto:
++
+{blank}
++
+:fig-time: 5:06 PM
+:fig-user-msg: Hola de nuevo
+:fig-bot-msg: ¡Hola! ¿En qué puedo ayudarte?
+include::_figures/rc-interaction.adoc[]
++
+{empty} +
++
+El bot responde, pero ¿puede realizar tareas reales? +
+*Todavía no*. Los servidores MCP y las herramientas están incluidos en el ejercicio, pero aún no están activos.
++
+{blank}
++
+Prueba a pedir algo específico:
++
+{blank}
++
+[.copypaste.value]
+****
+¿Puedes mostrarme el documento de póliza 61356291?
+****
++
+NOTE: El laboratorio incluye un documento de póliza de ejemplo (`61356291`) listo para usar. Es el documento al que se hace referencia en el comando anterior.
++
+TIP: También puedes intentar recuperar documentos de póliza que hayas generado durante el laboratorio de ingesta. Puedes usar cualquier número de documento de póliza de los ejercicios anteriores.
++
+{empty} +
++
+El bot responderá con algo parecido a esto:
++
+{blank}
++
+:fig-time: 5:07 PM
+:fig-user-msg: ¿Puedes mostrarme el documento de póliza 61356291?
+:fig-bot-msg: Lo siento, no puedo recuperar ese PDF en este momento.
+include::_figures/rc-interaction.adoc[]
++
+Como era de esperar, el bot rechaza la solicitud.
++
+--
+.¿Por qué respondió así el bot?
+[caption=]
+====
+El agente de IA no tiene acceso a las herramientas que necesita: los servidores MCP todavía no están conectados.
+
+El archivo `system.message` contiene el mensaje del sistema que guía el comportamiento del agente de IA. Una de sus reglas indica explícitamente al modelo que rechace la solicitud si no dispone de la herramienta adecuada:
+
+----
+# CRITICAL CONSTRAINTS
+* **NO TOOL, NO URL:** If there is no tool fit for the job (missing),
+  you MUST return Pattern 2 with the text: "I'm sorry, I don't have 
+  the capability to retrieve that PDF right now."
+----
+
+Cuando registres las herramientas, el agente las descubrirá y utilizará automáticamente.
+====
+--
+
+{empty} +
+
+=== Conectar los servidores MCP
+
+El proyecto incluye servidores MCP que proporcionan las herramientas necesarias para el flujo agéntico de Camel, pero el agente aún no los conoce. Debes conectarlos al flujo agéntico.
+
+El siguiente diagrama muestra cómo Agentic Integration (una vez que MCP está activo) enruta las llamadas a herramientas desde el modelo de IA. Dos servidores MCP proporcionan conjuntos de herramientas distintos: Node.js y Camel Quarkus. Cuando el modelo de IA necesita una herramienta, Agentic Integration enruta la solicitud al servidor MCP correspondiente, que ejecuta la herramienta en los sistemas de backend y devuelve el resultado.
+
+[.mermaid]
+----
+flowchart LR
+
+    MaaS <-->|Llamadas a herramientas| INTLabel
+
+    INTLabel <--> |"Conjunto de herramientas 1"| NodeJSLabel
+    INTLabel <--> |"Conjunto de herramientas 2"| CamelQuarkusLabel
+    NodeJSLabel --> |"Integraciones"| ToolsInner
+    CamelQuarkusLabel --> |"Integraciones"| ToolsInner
+
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Integración agéntica\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• Razonamiento de IA<br>• Llamadas a herramientas<br>• Integraciones</div></div>\n]
+
+    subgraph ToolsLabel ["<br><br><br>Sistemas de backend&nbsp;"]
+        subgraph ToolsInner [" "]
+            direction LR
+            DB ~~~ S3 ~~~ HD
+        end
+    end
+
+    subgraph NodeJSLabel [" "]
+        NodeJS
+    end
+
+  subgraph CamelQuarkusLabel [" "]
+        CamelQuarkus
+    end
+
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "Modelo de IA", pos: "b", h: 80, w: 80, constraint: "on" }
+    NodeJS@{ img: "../../_images/module-03/common/nodejs-icon.svg", label: "MCP NodeJS", pos: "b", h: 80, w: 80, constraint: "on" }
+    CamelQuarkus@{ img: "../../_images/module-03/common/camel-quarkus-icon.svg", label: "MCP Camel Quarkus", pos: "b", h: 80, w: 80, constraint: "on" }
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Base de datos", pos: "b", h: 70, w: 70, constraint: "on" }
+    S3@{ img: "../../_images/module-03/common/s3-icon.svg", label: "S3 / ODF", pos: "b", h: 70, w: 70, constraint: "on" }
+    HD@{ img: "../../_images/module-03/common/helpdesk-icon.svg", label: "Mesa de ayuda", pos: "b", h: 70, w: 70, constraint: "on" }
+
+    style MaaS fill:none,stroke:none
+    style NodeJS fill:none,stroke:none
+    style CamelQuarkus fill:none,stroke:none
+    style DB fill:none,stroke:none
+    style S3 fill:none,stroke:none
+    style HD fill:none,stroke:none
+    style INTLabel fill:none,stroke:none
+    style NodeJSLabel fill:none,stroke:none
+    style CamelQuarkusLabel fill:none,stroke:none
+    style ToolsLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style ToolsInner fill:#fce4e4,stroke:#EE0000
+----
+
+NOTE: Agentic Integration puede trabajar con servidores MCP implementados en distintos lenguajes. Este laboratorio incluye un servidor MCP de Node.js y otro de Camel Quarkus; cada uno proporciona herramientas distintas al modelo de IA.
+
+
+[TIP]
+--
+En Camel no necesitas servidores MCP para definir herramientas. Puedes definirlas directamente como rutas normales que comienzan con el componente `langchain4j-tools`. La ruta describe lo que hace la herramienta: el agente la descubre automáticamente mediante etiquetas y la invoca cuando la necesita.
+
+Por ejemplo, así definirías una herramienta local que recupera la URL del PDF de un documento de póliza determinado:
+
+image::module-03/m4/kaoto-tool-route.png[width=50%]
+
+La ruta comienza con el origen `langchain4j-tools`, procesa la solicitud mediante una serie de pasos y devuelve el resultado al LLM. No se necesita ninguna conexión especial. Camel usa etiquetas para asociar agentes con herramientas: cuando la etiqueta de un agente coincide con la de una herramienta, el agente puede invocarla.
+--
+
+{empty} +
+
+. *Conectar los servidores MCP* (Node.js y Camel Quarkus)
++
+[loweralpha]
+1. Detén el proceso que se está ejecutando en la terminal con kbd:[CTRL+C].
+1. Abre el archivo de configuración de tu agente.
++
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 agent +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties*
++
+1. Elimina las marcas de comentario de las propiedades de los servidores MCP. Deberías ver lo siguiente:
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #689956"># MCP server (Node JS)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>nodejs.url<span style="color: #FFD800">]</span>=http://localhost:9090/mcp
+
+<span style="color: #689956"># MCP server (Camel MCP)</span>
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>camel.transportType<span style="color: #FFD800">]</span>=http
+camel.component.langchain4j-agent.mcpServer<span style="color: #FFD800">[</span>camel.url<span style="color: #FFD800">]</span>=http://localhost:9091/mcp</pre>
+++++
++
+{blank}
++
+1. Ahora, usa el script `mcp` para iniciar los servidores MCP de la siguiente manera:
++
+{blank}
++
+[.copypaste]
+****
++++./mcp start+++
+****
++
+{blank}
++
+Deberías ver cómo se inician los servidores MCP en la terminal:
++
+{blank}
++
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Installing dependencies...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Starting server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server started (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Starting MCP server...
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Starting Camel MCP server...
+Running Camel Main: mcp-camel in background with PID: 89891 (waiting to startup)
+Camel Main: mcp-camel (state: Starting)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Server started
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
++
+[TIP]
+--
+.Cómo supervisar los registros del servidor MCP
+[%collapsible]
+====
+Puedes seguir en tiempo real los registros de cualquiera de los servidores MCP pasando su nombre (`camel` o `node`) al comando `logs`:
+
+{blank}
+
+[.copypaste]
+****
++++./mcp logs camel -f+++
+****
+
+{blank}
+
+Por ejemplo, los registros del servidor MCP de Camel muestran las cinco rutas registradas como herramientas MCP:
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">...AbstractCamelContext : Routes startup (total:5 started:5 kamelets:1)
+...AbstractCamelContext :     Started route1 (ai-tool://amend-policy-document)
+...AbstractCamelContext :     Started get-policy-document-data (direct://get-policy-document-data)
+...AbstractCamelContext :     Started route2 (ai-tool://create-ticket)
+...AbstractCamelContext :     Started store-pdf-s3 (direct://store-pdf-s3)
+...AbstractCamelContext :     Started route3 (ai-tool://share-ticket)
+...AbstractCamelContext : <span style="background-color: #F5F541; color: #1F1F1F; padding: 2px 4px;">Apache Camel 4.22.0 (mcp-camel) started in 6s719ms</span></pre> ...
+++++
+
+====
+--
++
+[TIP]
+--
+.¿Cómo puedo comprobar si los servidores MCP están en ejecución?
+[%collapsible]
+====
+Puedes comprobar el estado de los servidores MCP en cualquier momento ejecutando:
+
+{blank}
+
+[.copypaste]
+****
++++./mcp status+++
+****
+
+{blank}
+
+Deberías ver un resultado parecido a este:
+
+{blank}
+
+++++
+<pre style="background-color: #1F1F1F; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #07BC7A">[INFO]</span> Checking MCP servers status...
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89810)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #4F8ED2">[Node.js]</span> Endpoint: http://localhost:9090/mcp
+
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Server is <span style="color: #07BC7A">RUNNING</span> (PID: 89867)
+<span style="color: #07BC7A">[INFO]</span> <span style="color: #F5F541">[Camel]</span> Endpoint: http://localhost:9091/mcp</pre>
+++++
+====
+--
++
+{empty} +
+
+. *Reiniciar el agente de Camel*
++
+Los servidores MCP ya están en ejecución y el agente está configurado. +
+Reinícialo para que aplique la nueva configuración:
++
+{blank}
++
+[.copypaste]
+****
+camel run agent
+****
++
+{empty} +
+
+. *Pruébalo*
++
+Vuelve a _Rocket.Chat_ y pregunta de nuevo:
++
+{blank}
++
+[.copypaste.value]
+****
+¿Puedes mostrarme el documento de póliza 61356291?
+****
++
+[TIP]
+--
+.¿Qué ocurre si la IA sigue diciendo que no puede ayudar?
+[%collapsible]
+====
+El taller usa un LLM pequeño cuyo comportamiento puede ser inconsistente. El mensaje del sistema le indica que vuelva a evaluar sus herramientas antes de responder, pero a veces contesta como si no hubiera ninguna herramienta disponible. Por ejemplo:
+
+{blank}
+
+:fig-time: 5:10 PM
+:fig-user-msg: ¿Puedes mostrarme el documento de póliza 61356291?
+:fig-bot-msg: Lo siento, no puedo recuperar ese PDF en este momento.
+include::_figures/rc-interaction.adoc[]
+
+Si eso ocurre, prueba una o ambas opciones:
+
+1. Envía una solicitud más específica:
++
+{blank}
++
+[.copypaste.value]
+****
+Vuelve a intentarlo usando la herramienta para obtener documentos de póliza.
+****
++
+Esto dirige el LLM a la herramienta adecuada y, por lo general, basta para que funcione.
++
+{blank}
+2. Detén el proceso con kbd:[CTRL+C] y reinícialo. Al iniciarse de nuevo, el LLM recibe una lista de herramientas limpia.
+
+====
+--
++
+Si todo sale bien, esta vez el LLM descubrirá la herramienta, la invocará y responderá con el documento de póliza:
++
+{blank}
++
+:fig-time: 6:47 PM
+:fig-user-msg: ¿Puedes mostrarme el documento de póliza 61356291?
+:fig-bot-msg: Aquí tienes el documento de póliza que solicitaste.
+:fig-attach-title: Documento de póliza 61356291 PDF ▾
+:fig-attach-desc: Haz clic para verlo o descargarlo
+include::_figures/rc-interaction-attach.adoc[]
++
+{blank}
++
+El bot identificó la herramienta adecuada, recuperó el documento de póliza y devolvió un enlace de descarga al agente de soporte. Al hacer clic en el enlace, el PDF se abre en una nueva pestaña.
++
+{blank}
++
+.Ver el documento de póliza de ejemplo
+[%collapsible]
+=====
+{blank}
+
+include::_figures/invoice-pdf.adoc[]
+=====
+
+{empty} +
+
+=== Modificar el documento de póliza
+
+El bot de IA puede hacer más que recuperar datos: también puede actuar sobre ellos. Imagina que el cliente ha cambiado de opinión y quiere eliminar una cobertura. Pide al asistente de IA que modifique el documento de póliza:
+
+{blank}
+
+[.copypaste.value]
+****
+El cliente desea eliminar la cobertura de asistencia en carretera. ¿Podrías actualizar el documento de póliza?
+****
+
+El sistema agéntico inspecciona el documento de póliza, identifica la cobertura correspondiente, activa las herramientas necesarias para actualizar la base de datos y responde con un resumen de los cambios:
+
+{blank}
+
+:fig-time: 6:49 PM
+:fig-user-msg: El cliente desea eliminar la cobertura de asistencia en carretera. ¿Podrías actualizar el documento de póliza?
+:fig-bot-msg: Se actualizaron los registros de la base de datos. Se eliminó la cobertura de asistencia en carretera (elemento 4) y se recalcularon los valores del resumen. ¿Quieres ver el nuevo documento de póliza?
+include::_figures/rc-interaction.adoc[]
+
+El sistema agéntico actuó de forma autónoma: inspeccionó el documento de póliza, identificó la cobertura, actualizó el registro en la base de datos, recalculó los totales y confirmó los cambios. Todo a partir de una sola solicitud en lenguaje natural.
+
+Fíjate en la respuesta del bot: puede sugerir que consultes el documento de póliza actualizado (los LLM son impredecibles, por lo que la redacción exacta puede variar). Si lo hace, responde simplemente `sí`. Si no, pídele que muestre el documento de póliza modificado:
+
+{blank}
+
+[.copypaste.value]
+****
+¿Puedes mostrarme el documento de póliza actualizado?
+****
+
+En cualquier caso, el bot responde con el enlace al PDF actualizado:
+
+{blank}
+
+:fig-time: 6:50 PM
+:fig-bot-msg: Aquí tienes el PDF actualizado del documento de póliza 61356291.
+:fig-attach-title: Documento de póliza 61356291 PDF ▾
+:fig-attach-desc: Haz clic para verlo o descargarlo
+include::_figures/rc-bot-attach.adoc[]
+
+Haz clic en el enlace para abrir el documento de póliza regenerado.
+
+{blank}
+
+.Ver un ejemplo del documento de póliza modificado
+[%collapsible]
+====
+{blank}
+
+include::_figures/invoice-pdf-amended.adoc[]
+====
+
+NOTE: Observa la etiqueta roja *Amended* en la esquina superior derecha del documento: indica que el documento de póliza se modificó con respecto al original.
+
+Inspecciona el documento y verifica que las modificaciones sean correctas: la cobertura de asistencia en carretera (elemento 4) debe haberse eliminado y los totales deben haberse recalculado en consecuencia.
+
+{empty} +
+
+=== Crear un ticket
+
+Un proceso de atención al cliente rara vez termina con una sola acción. Modificar una póliza involucra a varios departamentos: confirmar los cambios, procesar cualquier reembolso, actualizar los registros de la póliza y avisar al cliente. En lugar de gestionar cada paso manualmente, pide al agente de IA que cree un ticket para coordinarlo todo:
+
+{blank}
+
+[.copypaste.value]
+****
+¿Podrías crear un ticket? Incluye los detalles explicados y pide a los departamentos correspondientes que procesen la modificación de la póliza.
+****
+
+El sistema agéntico reúne el contexto de la conversación, crea un ticket en el sistema de mesa de ayuda y responde con una confirmación:
+
+{blank}
+
+:fig-time: 6:52 PM
+:fig-user-msg: ¿Podrías crear un ticket? Incluye los detalles explicados y pide a los departamentos correspondientes que reembolsen al cliente.
+:fig-bot-msg: Se creó un ticket con el ID 1025. ¿Quieres compartirlo con el cliente?
+include::_figures/rc-interaction.adoc[]
+
+{empty} +
+
+IMPORTANT: Antes de continuar, asegúrate de haberte incorporado a _Matrix_ y de haber aceptado la invitación a la sala; el ticket se compartirá con el cliente allí. Recuerda que _Matrix_ representa el lado del cliente, mientras que _Rocket.Chat_ es donde trabaja el agente de soporte. Si aún no lo has hecho, sigue las instrucciones de xref:module-03/m2/m2.1.adoc[incorporación a la plataforma Matrix,window=_blank].
+
+La interacción anterior muestra una solicitud y una respuesta sencillas, pero, como los LLM no son deterministas, el bot podría haber respondido de otra manera. Esto es lo que puedes esperar y cómo gestionar cada caso:
+
+* **El bot pregunta si debe compartir el ticket** (como se muestra arriba): responde:
++
+{blank}
++
+[.copypaste.value]
+****
+Sí, compártelo con el cliente, por favor.
+****
++
+{blank}
+
+* **El bot no menciona que vaya a compartirlo**: pídeselo explícitamente:
++
+{blank}
++
+[.copypaste.value]
+****
+¿Podrías compartir el ticket con el cliente?
+****
++
+{blank}
++
+* **El bot comparte el ticket automáticamente** sin preguntar: no hace falta hacer nada, continúa con el siguiente paso.
++
+{empty} +
+
+En cualquier caso, el resultado final es el mismo: el bot comparte el ticket y el cliente recibe un enlace al sistema de mesa de ayuda:
+
+{blank}
+
+:fig-time: 6:53 PM
+:fig-user-msg: Sí, compártelo con el cliente, por favor.
+:fig-bot-msg: El ticket #1025 se compartió correctamente con el cliente. Recibirá un enlace al sistema de mesa de ayuda.
+include::_figures/rc-interaction.adoc[]
+
+Recuerda: el cliente se comunica desde la plataforma de mensajería _Matrix_. El bot indicó que compartió el ticket, lo que significa que el cliente debería haber recibido un mensaje con la referencia del ticket. Cambia a la ventana de _Matrix_ y compruébalo.
+
+Deberías ver un mensaje como este:
+
+{blank}
+
+:fig-time: 11:05
+:fig-sender: ai@rocketchat:
+:fig-msg: pass:[&#x1F4C4; Ticket <span style="color: #6D28D9; font-weight: bold;">#1025</span> creado.<br>(Haz clic para abrirlo en HelpDesk)]
+include::_figures/matrix-message.adoc[]
+
+{empty} +
+
+=== Verificar el ticket desde la perspectiva del cliente
+
+Ahora ponte en el lugar del cliente. El cliente recibió en _Matrix_ un mensaje con un enlace al sistema de tickets _Parasol HelpDesk_. Haz clic en el enlace del ticket en la ventana de _Matrix_.
+
+Se abrirá una nueva pestaña con la página de inicio de sesión de _Parasol HelpDesk_:
+
+{blank}
+
+include::_figures/helpdesk-login.adoc[]
+
+Inicia sesión con las siguientes credenciales:
+
+* *Nombre de usuario*:
++
+[.copypaste.value]
+****
+{user-username}
+****
+
+* *Contraseña*:
++
+[.copypaste.value]
+****
+[.path]
+/credentials/im
+
+[.default]
+password
+
+REPLACE
+****
+
+{empty} +
+
+Una vez que hayas iniciado sesión, _Parasol HelpDesk_ mostrará la lista de tickets abiertos. Deberías ver el ticket que acaba de crear el agente de IA:
+
+{blank}
+
+include::_figures/helpdesk-tickets.adoc[]
+
+Haz clic en el ticket para inspeccionar los detalles. El agente de IA redactó el cuerpo del ticket a partir de la conversación: incluye un resumen de los cambios y un enlace al documento de póliza actualizado:
+
+{blank}
+
+include::_figures/helpdesk-ticket-detail.adoc[]
+
+El ciclo está completo: el asistente de IA recuperó un documento de póliza, lo modificó, creó un ticket con todos los detalles pertinentes y lo compartió con el cliente a través de plataformas de mensajería. Todo mediante una conversación natural.
+
+Cuando termines, pulsa kbd:[Ctrl+C] en la terminal para detener Camel.
+
+{empty} +
+
+[.verification]
+****
+¿Puedes ver los detalles del ticket y el enlace al documento de póliza actualizado en _Parasol HelpDesk_?
+
+[.success]
+¡Buen trabajo! Has creado un flujo agéntico capaz de recuperar, analizar y modificar datos, crear tickets y coordinar departamentos mediante una conversación natural.
+
+[.fail]
+Revisa los pasos y asegúrate de que las herramientas estén habilitadas en el flujo agéntico (`Tags` = `all`) y de que el mensaje del sistema esté activo. Comprueba que estés en la sala correcta en la ventana de _Matrix_.
+****
+
+{empty} +
+
+
+

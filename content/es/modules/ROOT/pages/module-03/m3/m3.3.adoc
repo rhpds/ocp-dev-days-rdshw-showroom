@@ -1,0 +1,280 @@
+:imagesdir: ../../assets/images
+:page-time: 5
+include::partial$style.adoc[]
+
+[id="enable-and-test"]
+== Puesta en marcha en OpenShift
+
+Has completado el flujo de _Kafka_ a _Rocket.Chat_. Para ahorrar tiempo, los cuatro flujos ya se han implementado en _OpenShift_; ahora podrás probarlos y simular una conversación entre clientes y agentes de soporte.
+
+El diagrama siguiente muestra los cuatro flujos que permiten la comunicación bidireccional entre el cliente y el agente de soporte:
+
+[.mermaid.mermaid-w40]
+----
+flowchart LR
+    MX -->|"flow 1"| K -->|"flow 2"| RC
+    RC -->|"flow 3"| K -->|"flow 4"| MX
+
+    MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 100, w: 80, constraint: "on" }
+    K@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 100, w: 80, constraint: "on" }
+    RC@{ img: "../../_images/module-03/m4/rocketchat-icon.svg", label: "Rocket.Chat", pos: "b", h: 100, w: 100, constraint: "on" }
+
+    style MX fill:none,stroke:none
+    style K fill:none,stroke:none
+    style RC fill:none,stroke:none
+
+    linkStyle 0 stroke:#66bb6a,stroke-width:2px
+    linkStyle 1 stroke:#66bb6a,stroke-width:2px
+    linkStyle 2 stroke:#ef5350,stroke-width:2px
+    linkStyle 3 stroke:#ef5350,stroke-width:2px
+----
+
+{empty} +
+
+Puedes ver los cuatro flujos implementados previamente en la consola para desarrolladores de _OpenShift_ abriendo la vista *Topology*:
+
+* {url-devconsole}[Abrir la vista Topology^]
+** Username: `{user-username}`
+** Password: `{user-password}`
+
+La imagen siguiente muestra lo que deberías encontrar: las cuatro integraciones de Camel (`m2k`, `k2r`, `r2k`, `k2m`) conectadas al clúster central de _Kafka_. Observa que las implementaciones están reducidas a cero; todavía no se están ejecutando. Eso es lo que harás a continuación.
+
+TIP: Es posible que tu diseño se vea diferente; puedes arrastrar y soltar los nodos para organizarlos.
+
+[.bordered]
+image::module-03/m3/openshift-topology-flows.png[width=60%]
+
+{empty} +
+
+=== Iniciar los flujos
+
+Desde la terminal de _Dev Spaces_, escala las cuatro implementaciones para iniciar los flujos:
+
+{blank}
+
+[.copypaste]
+****
+oc scale deployment m2k r2k k2m k2r --replicas=1
+****
+
+[TIP]
+--
+.¿Qué hace este comando?
+[%collapsible]
+====
+* `oc scale deployment` — ajusta el número de réplicas en ejecución de una o varias implementaciones
+* `m2k r2k k2m k2r` — los cuatro flujos de integración de Camel
+* `--replicas=1` — escala cada implementación a una réplica y las inicia
+====
+--
+
+Cuando todos los pods estén en ejecución, la vista Topology debería mostrar anillos azules alrededor de cada implementación:
+
+[.bordered]
+image::module-03/m3/openshift-topology-running.png[width=60%]
+
+{empty} +
+
+=== Prueba de extremo a extremo
+
+Ahora que todos los flujos están en ejecución, es hora de simular una conversación entre un cliente y un agente de soporte. Asegúrate de tener abiertas ambas plataformas:
+
+* xref:module-03/m2/m2.1.adoc[Incorporación a la plataforma Matrix,window=_blank] — el lado del cliente
+* xref:module-03/m2/m2.2.adoc[Incorporación a la plataforma Rocket.Chat,window=_blank] — el lado del agente de soporte
+
+{empty} +
+
+Simulemos un breve intercambio entre un cliente y un agente de soporte (interpretarás ambos roles).
+
+. *El cliente envía un mensaje* — ve a tu sala de _Matrix_ y escribe:
++
+{blank}
++
+[.copypaste.value]
+****
+Hola, necesito ayuda con una solicitud de póliza que presenté recientemente.
+****
++
+{blank}
+
+. *El agente responde* — ve a tu sala de _Rocket.Chat_; deberías ver el mensaje del cliente. Responde con:
++
+{blank}
++
+[.copypaste.value]
+****
+¡Por supuesto! ¿Podrías compartir la referencia de tu póliza para que podamos investigarlo?
+****
+
+{empty} +
+
+Si todo sale bien, ambas plataformas deberían mostrar el intercambio completo. Deberías ver algo parecido a esto:
+
+[subs=attributes]
++++
+<div class="matrix-flow-wrapper">
+  <style>
+    .matrix-flow-wrapper {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 20px;
+      background-color: white;
+    }
+    .platform-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+    }
+    .icon-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 5px;
+      margin-left: 15px;
+      z-index: 2;
+    }
+    .icon-label {
+      font-size: 18px;
+      color: #000;
+      font-weight: 500;
+      margin-left: 15px;
+    }
+    .matrix-bg { background-color: #33C69D; }
+    .rocket-bg { background-color: #f5455c; padding: 5px; box-sizing: border-box; }
+    .msg-bubble-light {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fcfcfc;
+      width: 260px;
+      padding: 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 2;
+    }
+  </style>
+
+  <div style="display: flex; align-items: flex-end; margin-left: -100px; transform: scale(.8)">
+    <div style="margin-right: -200px; margin-bottom: 35px;">
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+      <div class="platform-row">
+        <!-- Matrix Icon -->
+        <div class="icon-container" style="transform: scale(1.8); margin-top: 35px; margin-right: 31px">
+          <div class="icon-box matrix-bg" style="margin-top: 5px; transform: scale(1);">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <g transform="translate(-11 -11) scale(0.09)">
+                <path stroke-width="30" d="m153.25 277.15c.47-46.35 37.79-81.6 81.6-81.6m0-42.3c46.35.47 81.6 37.79 81.6 81.6m42.3 0c-.47 46.35-37.79 81.6-81.6 81.6m0 42.3c-46.35 0-81.6-37.79-81.6-81.6"/>
+              </g>
+            </svg>
+          </div>
+          <span class="icon-label">Matrix</span>
+        </div>
+        <!-- Matrix Messages -->
+        <div style="border: 1px solid #ddd; border-radius: 4px; background: #fff; width: 480px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 5px 5px; gap: 2px; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <div style="display: flex; align-items: center;">
+            <div style="width: 30px; height: 30px; background-color: #4a90e2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; flex-shrink: 0;">
+              U
+            </div>
+            <div style="margin-left: 12px; font-weight: bold; font-size: 15px; color: #00d781; line-height: 1.4;">
+              {user-username}
+            </div>
+          </div>
+          <div style="background-color: white; display: flex; align-items: baseline; padding: 5px 0px;">
+            <div style="width: 30px; text-align: center; font-size: 10px; color: #6c757d; flex-shrink: 0;">
+              4:10
+            </div>
+            <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
+              Hola, necesito ayuda con una solicitud de póliza que presenté recientemente.
+            </div>
+          </div>
+          <div style="background-color: #eee; display: flex; align-items: baseline; padding: 5px 0px;">
+            <div style="width: 30px; text-align: center; font-size: 10px; color: #6c757d; flex-shrink: 0;">
+              4:11
+            </div>
+            <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
+              <span style="font-weight:700">{user-username}@rocketchat:</span> ¡Por supuesto! ¿Podrías compartir la referencia de tu póliza para que podamos investigarlo?
+            </div>
+          </div>
+        </div>
+        <!-- Bidirectional Arrow -->
+        <div style="margin-top: 15px">
+          <svg width="150" height="60" viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+            <path d="M5 30 L25 10 V20 H100 V10 L120 30 L100 50 V40 H25 V50 L5 30 Z" fill="#EDEDED" stroke="#777" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <!-- Rocket.Chat Icon -->
+        <div class="icon-container" style="margin-left:-85px; transform: scale(1.8); margin-top: 45px; position: relative; z-index: 20">
+          <div style="margin-left: 720px;">
+            <div class="icon-box rocket-bg">
+              <svg style="z-index: 10" width="45" height="45" viewBox="0 0 24 24" fill="white">
+                <g transform="translate(-2 -2) scale(.9)">
+                <path d="M 7.5488281 5 C 6.2638281 5 5.055 5.3086094 4 5.8496094 C 5.422467 6.9694938 6.4322525 8.5274703 6.8359375 10.300781 C 5.0652471 11.854193 4 13.838545 4 16 C 4 18.1 5.0028438 20.110797 6.8398438 21.716797 C 6.5498438 22.966797 5.9480312 24.134047 5.0820312 25.123047 L 4.0136719 26.345703 L 5.5859375 26.751953 C 6.2259375 26.917953 6.8868281 27 7.5488281 27 C 9.7768281 27 11.841828 26.197516 13.423828 24.728516 C 14.425828 24.908516 15.458 25 16.5 25 C 23.393 25 29 20.962 29 16 C 29 11.038 23.393 7 16.5 7 C 15.440923 7 14.418235 7.1058017 13.435547 7.2851562 C 11.913547 5.8774278 9.8442485 5 7.5488281 5 z M 16.5 9 C 22.29 9 27 12.14 27 16 C 27 19.86 22.29 23 16.5 23 C 15.412 23 14.338594 22.888969 13.308594 22.667969 L 12.757812 22.548828 L 12.371094 22.957031 C 11.147094 24.252031 9.469625 24.976 7.640625 25 C 8.290625 23.917 8.727875 22.724516 8.921875 21.478516 L 9.0136719 20.896484 L 8.5488281 20.535156 C 6.9058281 19.256156 6 17.646 6 16 C 6 12.14 10.71 9 16.5 9 z M 11.5 15 A 1.5 1.5 0 0 0 11.5 18 A 1.5 1.5 0 0 0 11.5 15 z M 16.5 15 A 1.5 1.5 0 0 0 16.5 18 A 1.5 1.5 0 0 0 16.5 15 z M 21.5 15 A 1.5 1.5 0 0 0 21.5 18 A 1.5 1.5 0 0 0 21.5 15 z"/>
+              </svg>
+            </div>
+            <span class="icon-label" style="margin-left: -0px">Rocket.Chat</span>
+          </div>
+        </div>
+        <!-- Rocket.Chat Messages -->
+        <div style="border: 1px solid #ddd; border-radius: 4px; background: #fff; width: 560px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; align-items: flex-start; padding: 8px 10px; gap: 10px; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; z-index: 1; background-color: white">
+          <div style="gap:10px; display: flex; flex-direction: row;">
+            <div style="width: 32px; height: 32px; background-color: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; flex-shrink: 0; z-index: 1">
+              U
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center; z-index: 1">
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; line-height: 1.2;">
+                <span style="font-weight: bold; font-size: 14px; color: #333;">{user-username}</span>
+                <span style="font-size: 11px; color: #aaa;">4:10 PM</span>
+              </div>
+              <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
+                <span style="font-weight:700">{user-username}@matrix:</span> Hola, necesito ayuda con una solicitud de póliza que presenté recientemente.
+              </div>
+            </div>
+          </div>
+          <div style="gap:10px; display: flex; flex-direction: row;">
+            <div style="width: 32px; height: 32px; background-color: #6c757d; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; flex-shrink: 0;">
+              U
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; line-height: 1.2;">
+                <span style="font-weight: bold; font-size: 14px; color: #333;">{user-username}</span>
+                <span style="font-size: 11px; color: #aaa;">4:11 PM</span>
+              </div>
+              <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
+                ¡Por supuesto! ¿Podrías compartir la referencia de tu póliza para que podamos investigarlo?
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
++++
+
+{empty} +
+
+El puente de comunicación ya está listo: los clientes y los agentes de soporte pueden hablar entre plataformas en tiempo real. Pero una conversación es solo el comienzo. El agente de soporte ya sabe qué necesita el cliente, y ahora es momento de actuar.
+
+En el próximo capítulo, el agente recurrirá a un sistema agéntico con tecnología de IA para obtener ayuda; crearás los componentes que le permitirán analizar el problema del cliente y empezar a trabajar para resolverlo.
+
+{empty} +
+
+[.verification]
+****
+¿Viste cómo los mensajes fluyen en ambas direcciones, de _Matrix_ a _Rocket.Chat_ y de vuelta?
+
+[.success]
+La integración bidireccional funciona. Los clientes y los agentes de soporte ya pueden comunicarse entre plataformas a través de _Kafka_.
+
+[.fail]
+Comprueba si hay errores en los registros de los pods con `oc logs deployment/m2k` y `oc logs deployment/k2r`.
+****

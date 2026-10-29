@@ -1,0 +1,106 @@
+++++
+<div style="width: 500px; aspect-ratio: 1 / 1.414; background: #fff; border: 1px solid #ccc; box-shadow: 2px 2px 8px rgba(0,0,0,0.15); font-family: 'Times New Roman', serif; padding: 30px 35px; font-size: 12px; color: #333; line-height: 1.5; position: relative; overflow: hidden;">
+
+  <div style="position: absolute; top: 14px; right: -35px; background: #e74c3c; color: #fff; font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; padding: 4px 45px; transform: rotate(35deg); box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1;">Amended</div>
+
+  <div style="font-size: 16px; font-weight: bold; color: #1a3c6e;">Policy no: 61356291</div>
+  <div style="margin-top: 4px; color: #8b6914;">Date of issue: <span style="margin-left: 40px;">09/06/2025</span></div>
+
+  <hr style="border: none; border-top: 1px solid #ccc; margin: 12px 0;">
+
+  <div style="display: flex; gap: 30px;">
+    <div style="flex: 1;">
+      <div style="font-weight: bold; font-size: 13px;">Insurer:</div>
+      <div style="color: #8b6914; font-size: 11px;">
+        Parasol Insurance<br>
+        One Parasol Plaza<br>
+        Atlanta, GA 30313<br><br>
+        <span style="color: #555;">Tax Id: 843-56-1234</span><br>
+        <span style="color: #555;">IBAN: GB50ACIE59715038217063</span>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: bold; font-size: 13px;">Policyholder:</div>
+      <div style="color: #8b6914; font-size: 11px;">
+        Alex Morgan<br>
+        742 Maple Avenue<br>
+        Austin, TX 78701<br><br>
+        <span style="color: #555;">Tax Id: 949-84-9105</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-weight: bold; font-size: 14px; margin-top: 15px; color: #1a3c6e;">COVERAGE DETAILS</div>
+
+  <table style="width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px;">
+    <thead>
+      <tr style="background: #f0f0f0; border-bottom: 2px solid #999;">
+        <th style="text-align: left; padding: 4px;">No.</th>
+        <th style="text-align: left; padding: 4px;">Description</th>
+        <th style="text-align: left; padding: 4px;">UM</th>
+        <th style="text-align: right; padding: 4px;">Net price</th>
+        <th style="text-align: right; padding: 4px;">Net worth</th>
+        <th style="text-align: right; padding: 4px;">VAT [%]</th>
+        <th style="text-align: right; padding: 4px;">Gross worth</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 4px;">1.</td>
+        <td style="padding: 4px;">Personal Liability – Standard Plan | Bodily injury &amp; property damage | Limit: $100,000/occurrence</td>
+        <td style="padding: 4px;">mo.</td>
+        <td style="text-align: right; padding: 4px;">28,99</td>
+        <td style="text-align: right; padding: 4px;">28,99</td>
+        <td style="text-align: right; padding: 4px;">10%</td>
+        <td style="text-align: right; padding: 4px;">31,89</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 4px;">2.</td>
+        <td style="padding: 4px;">Property Damage | Third-party property damage caused by insured | Limit: $50,000 | Deductible: $500</td>
+        <td style="padding: 4px;">mo.</td>
+        <td style="text-align: right; padding: 4px;">34,50</td>
+        <td style="text-align: right; padding: 4px;">34,50</td>
+        <td style="text-align: right; padding: 4px;">10%</td>
+        <td style="text-align: right; padding: 4px;">37,95</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 4px;">3.</td>
+        <td style="padding: 4px;">Medical Payments | No-fault medical expenses for injured parties | Limit: $5,000 per person</td>
+        <td style="padding: 4px;">mo.</td>
+        <td style="text-align: right; padding: 4px;">18,00</td>
+        <td style="text-align: right; padding: 4px;">18,00</td>
+        <td style="text-align: right; padding: 4px;">10%</td>
+        <td style="text-align: right; padding: 4px;">19,80</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-weight: bold; font-size: 14px; margin-top: 15px; color: #1a3c6e;">SUMMARY</div>
+
+  <table style="width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px;">
+    <thead>
+      <tr style="background: #f0f0f0; border-bottom: 2px solid #999;">
+        <th style="text-align: right; padding: 4px;">VAT [%]</th>
+        <th style="text-align: right; padding: 4px;">Net worth</th>
+        <th style="text-align: right; padding: 4px;">VAT</th>
+        <th style="text-align: right; padding: 4px;">Gross worth</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="text-align: right; padding: 4px;">10%</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f; font-weight: bold;">81,49</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f; font-weight: bold;">8,15</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f; font-weight: bold;">89,64</td>
+      </tr>
+      <tr style="border-top: 2px solid #999; font-weight: bold;">
+        <td style="text-align: right; padding: 4px;">Total</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f;">$ 81,49</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f;">$ 8,15</td>
+        <td style="text-align: right; padding: 4px; color: #d32f2f;">$ 89,64</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+++++

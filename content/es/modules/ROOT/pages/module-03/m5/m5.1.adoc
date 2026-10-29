@@ -1,0 +1,192 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup-lab5"]
+== Configurar la carpeta de trabajo del laboratorio
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+
+[.indent2]
+[IMPORTANT]
+--
+Si omitiste capítulos anteriores, despliega la sección siguiente para ponerte al día.
+
+[%collapsible]
+====
+
+* Habilitar el acceso a la base de datos
++
+======
+Este capítulo requiere acceso a una base de datos, pero no es accesible de forma predeterminada.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w50]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integración]
+        end
+    end
+
+    Camel -.-x|"❌ no accesible"| SVC
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            %% SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Base de datos", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style DB fill:none,stroke:none
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+
+Para habilitar el acceso a la base de datos, ejecuta el siguiente comando en tu terminal de _Dev Spaces_:
+
+[.copypaste]
+****
+si-setup
+****
+
+Deberías ver que todos los recursos indican `ready OK`:
+
+[subs="attributes"]
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
+    <span style="color: #07BC7A">✓</span> Site                    ready  OK
+    <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
+    <span style="color: #07BC7A">✓</span> Listener                ready  OK
+
+Namespace: shared-database
+    <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
+    <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
+++++
+
+El resultado anterior indica que se estableció un enlace de Service Interconnect entre tu espacio de nombres y el espacio de nombres de la base de datos.
+
+{blank}
+
+//[.text-center]
+[.mermaid.mermaid-w80]
+[subs="attributes"]
+----
+flowchart LR
+    subgraph yoursLabel ["{username}-devspaces ."]
+        subgraph yours [" "]
+            Camel[⚙️ Integración]
+
+            SI1{{"Service\nInterconnect"}}
+        end
+    end
+
+    Camel --> SI1
+
+    SI1 -.-|"🔒 enlace seguro"| SI2
+
+    subgraph sharedLabel ["shared-database ."]
+        subgraph shared [" "]
+            SI2{{"Service\nInterconnect"}}
+            SVC((svc))
+            SVC --> DB
+        end
+    end
+
+    SI2 --> SVC
+
+    DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Base de datos", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style yoursLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style sharedLabel fill:none,stroke:none,color:#EE0000,font-weight:bold
+    style yours fill:#fce4e4,stroke:#EE0000
+    style shared fill:#fce4e4,stroke:#EE0000
+    style Camel fill:#f8b4b4,stroke:#EE0000,font-weight:bold
+    style DB fill:none,stroke:none
+    style SI1 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SI2 fill:#f8b4b4,stroke:#EE0000,color:#333
+    style SVC fill:#fce4e4,stroke:#EE0000,color:#333
+----
+======
+====
+--
+
+{empty} +
+
+. Desde tu terminal en _Dev Spaces_:
+.. Si tienes procesos en ejecución, detenlos con kbd:[Ctrl+C].
+.. Ejecuta el siguiente comando:
++
+{blank}
++
+[.copypaste]
+****
+step 9
+****
++
+[TIP]
+--
+.Ejecuta el comando anterior en cualquier momento para restablecer el ejercicio.
+[%collapsible]
+====
+El taller incluye prácticos scripts auxiliares que te permiten saltar a cualquier paso o restablecer el laboratorio a un estado conocido y funcional:
+
+* `step N` — restablece el laboratorio al inicio del paso N
+* `steps` — muestra todos los pasos disponibles en el laboratorio
+* `start` o `restart` — vuelve al principio (equivale a `step 1`)
+* `ff` — avanza rápidamente al *siguiente* paso
+* `rw` — retrocede al paso *anterior*
+====
+--
++
+{empty} +
+
+. Revisa la carpeta del laboratorio
++
+Después de ejecutar los comandos anteriores, echa un vistazo a la vista de árbol de tu editor para confirmar que todo se vea bien. Debería ser similar a la estructura de carpetas que viste en el ejercicio anterior.
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *data* pass:[<small style="color: #999">(datos de entrada simulados)</small>] +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 *prompt* pass:[<small style="color: #999">(indicaciones del modelo)</small>] +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-main.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *agent-tool-profile.camel.yaml* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;⚙&nbsp;&nbsp;</b></mark>] *application.properties* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: #b07219"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *PdfRenderer.java* +
+pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>&nbsp;≡&nbsp;&nbsp;</b></mark>] *template-pdf.xsl* +
+
+[.indent2]
+NOTE: Esta versión del ejercicio no utiliza servidores MCP para simplificar la ejecución. Todas las herramientas están integradas directamente en el proceso agéntico de Camel: están definidas como rutas regulares de Camel que el agente puede descubrir y utilizar.
+--
++
+{empty} +
+
+
+
+[.verification]
+****
+¿Ves la estructura de carpetas y los archivos esperados?
+
+[.success]
+Estás listo para continuar.
+
+[.fail]
+Asegúrate de que la sintaxis de los comandos sea compatible con tu entorno e inténtalo de nuevo.
+****
+
+{empty} +

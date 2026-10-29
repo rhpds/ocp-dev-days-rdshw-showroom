@@ -1,0 +1,84 @@
+:imagesdir: ../../assets/images
+:page-time: 1
+include::partial$style.adoc[]
+
+[id="setup"]
+== ラボの作業フォルダーをセットアップする
+
+[.indent2]
+include::../_shared/close-tabs.adoc[]
+
+. _Dev Spaces_ のターミナルで、次の操作を行います:
+.. 実行中のプロセスがある場合は、kbd:[Ctrl+C] を押して停止します。
+.. 次のコマンドを実行します: +
+(このコマンドを実行する前に、開いている Camel のファイルタブをすべて閉じてください — コマンド実行後に自動更新されない場合があります)
++
+{blank}
++
+[.copypaste]
+****
+step 4
+****
++
+[TIP]
+--
+演習をリセットするときは、いつでも上記のコマンドを実行できます。
+
+. 補助コマンド
+[%collapsible]
+====
+* `step N` — ラボをステップ N の開始時点にリセットします
+* `steps` — ラボで利用可能なすべてのステップを一覧表示します
+* `start` または `restart` — 最初に戻ります（ `step 1` と同じです）
+* `ff` — 次のステップへ進みます
+* `rw` — 前のステップに戻ります
+====
+--
++
+{empty} +
+
+. ラボフォルダーを確認する
++
+上記のコマンドを実行したら、エディターのツリービューを確認し、問題なく表示されていることを確かめてください。次のようになっているはずです:
++
+--
+[.indent2]
+📁 workshop +
+&nbsp;&nbsp;📁 lab +
+&nbsp;&nbsp;&nbsp;&nbsp;📁 pass:[<b>k2r</b> <small style="color: #999">(Kafka to Rocket.Chat)</small>] +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: grey"><b>⚙</b>&nbsp;</mark>] *application.properties* +
+pass:[<mark style="padding-left: 2rem; background-color: white; color: purple"><b><i>&nbsp;!&nbsp;&nbsp;</i></b></mark>] *k2r.camel.yaml* +
+
+[.indent2]
+[NOTE]
+====
+この `application.properties` ファイルには、環境用の接続設定があらかじめ含まれているため、そのまま使用できます。接続設定ではなく、統合ロジックの構築に集中できます。
+
+.何が含まれていますか?
+[%collapsible]
+=====
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat の認証情報</span>
+<span style="color: #a6e22e">rocketchat.token</span>=<span style="color: #e6db74">&lt;your-token&gt;</span>
+<span style="color: #a6e22e">rocketchat.userid</span>=<span style="color: #e6db74">&lt;your-userid&gt;</span></pre>
+++++
+=====
+====
+
+--
++
+{empty} +
+
+[.verification]
+****
+同じフォルダー構成とファイルを確認できましたか?
+
+[.success]
+これで次に進む準備ができました。
+
+[.fail]
+コマンドの構文がご利用の環境に合っていることを確認し、もう一度試してください。
+****
+
+
+{empty} +

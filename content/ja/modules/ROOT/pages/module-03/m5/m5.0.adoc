@@ -1,0 +1,211 @@
+:imagesdir: ../../assets/images
+:page-time: 3
+include::partial$style.adoc[]
+
+[id='lab5-govern-ai-consumption']
+== Lab 5 - LLM ガバナンス
+
+Connectivity Link を使って LLM エンドポイントの前にガバナンス層を配置し、複数のサービスティアにわたって API キー認証とトークンベースのレート制限を適用します。
+
+{empty} +
+
+=== シナリオ
+
+前のラボでは、自然言語で顧客サポートの問題を解決する AI エージェントを構築しました。このエージェントは、チャットインターフェースからデータベースを照会してレコードを更新し、ポリシードキュメントを再生成します。
+
+ここで、新しい機能として **顧客プロファイル分析** を追加します。サポート担当者が顧客について尋ねると、AI が顧客データを分析し、構造化された要約を返します。分析には次の 2 つのティアがあります。
+
+* **Gold** -- ポリシー履歴、請求履歴、ロイヤルティステータスをすべて含む分析。
+* **Silver** -- 最近のポリシーと基本的なプロファイル情報に絞った分析。
+
+[.mermaid.mermaid-w60]
+----
+flowchart LR
+    AGT5 <--> AI5
+    AI5 <--> GW
+
+    GW <--> GWp
+    %%GWp[" "] --> |"🥇 レート制限"| GP
+    %%GWp --> |"🥈 レート制限"| SP
+    GWp[" "] --- GP --- GWp2[" "] <--> LLM
+    GWp --- SP --- GWp2
+
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style AGT5 fill:none,stroke:none
+    style AI5 fill:none,stroke:none
+    style GW fill:none,stroke:none
+    style GWp fill:none,stroke:none,width:1px,height:1px
+    style GWp2 fill:none,stroke:none,width:1px,height:1px
+    style GP fill:none,stroke:none
+    style SP fill:none,stroke:none
+    style LLM fill:none,stroke:none
+----
+
+Gold は分析がより詳細で応答内容も充実するため、より多くのトークンを消費します。Silver はより軽量です。このシステムにはフォールバック戦略があり、Gold ティアのトークン予算が尽きるとサービスは Silver に切り替わります。Silver の予算も尽きた場合、リクエストは保留されます。
+
+ただし、これらを実現するには、まずガバナンスが必要です。LLM エンドポイントにアクセスできるのは誰でしょうか。各ティアが消費できるトークン数はいくつでしょうか。制御がなければ、消費量を抑えられず、組織の API 予算を使い果たしかねません。
+
+このラボでは、link:https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[*_Red Hat Connectivity Link_*,window=_blank] を使って LLM エンドポイントの前に **ガバナンス層** を配置し、次の 2 つのポリシーを実装します。
+
+* **AuthPolicy** -- API キー認証とグループベースの認可を使って、エンドポイントに _誰が_ アクセスできるかを制御します。
+* **TokenRateLimitPolicy** -- 実際のトークン使用量に基づくレート制限で、各ティアが _どれだけ_ 消費できるかを制御します。
+
+{empty} +
+
+=== Connectivity Link を選ぶ理由
+
+これはまさに _Red Hat Connectivity Link_ が解決するために設計された課題です。link:https://kuadrant.io/[_Kuadrant_ プロジェクト,window=_blank] を基盤とし、*Kubernetes* に AI を考慮したガバナンスをもたらします。
+
+* **トークン対応のレート制限** -- リクエスト数ではなく、実際に消費されたトークンに基づいて制限します。これにより、各ティアに独自のトークン予算を割り当て、ゲートウェイで適用できるため、階層型 AI サービスを実現できます。
+* **コード変更不要** -- ポリシーはインフラストラクチャ層で適用されるため、AI エージェントや統合コードを変更する必要はありません。
+* **Kubernetes ネイティブ** -- ポリシーは標準の CRD です。 `oc apply` で適用し、Git に保存して、PR でレビューできます。別の管理コンソールやベンダーのコントロールプレーンは必要ありません。
+* **組み合わせ可能** -- あるポリシーで ID を抽出し、別のポリシーでその ID を使ってティアごとのトークン予算を適用します。ポリシーを宣言的に組み合わせて適用できます。
+
+これらの機能は、Connectivity Link が _Kubernetes Gateway API_ 標準を基盤としていることによって実現されています。ポリシーの設定に進む前に、Gateway API モデルを見てみましょう。
+
+{empty} +
+
+=== Gateway API モデル
+
+Connectivity Link は、*Kubernetes* でトラフィックルーティングを管理する標準である _Kubernetes Gateway API_ を基盤としています。このモデルを理解しておくと、以降の演習が分かりやすくなります。
+
+構成要素は次のとおりです。
+
+* **GatewayClass + Gateway** -- プラットフォームチームが管理し、トラフィックが _どのように_ クラスターに入るかを定義します。すでにプロビジョニングされています。
+* **HTTPRoute** -- プラットフォームチームまたは開発チームが管理し、トラフィックを _どこへ_ 送るかを定義します（ここでは LLM API です）。
+
+[.text-center]
+[.mermaid]
+[subs="attributes"]
+----
+---
+title: Gateway API モデル
+config:
+    flowchart:
+        titleTopMargin: -200
+---
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '18px'}}}%%
+flowchart LR
+    subgraph yoursLabel [" "]
+        subgraph yours ["OpenShift"]
+            GC[GatewayClass]
+            GT[Gateway]
+            HTTP[HTTPRoute]
+        end
+    end
+
+    GC -->|定義| GT -->|経由してルーティング| HTTP
+
+    style yoursLabel fill:none,stroke:none
+    style yours fill:#e8eaf6,stroke:#7986cb
+    style GC fill:#fff,stroke:#7986cb
+    style GT fill:#fff,stroke:#7986cb
+    style HTTP fill:#fff,stroke:#7986cb
+----
+
+// ++++
+// <p style="text-align: center; margin-top: -2rem; padding-right: 12rem; font-style: italic; color: #555">Gateway API モデル</p>
+// ++++
+
+[.mermaid-hints-simple]
+****
+GC | GatewayClass | プラットフォームチームが管理します。Gateway を管理するコントローラー実装と、その設定（IP プール、リソース制限など）を定義します。 +
+GT | Gateway | クラスターへの入口です。トラフィックを適切な宛先に振り分けるロードバランサーまたはサービスです。 +
+HTTP | HTTPRoute | ルーティングルールです。URL パス、ヘッダー、ホストに基づいて、Gateway からバックエンドサービス（LLM）へのリクエストを振り分けます。
+****
+TIP: 図の各コンポーネントにカーソルを合わせると、その役割を確認できます。
+
+{empty} +
+
+ここで Connectivity Link の出番です。アプリケーションにガバナンスを組み込む代わりに、Gateway API リソースに **ポリシー** を直接関連付けます。Authentication Policy と TokenRateLimit Policy が HTTPRoute に適用され、インフラストラクチャ層で強制されるため、サービス側からは見えません。
+
+[.mermaid]
+----
+---
+config:
+  markdownAutoWrap: false
+---
+flowchart LR
+    Client([アプリ])
+    Gateway[Gateway]
+
+    subgraph S1 ["HTTPRoute"]
+        direction LR
+        subgraph S2 [" "]
+            direction LR
+            Auth[認証ポリシー]
+            RateLimit[トークンレート制限ポリシー]
+            Auth ~~~ RateLimit
+        end
+        
+        A@{ shape: braces, label: "<i>Connectivity Link のポリシーは Gateway API リソースに関連付けられます</i>" }
+    end
+
+    Service[Service]
+    Pod1[Pod]
+    Pod2[Pod]
+
+    Client -.->|HTTP リクエスト| Gateway --> S2 -->|ルーティングルール| Service
+    Service --> Pod1
+    Service --> Pod2
+
+
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S1 fill:none,stroke:none
+    style Client fill:#f5f5f5,stroke:#ccc
+    style Gateway fill:#fff,stroke:#7986cb
+    style Auth fill:#fff3e0,stroke:#fb8c00
+    style RateLimit fill:#fff3e0,stroke:#fb8c00
+    style Service fill:#fff,stroke:#7986cb
+    style Pod1 fill:#336,color:#fff
+    style Pod2 fill:#336,color:#fff
+----
+
+=== エンドツーエンドのリクエストフロー
+
+モデルを理解したところで、この構成にどう当てはまるかを見てみましょう。サポート担当者は AI アシスタントを使い、AI アシスタントはゲートウェイとガバナンス層を経由して LLM にリクエストを送信します。
+
+{blank}
+
+[.mermaid]
+----
+flowchart LR
+    Agent --> Bot
+    Bot -->|API キー| Gateway
+    Gateway --> S2
+    Auth -->|userid + group| Token
+    S2 --> LLM
+
+    subgraph S2 ["HTTPRoute"]
+        subgraph S3 ["Connectivity Link"]
+            Auth[認証ポリシー]
+            Token[トークンレート制限]
+        end
+    end
+
+    Agent@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポート担当者", pos: "b", h: 80, w: 80, constraint: "on" }
+    Bot@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    LLM@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "LLM", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style Agent fill:none,stroke:none
+    style S2 fill:#e8eaf6,stroke:#7986cb
+    style S3 fill:#e3f2fd,stroke:#7986cb
+    style Bot fill:none,stroke:none
+    style Gateway fill:#fff,stroke:#7986cb
+    style LLM fill:none,stroke:none
+    style Auth fill:#fff3e0,stroke:#fb8c00
+    style Token fill:#fff3e0,stroke:#fb8c00
+----
+
+サポート担当者の接続方法にかかわらず、同じアーキテクチャを適用できます。Rocket.Chat、社内チャットボット、その他のアプリケーションから接続する場合も同様です。
+
+
+
+
+

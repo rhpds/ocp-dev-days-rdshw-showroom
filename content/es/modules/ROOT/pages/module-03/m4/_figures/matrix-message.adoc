@@ -1,0 +1,30 @@
+[subs=attributes]
+++++
+<div style="display: flex; align-items: flex-start; gap: 15px;">
+  <!-- Matrix icon -->
+  <div style="display: flex; flex-direction: column; align-items: center; flex-shrink: 0;">
+    <div style="width: 90px; height: 90px; background-color: #33C69D; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+      {ico-matrix}
+    </div>
+    <span style="font-size: 16px; color: #000; font-weight: 500; margin-top: 5px;">matrix</span>
+  </div>
+  <div style="border: 1px solid #ddd; border-radius: 4px; background: #fff; width: 400px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 10px 12px; gap: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <!-- Row 1: Avatar + Username -->
+    <div style="display: flex; flex-direction: row; align-items: center; gap: 12px; margin-bottom: 6px;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #8B5CF6, #A78BFA); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0;">
+        U
+      </div>
+      <span style="font-weight: bold; font-size: 15px; color: #6D28D9;">{username}</span>
+    </div>
+    <!-- Row 2: Timestamp + sender -->
+    <div style="display: flex; flex-direction: row; align-items: baseline; gap: 12px; margin-bottom: 6px;">
+      <span style="width: 36px; text-align: center; font-size: 11px; color: #aaa; flex-shrink: 0;">{fig-time}</span>
+      <span style="font-size: 15px; color: #333; font-weight: 500;">{fig-sender}</span>
+    </div>
+    <!-- Row 3+: Message content (indented) -->
+    <div style="font-size: 15px; color: #333; line-height: 1.6; padding-left: 48px;">
+      {fig-msg}
+    </div>
+  </div>
+</div>
+++++

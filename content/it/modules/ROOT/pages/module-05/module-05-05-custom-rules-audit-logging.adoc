@@ -1,0 +1,140 @@
+= Sezione 5: Regole personalizzate per la libreria di logging di audit
+include::partial$_attributes.adoc[]
+:imagesdir: ../../assets/images
+
+== Obiettivo
+
+Scopri perché le regole MTA personalizzate sono importanti per le librerie proprietarie:
+
+* Esplora le regole di logging di audit distribuite con `parasol-insurance-eap`
+* Associale a un profilo di analisi MTA
+* Esegui l'analisi per visualizzare i risultati che le regole standard di Quarkus non sono in grado di rilevare
+
+I ruleset di migrazione standard (ad esempio, le regole di destinazione Quarkus) conoscono Java EE, Jakarta e i framework open source più diffusi. Non conoscono la `audit-logging-library` interna di Parasol. Senza regole personalizzate, MTA migrerebbe tranquillamente EJB e MDB lasciando però in uso, senza segnalarlo, un'API di audit obsoleta e non funzionante: un rischio di conformità per una piattaforma assicurativa.
+
+In questa sezione tratterai le regole personalizzate come conoscenze di migrazione di prima classe: create una volta dai team di piattaforma / architettura e poi riutilizzate ogni volta che un'applicazione dipende da quella libreria.
+
+== Perché Parasol ha bisogno di regole personalizzate
+
+Parasol Insurance dipende da una libreria aziendale condivisa, `com.enterprise:audit-logging-library`, inclusa nel progetto come repository Maven locale:
+
+* **v1 (`1.0.0`)** — logging di audit sincrono basato sul filesystem (`AuditEvent` basato su builder, `FileSystemAuditLogger`, metodi di utilità come `logSuccess` / `logFailure`)
+* **v2 (`2.0.0`)** — API orientata allo streaming (`StreamableAuditLogger`, `AuditEvent` in stile record, `logEventAsync` non bloccante)
+
+I JAR e i POM si trovano in `lib/repository/`. Attualmente l'applicazione dichiara **v1** in `pom.xml` tramite il repository file `project-local`: esattamente il tipo di dipendenza privata che non compare su Maven Central e non è mai inclusa nelle regole pubbliche di Quarkus.
+
+[cols="2,2"]
+|===
+| v1 (quella in uso) | v2 (destinazione della migrazione)
+
+| Logging sincrono basato su file
+| Logging asincrono / in streaming
+
+| Pattern `AuditEvent.builder()`
+| Creazione diretta di `AuditEvent` (API in stile record)
+
+| `FileSystemAuditLogger`
+| `StreamableAuditLogger`
+
+| `logEvent(...)`, `logSuccess(...)`, `logFailure(...)`
+| Preferisci `logEventAsync(...)` con un `AuditEvent` completo
+|===
+
+== Esercizio 1: Esplora le regole personalizzate
+
+Apri xref:module-05/module-05-logging.adoc[logging.yaml] per **scaricare** o **copiare** il contenuto in `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (crea la directory `rules/` se non esiste già).
+
+Esamina rapidamente ogni `ruleID`, la clausola `when:` e il `message:` in `logging.yaml`: sono gli elementi che l'analizzatore segnalerà nel pannello Analysis. Il file definisce **cinque** regole (`audit-logging-0001` … `audit-logging-0005`).
+
+=== Cosa rileva ogni regola
+
+[cols="1,3,2"]
+|===
+| ID regola | Rileva | Azione tipica di migrazione
+
+| `audit-logging-0001`
+| Dipendenza Maven da `com.enterprise:audit-logging-library` nell'intervallo **1.x**
+| Aggiorna a `2.0.0` (e allinea il livello Java alle aspettative della libreria v2)
+
+| `audit-logging-0002`
+| Chiamate a `AuditEvent.builder`
+| Sostituisci il builder con la creazione diretta di `AuditEvent`
+
+| `audit-logging-0003`
+| Riferimenti a `FileSystemAuditLogger`
+| Passa a `StreamableAuditLogger` per i sink di audit in streaming / in stile TCP
+
+| `audit-logging-0004`
+| Chiamate sincrone `logEvent(...)` sui tipi di logger di audit
+| Preferisci `logEventAsync(...)` non bloccante
+
+| `audit-logging-0005`
+| Metodi di utilità legacy `logSuccess` / `logFailure`
+| Crea un `AuditEvent` completo ed effettua il logging in modo asincrono
+|===
+
+TIP: Le regole personalizzate usano lo stesso linguaggio delle regole MTA dei ruleset pubblici (`java.dependency`, `java.referenced`, categorie, effort, etichette). La differenza è la **responsabilità**: queste regole codificano il contratto della libreria privata di Parasol.
+
+Apri anche `pom.xml` e individua la dipendenza da `audit-logging-library` versione `1.0.0` e il repository `project-local` che punta a `lib/repository`. Questo è il collegamento concreto per la regola `audit-logging-0001`.
+
+== Esercizio 2: Associa le regole personalizzate a un profilo MTA
+
+In precedenza hai configurato l'estensione MTA e potresti aver notato che è disponibile anche un'opzione per aggiungere regole personalizzate all'analisi. Iniziamo ad aggiungere regole personalizzate al nostro `quarkus-profile`.
+
+. Apri la vista MTA Analysis. Fai clic sull'icona **gear** (1), quindi in **Select Profile** fai clic su **Edit in Profile Manager** (2).
++
+image::module-05-mta-dls/05-05-dls-01.jpg[Aprire Profile Manager da Get Ready to Analyze,link=self,window=blank,title="Edit in Profile Manager"]
+
+. Associamo le regole personalizzate al nostro `quarkus-profile`
+
+. In **Profile Settings**, imposta la destinazione della migrazione in modo coerente con questo workshop (Quarkus / la stessa famiglia di destinazioni usata da `quarkus-profile`). Le regole personalizzate in questo repository sono orientate a una destinazione in stile Quarkus 3.
+
+. In **Custom Rules**, fai clic su **Upload Custom Rules...** e carica il file xref:module-05/module-05-logging.adoc[`logging.yaml`] che hai salvato localmente (oppure indica al profilo la directory `rules/` del progetto che contiene `logging.yaml`).
++
+image::module-05-mta-dls/05-05-dls-02.jpg[Caricare regole personalizzate in Profile Settings,link=self,window=blank,title="Custom Rules"]
+
+. Attiva il profilo, così sarà quello utilizzato per la prossima esecuzione dell'analisi.
+
+IMPORTANT: Se esegui solo `quarkus-profile` senza caricare le regole personalizzate né specificarne il percorso, continuerai a vedere i risultati Java EE → Quarkus (MDB, EJB e così via), ma **non vedrai** i problemi relativi alla libreria di audit. Le regole personalizzate e quelle standard si completano a vicenda.
+
+== Esercizio 3: Esegui l'analisi ed esamina i risultati personalizzati
+
+. Congratulazioni per aver completato l'esercizio 3! Ora è il momento di eseguire l'analisi. Poiché utilizziamo lo stesso profilo attivo di prima, `quarkus-profile`, torna al pannello Analysis ed esegui di nuovo l'analisi.
+
+. Quando il pannello Analysis mostra i risultati, filtrali o cerca quelli relativi ad **audit** / **`Audit`**. Espandi gli incidenti e verifica che sia possibile ricondurli agli ID delle regole che hai letto in `logging.yaml`. Come minimo, dovresti vedere un risultato relativo alla **dipendenza** `audit-logging-library` **1.0.0** in `pom.xml` (regola `audit-logging-0001`).
+
+. Per un risultato come la sostituzione di `FileSystemAuditLogger`, apri il menu a discesa **AI** e seleziona **Get solution** (oppure **Get solution for N incidents**).
++
+image::module-05-mta-dls/05-05-dls-03.jpg[Risultati di audit e Get Solution,link=self,window=blank,title="Get Solution"]
+
+. Esamina la patch generata in **MTA Resolution Details**. Verifica la modifica (ad esempio `FileSystemAuditLogger` → `StreamableAuditLogger`), quindi scegli **Review in Editor**, **Reject** o **Accept**.
++
+image::module-05-mta-dls/05-05-dls-04.jpg[Esaminare e accettare la patch di ClaimsResource,link=self,window=blank,title="Accept patch"]
+
+. Poi cerca **`ClaimsResource`** nel pannello Analysis e imposta **Group by: Files**. Apri il menu **AI** e richiedi una soluzione per gli incidenti in quel file (le regole `audit-logging-0002` … `audit-logging-0005` vengono attivate in punti di chiamata come `AuditEvent.builder`, `logEvent` e `logSuccess` / `logFailure`).
++
+image::module-05-mta-dls/05-05-dls-05.jpg[Raggruppamento di ClaimsResource per file e Get Solution,link=self,window=blank,title="ClaimsResource AI"]
+
+. Esamina le patch aggiuntive. Ad esempio, `logSuccess(...)` legacy dovrebbe essere sostituito dalla creazione di un `AuditEvent` completo (e in genere da `logEventAsync`). Accetta o rifiuta la patch dopo aver compreso le differenze.
++
+image::module-05-mta-dls/05-05-dls-06.jpg[Esaminare la patch di migrazione di AuditEvent,link=self,window=blank,title="AuditEvent patch"]
+
+NOTE: Leggi attentamente il **message** di ogni risultato. Nota come il testo della regola sia scritto sia per le persone *sia* per Developer Lightspeed: esprime con chiarezza l'intento (“aggiorna a 2.0.0”, “usa `logEventAsync`” e così via), senza chiedere al modello di inventare da zero le policy di Parasol. Gli aggiornamenti delle librerie personalizzate possono comportare modifiche al livello Java e all'API che vanno oltre un semplice numero di versione: esamina le differenze prima di accettarle.
+
+== Cosa abbiamo imparato
+
+* **Lacuna nelle regole standard:** i ruleset pubblici di Quarkus / Java EE non conoscono librerie proprietarie come `audit-logging-library`.
+* **Struttura delle regole personalizzate:** file come `logging.yaml` usano condizioni `when:` e testo operativo `message:` che MTA (e Developer Lightspeed) possono utilizzare.
+* **Cinque aree di migrazione:** aggiornamento della dipendenza, creazione dell'evento, implementazione del logger, logging sincrono → asincrono e rimozione dei metodi di utilità.
+* **Configurazione del profilo:** l'analisi MTA applica le regole personalizzate solo se il profilo attivo punta al percorso `rules/`.
+* **Riutilizzo tra servizi:** la stessa cartella `rules/` può essere condivisa da ogni servizio Parasol che dipende dalla libreria di audit: scrivi le regole una volta ed esegui l'analisi più volte.
+
+== Verifica
+
+. La directory `rules/` esiste in `parasol-insurance-eap` e contiene `logging.yaml` (copiato o scaricato da questa guida, se necessario).
+
+. Sai spiegare con parole tue cosa rilevano almeno tre delle cinque regole `audit-logging-****`.
+
+. Un profilo MTA è configurato con il percorso personalizzato `rules/` ed è stato utilizzato per eseguire l'analisi.
+
+. Sai individuare in `pom.xml` il risultato `audit-logging-0001` relativo alla dipendenza v1.

@@ -1,0 +1,323 @@
+:imagesdir: ../../assets/images
+:page-time: 5
+include::partial$style.adoc[]
+
+== トークンレート制限
+
+認証が整ったら、次の制御層はトークン消費です。 **TokenRateLimitPolicy** は、従来のレート制限のように単純にリクエスト数を数えるのではなく、LLM 応答で実際に *使用されたトークン* を追跡します。
+
+{blank}
+
+[.mermaid.mermaid-w60]
+----
+flowchart LR
+    AGT5 <--> AI5
+    AI5 <--> GW
+
+    GW --- GWp
+    GWp[" "] --> |"🥇 レート制限"| GP
+    GWp --> |"🥈 レート制限"| SP
+
+    AGT5@{ img: "../../_images/module-03/common/agent-icon.svg", label: "サポートエージェント", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI5@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI アシスタント", pos: "b", h: 80, w: 80, constraint: "on" }
+    GP@{ img: "../../_images/module-03/common/profile-icon.svg", label: "Gold プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+    SP@{ img: "../../_images/module-03/common/profile-silver-icon.svg", label: "Silver プロファイル", pos: "b", h: 80, w: 70, constraint: "on" }
+
+    style AGT5 fill:none,stroke:none
+    style AI5 fill:none,stroke:none
+    GW@{ img: "../../_images/module-03/common/guardrail-icon.svg", label: "Connectivity Link", pos: "b", h: 80, w: 80, constraint: "on" }
+
+    style GW fill:none,stroke:none
+    style GWp fill:none,stroke:none,width:1px,height:1px
+    style GP fill:none,stroke:none
+    style SP fill:none,stroke:none
+----
+
+レート制限ポリシーは、AI の機能とコストおよびリソース制御を組み合わせる強力な方法です。この演習では、Customer Profile Tool がトークン予算を使って、どの階層の分析を出力するかを決定する仕組みを確認します。
+
+すべての LLM リクエストは計算能力を消費し、より豊富な分析ほど多くの計算資源を必要とします。AI の採用が進むにつれて、コストとインフラ容量の管理は重要になります。レート制限ポリシーは、各サービス全体でのトークン使用量を制御するのに役立ちます。
+
+この演習では、Customer Profile Tool は単純なレート制限にとどまらず、段階的に分析レベルを下げる戦略を採用します。まず *Gold* 分析を試み、Gold 予算が使い切られたら *Silver* にフォールバックして、より低コストで有用なプロファイルを生成し続けます。両方の予算が尽きた場合にのみ、リクエストは拒否されます。
+
+[NOTE]
+====
+.Camel でフォールバックがどのように実装されているかを見る
+[%collapsible]
+=====
+以下のルートは、Camel における Gold パスの定義を示しています。Circuit Breaker ブロック内で、LLM が処理するためのデータを取得します。Connectivity Link が呼び出しをレート制限すると、エラーで応答し、Camel はそのパスを失敗としてマークし、ルートは Silver パスへフォールバックします。
+
+image::module-03/m5/kaoto-gold-fallback.png[Kaoto におけるフォールバック付き Gold ルート,width=100%]
+=====
+====
+
+{blank} 
+
+以下の図は、フォールバック戦略の流れを示しています。
+
+{blank}
+
+[.mermaid]
+----
+flowchart TD
+    REQ(["プロファイルのリクエスト"]) --> QA["🥇 Gold の割り当てはありますか？"]
+    QA -->|"✅ はい"| GOLDBox
+    QA2 -->|"✅ はい"| SILVERBox
+    QA --> |"❌ いいえ"| QA2["🥈 Silver の割り当てはありますか？"]
+    QA2 -->|"❌ いいえ"| ERR["⚠️ 後でもう一度お試しください"]
+
+    subgraph fallback [" "]
+        direction TD
+        SILVERBox
+        ERR
+    end
+
+    GOLDBox["<div style='display:flex;align-items:center;gap:20px;min-width:280px'><img src='../../_images/module-03/common/profile-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Gold 分析</b><br/>• 購入履歴全体<br/>• 支出パターン<br/>• ロイヤルティ状況</div></div>"]
+
+    SILVERBox["<div style='display:flex;align-items:center;gap:20px;min-width:230px'><img src='../../_images/module-03/common/profile-silver-icon.svg' style='width:60px;min-width:60px;max-width:60px'/><div style='text-align:left'><b style='font-size:1.3em'>Silver 分析</b><br/>• 最近の注文<br/>• 基本プロフィール</div></div>"]
+
+    style REQ fill:#f5f5f5,stroke:#EE0000,color:#333
+    style QA fill:none,stroke:none,color:#333
+    style QA2 fill:none,stroke:none,color:#333
+    style GOLDBox fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style SILVERBox fill:#e8f5e9,stroke:#66bb6a,color:#333
+    style ERR fill:#fce4e4,stroke:#EE0000,color:#333
+    style fallback fill:none,stroke:none
+----
+
+実践として、各階層にそれぞれのトークン予算を割り当てる TokenRateLimitPolicy を適用します。その後、プロファイル要求を送り続けて Gold 予算が消費されるまで試し、システムが Silver に切り替わる様子を確認します。
+
+{empty} +
+
+=== エージェントの統合を開始する
+
+エージェントがターミナルで実行中であることを確認してください。前の演習のあとに停止した場合は、もう一度起動します。
+
+{blank}
+
+[.copypaste]
+****
+camel run * --local-kamelet-dir ../support/kamelets
+****
+
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+* `camel run *` — 現在のディレクトリにあるすべての Camel ルートファイルを実行します
+* `--local-kamelet-dir ../support/kamelets` — support フォルダからカスタム Kamelets（コネクタ）を読み込みます +
+(Rocket.Chat コネクタを含む)
+====
+--
+
+{empty} +
+
+=== TokenRateLimitPolicy を適用して確認する
+
+TokenRateLimitPolicy はゲートウェイレベルのリソースです。階層ごとのトークン予算を定義し、実行中のアプリケーションとは独立してゲートウェイに適用させます。
+
+. _DevSpaces_ で kbd:[+] アイコンをクリックして新しいターミナルタブを開きます（後でテストできるよう、_Camel_ が実行中の前のタブはそのまま残してください）。
++
+[#terminal-tab]
+image::module-03/m5/devspace_terminal_new_tab.png[Dev Spaces のターミナル,width=70%]
++
+[.overlay]
+****
+[.target]
+terminal-tab
+
+[.arrows]
+{x: 38, y: 67, rot: -45, size: 3}
+****
++
+{empty} +
++
+NOTE: このポリシーはインフラストラクチャ層で動作するため、エージェントを実行したままでも適用でき、再起動は不要です。
++
+{empty} +
+
+. 各階層のトークン予算を確認し、ポリシーを名前空間に適用します。
++
+--
+このポリシーは、各階層のコストを反映した 2 つのトークン予算を定義します。
+
+* *Gold* — より豊富な分析、より高い計算コスト。更新ウィンドウが長く、より厳しいトークン許容量です。
+* *Silver* — より軽い分析、より低い計算コスト。更新がより速く、より寛大なトークン許容量です。
+--
++
+{blank}
++
+以下の TokenRateLimitPolicy を確認し、次の yaml を新しいターミナルタブに *貼り付けて適用* してください。
++
+{blank}
++
+[.copypaste]
+****
+oc apply -f - <<EOF
+apiVersion: kuadrant.io/v1alpha1
+kind: TokenRateLimitPolicy
+metadata:
+  name: openai-token-limits
+  namespace: {user-username}-devspaces
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ai-proxy-route
+  limits:
+    gold:
+      rates:
+        - limit: 50
+          window: 4m
+      when:
+        - predicate: |
+            auth.identity.groups.split(",").exists(g, g == "gold")
+      counters:
+        - expression: auth.identity.userid
+    silver:
+      rates:
+        - limit: 500
+          window: 2m
+      when:
+        - predicate: |
+            auth.identity.groups.split(",").exists(g, g == "silver")
+      counters:
+        - expression: auth.identity.userid
+EOF
+****
++
+YAML が上で説明した階層別の予算に対応していることに注目してください。`gold` はより厳しい制限と長いウィンドウを持ち、`silver` はより寛大な許容量で、より速く更新されます。
++
+[IMPORTANT]
+====
+TokenRateLimitPolicy は AuthPolicy に依存します。ここで参照している `auth.identity.groups` と `auth.identity.userid` フィールドは、AuthPolicy の `response.success.filters` セクションによって設定されます。AuthPolicy がなければ、TokenRateLimitPolicy には評価するための ID コンテキストがありません。
+====
++
+{empty} +
+
+. TokenRateLimitPolicy を確認する
++
+devspaces のターミナルから、TokenRateLimitPolicy が正常に作成されたことを確認するために次のコマンドを実行します。
++
+[.copypaste]
+****
+oc describe tokenratelimitpolicy -n {user-username}-devspaces \
+| grep -iE "Name:|target|gold:|silver:|limit:|window:|type:|status:"
+****
++
+[TIP]
+--
+.このコマンドは何をしますか？
+[%collapsible]
+====
+* `oc describe tokenratelimitpolicy` — TokenRateLimitPolicy リソースの完全な詳細を表示します
+* `-n {user-username}-devspaces` — あなたの名前空間を対象にします
+* `grep -iE "Name:|target|..."` — 出力を絞り込み、主要なフィールド（名前、ターゲット、制限、状態）のみを表示します
+====
+--
++
+出力には、TokenRateLimitPolicy が存在し、正しい HTTPRoute を対象にしており、Enforced 状態になっていることが示されるはずです。例:
++
+{blank}
++
+++++
+<pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         openai-token-limits
+    <span style="color: #F14C4B;font-weight:bold">Gold:</span>
+        <span style="color: #F14C4B;font-weight:bold">Limit:</span>   50
+        <span style="color: #F14C4B;font-weight:bold">Window:</span>  4m
+    <span style="color: #F14C4B;font-weight:bold">Silver:</span>
+        <span style="color: #F14C4B;font-weight:bold">Limit:</span>   500
+        <span style="color: #F14C4B;font-weight:bold">Window:</span>  2m
+  <span style="color: #F14C4B;font-weight:bold">Target</span> Ref:
+    <span style="color: #F14C4B;font-weight:bold">Name:</span>   ai-proxy-route
+<span style="color: #F14C4B;font-weight:bold">Status:</span>
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
+    <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
+    <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
+++++
++
+ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を継続的に追跡しています。+
+フォールバック戦略を実際に見てみましょう。
+
+{empty} +
+
+=== Rocket.Chat からトークンレート制限をテストする
+
+. _Rocket.Chat_ に戻り、前の演習と同じリクエストを送ります。
++
+{blank}
++
+[.copypaste.value]
+****
+注文 61356291 の顧客プロファイルを生成してください
+****
++
+NOTE: このリクエストの注文番号は説明用です。Customer Profile Tool は、プロジェクトの `data/` フォルダにある JSON ファイルからのシミュレートされた入力データを使用します。ソースコード内でこれらのファイルを調べると、分析の元になるモック CRM、履歴、監査、チケットのデータを確認できます。
++
+Gold のトークン予算はまだ十分残っているため、システムは前の演習と同じように *GOLD TIER ANALYSIS* を出力するはずです。
+
+{empty} +
+
+. もう一度試して、システムが Silver に切り替わることを確認します。
++
+前回のリクエストで Gold のトークン予算（およそ 50 トークン）が消費されているはずです。もう一度質問してシステムが Silver に切り替わるか確認してください。シンプルな「try again」プロンプトで十分です。
++
+{blank}
++
+[.copypaste.value]
+****
+もう一度試してください
+****
++
+今度は Gold ではなく *SILVER TIER ANALYSIS* が表示されるはずです。応答は短くなり、Customer Profile と Open Issues の 2 つのセクションだけになります。これは、より軽い分析階層を反映しています。
++
+{blank}
++
+:fig-time: 11:21 AM
+include::_figures/rc-silver-profile.adoc[]
++
+{blank}
++
+これでフォールバック戦略が実際に動作していることが確認できます。最初のリクエストで Gold 予算が消費されたため、システムは自動的に Silver に切り替わりました。
+
+{empty} +
+
+. プロファイル要求を送り続けます。Silver 予算はより寛大なので、予算が尽きるまでに複数回の Silver 分析を受け取れるはずです。システムがこれ以上プロファイルを生成できなくなるまで続けてください。
++
+{blank}
++
+[.copypaste.value]
+****
+もう一度試してください
+****
++
+{empty} +
+
+. 両方の予算が消費されると、システムには残りの容量がありません。 *SERVICE NOTICE* と `429 Too Many Requests` ステータスが表示され、トークンレート制限ポリシーが完全に強制されていることが確認できます。
++
+{blank}
++
+:fig-time: 11:25 AM
+:fig-user-msg: Please try again
+:fig-status: 429 Too Many Requests
+:fig-action: Intelligence Service is currently paused due to high traffic.
+:fig-notice: Please try your request again in a few moments.
+include::_figures/rc-service-notice.adoc[]
+
+{empty} +
+
+NOTE: トークン予算は永続的ではありません。時間ウィンドウ単位で動作するため、十分な時間が経過すると予算は補充されます。数分待ってからもう一度試すと、システムは同じフォールバック戦略、つまり Gold を先に、その後 Silver を生成する動作に戻ります。
+
+{empty} +
+
+[.verification]
+****
+Gold の予算がなくなったあとに Silver が表示され、最後に両方の予算が尽きたときに 429 エラーが出る、という流れを確認できましたか？
+
+[.success]
+階層化されたトークンレート制限と、分析レベルを段階的に下げる戦略を正常に適用できました。
+
+[.fail]
+AuthPolicy と TokenRateLimitPolicy の両方が Enforced 状態であることを確認してください。トークン予算が更新されるまで待ってから、もう一度試してください。
+****
