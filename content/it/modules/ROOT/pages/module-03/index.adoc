@@ -7,11 +7,11 @@ include::partial$style.adoc[]
 
 == Connettività delle applicazioni per l'IA
 
-Benvenuti. Il modulo __Connettività delle applicazioni per l'IA__ offre un'introduzione completa alla creazione di flussi di dati per l'IA usando i potenti strumenti e le tecnologie di Red Hat. Che siate alle prime armi con l'IA o sviluppatori esperti, questo workshop vi guiderà nella creazione di flussi di dati efficienti e sicuri per le vostre applicazioni di IA.
+Benvenuti nel modulo __Connettività delle applicazioni per l'IA__. Questo modulo offre un'introduzione completa alla creazione di flussi di dati per l'IA con i potenti strumenti e le tecnologie di Red Hat. Che siate alle prime armi con l'IA o sviluppatori esperti, questo workshop vi guiderà nella creazione di flussi di dati efficienti e sicuri per le vostre applicazioni di IA.
 
 [TIP]
 --
-Per un'esperienza ottimale, vi consigliamo di seguire il modulo in ordine. Ogni sezione si basa sulla precedente e vi permette di sviluppare gradualmente le vostre competenze e la comprensione dei concetti. Potete comunque scegliere le sezioni che vi interessano di più.
+Per un'esperienza ottimale, vi consigliamo di seguire il modulo in ordine. Ogni sezione si basa sulla precedente e vi permette di sviluppare gradualmente le vostre competenze e la comprensione dei concetti, ma potete comunque scegliere le sezioni che vi interessano di più.
 --
 
 Selezionate un modulo qui sotto per iniziare.
@@ -27,7 +27,7 @@ Scoprite gli obiettivi del workshop, le tecnologie coinvolte e lo scenario, quin
 ****
 xref:module-03/m1/m1.0.adoc[Laboratorio 1 -- Servizio di acquisizione]
 
-Acquisite le richieste di polizza EDI, trasformatele e archiviatele in un database backend, quindi generate documenti di polizza PDF. La connettività sicura tra cluster è fornita da Service Interconnect.
+Acquisite le domande di polizza EDI, trasformatele e archiviatele in un database backend, quindi generate documenti di polizza PDF. Service Interconnect fornisce una connettività sicura tra cluster.
 ****
 
 [.tile]
@@ -48,7 +48,7 @@ Disaccoppiate l'architettura di messaggistica usando Kafka come backbone, adotta
 ****
 xref:module-03/m4/m4.0.adoc[Laboratorio 4 -- Supporto clienti basato sull'IA]
 
-Create un agente di supporto basato sull'IA che risolve i problemi relativi alle polizze tramite il linguaggio naturale in Rocket.Chat, orchestrato con Agentic Apache Camel e MaaS.
+Create un agente di supporto basato sull'IA che risolve i problemi relativi alle polizze tramite il linguaggio naturale in Rocket.Chat, orchestrato da Agentic Apache Camel e MaaS.
 ****
 
 [.tile]

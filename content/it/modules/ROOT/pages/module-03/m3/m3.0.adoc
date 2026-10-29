@@ -5,14 +5,14 @@ include::partial$style.adoc[]
 [id='lab3-introduction']
 == Introduzione
 
-Crea gli integration flow che collegano Matrix e Rocket.Chat tramite Apache Kafka, realizzando un’architettura disaccoppiata ed event-driven, pronta ad accogliere nuovi sistemi.
+Crea i flussi di integrazione che collegano Matrix e Rocket.Chat tramite Apache Kafka, realizzando un’architettura disaccoppiata e basata sugli eventi, pronta ad accogliere nuovi sistemi.
 
 {empty} +
 
 
 === Un rapido promemoria
 
-I clienti contattano l’assistenza per le loro richieste di polizza tramite *Matrix*, mentre gli operatori rispondono da *Rocket.Chat*. L’obiettivo è collegare le due piattaforme, così che i messaggi possano fluire senza interruzioni da una all’altra.
+I clienti contattano l’assistenza per le loro richieste relative alle polizze tramite *Matrix*, mentre gli operatori del supporto rispondono da *Rocket.Chat*. L’obiettivo è collegare le due piattaforme, così che i messaggi possano fluire senza interruzioni dall’una all’altra.
 
 {empty} +
 
@@ -31,7 +31,7 @@ image::module-03/m3/data-flow.png[width=90%]
 
 === Un modello dati comune
 
-Per far funzionare tutto in modo pulito, adottiamo un *modello dati standard* come linguaggio comune su Kafka. Invece di tradurre direttamente tra formati specifici delle piattaforme (Matrix e Rocket.Chat), ogni flow trasforma i dati in due passaggi:
+Per far funzionare tutto in modo lineare, adottiamo un *modello dati standard* come linguaggio comune su Kafka. Invece di tradurre direttamente tra formati specifici delle piattaforme (Matrix e Rocket.Chat), ogni flow trasforma i dati in due passaggi:
 
 * *In ingresso*: formato specifico della piattaforma → modello dati standard (verso Kafka)
 * *In uscita*: modello dati standard → formato specifico della piattaforma (da Kafka)

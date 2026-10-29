@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-L'approccio tradizionale alla sicurezza consiste nell'eseguire la scansione alla fine della pipeline -- o, peggio, dopo il deployment. A quel punto, correggere le vulnerabilità significa rifare il lavoro, accumulare ritardi e applicare patch urgenti. Un approccio migliore è **spostare i controlli a sinistra**: fornire agli sviluppatori gli strumenti per identificare e correggere le vulnerabilità il prima possibile, mentre stanno ancora scrivendo il codice.
+L'approccio tradizionale alla sicurezza consiste nell'eseguire la scansione alla fine della pipeline -- o, peggio, dopo il deployment. A quel punto, correggere le vulnerabilità significa rifare il lavoro, accumulare ritardi e applicare patch urgenti. Un approccio migliore è **anticipare i controlli di sicurezza**: fornire agli sviluppatori gli strumenti per identificare e correggere le vulnerabilità il prima possibile, mentre stanno ancora scrivendo il codice.
 
 In questa sezione configurerai il tuo ambiente di sviluppo protetto e poi userai Red Hat Dependency Analytics per individuare e correggere le vulnerabilità nelle dipendenze dell'applicazione, prima ancora di eseguire il push di un commit.
 
@@ -154,7 +154,7 @@ quindi esegui **gitsign login**
 image::m02-devspaces-gitsign-select.png[Seleziona il task gitsign login,link=self,window=blank,width=700]
 ====
 
-. Attendi che l'ambiente Java si stabilizzi: vedrai gli indicatori di avanzamento nella barra di stato in basso mentre vengono caricate le estensioni. Puoi riordinare l'IDE chiudendo tutti i pannelli "Welcome" e il pannello chat sulla destra. Nota il messaggio **Java: Ready** in basso.
+. Attendi che l'ambiente Java si stabilizzi: vedrai gli indicatori di avanzamento nella barra di stato in basso mentre vengono caricate le estensioni. Puoi fare un po' di pulizia nell'IDE chiudendo tutti i pannelli "Welcome" e il pannello chat sulla destra. Nota il messaggio **Java: Ready** in basso.
 +
 image::m02-devspaces-java-ready.png[IDE Dev Spaces con lo stato Java Ready,link=self,window=blank,width=700]
 

@@ -3,11 +3,11 @@ include::partial$_attributes.adoc[]
 
 == Ambiente del workshop
 
-È già stato predisposto tutto ciò che serve. L'ambiente di laboratorio include:
+È già tutto predisposto. L'ambiente di laboratorio include:
 
 * Un cluster OpenShift con Developer Hub, Dev Spaces, Pipelines e GitOps preconfigurati
 * Un account utente con accesso a tutte le risorse del workshop
-* Un'applicazione di esempio (Parasol Insurance) che estenderai con una nuova funzionalità
+* Un'applicazione di esempio (Parasol Insurance) a cui aggiungerai una nuova funzionalità
 
 Le tue credenziali di accesso (usale per Developer Hub, GitLab e tutti i servizi del workshop):
 
@@ -26,7 +26,7 @@ Il tuo ambiente di laboratorio include:
 * **GitLab**: {gitlab_url}[{gitlab_url}^]
 * **Argo CD**: {argocd_url}[{argocd_url}^]
 
-NOTE: Tutti gli URL e le credenziali sono disponibili anche nel pannello a destra di questa interfaccia di laboratorio. Usa le schede in alto per passare da OpenShift Console a Terminal e GitLab.
+NOTE: Tutti gli URL e le credenziali sono disponibili anche nel pannello a destra di questa interfaccia di laboratorio. Usa le schede in alto per passare da OpenShift Console, Terminal e GitLab.
 
 == Durata
 
@@ -42,7 +42,7 @@ Questo workshop prevede **90 minuti** di attività pratica.
 
 | La tua missione
 | 10 min
-| Trova l'attività che ti è stata assegnata e crea un ambiente di sviluppo usando un modello self-service
+| Trova l'attività che ti è stata assegnata e crea un ambiente di sviluppo usando un template self-service
 
 | Sviluppare la funzionalità
 | 25 min
@@ -50,7 +50,7 @@ Questo workshop prevede **90 minuti** di attività pratica.
 
 | Consegnarla
 | 15 min
-| Esegui il push del codice, visualizza la pipeline CI in Developer Hub e individua la causa di un errore del quality gate
+| Esegui il push del codice, visualizza la pipeline CI in Developer Hub e individua la causa del fallimento di un quality gate
 
 | Chiedere aiuto all'IA
 | 10 min

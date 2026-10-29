@@ -13,7 +13,7 @@ include::partial$style.adoc[]
 
 . Apri il client web di _Matrix_
 +
-Fai clic sul link qui sotto per aprire la pagina Login in _Matrix_ (si aprirà una nuova scheda).
+Fai clic sul link qui sotto per aprire la pagina di accesso in _Matrix_ (si aprirà in una nuova scheda).
 +
 --
 - link:{url-element}[Matrix Login page,window="_blank"]
@@ -21,7 +21,7 @@ Fai clic sul link qui sotto per aprire la pagina Login in _Matrix_ (si aprirà u
 +
 {blank}
 +
-Verrà visualizzata una pagina Login.
+Ti verrà mostrata una pagina di accesso.
 +
 {empty} +
 
@@ -58,12 +58,12 @@ REPLACE
 +
 {empty} +
 +
-. Poi, fai clic su **_"Sign in"_**
+. Poi fai clic su **_"Sign in"_**
 ====
 +
 {empty} +
 +
-Ti verrà chiesto di confermare la tua identità. Inserisci la password per farlo, come mostrato di seguito:
+Ti verrà chiesto di confermare la tua identità. Inserisci la password per confermarla, come mostrato di seguito:
 +
 image::module-03/m2/matrix-login-confirm.jpg[width=60%]
 +
@@ -73,7 +73,7 @@ Conferma facendo clic su _"Continue"_.
 +
 {empty} +
 +
-Infine, nella schermata di _Matrix_ noterai un invito in attesa per entrare nella tua stanza. +
+Infine, nella schermata di _Matrix_ vedrai un invito in sospeso a entrare nella tua stanza. +
 Segui i passaggi seguenti per accettare l'invito:
 +
 image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
@@ -88,7 +88,7 @@ image::module-03/m2/matrix-room-accept-invite.jpg[width=70%]
 
 [.verification]
 ****
-Sei riuscito a entrare correttamente nella stanza Matrix?
+Hai completato correttamente l'accesso alla stanza Matrix?
 ****
 
 {empty} +

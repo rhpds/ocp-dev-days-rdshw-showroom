@@ -40,7 +40,7 @@ Creerai il lato listener, ovvero il flow che acquisisce gli eventi da _Kafka_ e 
 
 === Aprire la route Camel
 
-Trova il seguente resource nell'albero delle directory:
+Trova la seguente risorsa nell'albero delle directory:
 
 * `k2r.camel.yaml`
 +
@@ -127,11 +127,11 @@ Il primo passaggio del flow consiste nel definire _Kafka_ come sorgente da cui a
 
 NOTE: Il tuo namespace _OpenShift_ contiene già un cluster _Streams for Apache Kafka_ (_Kafka_) pronto all'uso.
 
-1. Passa il puntatore sullo step pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] e fai clic sul pulsante mobile {nbsp}{btn-replace}{nbsp} (sostituisci step).
+1. Passa il cursore sullo step pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] e fai clic sul pulsante mobile {nbsp}{btn-replace}{nbsp} (sostituisci step).
 1. Digita `Kafka` in {ui-filter} per trovarlo, quindi seleziona il componente _Kafka_.
 1. Fai clic sullo step _Kafka_ per aprire il pannello di configurazione.
 1. Seleziona la scheda di configurazione `All`.
-1. Configura le seguenti 2 proprietà:
+1. Configura le seguenti due proprietà:
 +
 (Usa {ui-filter} in alto per trovare rapidamente ciascuna proprietà)
 +
@@ -386,14 +386,14 @@ camel get
 
 Dovresti vedere il processo con stato `Running`:
 
-+++
+++++
 <pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white">  PID   NAME  CAMEL   PLATFORM  PROFILE  READY  STATUS   RELOAD  AGE  ROUTE  MSG/S  TOTAL  FAIL  INFLIGHT  LAST  SINCE-LAST
  16763  k2r   4.18.0  Camel     dev       1/1   Running     0/0  16s    1/1   0.00      0     0         0             -/-/-</pre>
- ++++
+++++
 
 {empty} +
 
-Prima di inviare un messaggio di test, assicurati che _Rocket.Chat_ sia aperto e che tu sia nella room assegnata. Se non hai ancora effettuato l'accesso, segui le istruzioni in xref:module-03/m2/m2.2.adoc[Onboarding della piattaforma Rocket.Chat,window=_blank].
+Prima di inviare un messaggio di test, assicurati che _Rocket.Chat_ sia aperto e che tu sia nella stanza assegnata. Se non hai ancora effettuato l'accesso, segui le istruzioni in xref:module-03/m2/m2.2.adoc[Onboarding della piattaforma Rocket.Chat,window=_blank].
 
 Quando è tutto pronto, invia un messaggio di test a _Kafka_:
 
@@ -422,7 +422,7 @@ Quando è tutto pronto, invia un messaggio di test a _Kafka_:
 
 {empty} +
 
-Apri la room _Rocket.Chat_ e verifica che sia arrivato il messaggio. Dovresti vedere qualcosa del genere:
+Apri la stanza _Rocket.Chat_ e verifica che sia arrivato il messaggio. Dovresti vedere qualcosa del genere:
 
 {empty} +
 
@@ -457,7 +457,7 @@ camel stop
 
 [.verification]
 ****
-Hai visto il messaggio di test nella room _Rocket.Chat_?
+Hai visto il messaggio di test nella stanza _Rocket.Chat_?
 
 [.success]
 Il flow funziona: la route da _Kafka_ a _Rocket.Chat_ riceve gli eventi e li invia a destinazione. Ora che il flow è stato convalidato in locale, è il momento di eseguirne il deploy su _OpenShift_.

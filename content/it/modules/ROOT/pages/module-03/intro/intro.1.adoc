@@ -102,7 +102,7 @@ Le colleghi in modo che i messaggi inviati su una piattaforma compaiano anche su
 C | ③ Risoluzione dei problemi assistita dall'IA | L'operatore deve consultare la polizza, correggerla nel database e generare nuovamente il documento. Invece di svolgere queste operazioni manualmente, interagisce con un bot di IA direttamente nel proprio portale di messaggistica. +
 Il livello di integrazione invia la richiesta a un LLM, che decide cosa fare (consultare il database, aggiornare il record, rigenerare il PDF) e restituisce una risposta. Tutto avviene in linguaggio naturale. +
 D | ④ Governance del consumo di IA | Quando l'IA entra a far parte del flusso di lavoro, servono dei controlli. Chi può chiamare l'LLM? Quanti token può consumare? +
-Un gateway si interpone davanti al servizio AI e applica l'autenticazione e limiti di frequenza basati sui token. Sono disponibili più livelli di servizio, ciascuno con il proprio budget di token. Quando il budget di un livello si esaurisce, il sistema passa a quello successivo.
+Un gateway si interpone davanti al servizio di IA e applica l'autenticazione e limiti di frequenza basati sui token. Sono disponibili più livelli di servizio, ciascuno con il proprio budget di token. Quando il budget di un livello si esaurisce, il sistema passa a quello successivo.
 ****
 SUGGERIMENTO: Passa il puntatore su ciascuna fase del diagramma per saperne di più.
 

@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id='lab5-govern-ai-consumption']
 == Lab 5 - Governance degli LLM
 
-Posiziona un livello di governance davanti all'endpoint LLM usando Connectivity Link. Applica l'autenticazione con chiave API e limiti di frequenza basati sui token per più tier di servizio.
+Posiziona un livello di governance davanti all'endpoint LLM usando Connectivity Link. Applica l'autenticazione con chiave API e limiti di frequenza basati sui token per più livelli di servizio.
 
 {empty} +
 
@@ -13,7 +13,7 @@ Posiziona un livello di governance davanti all'endpoint LLM usando Connectivity 
 
 Nei lab precedenti hai creato un agente AI che risolve i problemi dell'assistenza clienti tramite il linguaggio naturale. L'agente interroga il database, aggiorna i record e rigenera i documenti delle polizze, tutto dall'interfaccia di chat.
 
-Ora vuoi estenderlo con una nuova funzionalità: **analisi del profilo cliente**. Quando un agente di supporto chiede informazioni su un cliente, l'AI ne analizza i dati e restituisce un riepilogo strutturato. Sono disponibili due tier di analisi:
+Ora vuoi estenderlo con una nuova funzionalità: **analisi del profilo cliente**. Quando un agente di supporto chiede informazioni su un cliente, l'AI ne analizza i dati e restituisce un riepilogo strutturato. Sono disponibili due livelli di analisi:
 
 * **Gold** -- cronologia completa delle polizze, dei sinistri e stato del programma fedeltà.
 * **Silver** -- polizze recenti e informazioni di base sul profilo.
@@ -47,7 +47,7 @@ flowchart LR
     style LLM fill:none,stroke:none
 ----
 
-Gold consuma più token perché l'analisi è più approfondita e la risposta più ricca. Silver è più leggero. Il sistema è progettato con una strategia di fallback: se il budget di token del tier Gold si esaurisce, il servizio passa a Silver. Se si esaurisce anche Silver, la richiesta viene rinviata.
+Gold consuma più token perché l'analisi è più approfondita e la risposta più ricca. Silver è più leggero. Il sistema è progettato con una strategia di fallback: se il budget di token del livello Gold si esaurisce, il servizio passa a Silver. Se si esaurisce anche quello del livello Silver, la richiesta viene rinviata.
 
 Ma prima che tutto questo possa funzionare, serve la governance. Chi può accedere all'endpoint LLM? Quanti token può consumare ciascun tier? Senza controlli, niente impedisce un consumo incontrollato che esaurisca il budget API dell'organizzazione.
 
@@ -62,10 +62,10 @@ In questo lab aggiungerai un **livello di governance** davanti all'endpoint LLM 
 
 È proprio il tipo di problema per cui è stato progettato _Red Hat Connectivity Link_. Basato sul progetto link:https://kuadrant.io/[_Kuadrant_,window=_blank], porta la governance consapevole dell'AI in *Kubernetes*:
 
-* **Limiti di frequenza consapevoli dei token** -- i limiti si basano sui token effettivamente consumati, non sul numero di richieste. Questo rende praticabili i servizi AI a tier: ogni tier riceve un proprio budget di token, applicato al gateway.
+* **Limiti di frequenza consapevoli dei token** -- i limiti si basano sui token effettivamente consumati, non sul numero di richieste. Questo rende praticabili i servizi AI a più livelli: ciascun livello riceve un proprio budget di token, applicato al gateway.
 * **Nessuna modifica al codice** -- le policy vengono applicate a livello infrastrutturale. Il tuo agente AI e il codice di integrazione restano invariati.
 * **Nativo per Kubernetes** -- le policy sono CRD standard, applicate con `oc apply`, archiviate in Git e revisionate nelle PR. Non servono una console di gestione separata né un control plane del vendor.
-* **Componibile** -- una policy estrae l'identità, un'altra la usa per i budget di token per tier. Si sovrappongono in modo dichiarativo.
+* **Componibile** -- una policy estrae l'identità, un'altra la usa per assegnare budget di token distinti a ciascun livello. Si sovrappongono in modo dichiarativo.
 
 Queste funzionalità derivano dal modo in cui Connectivity Link si basa sullo standard _Kubernetes Gateway API_. Prima di iniziare a configurare le policy, esaminiamo il modello Gateway API.
 
@@ -132,7 +132,7 @@ config:
   markdownAutoWrap: false
 ---
 flowchart LR
-    Client([App])
+    Client([Applicazione])
     Gateway[Gateway]
 
     subgraph S1 ["HTTPRoute"]
@@ -204,7 +204,6 @@ flowchart LR
 ----
 
 La stessa architettura si applica indipendentemente dal modo in cui l'agente di supporto si connette: tramite Rocket.Chat, un chatbot interno o qualsiasi altra applicazione.
-
 
 
 

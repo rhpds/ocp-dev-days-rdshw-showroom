@@ -57,11 +57,11 @@ Il file `application.properties` contiene impostazioni di connessione preconfigu
 .Cosa contiene?
 [%collapsible]
 =====
-+++
-<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Rocket.Chat credentials</span>
+++++
+<pre style="background-color: #272822; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: white"><span style="color: #75715e"># Credenziali Rocket.Chat</span>
 <span style="color: #a6e22e">rocketchat.token</span>=<span style="color: #e6db74">&lt;your-token&gt;</span>
 <span style="color: #a6e22e">rocketchat.userid</span>=<span style="color: #e6db74">&lt;your-userid&gt;</span></pre>
-+++
+++++
 =====
 ====
 

@@ -11,7 +11,7 @@ Prendi confidenza con le due piattaforme di messaggistica usate in questo worksh
 
 === Lo scenario di messaggistica
 
-I clienti che hanno inviato domande di polizza potrebbero dover contattare il supporto clienti — per un reclamo, una domanda sulla copertura o una modifica a una polizza esistente. Dall'altra parte, gli agenti del supporto sono pronti ad aiutarli.
+I clienti che hanno inviato richieste di polizza potrebbero aver bisogno di contattare l'assistenza clienti — per un reclamo, una domanda sulla copertura o una modifica a una polizza esistente. Dall'altra parte, gli agenti del supporto sono pronti ad aiutarli.
 
 La particolarità è che ciascuna parte usa una piattaforma di messaggistica *diversa*:
 
@@ -23,15 +23,15 @@ La particolarità è che ciascuna parte usa una piattaforma di messaggistica *di
 .Cosa sono queste piattaforme?
 [%collapsible]
 ====
-Matrix e Rocket.Chat sono piattaforme di messaggistica simili a Slack, Telegram o WhatsApp. Questo workshop le usa perché possono essere self-hosted su OpenShift, quindi non servono account esterni.
+Matrix e Rocket.Chat sono piattaforme di messaggistica simili a Slack, Telegram o WhatsApp. Questo workshop le usa perché possono essere ospitate autonomamente su OpenShift, quindi non servono account esterni.
 
-*Matrix* è uno standard aperto e un protocollo di comunicazione per comunicazioni decentralizzate in tempo reale. Funziona senza problemi tra diversi provider di servizi.
+*Matrix* è uno standard aperto e un protocollo di comunicazione per comunicazioni decentralizzate in tempo reale. Funziona senza problemi con diversi provider di servizi.
 
-*Rocket.Chat* è una piattaforma di comunicazione open source con rigorosi standard di protezione dei dati. Consente conversazioni in tempo reale tra colleghi, altre aziende o i tuoi clienti, su dispositivi web, desktop o mobili.
+*Rocket.Chat* è una piattaforma di comunicazione open source con rigorosi standard per la protezione dei dati. Consente conversazioni in tempo reale tra colleghi, altre aziende o i tuoi clienti, su dispositivi web, desktop o mobili.
 ====
 --
 
-Nei prossimi moduli userai Apache Camel e Kafka per creare le integrazioni che collegano le due piattaforme, in modo che un messaggio inviato da una parte appaia senza interruzioni anche sull'altra.
+Nei prossimi moduli userai Apache Camel e Kafka per creare le integrazioni che collegano le due piattaforme — così un messaggio inviato da una parte apparirà senza interruzioni anche sull'altra.
 
 [.mermaid]
 ----
@@ -47,6 +47,6 @@ flowchart LR
     style RC fill:none,stroke:none
 ----
 
-Entrambe le piattaforme sono deployate su OpenShift e accessibili dal web, quindi puoi interagire direttamente con loro dal browser. Le prossime pagine ti guideranno nell'accesso a ciascuna, così sarai pronto quando inizierà il lavoro di integrazione.
+Entrambe le piattaforme sono deployate su OpenShift e accessibili via web, quindi puoi interagire direttamente con loro dal browser. Le prossime pagine ti guideranno nell'accesso a ciascuna, così sarai pronto quando inizierà il lavoro di integrazione.
 
 {empty} +

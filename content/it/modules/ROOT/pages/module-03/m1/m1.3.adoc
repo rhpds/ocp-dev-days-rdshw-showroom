@@ -440,7 +440,7 @@ image::module-03/common/kaoto-design-tab.png[width=50%]
 
 . *Torna al flow principale*
 +
-Select pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] from the *Routes* dropdown.
+Seleziona pass:[<span style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #ccc; border-radius: 6px; padding: 4px 12px; font-family: monospace; font-size: 13px; background: #fff"><span style="font-size: 15px">&#x2630;</span> service-x12 <span style="background: #e8e8e8; border-radius: 10px; padding: 1px 8px; font-size: 11px">1/5</span> &#x25BE;</span>] dal menu a discesa *Routes*.
 +
 {empty} +
 

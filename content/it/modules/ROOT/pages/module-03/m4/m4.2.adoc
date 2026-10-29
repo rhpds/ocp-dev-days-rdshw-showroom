@@ -241,7 +241,7 @@ image::module-03/m4/kaoto-agent-steps.png[width=100%]
 +
 {empty} +
 +
-Poiché _Camel_ è in modalità dev, esegue automaticamente il hot reload. Controlla il terminale: i log dovrebbero confermare che l’agente è in esecuzione:
+Poiché _Camel_ è in modalità dev, esegue automaticamente l’hot reload. Controlla il terminale: i log dovrebbero confermare che l’agente è in esecuzione:
 +
 {blank}
 +
@@ -291,7 +291,7 @@ Torna alla finestra di _Rocket.Chat_ e digita:
 Ciao di nuovo
 ****
 +
-L’agente AI elabora il messaggio: lo invia all’LLM tramite MaaS, che lo esamina e restituisce una risposta in linguaggio naturale. Dovresti vedere qualcosa di simile:
+L’agente AI elabora il messaggio: lo invia al modello LLM tramite MaaS, che lo esamina e restituisce una risposta in linguaggio naturale. Dovresti vedere qualcosa di simile:
 +
 {blank}
 +
@@ -364,16 +364,16 @@ Il diagramma seguente mostra come Agentic Integration, una volta attivo MCP, ins
 ----
 flowchart LR
 
-    MaaS <-->|Tool calls| INTLabel
+    MaaS <-->|Chiamate agli strumenti| INTLabel
 
-    INTLabel <--> |"Toolset 1"| NodeJSLabel
-    INTLabel <--> |"Toolset 2"| CamelQuarkusLabel
-    NodeJSLabel --> |"Integrations"| ToolsInner
-    CamelQuarkusLabel --> |"Integrations"| ToolsInner
+    INTLabel <--> |"Set di strumenti 1"| NodeJSLabel
+    INTLabel <--> |"Set di strumenti 2"| CamelQuarkusLabel
+    NodeJSLabel --> |"Integrazioni"| ToolsInner
+    CamelQuarkusLabel --> |"Integrazioni"| ToolsInner
 
-    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Agentic Integration\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI reasoning<br>• Tool calling<br>• Integrations</div></div>\n]
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>Agentic Integration\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• Ragionamento AI<br>• Chiamata agli strumenti<br>• Integrazioni</div></div>\n]
 
-    subgraph ToolsLabel ["<br><br><br>Backend Systems&nbsp;"]
+    subgraph ToolsLabel ["<br><br><br>Sistemi backend&nbsp;"]
         subgraph ToolsInner [" "]
             direction LR
             DB ~~~ S3 ~~~ HD
@@ -388,7 +388,7 @@ flowchart LR
         CamelQuarkus
     end
 
-    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "AI Model", pos: "b", h: 80, w: 80, constraint: "on" }
+    MaaS@{ img: "../../_images/module-03/common/ai-model-icon.svg", label: "Modello AI", pos: "b", h: 80, w: 80, constraint: "on" }
     NodeJS@{ img: "../../_images/module-03/common/nodejs-icon.svg", label: "MCP NodeJS", pos: "b", h: 80, w: 80, constraint: "on" }
     CamelQuarkus@{ img: "../../_images/module-03/common/camel-quarkus-icon.svg", label: "MCP Camel Quarkus", pos: "b", h: 80, w: 80, constraint: "on" }
     DB@{ img: "../../_images/module-03/common/database-icon.svg", label: "Database", pos: "b", h: 70, w: 70, constraint: "on" }
@@ -829,6 +829,3 @@ Rivedi i passaggi e assicurati che gli strumenti siano abilitati nel flusso agen
 ****
 
 {empty} +
-
-
-

@@ -4,7 +4,7 @@ include::partial$style.adoc[]
 
 == Verificare l'autenticazione
 
-Nella sezione precedente hai eseguito il deploy di un AuthPolicy che protegge l'endpoint LLM. Ecco come la funzionalità di analisi del profilo cliente si inserisce nell'architettura e dove interviene AuthPolicy image:module-03/common/guardrail-icon.svg[width=40]:
+Nella sezione precedente hai eseguito il deploy di un AuthPolicy che protegge l'endpoint LLM. Ecco come la funzionalità di analisi del profilo cliente si inserisce nell'architettura e in che modo interviene AuthPolicy image:module-03/common/guardrail-icon.svg[width=40]:
 
 [#auth-diagram.mermaid]
 ----
@@ -143,7 +143,7 @@ Al momento entrambe le chiavi sono `EMPTY`. Qualsiasi richiesta che attiva lo St
 
 Verifichiamolo richiedendo un'analisi del profilo cliente.
 
-. Esegui l'applicazione camel agent
+. Esegui l'applicazione dell'agent Camel
 +
 {blank}
 +
@@ -351,5 +351,5 @@ Hai visualizzato un errore 401 con le chiavi vuote e una Gold Tier Analysis dopo
 AuthPolicy funziona come previsto -- le richieste non autenticate vengono bloccate e le chiavi valide generano un profilo cliente.
 
 [.fail]
-Verifica che entrambe le API key in `application.properties` siano state inserite (non siano `EMPTY`) e che l'agent camel sia stato riavviato correttamente.
+Verifica che entrambe le API key in `application.properties` siano state inserite (non siano `EMPTY`) e che l'agent Camel sia stato riavviato correttamente.
 ****

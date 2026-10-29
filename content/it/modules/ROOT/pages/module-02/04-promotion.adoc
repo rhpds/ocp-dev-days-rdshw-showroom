@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-L'immagine del tuo ambiente sandbox è pulita: le vulnerabilità sono state risolte, l'immagine di base è stata protetta e il commit è firmato. Ora è il momento di far passare le modifiche attraverso le fasi protette della pipeline: verifica della richiesta di merge, build post-merge e promozione in produzione basata su tag.
+L'immagine del tuo ambiente sandbox è pulita: le vulnerabilità sono state risolte, l'immagine di base è stata rafforzata e il commit è firmato. Ora è il momento di far passare le modifiche attraverso le fasi protette della pipeline: verifica della richiesta di merge, build post-merge e promozione in produzione basata su tag.
 
 A differenza dell'ambiente sandbox, queste pipeline **applicano** le policy di sicurezza. I commit non firmati, le violazioni delle policy e le approvazioni mancanti bloccheranno la promozione.
 
@@ -82,7 +82,7 @@ image::m02-rhdh-post-merge-pipeline.png[Pipeline di build post-merge in Develope
 [#section-2]
 == Sezione 2: Promuovi in produzione
 
-La build post-merge ha creato un'immagine firmata dal branch `main`. Per promuoverla in produzione, crea un **tag Git**: in questo modo viene avviata la pipeline di promozione tramite tag.
+La build post-merge ha creato dal branch `main` un'immagine firmata. Per promuoverla in produzione, crea un **tag Git**: in questo modo viene avviata la pipeline di promozione tramite tag.
 
 === Esercizio 1: Crea un tag
 
@@ -202,7 +202,7 @@ image::m02-gitlab-prod-mr-merge.png[Pulsante Merge nella MR di produzione,link=s
 
 . Approva e unisci la MR nel repository dei manifest.
 
-. ArgoCD rileverà la modifica e distribuirà la nuova immagine firmata, attestata, convalidata e approvata nel namespace `secured-prod`.
+. Argo CD rileverà la modifica e distribuirà la nuova immagine firmata, attestata, convalidata e approvata nel namespace `secured-prod`.
 
 === Perché è importante?
 
@@ -230,7 +230,7 @@ Per rendere l'esercizio più leggibile, abbiamo aggiunto i dettagli qui sotto. E
 * Crea un'**attestazione di provenienza SLSA** contenente tutti i risultati delle attività
 * L'attestazione e la firma vengono registrate in **Rekor** (log di trasparenza) e associate all'immagine nel registry
 
-**Conforma (Enterprise Contract)** convalida l'attestazione rispetto a un insieme di policy Rego archiviate nel repository {gitlab_url}/parasol/conforma-policies[`conforma-policies` su GitLab^]. Le policy nel bundle `parasol-software-supply-chain` verificano che:
+**Conforma (Enterprise Contract)** convalida l'attestazione rispetto a un insieme di policy Rego archiviate nel repository {gitlab_url}/parasol/conforma-policies[`conforma-policies` repository su GitLab^]. Le policy nel bundle `parasol-software-supply-chain` verificano che:
 
 * Siano state eseguite le attività obbligatorie (verify-commit-signature, acs-image-scan, acs-image-check, sonar-scan)
 * Lo stato della firma del commit sia `SIGNED` (non `UNSIGNED` né un commit del bot)

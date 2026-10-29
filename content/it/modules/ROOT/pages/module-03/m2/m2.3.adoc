@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id="whats-next"]
 == Prossimi passi
 
-Ora hai entrambe le piattaforme di messaggistica aperte e pronte: *Matrix* sul lato cliente e *Rocket.Chat* sul lato dell'agente di supporto. Al momento, però, sono completamente separate. Un messaggio inviato su una piattaforma non può raggiungere l'altra.
+Ora hai entrambe le piattaforme di messaggistica aperte e pronte: *Matrix* sul lato del cliente e *Rocket.Chat* sul lato dell'agente di supporto. Al momento, però, sono completamente separate. Un messaggio inviato su una piattaforma non può raggiungere l'altra.
 
 {blank}
 
@@ -29,7 +29,7 @@ flowchart LR
 
 {empty} +
 
-Nel prossimo lab, creerai l'integrazione che le collega: userai *Apache Camel* per trasformare i messaggi e *Apache Kafka* come infrastruttura di streaming che connette tutto.
+Nel prossimo lab creerai l'integrazione che farà da ponte tra le due piattaforme, usando *Apache Camel* per trasformare i messaggi e *Kafka* come infrastruttura di streaming che connette tutti gli elementi.
 
 {empty} +
 
@@ -41,7 +41,7 @@ Hai effettuato l'accesso sia a Matrix sia a Rocket.Chat?
 È tutto pronto: continua con il modulo successivo per iniziare a creare l'integrazione.
 
 [.fail]
-Torna indietro e verifica di poter accedere a entrambe le piattaforme prima di proseguire.
+Torna indietro e verifica di poter accedere a entrambe le piattaforme prima di continuare.
 ****
 
 {empty} +

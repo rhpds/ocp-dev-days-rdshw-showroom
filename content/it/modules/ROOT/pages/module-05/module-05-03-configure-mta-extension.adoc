@@ -4,9 +4,9 @@ include::partial$_attributes.adoc[]
 
 [IMPORTANT]
 ====
-In questo lab useremo l'estensione Visual Studio Code **Migration Toolkit for Applications**, ovvero l'**estensione MTA**, in un ambiente Red Hat Dev Spaces che fornisce una GUI basata su VS Code.
+In questo lab useremo **Migration Toolkit for Applications**, l'estensione per Visual Studio Code nota come **estensione MTA**, in un ambiente Red Hat Dev Spaces che fornisce una GUI basata su VS Code.
 
-**Developer Lightspeed** non è un'estensione separata. È la funzionalità di refactoring del codice basata sull'AI di MTA. Nell'IDE viene installata l'**estensione MTA**, che include sia l'analisi statica del codice MTA sia Developer Lightspeed (AI generativa).
+**Developer Lightspeed** non è un'estensione separata. È la funzionalità di refactoring del codice basata sull'AI di MTA. Nell'IDE viene installata **l'estensione MTA**, che include sia l'analisi statica del codice MTA sia Developer Lightspeed (AI generativa).
 ====
 
 == Obiettivo
@@ -62,32 +62,32 @@ Il repository **parasol-insurance-eap** (dal tuo progetto GitLab) viene caricato
 Il workspace si apre in una nuova scheda del browser.
 +
 * Se ti viene chiesto di considerare attendibili gli autori o il workspace, conferma. (Figura 3)
-* Se viene visualizzato un pannello introduttivo per la configurazione, scegli il tema **Light** per ottenere il miglior contrasto nelle fasi successive del lab, quindi fai clic su **Mark Done**. Mark Done chiuderà il pannello introduttivo e aprirà il pannello delle estensioni installate facendo clic sull'icona delle estensioni sul lato sinistro dello schermo, come mostrato nel passaggio 2 dell'immagine seguente. (Figura 4)
+* Se viene visualizzato un pannello introduttivo per la configurazione, scegli il tema **Light** per ottenere il miglior contrasto nelle fasi successive del lab, quindi fai clic su **Mark Done**. Il pannello introduttivo si chiuderà; fai quindi clic sull'icona delle estensioni sul lato sinistro dello schermo per aprire il pannello delle estensioni installate, come mostrato nel passaggio 2 dell'immagine seguente. (Figura 4)
 +
 image::module-05-mta-dls/05-03-dls-05.png[Scheda VSCode,link=self,window=blank,title="Manage profiles"]
 +
 image::module-05-mta-dls/05-03-dls-03.png[Scheda VSCode,link=self,window=blank,title="Mark done"]
 
-In alcuni casi l'installazione delle estensioni potrebbe richiedere del tempo. Se vedi il pulsante di ricaricamento della finestra, fai clic su di esso. La scheda del browser verrà ricaricata automaticamente.
+In alcuni casi l'installazione delle estensioni potrebbe richiedere del tempo. Se vedi il pulsante **Reload Window**, fai clic su di esso. La scheda del browser verrà ricaricata automaticamente.
 
 image::module-05-mta-dls/05-03-dls-04.png[Scheda VSCode,link=self,window=blank,title="Trust the Authors"]
 
 
 == Esercizio 2: Configurare i profili MTA e il provider GenAI
 
-Ottimo! Sei arrivato all'esercizio 2; questo significa anche che ora abbiamo un ambiente funzionante in cui configurare i nostri profili di analisi.
+Ottimo! Sei arrivato all'esercizio 2; questo significa che ora abbiamo un ambiente funzionante in cui configurare i profili di analisi.
 
-La gestione di più profili è una potente funzionalità dell'estensione MTA. Ti consente di passare facilmente da un profilo di analisi all'altro. Puoi creare un nuovo profilo facendo clic sul pulsante "New Profile", come mostrato nel passaggio 3 dell'immagine seguente.
+La gestione di più profili è una funzionalità potente dell'estensione MTA. Ti consente di passare facilmente da un profilo di analisi all'altro. Puoi creare un nuovo profilo facendo clic sul pulsante "New Profile", come mostrato nel passaggio 3 dell'immagine seguente.
 
-Inizieremo creando il nostro primo profilo, `quarkus-profile`, per migrare l'applicazione a Quarkus. In xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Sezione 5: Regole personalizzate (audit logging)] esploreremo le regole personalizzate di audit logging.
+Inizieremo creando il nostro primo profilo, `quarkus-profile`, per migrare l'applicazione a Quarkus. In xref:module-05/module-05-05-custom-rules-audit-logging.adoc[Sezione 5: Regole personalizzate (audit logging)] esploreremo le regole personalizzate per l'audit logging.
 
 Fai clic sul pulsante `Manage Profiles` per aprire il pannello di gestione dei profili.
 
 image::module-05-mta-dls/05-03-dls-06.png[Scheda VSCode,link=self,window=blank,title="VSCode Tab"]
 
 - Crea un nuovo profilo `quarkus-profile`
-- Nome profilo: `quarkus-profile``
-- Tecnologie di destinazione: `quarkus``, `quarkus3+``, `jakarta-ee``
+- Nome profilo: `quarkus-profile`
+- Tecnologie di destinazione: `quarkus`, `quarkus3+`, `jakarta-ee`
 
 image::module-05-mta-dls/05-03-dls-07.png[Scheda VSCode,link=self,window=blank,title="Review profiles"]
 
@@ -106,7 +106,7 @@ image::module-05-mta-dls/05-03-dls-08.png[Scheda VSCode,link=self,window=blank,t
 
 Si dovrebbe aprire la configurazione delle impostazioni del provider. MTA usa **provider-settings.yaml** per connettersi all'LLM.
 
-Il workspace del lab è preconfigurato con le impostazioni del provider e le credenziali LiteLLM. Verifica che il modello **OpenShift** sia attivo e che i campi URL di base / chiave API siano compilati (dovrebbero già corrispondere all'ambiente del tuo lab).
+Il workspace del lab è preconfigurato con le impostazioni del provider e le credenziali LiteLLM. Verifica che il modello **OpenShift** sia attivo e che i campi URL di base / chiave API siano compilati (dovrebbero già corrispondere all'ambiente del lab).
 
 TIP: Normalmente le impostazioni del provider sono già compilate per questo lab. Usa lo YAML seguente solo se il file è vuoto o incompleto (ad esempio, dopo un reset del workspace): è una procedura di ripristino, non un errore previsto.
 
@@ -128,9 +128,9 @@ active: *active
 Verifica che i campi delle impostazioni contengano i valori seguenti.
 
 - `OPENAI_API_KEY` : è la chiave LLM per il modello ospitato su OpenShift AI
-- `model` : il nome del modello che stiamo usando
-- `baseURL` : l'URL/route a cui il modello è in ascolto per ricevere richieste tramite l'API chat completions.
-- `active` : infine, vogliamo assicurarci che questo profilo sia attivo. MTA può essere configurato con più LLM, ma solo uno può essere attivo alla volta.
+- `model` : il nome del modello in uso
+- `baseURL` : l'URL/route su cui il modello è in ascolto per ricevere richieste tramite l'API Chat Completions.
+- `active` : infine, assicurati che questo profilo sia attivo. MTA può essere configurato con più LLM, ma solo uno può essere attivo alla volta.
 
 image::module-05-mta-dls/05-03-dls-09.png[Scheda VSCode,link=self,window=blank,title="VSCode Tab"]
 
@@ -146,5 +146,5 @@ Verifica che l'ambiente Dev Spaces e l'estensione MTA (incluso Developer Lightsp
 
 . Verifica che il workspace Dev Spaces punti al repository corretto
 * Fai clic sull'icona del file sul lato sinistro dell'ambiente Dev Spaces
-* File _EXPLORER_ mostra la directory **parasol-insurance-eap** (la tua copia GitLab, non un sample condiviso)
+* File _EXPLORER_ mostra la directory **parasol-insurance-eap** (la tua copia GitLab, non un esempio condiviso)
 * Se necessario, espandi le directory usando le frecce di File Explorer: dovresti vedere package come `com.parasol.mdb` (`EmailIntakeMDB`) e `com.parasol.ejb` (`ClaimService`)

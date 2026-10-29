@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="enable-and-test"]
-== Avvia il servizio su OpenShift
+== Attiva i flow su OpenShift
 
 Hai completato il flow da _Kafka_ a _Rocket.Chat_. Per risparmiare tempo, tutti e quattro i flow sono già stati deployati su _OpenShift_: ora puoi provarli e simulare una conversazione tra clienti e agenti dell'assistenza.
 
@@ -39,7 +39,7 @@ Puoi vedere i quattro flow già deployati nella Developer Console di _OpenShift_
 
 L'immagine seguente mostra ciò che dovresti trovare: le quattro integrazioni Camel (`m2k`, `k2r`, `r2k`, `k2m`) collegate al cluster _Kafka_ centrale. Nota che i deployment sono attualmente scalati a zero, quindi non sono ancora in esecuzione. Ora li avvierai.
 
-TIP: Il layout potrebbe essere diverso: puoi trascinare i node per disporli come preferisci.
+TIP: Il layout potrebbe essere diverso: puoi trascinare i node e disporli come preferisci.
 
 [.bordered]
 image::module-03/m3/openshift-topology-flows.png[width=60%]
@@ -48,7 +48,7 @@ image::module-03/m3/openshift-topology-flows.png[width=60%]
 
 === Avvia i flow
 
-Dal terminale di _Dev Spaces_, aumenta la scala di tutti e quattro i deployment per avviare i flow:
+Dal terminale di _Dev Spaces_, porta a una replica tutti e quattro i deployment per avviare i flow:
 
 {blank}
 
@@ -62,9 +62,9 @@ oc scale deployment m2k r2k k2m k2r --replicas=1
 .Cosa fa questo comando?
 [%collapsible]
 ====
-* `oc scale deployment` — modifica il numero di replica in esecuzione per uno o più deployment
+* `oc scale deployment` — modifica il numero di repliche in esecuzione per uno o più deployment
 * `m2k r2k k2m k2r` — i quattro flow di integrazione Camel
-* `--replicas=1` — imposta una replica per ogni deployment, avviandoli
+* `--replicas=1` — imposta una replica per ogni deployment e li avvia
 ====
 --
 
@@ -262,9 +262,9 @@ Se tutto va bene, entrambe le piattaforme dovrebbero mostrare l'intero scambio. 
 
 {empty} +
 
-Il ponte di comunicazione è pronto: ora clienti e agenti dell'assistenza possono parlare in tempo reale tra piattaforme diverse. Ma la conversazione è solo l'inizio. L'agente dell'assistenza ora sa di cosa ha bisogno il cliente, ed è il momento di intervenire.
+Il ponte di comunicazione è pronto: ora clienti e agenti dell'assistenza possono comunicare in tempo reale tra piattaforme diverse. Ma la conversazione è solo l'inizio. L'agente dell'assistenza sa di cosa ha bisogno il cliente: è il momento di intervenire.
 
-Nel prossimo capitolo, l'agente si rivolgerà a un sistema agentico basato sull'AI — e tu realizzerai i componenti che gli permetteranno di analizzare il problema del cliente e iniziare a trovare una soluzione.
+Nel prossimo capitolo, l'agente si rivolgerà a un sistema agentico basato sull'AI e tu realizzerai i componenti che gli permetteranno di analizzare il problema del cliente e iniziare a lavorare per risolverlo.
 
 {empty} +
 

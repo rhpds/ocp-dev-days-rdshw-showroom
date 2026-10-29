@@ -97,7 +97,7 @@ step 2
 .Esegui il comando qui sopra in qualsiasi momento per reimpostare l'esercizio.
 [%collapsible]
 ====
-Il workshop include pratici script helper che ti consentono di passare a qualsiasi passaggio o di reimpostare il lab a uno stato noto e funzionante:
+Il workshop include pratici script di supporto che ti consentono di passare a qualsiasi passaggio o di reimpostare il lab a uno stato noto e funzionante:
 
 * `step N` — reimposta il lab all'inizio del passaggio N
 * `steps` — elenca tutti i passaggi disponibili nel lab
@@ -125,7 +125,7 @@ pass:[<mark style="padding-left: 1rem; background-color: white; color: grey"><b>
 pass:[<mark style="padding-left: 1rem; background-color: white; color: orange"><b>&nbsp;≋&nbsp;&nbsp;</b></mark>] *X12-850.dfdl.xsd* +
 pass:[<mark style="padding-left: 1rem; background-color: white; color: #ce6a32"><b>&nbsp;J&nbsp;&nbsp;</b></mark>] *x12.java* +
 
-TIP: Il file `index.html` è una semplice app portale che simula l'invio di richieste di polizza da parte di un cliente. Camel JBang può servire pagine HTML statiche insieme alle route, quindi lo userai nelle sezioni successive per avviare gli invii e testare l'integrazione dall'inizio alla fine.
+TIP: Il file `index.html` è una semplice applicazione portale che simula l'invio di richieste di polizza da parte di un cliente. Camel JBang può servire pagine HTML statiche insieme alle route, quindi lo userai nelle sezioni successive per avviare gli invii e testare l'integrazione dall'inizio alla fine.
 --
 +
 {empty} +
@@ -136,7 +136,7 @@ Il file `application.properties` è già preconfigurato con le credenziali per e
 +
 --
 * *Database* — impostazioni di connessione per il database PostgreSQL (accessibile tramite Service Interconnect)
-* *Object storage S3* — chiave di accesso, secret ed endpoint per caricare i documenti di polizza PDF generati
+* *Archiviazione oggetti S3* — chiave di accesso, chiave segreta ed endpoint per caricare i documenti di polizza PDF generati
 --
 +
 {blank}

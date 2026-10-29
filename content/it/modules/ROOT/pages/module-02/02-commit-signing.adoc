@@ -2,7 +2,7 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-Ogni commit racconta una storia -- ma come fai a sapere se è vera? Gli autori dei commit possono essere falsificati con un singolo comando `git config`. L'accesso al repository può essere compromesso. Le chiavi SSH o GPG possono essere smarrite, rubate o condivise. La firma tradizionale del codice si basa su coppie di chiavi di lunga durata che gli sviluppatori devono gestire, ruotare e proteggere -- e molti semplicemente non lo fanno.
+Ogni commit racconta una storia -- ma come fai a sapere se è vera? L'identità dell'autore di un commit può essere falsificata con un singolo comando `git config`. L'accesso al repository può essere compromesso. Le chiavi SSH o GPG possono essere smarrite, rubate o condivise. La firma tradizionale del codice si basa su coppie di chiavi di lunga durata che gli sviluppatori devono gestire, ruotare e proteggere -- e molti semplicemente non lo fanno.
 
 La **firma senza chiavi di Sigstore**, insieme a **Red Hat Trusted Artifact Signer (RHTAS)**, distribuito come componente dell'infrastruttura del cluster, risolve il problema associando la firma alla *identità* dello sviluppatore anziché a una coppia di chiavi. Quando firmi un commit, esegui l'autenticazione tramite il provider di identità della tua organizzazione (nel nostro caso, Keycloak SSO). Fulcio (l'autorità di certificazione di RHTAS) emette un certificato di breve durata, la firma viene registrata nel registro di trasparenza di Rekor e il certificato scade nel giro di pochi minuti. Non ci sono chiavi da gestire, smarrire o ruotare.
 
@@ -28,7 +28,7 @@ Cleared most of the application vulnerabilities
 +
 image::m02-devspaces-commit.png[Commit delle modifiche nel pannello Source Control,link=self,window=blank,width=700]
 
-. Non abbiamo preparato correttamente le modifiche per lo staging, quindi esegui direttamente il commit facendo clic su **Yes**.
+. Non abbiamo eseguito correttamente lo staging delle modifiche, quindi esegui direttamente il commit facendo clic su **Yes**.
 +
 image::m02-devspaces-stage-commit.png[Richiesta di staging e commit,link=self,window=blank,width=400]
 

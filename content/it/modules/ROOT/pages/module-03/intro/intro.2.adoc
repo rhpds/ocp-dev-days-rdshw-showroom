@@ -9,7 +9,7 @@ Le seguenti istruzioni ti presentano l'ambiente di sviluppo e il cluster in cui 
 
 === Panoramica
 
-Basato sul progetto open source Eclipse Che, Red Hat OpenShift Dev Spaces utilizza Kubernetes e i container per offrire a ogni membro del team di sviluppo o IT un ambiente di sviluppo coerente, sicuro e senza configurazione. L'esperienza è rapida e familiare come quella di un ambiente di sviluppo integrato sul tuo laptop.
+Basato sul progetto open source Eclipse Che, Red Hat OpenShift Dev Spaces utilizza Kubernetes e i container per offrire a ogni membro del team di sviluppo o IT un ambiente di sviluppo coerente, sicuro e pronto all'uso, senza necessità di configurazione. L'esperienza è rapida e familiare come quella di un ambiente di sviluppo integrato sul tuo laptop.
 
 [.text-center]
 image::module-03/intro/devspaces-ide-developer.png[width=70%]
@@ -60,7 +60,7 @@ image::module-03/intro/devspaces-dashboard.png[Dashboard di Dev Spaces]
 
 === Accedere al tuo spazio di lavoro Dev Spaces
 
-Questo workshop fornisce un unico spazio di lavoro preconfigurato, con plug-in, codice sorgente e persino immagini di container con diversi strumenti a riga di comando (CLI) installati.
+Questo workshop fornisce un unico spazio di lavoro preconfigurato, con plug-in, codice sorgente e persino immagini di container che includono diversi strumenti a riga di comando (CLI).
 
 . Fai clic sul link *Open* dello spazio di lavoro denominato `camel-lab`.
 +

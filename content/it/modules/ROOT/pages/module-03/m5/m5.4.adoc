@@ -220,7 +220,7 @@ Dovresti vedere un output che conferma l'esistenza di TokenRateLimitPolicy, il t
 +
 {blank}
 +
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB"><span style="color: #F14C4B;font-weight:bold">Name:</span>         openai-token-limits
     <span style="color: #F14C4B;font-weight:bold">Gold:</span>
         <span style="color: #F14C4B;font-weight:bold">Limit:</span>   50
@@ -235,7 +235,7 @@ Dovresti vedere un output che conferma l'esistenza di TokenRateLimitPolicy, il t
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Accepted
     <span style="color: #F14C4B;font-weight:bold">Status:</span>                True
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
-+++
+++++
 +
 Quando la policy risulta *Enforced*, il gateway sta monitorando attivamente l'utilizzo dei token per entrambi i livelli. +
 È il momento di vedere la strategia di fallback in azione.

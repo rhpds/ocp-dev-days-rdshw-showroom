@@ -10,7 +10,7 @@ Passa al branch `quarkus` di `parasol-insurance-eap` — dove la migrazione comp
 * Se vuoi, esegui l'app in locale
 * Compila ed esegui il deploy su OpenShift, quindi verifica la UI e le API di Parasol
 
-Nelle sezioni precedenti hai usato l'analisi MTA e Developer Lightspeed per migrare alcune parti dell'applicazione **legacy** (messaggistica MDB, regole di audit personalizzate, EJB Stateless). Il repository include anche un branch **`quarkus`** in cui la modernizzazione è già stata applicata end-to-end. Questo lab completa il percorso: esamina l'architettura di destinazione, quindi distribuiscila sul cluster.
+Nelle sezioni precedenti hai usato l'analisi MTA e Developer Lightspeed per migrare alcune parti dell'applicazione **legacy** (messaggistica MDB, regole di audit personalizzate, EJB stateless). Il repository include anche un branch **`quarkus`** in cui la modernizzazione è già stata applicata end-to-end. Questo lab completa il percorso: esamina l'architettura di destinazione, quindi esegui il deploy sul cluster.
 
 == Esercizio 1: Passare al branch `quarkus`
 
@@ -180,7 +180,7 @@ oc get pods -l name=parasol-db
 
 === Compilare l'applicazione Quarkus
 
-. Crea il package dell'app in locale (o nel terminale Dev Spaces):
+. Crea il pacchetto dell'app in locale (o nel terminale Dev Spaces):
 +
 [.console-input]
 [source,bash]
@@ -267,7 +267,7 @@ Controlla anche le variabili d'ambiente del Deployment e verifica che corrispond
 * Il branch **`quarkus`** è la destinazione con la migrazione completa per i pattern che hai provato con MTA / DLS.
 * Messaggistica, servizi CDI, scheduling e REST usano tutti le convenzioni Quarkus / MicroProfile (`@Incoming`, `@Channel`, `@Scheduled`, `@ApplicationScoped`).
 * **`quarkus:dev`** in locale (H2) è ideale per una rapida verifica della UI; **OpenShift** usa PostgreSQL tramite il profilo `%prod`.
-* Il deploy del container usa una normale binary build + Deployment / Service / Route: non servono file XML specifici dei subsystem EAP.
+* Il deploy del container usa una normale build binaria + Deployment / Service / Route: non servono file XML specifici dei sottosistemi EAP.
 
 == Riepilogo
 

@@ -7,11 +7,11 @@ include::partial$_attributes.adoc[]
 In questo modulo:
 
 * Capirai come le misure di sicurezza vengono integrate in ogni fase del ciclo di vita dello sviluppo
-* Userai Red Hat Dependency Analytics per identificare e correggere le vulnerabilità prima che arrivino a una pipeline
+* Userai Red Hat Dependency Analytics per individuare e correggere le vulnerabilità prima che raggiungano una pipeline
 * Firmerai i commit con la tua identità usando la firma keyless di Sigstore
 * Osserverai come le pipeline automatizzate verificano le firme, analizzano le immagini e applicano le policy
-* Promuoverai una release attraverso i controlli delle merge request, la convalida Conforma/Enterprise Contract e un processo di approvazione firmato
-* Vedrai come Sigstore Policy Controller impedisce i deploy non autorizzati a livello di namespace
+* Promuoverai una release tramite i controlli delle merge request, la convalida Conforma/Enterprise Contract e un processo di approvazione firmato
+* Vedrai come Sigstore Policy Controller impedisce deploy non autorizzati a livello di namespace
 
 == A chi è rivolto
 
@@ -25,15 +25,15 @@ Per completare questo modulo occorrono circa **60-90 minuti**.
 
 == Il tuo ruolo e la tua missione
 
-Sei uno sviluppatore presso **Parasol Insurance**. Il workflow che usi ogni giorno -- scrivere codice, creare commit, eseguire build e fare deploy -- è stato arricchito dal team della piattaforma con misure di sicurezza. Il tuo compito è correggere le vulnerabilità dell'applicazione, fare deploy di questa modifica seguendo il processo rafforzato e imparare a conoscere ogni controllo di sicurezza.
+Sei uno sviluppatore presso **Parasol Insurance**. Il workflow che usi ogni giorno -- scrivere codice, creare commit, eseguire build e fare deploy -- è stato arricchito dal team della piattaforma con misure di sicurezza. Il tuo compito è correggere le vulnerabilità dell'applicazione, rilasciare questa modifica seguendo il processo rafforzato e scoprire ogni controllo di sicurezza.
 
 L'ufficio del CISO di Parasol ha stabilito che tutti i deploy in produzione devono:
 
 * Partire da **commit firmati** riconducibili a un'identità di sviluppatore verificata
 * Superare **l'analisi delle vulnerabilità** e **i controlli delle policy** prima della promozione
-* Includere un'**attestazione firmata** che dimostri il corretto funzionamento della pipeline di build
-* Ricevere un'**approvazione esplicita** prima di raggiungere la produzione
-* Essere verificate da un **admission controller** al momento del deploy
+* Includere **un'attestazione firmata** che dimostri il corretto funzionamento della pipeline di build
+* Ricevere **un'approvazione esplicita** prima di raggiungere la produzione
+* Essere verificati da un **admission controller** al momento del deploy
 
 
 
@@ -41,10 +41,10 @@ L'ufficio del CISO di Parasol ha stabilito che tutti i deploy in produzione devo
 
 Questo modulo segue un'unica storia:
 
-. **Scopri la piattaforma** -- Esplora i componenti protetti in Developer Hub e crea una sandbox isolata
-. **Anticipa l'analisi delle vulnerabilità** -- Usa l'analisi delle dipendenze per trovare e correggere le vulnerabilità prima che arrivino a una pipeline
+. **Scopri la piattaforma** -- Esplora i componenti sicuri in Developer Hub e crea una sandbox isolata
+. **Anticipa l'analisi delle vulnerabilità** -- Usa l'analisi delle dipendenze per individuare e correggere le vulnerabilità prima che raggiungano una pipeline
 . **Firma i tuoi commit** -- Usa la firma keyless di Sigstore per associare ogni commit alla tua identità
-. **Pipeline della sandbox** -- Osserva i controlli automatizzati verificare la tua firma, analizzare la tua immagine e applicare le policy ACS
+. **Pipeline della sandbox** -- Osserva i controlli automatizzati verificare la tua firma, analizzare l'immagine e applicare le policy ACS
 . **Promuovi in produzione** -- Fai merge, esegui la build, convalida con le policy Conforma, approva la release e fai deploy
 . **Sicurezza dei namespace** -- Scopri come Policy Controller impedisce l'esecuzione di immagini non autorizzate
 

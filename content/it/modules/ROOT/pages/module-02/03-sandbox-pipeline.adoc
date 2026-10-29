@@ -37,7 +37,7 @@ IMPORTANT: La pipeline sandbox è progettata per **non bloccare mai** lo svilupp
 . Esamina l'output del log. Se il commit è stato firmato, dovresti vedere:
 +
 ----
-✅ Good signature — {user}@demo.redhat.com (issuer: https://sso.{subdomain}/realms/sso)
+✅ Firma valida — {user}@demo.redhat.com (emittente: https://sso.{subdomain}/realms/sso)
 ----
 +
 image::m02-pipeline-verify-signature.png[Log della pipeline che mostra la verifica della firma del commit completata correttamente,link=self,window=blank,width=700]
@@ -93,13 +93,13 @@ image::m02-gitlab-branch-selector.png[Assicurati di essere sul tuo branch sandbo
 . Osserva l'esecuzione della pipeline. Il passaggio `verify-commit-signature` mostrerà:
 +
 ----
-⚠️  WARNING! UNSIGNED COMMIT DETECTED!
+⚠️  ATTENZIONE! RILEVATO COMMIT NON FIRMATO!
 ----
 +
 La pipeline verrà comunque completata (la sandbox non applica i controlli), ma il commento al commit in GitLab mostrerà:
 +
 ----
-⛔ UNSIGNED COMMIT — as per company policy, unsigned code will not be promoted beyond developer sandboxes
+⛔ COMMIT NON FIRMATO — secondo la policy aziendale, il codice non firmato non verrà promosso oltre le sandbox degli sviluppatori
 ----
 
 Questo dimostra che, mentre gli sviluppatori possono iterare liberamente nella sandbox, il sistema tiene traccia dello stato della firma e lo segnala a ogni passaggio.

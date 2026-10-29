@@ -7,7 +7,7 @@ Tutto ciò di cui hai bisogno è già stato predisposto. Il tuo ambiente di labo
 
 * Un cluster OpenShift con Developer Hub, Dev Spaces, Pipelines, GitOps e l'intero stack Sigstore già configurati
 * Un account utente con accesso a tutte le risorse del workshop
-* Un'applicazione di esempio (Parasol Insurance -- Secured) che metterai in sicurezza e promuoverai attraverso la pipeline rinforzata
+* Un'applicazione di esempio (Parasol Insurance -- Secured) che metterai in sicurezza e promuoverai attraverso la pipeline protetta
 
 Le tue credenziali di accesso (usale per Developer Hub, GitLab e tutti i servizi del workshop):
 
@@ -40,7 +40,7 @@ Questo modulo è pensato per **60-90 minuti** di attività pratica.
 
 | Gestire le vulnerabilità fin dalle prime fasi
 | 15 min
-| Esplora il componente protetto, crea un ambiente sandbox e usa RHDA per individuare e correggere le vulnerabilità delle dipendenze
+| Esplora il componente protetto, crea una sandbox e usa RHDA per individuare e correggere le vulnerabilità delle dipendenze
 
 | Firmare i commit
 | 10 min
@@ -52,7 +52,7 @@ Questo modulo è pensato per **60-90 minuti** di attività pratica.
 
 | Passare alle fasi successive
 | 25 min
-| Crea una merge request, promuovi tramite tag e risolvi l'errore dei criteri Conforma con un'approvazione firmata
+| Crea una merge request, promuovi tramite tag e risolvi l'errore di policy Conforma con un'approvazione firmata
 
 | Proteggere i namespace
 | 10 min
@@ -71,7 +71,7 @@ Questo modulo usa tutte le tecnologie del Modulo 1, oltre alle seguenti aggiunte
 * **Red Hat Advanced Cluster Security (ACS)** -- Scansione delle vulnerabilità delle immagini e applicazione delle policy di sicurezza
 * **Red Hat Dependency Analytics (RHDA)** -- Estensione IDE per l'analisi in tempo reale delle vulnerabilità delle dipendenze
 * **Trusted Profile Analyzer (TPA)** -- Backend di informazioni sulle vulnerabilità con dati di correzione di Lightwell e gestione SBOM
-* **Quay** -- Registro di immagini container con archiviazione di firme e attestazioni
+* **Quay** -- Registry di immagini container con archiviazione di firme e attestazioni
 * **SonarQube** -- Analisi statica e scansione della qualità del codice
 * **Parasol Insurance (Secured)** -- Variante rinforzata dell'applicazione Quarkus di esempio, con sicurezza completa della supply chain
 

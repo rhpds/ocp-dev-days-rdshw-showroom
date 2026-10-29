@@ -461,232 +461,232 @@
   "it": {
     "nav.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T22:06:57Z",
+      "translated_at": "2026-10-29T20:25:11Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/index.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:40:57Z",
+      "translated_at": "2026-10-29T19:44:45Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-01/00-intro.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:41:23Z",
+      "translated_at": "2026-10-29T19:45:05Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-01/01-environment.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:41:45Z",
+      "translated_at": "2026-10-29T19:45:25Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-01/02-developer-experience.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:43:04Z",
+      "translated_at": "2026-10-29T19:45:40Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/00-intro.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:43:32Z",
+      "translated_at": "2026-10-29T19:46:13Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/01-vulnerabilities.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:44:10Z",
+      "translated_at": "2026-10-29T19:46:32Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/01a-environment.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:44:32Z",
+      "translated_at": "2026-10-29T19:46:51Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/02-commit-signing.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:45:20Z",
+      "translated_at": "2026-10-29T19:47:13Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/03-sandbox-pipeline.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:45:50Z",
+      "translated_at": "2026-10-29T19:47:29Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/04-promotion.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:46:08Z",
+      "translated_at": "2026-10-29T19:47:52Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-02/05-namespace-security.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T21:46:45Z",
+      "translated_at": "2026-10-29T19:48:13Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/index.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:47:09Z",
+      "translated_at": "2026-10-29T19:48:37Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/intro/intro.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:47:35Z",
+      "translated_at": "2026-10-29T19:48:53Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/intro/intro.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:47:45Z",
+      "translated_at": "2026-10-29T19:49:10Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m1/m1.0.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:48:02Z",
+      "translated_at": "2026-10-29T19:49:26Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m1/m1.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:49:43Z",
+      "translated_at": "2026-10-29T19:49:50Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m1/m1.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:50:14Z",
+      "translated_at": "2026-10-29T19:50:05Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m1/m1.3.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:51:42Z",
+      "translated_at": "2026-10-29T19:50:31Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m2/m2.0.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:52:00Z",
+      "translated_at": "2026-10-29T19:50:59Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m2/m2.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:52:17Z",
+      "translated_at": "2026-10-29T19:51:16Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m2/m2.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:52:28Z",
+      "translated_at": "2026-10-29T19:51:35Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m2/m2.3.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:52:45Z",
+      "translated_at": "2026-10-29T19:51:47Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m3/m3.0.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:52:58Z",
+      "translated_at": "2026-10-29T19:52:07Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m3/m3.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:53:22Z",
+      "translated_at": "2026-10-29T19:52:33Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m3/m3.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:54:11Z",
+      "translated_at": "2026-10-29T19:53:09Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m3/m3.3.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:54:41Z",
+      "translated_at": "2026-10-29T19:53:27Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m4/m4.0.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:55:04Z",
+      "translated_at": "2026-10-29T19:53:45Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m4/m4.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:55:39Z",
+      "translated_at": "2026-10-29T19:55:03Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m4/m4.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:57:19Z",
+      "translated_at": "2026-10-29T20:16:35Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m4/m4.3.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:57:28Z",
+      "translated_at": "2026-10-29T20:16:43Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m4/m4.4.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:57:36Z",
+      "translated_at": "2026-10-29T20:16:52Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.0.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:58:21Z",
+      "translated_at": "2026-10-29T20:17:49Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.1.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:58:46Z",
+      "translated_at": "2026-10-29T20:18:17Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.2.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T21:59:29Z",
+      "translated_at": "2026-10-29T20:18:36Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.3.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T22:00:32Z",
+      "translated_at": "2026-10-29T20:18:52Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.4.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T22:01:17Z",
+      "translated_at": "2026-10-29T20:19:13Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-03/m5/m5.5.adoc": {
       "source_commit": "7748a31b8b03aea6ec03b0d9b4bdc988158c8983",
-      "translated_at": "2026-10-28T22:01:30Z",
+      "translated_at": "2026-10-29T20:19:29Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-01-goals.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:01:46Z",
+      "translated_at": "2026-10-29T20:19:55Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-02-introduction.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:02:25Z",
+      "translated_at": "2026-10-29T20:20:14Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-03-configure-mta-extension.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:03:01Z",
+      "translated_at": "2026-10-29T20:21:22Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-04-mdb-to-reactive-messaging.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:03:41Z",
+      "translated_at": "2026-10-29T20:22:47Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-05-custom-rules-audit-logging.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:04:58Z",
+      "translated_at": "2026-10-29T20:23:31Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-06-stateless-ejb-to-cdi.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:05:29Z",
+      "translated_at": "2026-10-29T20:23:59Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-07-quarkus-branch-deploy.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:06:15Z",
+      "translated_at": "2026-10-29T20:24:29Z",
       "model": "translate/gpt-6-luna"
     },
     "pages/module-05/module-05-logging.adoc": {
       "source_commit": "c24d589cc64929dbc9fe52ccea3a0bbba0012691",
-      "translated_at": "2026-10-28T22:06:39Z",
+      "translated_at": "2026-10-29T20:24:45Z",
       "model": "translate/gpt-6-luna"
     }
   }

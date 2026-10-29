@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab4"]
-== Preparare la cartella di lavoro del lab
+== Configura la cartella di lavoro del lab
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -11,20 +11,20 @@ include::../_shared/close-tabs.adoc[]
 [.indent2]
 [IMPORTANT]
 --
-Se hai saltato i capitoli precedenti, espandi la sezione qui sotto per recuperare i passaggi.
+Se hai saltato i capitoli precedenti, espandi la sezione qui sotto per recuperare.
 
 [%collapsible]
 ====
-Devono essere soddisfatti i seguenti requisiti:
+Devono essere soddisfatti questi requisiti:
 
 . *Accesso al database*
 . *Integrazione di Kafka con Matrix* (piattaforma di messaggistica per i clienti)
 
 {blank}
 
-Seguendo i passaggi qui sotto potrai soddisfare entrambi i requisiti.
+Seguendo i passaggi qui sotto, potrai soddisfare entrambi i requisiti.
 
-. Abilitare l'accesso al database
+. Abilita l'accesso al database
 +
 ======
 Questo capitolo richiede l'accesso a un database, ma per impostazione predefinita non è raggiungibile.
@@ -38,11 +38,11 @@ Questo capitolo richiede l'accesso a un database, ma per impostazione predefinit
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ Integration]
+            Camel[⚙️ Integrazione]
         end
     end
 
-    Camel -.-x|"❌ unreachable"| SVC
+    Camel -.-x|"❌ non raggiungibile"| SVC
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -63,17 +63,17 @@ flowchart LR
     style SVC fill:#fce4e4,stroke:#EE0000,color:#333
 ----
 
-Per abilitare l'accesso al database, esegui il seguente comando nel terminale di _Dev Spaces_:
+Per abilitare l'accesso al database, esegui il comando seguente nel terminale di _Dev Spaces_:
 
 [.copypaste]
 ****
 si-setup
 ****
 
-Dovresti vedere che tutte le risorse riportano `ready OK`:
+Dovresti vedere tutte le risorse con stato `ready OK`:
 
 [subs="attributes"]
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -82,9 +82,9 @@ Dovresti vedere che tutte le risorse riportano `ready OK`:
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-+++
+++++
 
-L'output qui sopra indica che è stato stabilito un link di Service Interconnect tra il tuo namespace e quello del database.
+L'output qui sopra indica che è stato stabilito un collegamento Service Interconnect tra il tuo namespace e quello del database.
 
 {blank}
 
@@ -95,7 +95,7 @@ L'output qui sopra indica che è stato stabilito un link di Service Interconnect
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ Integration]
+            Camel[⚙️ Integrazione]
 
             SI1{{"Service\nInterconnect"}}
         end
@@ -103,7 +103,7 @@ flowchart LR
 
     Camel --> SI1
 
-    SI1 -.-|"🔒 secure link"| SI2
+    SI1 -.-|"🔒 collegamento sicuro"| SI2
 
     subgraph sharedLabel ["shared-database ."]
         subgraph shared [" "]
@@ -132,10 +132,10 @@ flowchart LR
 {empty} +
 
 [start=2]
-. Abilitare l'integrazione di Kafka con Matrix
+. Abilita l'integrazione di Kafka con Matrix
 +
 ======
-Avviare l'integrazione di Kafka con Matrix
+Aumenta a 1 il numero di repliche dell'integrazione di Kafka con Matrix
 
 [.copypaste]
 ****
@@ -149,10 +149,10 @@ Il pod abiliterà il seguente flusso di notifiche:
 flowchart LR
     AI --> KF --> |"k2m\n(pod)"| MX --> CUST
     
-    CUST@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Customer", pos: "b", h: 80, w: 80, constraint: "on" }
+    CUST@{ img: "../../_images/module-03/common/customer-icon.svg", label: "Cliente", pos: "b", h: 80, w: 80, constraint: "on" }
     MX@{ img: "../../_images/module-03/common/element-icon.svg", label: "Matrix", pos: "b", h: 80, w: 80, constraint: "on" }
     KF@{ img: "../../_images/module-03/common/kafka-icon.svg", label: "Kafka", pos: "b", h: 80, w: 80, constraint: "on" }
-    AI@{ img: "../../_images/module-03/common/ai-icon.svg", label: "AI Assistant", pos: "b", h: 80, w: 80, constraint: "on" }
+    AI@{ img: "../../_images/module-03/common/ai-icon.svg", label: "Assistente AI", pos: "b", h: 80, w: 80, constraint: "on" }
 
     style CUST fill:none,stroke:none
     style MX fill:none,stroke:none
@@ -160,7 +160,7 @@ flowchart LR
     style AI fill:none,stroke:none
 ----
 
-Per verificare che il pod sia in esecuzione, esegui il seguente comando:
+Per verificare che il pod sia in esecuzione, esegui il comando seguente:
 
 [.copypaste]
 ****
@@ -169,10 +169,10 @@ oc get deployment k2m
 
 Dovresti vedere il deployment `Ready 1/1`:
 
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 k2m    1/1     1            1           27h</pre>
-+++
+++++
 
 ======
 ====
@@ -180,8 +180,8 @@ k2m    1/1     1            1           27h</pre>
 
 {empty} +
 
-. Dal terminale di _Dev Spaces_, esegui il seguente comando: +
-(prima chiudi tutte le schede dei file Camel aperte: dopo aver eseguito questo comando potrebbero non aggiornarsi automaticamente)
+. Dal terminale di _Dev Spaces_, esegui il comando seguente: +
+(prima chiudi tutte le schede di file Camel aperte: potrebbero non aggiornarsi automaticamente dopo aver eseguito questo comando)
 +
 {blank}
 +
@@ -192,14 +192,14 @@ step 7
 +
 [TIP]
 --
-.Esegui il comando qui sopra in qualsiasi momento per ripristinare l'esercizio.
+.Esegui il comando qui sopra in qualsiasi momento per reimpostare l'esercizio.
 [%collapsible]
 ====
-Il workshop include utili script di supporto che ti consentono di passare a qualsiasi step o di reimpostare il lab a uno stato noto e funzionante:
+Il workshop include utili script di supporto che consentono di passare a qualsiasi step o di reimpostare il lab a uno stato iniziale noto:
 
 * `step N` — reimposta il lab all'inizio dello step N
 * `steps` — elenca tutti gli step disponibili nel lab
-* `start` o `restart` — torna all'inizio (equivale a `step 1`)
+* `start` o `restart` — torna all'inizio (equivalente a `step 1`)
 * `ff` — passa rapidamente allo step *successivo*
 * `rw` — torna allo step *precedente*
 ====
@@ -207,9 +207,9 @@ Il workshop include utili script di supporto che ti consentono di passare a qual
 +
 {empty} +
 
-. Controllare la cartella del lab
+. Controlla la cartella del lab
 +
-Dopo aver eseguito i comandi qui sopra, dai un'occhiata alla vista ad albero del tuo editor per verificare che la struttura sia corretta. Dovrebbe essere simile a questa:
+Dopo aver eseguito i comandi qui sopra, controlla la vista ad albero dell'editor per verificare che la struttura sia corretta. Dovrebbe essere simile a questa:
 +
 --
 [.indent2]
@@ -225,7 +225,7 @@ pass:[<mark style="padding-left: .8rem; background-color: white; color: grey"><b
 {empty} +
 
 [.indent2]
-NOTE: `agent` e `mcp-servers` includono impostazioni preconfigurate per il tuo ambiente, tra cui la configurazione del modello AI e la connettività degli endpoint (database, storage S3 e HelpDesk). È tutto pronto all'uso, così puoi concentrarti sulla creazione del flusso agentic.
+NOTE: `agent` e `mcp-servers` includono impostazioni preconfigurate per il tuo ambiente, tra cui la configurazione del modello AI e la connettività agli endpoint (database, storage S3 e HelpDesk). È tutto pronto: puoi concentrarti sulla creazione del flusso agentico.
 --
 +
 {empty} +
@@ -238,7 +238,7 @@ Vedi la struttura di cartelle e i file previsti?
 Puoi continuare.
 
 [.fail]
-Prova a eseguire di nuovo `step 7` e verifica che i file compaiano nell'esplora file del tuo editor.
+Prova a eseguire di nuovo `step 7` e verifica che i file compaiano nell'esplora file dell'editor.
 ****
 
 {empty} +

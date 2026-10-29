@@ -71,9 +71,9 @@ sql postgres.shared-database.svc:5432 \
 .Cosa fa questo comando?
 [%collapsible]
 ====
- * `sql` — uno script di supporto del lab che si connette a un database PostgreSQL ed esegue una query
- * `postgres.shared-database.svc:5432` — indirizzo del database: service, namespace e porta
- * `"SELECT count(*) FROM policies"` — conta il numero di record nel database
+* `sql` — uno script di supporto del lab che si connette a un database PostgreSQL ed esegue una query
+* `postgres.shared-database.svc:5432` — indirizzo del database: service, namespace e porta
+* `"SELECT count(*) FROM policies"` — conta il numero di record nel database
 ====
 --
 
