@@ -60,7 +60,9 @@
     "YAML",
     "CISO",
     "Conforma",
+    "exploitability",
     "Fulcio",
+    "GHSA",
     "Gitsign",
     "gitsign",
     "Lightwell",
@@ -70,6 +72,7 @@
     "RHDA",
     "RHTAS",
     "Sigstore",
+    "SLSA",
     "syft"
   ],
   "ignoreWords": [
@@ -120,7 +123,9 @@
     "*.min.js",
     "*.min.css",
     "www/**",
-    "content/[!e][!n]/**"
+    "content/es/**",
+    "content/it/**",
+    "content/ja/**"
   ],
   "overrides": [
     {

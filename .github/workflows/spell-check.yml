@@ -40,7 +40,7 @@ jobs:
             --no-progress \
             --show-context \
             --show-suggestions \
-            "content/**/*.adoc"
+            "content/en/**/*.adoc"
 
       - name: Comment on PR (if spell check fails)
         if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
