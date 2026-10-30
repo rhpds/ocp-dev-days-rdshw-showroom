@@ -237,7 +237,7 @@ oc describe tokenratelimitpolicy -n {user-username}-devspaces \
     <span style="color: #F14C4B;font-weight:bold">Type:</span>                  Enforced</pre>
 ++++
 +
-ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を継続的に追跡しています。+
+ポリシーが *Enforced* と表示されていれば、ゲートウェイは両方の階層のトークン使用量を継続的に追跡しています。 +
 フォールバック戦略を実際に見てみましょう。
 
 {empty} +

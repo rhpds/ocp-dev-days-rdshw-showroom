@@ -66,7 +66,7 @@ si-setup
 すべてのリソースで `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -75,7 +75,7 @@ si-setup
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-+++
+++++
 
 上記の出力は、自分の namespace とデータベースの namespace の間に Service Interconnect の link が確立されたことを示しています。
 
