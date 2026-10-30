@@ -42,7 +42,7 @@ The JARs and POMs live under `lib/repository/`. The application currently declar
 
 == Exercise 1: Explore the custom rules
 
-Open xref:module-05/module-05-logging.adoc[logging.yaml] to **download** or **copy** the content into `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (create the `rules/` directory if it is not already there).
+Open xref:module-05/module-05-logging.adoc[logging.yaml] to **download** the file to your local drive.
 
 Skim each `ruleID`, `when:` clause, and `message:` in `logging.yaml` — these are what the analyzer will report in the Analysis panel. The file defines **five** rules (`audit-logging-0001` … `audit-logging-0005`).
 
@@ -79,17 +79,17 @@ Also open `pom.xml` and find the dependency on `audit-logging-library` version `
 
 == Exercise 2: Attach the custom rules to an MTA profile
 
-Earlier you configured the MTA extension and you might have noticed that there is also an option to add custom rules in our analysis. Lets get started with adding custom rules to our `quarkus-profile`.
+Earlier you configured the MTA extension and you might have noticed that there is also an option to add custom rules in our analysis. Let's get started with adding custom rules to our `quarkus-profile`.
 
 . Open the MTA Analysis View. Click the **gear** icon (1), then under **Select Profile** click **Edit in Profile Manager** (2).
 +
 image::module-05-mta-dls/05-05-dls-01.jpg[Open Profile Manager from Get Ready to Analyze,link=self,window=blank,title="Edit in Profile Manager"]
 
-. Let's attach customer rules to our `quarkus-profile`
+. Let's attach custom rules to our `quarkus-profile`.
 
 . In **Profile Settings**, set the migration target consistent with this workshop (Quarkus / the same target family used by `quarkus-profile`). Custom rules in this repo are labeled toward a Quarkus 3-style target.
 
-. Under **Custom Rules**, click **Upload Custom Rules...** and upload the xref:module-05/module-05-logging.adoc[`logging.yaml`] file you saved locally (or point the profile at the project's `rules/` directory that contains `logging.yaml`).
+. Under **Custom Rules**, click **Upload Custom Rules...** and upload the xref:module-05/module-05-logging.adoc[`logging.yaml`] file you downloaded earlier.
 +
 image::module-05-mta-dls/05-05-dls-02.jpg[Upload Custom Rules in Profile Settings,link=self,window=blank,title="Custom Rules"]
 

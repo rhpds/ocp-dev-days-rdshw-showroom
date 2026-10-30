@@ -20,13 +20,14 @@ image::module-05-mta-dls/05-07-dls-01.jpg[Open a new terminal in Dev Spaces,link
 
 . Make sure you are in the `parasol-insurance-eap` project root.
 
-. Fetch and check out the migrated branch:
+. Fetch and check out the migrated branch. `git reset --hard` discards local changes to tracked files. `git clean -df` removes untracked files and directories left from earlier lab work (for example generated artifacts or files created by Developer Lightspeed) so they do not linger after the branch switch:
 +
 [.console-input]
 [source,bash]
 ----
 git fetch origin
 git reset --hard
+git clean -df
 git checkout quarkus
 git pull origin quarkus
 ----
@@ -143,10 +144,10 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol Quarkus inbox,link=self,window
 
 Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a {user}-ai-mta namespace is selected (`oc project`).
 
-To start the deployment to OpenShift, lets first change to our project namespace {user}-ai-mta
+To start the deployment to OpenShift, let's first change to our project namespace `{user}-ai-mta`.
 
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes",role="copypaste"]
 ----
 oc project {user}-ai-mta
 ----
@@ -209,9 +210,9 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 . Deploy the application (image namespace is substituted from your current project). The Deployment maps Secret `parasol-db` into the `POSTGRESQL_*` variables expected by the **`%prod`** profile:
 +
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+sed "s|REPLACE_NAMESPACE|{user}-ai-mta|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
 oc apply -f openshift/route.yaml
 oc rollout status deployment/parasol-insurance
@@ -231,8 +232,8 @@ echo "https://${ROUTE}/"
 [.console-input]
 [source,bash]
 ----
-curl -sk "https://${ROUTE}/api/claims"
-curl -sk "https://${ROUTE}/api/inbox"
+curl -sk "https://${ROUTE}/api/claims" | jq .
+curl -sk "https://${ROUTE}/api/inbox" | jq .
 ----
 
 . In the OpenShift console, open your project **Topology** (or **Workloads → Deployments**) and confirm the application is running.
