@@ -78,8 +78,8 @@ image::module-05-mta-dls/05-04-dls-03.jpg[EmailIntakeMDB Get Solution,link=self,
 
 TIP: Generations are closely linked to the analysis. This means every time a new generation is created and accepted the analysis re-runs. If you try to access the analysis panel during generations, it will not be active. This is by design.
 
-+
-image::module-05-mta-dls/05-04-dls-04.jpg[EmailIntakeMDB generated results,link=self,window=blank,title="EmailIntakeMDB"]
+image::module-05-mta-dls/05-04-dls-04.jpg[EmailIntakeMDB Get Solution,link=self,window=blank,title="EmailIntakeMDB"]
+
 
 Let's review the kinds of changes you should expect for `EmailIntakeMDB`.
 
