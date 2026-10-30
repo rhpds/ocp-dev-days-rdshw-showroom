@@ -42,7 +42,7 @@ The JARs and POMs live under `lib/repository/`. The application currently declar
 
 == Exercise 1: Explore the custom rules
 
-Open xref:module-05/module-05-logging.adoc[logging.yaml] to **download** or **copy** the content into `parasol-insurance-eap/rules/logging.yaml` in Dev Spaces (create the `rules/` directory if it is not already there).
+Open xref:module-05/module-05-logging.adoc[logging.yaml] to **download** the content into your local drive. 
 
 Skim each `ruleID`, `when:` clause, and `message:` in `logging.yaml` — these are what the analyzer will report in the Analysis panel. The file defines **five** rules (`audit-logging-0001` … `audit-logging-0005`).
 
@@ -89,7 +89,7 @@ image::module-05-mta-dls/05-05-dls-01.jpg[Open Profile Manager from Get Ready to
 
 . In **Profile Settings**, set the migration target consistent with this workshop (Quarkus / the same target family used by `quarkus-profile`). Custom rules in this repo are labeled toward a Quarkus 3-style target.
 
-. Under **Custom Rules**, click **Upload Custom Rules...** and upload the xref:module-05/module-05-logging.adoc[`logging.yaml`] file you saved locally (or point the profile at the project's `rules/` directory that contains `logging.yaml`).
+. Under **Custom Rules**, click **Upload Custom Rules...** and upload the xref:module-05/module-05-logging.adoc[`logging.yaml`] file you downloaded earlier locally.
 +
 image::module-05-mta-dls/05-05-dls-02.jpg[Upload Custom Rules in Profile Settings,link=self,window=blank,title="Custom Rules"]
 
