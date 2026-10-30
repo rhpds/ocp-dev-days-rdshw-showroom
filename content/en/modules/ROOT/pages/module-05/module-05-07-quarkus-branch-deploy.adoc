@@ -20,13 +20,14 @@ image::module-05-mta-dls/05-07-dls-01.jpg[Open a new terminal in Dev Spaces,link
 
 . Make sure you are in the `parasol-insurance-eap` project root.
 
-. Fetch and check out the migrated branch:
+. Fetch and check out the migrated branch. `git reset --hard` discards local changes to tracked files; `git clean -df` removes untracked files and directories left from earlier lab work (for example generated artifacts or files created by Developer Lightspeed) so they do not linger after the branch switch:
 +
 [.console-input]
 [source,bash]
 ----
 git fetch origin
 git reset --hard
+git clean -df
 git checkout quarkus
 git pull origin quarkus
 ----
