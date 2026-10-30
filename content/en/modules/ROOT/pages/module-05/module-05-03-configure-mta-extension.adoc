@@ -125,14 +125,23 @@ models:
 active: *active
 ----
 
-Confirm that the settings have the following values in the following fields. 
+Confirm that the settings have the following values in the following fields.
 
 - `OPENAI_API_KEY` : this is the LLM key to the model hosted on OpenShift AI
 - `model` : the name of the model we are using
 - `baseURL` : the url/route at which the model is listening to requests via the chat completions API.
 - `active` : Finally we want to ensure that this profile is active. MTA can be configured with multiple LLMs however only one LLM can be active at a time.
 
-image::module-05-mta-dls/05-03-dls-09.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
+Save the `provider-settings.yaml` file if you edited it (`Ctrl+S` / `Cmd+S`), then return to the **MTA Analysis View** tab.
+
+With GenAI configured and `quarkus-profile` selected, start the analysis server and run your first analysis. The image below shows both steps:
+
+- *1* Click **Start** (power icon) in the top-right of the MTA Analysis View. Wait until **Server Status** changes from a red **Stopped** badge to a green **Running** badge. While the server is stopped, **Run Analysis** stays disabled.
+- *2* When the server is **Running**, click **Run Analysis** next to the `quarkus-profile` dropdown.
+
+image::module-05-mta-dls/05-03-dls-09.png[Start MTA server and run analysis,link=self,window=blank,title="Start MTA server and run analysis"]
+
+NOTE: The first analysis can take a minute or two. When it finishes, the MTA Analysis View lists migration issues for `parasol-insurance-eap`. You will review those findings in the next section.
 
 == Verify
 
@@ -143,6 +152,7 @@ Confirm the Dev Spaces environment and MTA extension (including Developer Lights
 * Click on the gear icon on the right side of the screen
 * The **Get Ready to Analyze** pane will open on the right hand side of the screen
 * There should be a green check mark in four of the message boxes and each should be listed as completed. The `Hub Configuration` should stay "Not Configured" abd yellow.
+* And finally ensure that the Analysis ran and you can see multiple entries, (we will review them in detail in the next section)
 
 . Confirm the Dev Spaces workspace is pointing to the correct repository
 * Click on the file icon on the left side of the Dev Spaces environment
