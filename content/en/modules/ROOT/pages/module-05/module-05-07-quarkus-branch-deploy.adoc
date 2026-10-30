@@ -147,7 +147,7 @@ Deploy from the `quarkus` branch using the manifests under `openshift/` and a cl
 To start the deployment to OpenShift, lets first change to our project namespace {user}-ai-mta
 
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes",role="copypaste"]
 ----
 oc project {user}-ai-mta
 ----
@@ -210,9 +210,9 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 . Deploy the application (image namespace is substituted from your current project). The Deployment maps Secret `parasol-db` into the `POSTGRESQL_*` variables expected by the **`%prod`** profile:
 +
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+sed "s|REPLACE_NAMESPACE|{user}-ai-mta|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
 oc apply -f openshift/route.yaml
 oc rollout status deployment/parasol-insurance
@@ -232,8 +232,8 @@ echo "https://${ROUTE}/"
 [.console-input]
 [source,bash]
 ----
-curl -sk "https://${ROUTE}/api/claims"
-curl -sk "https://${ROUTE}/api/inbox"
+curl -sk "https://${ROUTE}/api/claims" | jq .
+curl -sk "https://${ROUTE}/api/inbox" | jq .
 ----
 
 . In the OpenShift console, open your project **Topology** (or **Workloads → Deployments**) and confirm the application is running.
