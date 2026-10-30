@@ -52,11 +52,11 @@ image::m02-rhdh-pipeline-output-icon.png[pipeline run の Output アイコン,li
 +
 image::m02-pipeline-acs-tasks.png[pipeline 内の ACS image scan と image check task,link=self,window=blank,width=400]
 +
- **Image Scan** タブには、container image で検出されたすべての CVE が重要度別に表示されます。
+**Image Scan** タブには、container image で検出されたすべての CVE が重要度別に表示されます。
 +
 image::m02-rhdh-acs-image-scan.png[重要度別の CVE を表示する ACS Image Scan の結果,link=self,window=blank,width=700]
 +
- **Image Check** タブには、ACS ポリシー違反が表示されます。 **Breaks build** 列に注目してください。「yes」と表示されたポリシーは secured pipeline で build をブロックし、「no」のポリシーは情報として報告されます。
+**Image Check** タブには、ACS ポリシー違反が表示されます。 **Breaks build** 列に注目してください。「yes」と表示されたポリシーは secured pipeline で build をブロックし、「no」のポリシーは情報として報告されます。
 +
 image::m02-rhdh-acs-image-check.png[ポリシー違反を表示する ACS Image Check の結果,link=self,window=blank,width=700]
 
