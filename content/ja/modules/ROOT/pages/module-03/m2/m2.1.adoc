@@ -69,7 +69,7 @@ image::module-03/m2/matrix-login-confirm.jpg[width=60%]
 +
 {blank}
 +
- _"Continue"_ をクリックします。
+_"Continue"_ をクリックします。
 +
 {empty} +
 +

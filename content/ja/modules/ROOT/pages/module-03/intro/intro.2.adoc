@@ -22,7 +22,7 @@ OpenShift Dev Spaces は OpenShift サブスクリプションに含まれてお
 
 開発環境にアクセスするには、次の手順を実行します。
 
-. 次のリンクをクリックします:{url-codeready}[Console, window="_blank"] link。 +
+. 次のリンクをクリックします。 link:{url-codeready}[Console, window="_blank"]  +
 （右側の *Resources* パネルにある *Red Hat OpenShift Dev Spaces* からもアクセスできます）。
 +
 {blank}
