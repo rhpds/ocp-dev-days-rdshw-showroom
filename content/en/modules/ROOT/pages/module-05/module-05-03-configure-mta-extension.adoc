@@ -142,7 +142,7 @@ Confirm the Dev Spaces environment and MTA extension (including Developer Lights
 * With the MTA extension icon selected and the MTA Analysis View tab active:
 * Click on the gear icon on the right side of the screen
 * The **Get Ready to Analyze** pane will open on the right hand side of the screen
-* There should be green check marks in all four of the message boxes and each should be listed as completed
+* There should be a green check mark in four of the message boxes and each should be listed as completed. The `Hub Configuration` should stay "Not Configured" abd yellow.
 
 . Confirm the Dev Spaces workspace is pointing to the correct repository
 * Click on the file icon on the left side of the Dev Spaces environment
