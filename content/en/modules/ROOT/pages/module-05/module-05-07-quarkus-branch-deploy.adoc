@@ -20,7 +20,7 @@ image::module-05-mta-dls/05-07-dls-01.jpg[Open a new terminal in Dev Spaces,link
 
 . Make sure you are in the `parasol-insurance-eap` project root.
 
-. Fetch and check out the migrated branch. `git reset --hard` discards local changes to tracked files; `git clean -df` removes untracked files and directories left from earlier lab work (for example generated artifacts or files created by Developer Lightspeed) so they do not linger after the branch switch:
+. Fetch and check out the migrated branch. `git reset --hard` discards local changes to tracked files. `git clean -df` removes untracked files and directories left from earlier lab work (for example generated artifacts or files created by Developer Lightspeed) so they do not linger after the branch switch:
 +
 [.console-input]
 [source,bash]
@@ -144,7 +144,7 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol Quarkus inbox,link=self,window
 
 Deploy from the `quarkus` branch using the manifests under `openshift/` and a cluster-side binary Docker build. These steps assume `oc` is logged in and a {user}-ai-mta namespace is selected (`oc project`).
 
-To start the deployment to OpenShift, lets first change to our project namespace {user}-ai-mta
+To start the deployment to OpenShift, let's first change to our project namespace `{user}-ai-mta`.
 
 [.console-input]
 [source,bash,subs="attributes",role="copypaste"]
