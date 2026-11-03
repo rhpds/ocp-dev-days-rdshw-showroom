@@ -78,7 +78,7 @@ image::module-05-mta-dls/05-04-dls-03.jpg[Get Solution de EmailIntakeMDB,link=se
 
 TIP: Las generaciones están estrechamente vinculadas al análisis. Esto significa que cada vez que se crea y acepta una nueva generación, se vuelve a ejecutar el análisis. Si intentas acceder al panel de análisis mientras se generan resultados, no estará activo. Esto es intencional.
 
-+
+
 image::module-05-mta-dls/05-04-dls-04.jpg[Resultados generados para EmailIntakeMDB,link=self,window=blank,title="EmailIntakeMDB"]
 
 Revisemos los tipos de cambios que deberías esperar para `EmailIntakeMDB`.

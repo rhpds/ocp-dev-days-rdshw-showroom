@@ -78,7 +78,7 @@ image::module-05-mta-dls/05-04-dls-03.jpg[EmailIntakeMDB の Get Solution,link=s
 
 TIP: 生成は分析と密接に連動しています。つまり、新しい生成が作成されて受け入れられるたびに、分析が再実行されます。生成中に分析パネルへアクセスしようとしても、アクティブにはなりません。これは設計どおりです。
 
-+
+
 image::module-05-mta-dls/05-04-dls-04.jpg[EmailIntakeMDB の生成結果,link=self,window=blank,title="EmailIntakeMDB"]
 
 `EmailIntakeMDB` に対して想定される変更を確認しましょう。
