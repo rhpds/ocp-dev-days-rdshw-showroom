@@ -18,7 +18,7 @@ include::../_shared/close-tabs.adoc[]
 満たす必要がある要件は次のとおりです。
 
 . *データベースへのアクセス*
-. *Kafka と Matrix の統合* （お客様向けメッセージングプラットフォーム）
+. *Kafka と Matrix のインテグレーション* （お客様向けメッセージングプラットフォーム）
 
 {blank}
 
@@ -38,7 +38,7 @@ include::../_shared/close-tabs.adoc[]
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
         end
     end
 
@@ -95,7 +95,7 @@ Namespace: shared-database
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
 
             SI1{{"Service\nInterconnect"}}
         end
@@ -132,10 +132,10 @@ flowchart LR
 {empty} +
 
 [start=2]
-. Kafka と Matrix の統合を有効にする
+. Kafka と Matrix のインテグレーションを有効にする
 +
 ======
-Matrix との Kafka 統合をスケールアップします。
+Matrix との Kafka インテグレーションをスケールアップします。
 
 [.copypaste]
 ****

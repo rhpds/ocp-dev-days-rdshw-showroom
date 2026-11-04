@@ -5,7 +5,7 @@ include::partial$_attributes.adoc[]
 署名済みの commit が push され、sandbox pipeline が実行中です。このセクションでは、pipeline の処理内容やセキュリティチェックを確認し、sandbox pipeline が *ブロック* ではなく *通知* を目的として設計されている理由を理解します。
 
 [#section-1]
-== セクション 1: sandbox pipeline の理解
+== セクション 1: Sandbox pipeline を理解する
 
 === 演習 1: Developer Hub で pipeline を表示する
 
@@ -28,7 +28,7 @@ image::m02-rhdh-sandbox-pipeline-running.png[Developer Hub での task の詳細
 IMPORTANT: sandbox pipeline は、developer を **決してブロックしない** ように設計されています。すべてのセキュリティチェックを実行しますが、失敗は情報として報告され、build は停止しません。これにより、developer は迅速に反復作業を進めながら、production pipeline で何が失敗するかを正確に把握できます。
 
 [#section-2]
-== セクション 2: sandbox でのセキュリティチェック
+== セクション 2: Sandbox のセキュリティチェック
 
 === 演習 1: commit 署名の検証を確認する
 
@@ -106,7 +106,7 @@ pipeline は最後まで実行されます（sandbox では強制されません
 ====
 
 [#section-3]
-== セクション 3: 脆弱な base image の修正
+== セクション 3: 脆弱なベースイメージを修正する
 
 === 演習 1: ACS ポリシー違反を理解する
 
@@ -205,4 +205,4 @@ pipeline task の `acs-image-scan` と `acs-image-check` は、`roxctl` CLI を�
 
 == 次のステップ
 
-変更を merge し、secured pipeline を通じて次の段階へ進めるには、xref:module-02/04-promotion.adoc[次の段階への移行] に進んでください。
+変更を merge し、secured pipeline を通じて次の段階へ進めるには、xref:module-02/04-promotion.adoc[次のステージへ] に進んでください。

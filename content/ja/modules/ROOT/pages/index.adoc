@@ -1,7 +1,7 @@
 = OpenShift Dev Day Roadshow
 include::partial$_attributes.adoc[]
 
-OpenShift Dev Day Roadshow へようこそ。Red Hat OpenShift で、最新のアプリケーション開発と統合を体験できる実践的なワークショップを集めました。
+OpenShift Dev Day Roadshow へようこそ。Red Hat OpenShift で、最新のアプリケーション開発とインテグレーションを体験できる実践的なワークショップを集めました。
 
 == 利用可能なモジュール
 
@@ -29,7 +29,7 @@ SLSA Level 3 に準拠したソフトウェアサプライチェーンを通じ�
 ****
 xref:module-03/index.adoc[モジュール 3: AI のためのアプリケーション接続]
 
-Red Hat の統合テクノロジーを使って AI のデータフローを構築します。Service Interconnect による EDI の取り込み、Kafka と Matrix/Rocket.Chat によるイベント駆動型メッセージング、AI カスタマーサポート向けの Agentic Apache Camel、Connectivity Link による LLM ガバナンスを体験します。
+Red Hat のインテグレーションテクノロジーを使って AI のデータフローを構築します。Service Interconnect による EDI の取り込み、Kafka と Matrix/Rocket.Chat によるイベント駆動型メッセージング、AI カスタマーサポート向けの Agentic Apache Camel、Connectivity Link による LLM ガバナンスを体験します。
 
 **所要時間** : ラボによって異なります
 ****

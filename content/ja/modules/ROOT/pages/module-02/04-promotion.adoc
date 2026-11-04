@@ -7,7 +7,7 @@ include::partial$_attributes.adoc[]
 サンドボックスとは異なり、これらの pipeline ではセキュリティポリシーが **適用** されます。署名されていない commit、ポリシー違反、承認の不足があると、promotion はブロックされます。
 
 [#section-1]
-== セクション 1: Merge Request
+== セクション 1: リクエストのマージ
 
 === 演習 1: Merge Request を作成する
 
@@ -80,7 +80,7 @@ image::m02-rhdh-post-merge-pipeline.png[Developer Hub のマージ後 build pipe
 '''
 
 [#section-2]
-== セクション 2: 本番環境への promotion
+== セクション 2: 本番環境に昇格する
 
 マージ後の build では、`main` branch から署名済み image が作成されました。本番環境に promotion するには **Git tag** を作成します。これにより tag-promote pipeline が開始されます。
 
@@ -274,4 +274,4 @@ image::m02-approval-attestation-json.png[predicate と subject を含む in-toto
 
 == 次のステップ
 
-xref:module-02/05-namespace-security.adoc[Namespace の保護] に進み、Policy Controller が未承認の image の deploy をどのように防ぐかを確認してください。
+xref:module-02/05-namespace-security.adoc[Namespaceを保護する] に進み、Policy Controller が未承認の image の deploy をどのように防ぐかを確認してください。

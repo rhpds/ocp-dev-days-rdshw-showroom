@@ -1,4 +1,4 @@
-= 名前空間のセキュリティ保護
+= Namespaceを保護する
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 

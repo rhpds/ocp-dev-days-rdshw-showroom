@@ -9,7 +9,7 @@ include::partial$style.adoc[]
 
 === 概要
 
-オープンソースの Eclipse Che を基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes と container を使用して、開発チームや IT チームのメンバーに一貫性があり、安全で、設定不要の開発環境を提供します。ノート PC 上の統合開発環境と同じくらい、すばやく使い慣れた操作感で利用できます。
+オープンソースの Eclipse Che を基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes と container を使用して、開発チームや IT チームのメンバーに一貫性があり、安全で、設定不要の開発環境を提供します。ノート PC 上のインテグレーション開発環境と同じくらい、すばやく使い慣れた操作感で利用できます。
 
 [.text-center]
 image::module-03/intro/devspaces-ide-developer.png[width=70%]

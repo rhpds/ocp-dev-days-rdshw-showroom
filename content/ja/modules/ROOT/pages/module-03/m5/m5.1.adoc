@@ -31,7 +31,7 @@ include::../_shared/close-tabs.adoc[]
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
         end
     end
 
@@ -88,7 +88,7 @@ Namespace: shared-database
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
 
             SI1{{"Service\nInterconnect"}}
         end

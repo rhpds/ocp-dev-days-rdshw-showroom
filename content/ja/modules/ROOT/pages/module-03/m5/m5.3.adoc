@@ -65,7 +65,7 @@ auth-diagram
 
 [NOTE]
 ====
-この統合では、2 つの異なる AI モデルを使用します。
+このインテグレーションでは、2 つの異なる AI モデルを使用します。
 
 * pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">1</span>] *AI Model* -- 推論を行い、ツールを呼び出します。
 * pass:[<span style="display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;border-radius:50%;background:#EE0000;color:white;font-size:0.85em;font-weight:bold">2</span>] *LLM* -- Customer Profile Tool を使って顧客分析を生成します。
