@@ -44,7 +44,7 @@ Lets review the issues reported (wording may vary slightly by ruleset version):
 * `javax.ejb` imports are not supported.
   Remove `javax.ejb.Stateless` and use `jakarta.enterprise.context.ApplicationScoped` (and `jakarta.transaction.Transactional` as needed).
 * The package `javax` has been replaced by `jakarta`.
-  Update persistence imports (for example `javax.persistence.*` → `jakarta.persistence.*`) as the analyzer reports them.
+  Update persistence imports (for example `javax.persistence.\*` → `jakarta.persistence.*`) as the analyzer reports them.
 
 == Exercise 2: Generate and accept an AI solution
 
@@ -89,7 +89,7 @@ image::module-05-mta-dls/05-06-dls-05.jpg[Agent workflow — generate fix, diagn
 Walk through the loop with `ClaimService` as the concrete example:
 +
 * **Generate fix (LLM)** — From the analysis incident (for example “replace `@Stateless` with a CDI scope”), Developer Lightspeed proposes a first patch: annotations, imports, and the obvious call-site updates in `ClaimService.java`.
-* **Identify additional changes (LLM)** — One edit often implies others. After dropping `@Stateless`, the agent may also rewrite `@PersistenceContext` to `@Inject`, update `javax.*` → `jakarta.*` imports, or touch callers such as `ClaimsResource` that still expect EJB-style wiring.
+* **Identify additional changes (LLM)** — One edit often implies others. After dropping `@Stateless`, the agent may also rewrite `@PersistenceContext` to `@Inject`, update `javax.\*` → `jakarta.*` imports, or touch callers such as `ClaimsResource` that still expect EJB-style wiring.
 * **Accept / Reject (you)** — You stay in control. Accept the patch if it looks right, reject it if the agent overreached, or review it in the editor before deciding. Nothing is applied permanently without your choice.
 * **Get diagnostics from tools (IDE)** — After a change lands, the agent asks the IDE for fresh signal: language-server errors, unresolved types, broken Maven coordinates, missing Quarkus extensions, and similar diagnostics. That is how it notices gaps the original MTA incident did not list.
 * **Fix more issues? (you + LLM)** — If diagnostics remain (for example no `quarkus-hibernate-orm` dependency in `pom.xml`, or no `application.properties` for datasource settings), the agent asks whether to continue. Choose **Yes** to let it generate the next patch; choose **No** / **Stop** to end the loop.

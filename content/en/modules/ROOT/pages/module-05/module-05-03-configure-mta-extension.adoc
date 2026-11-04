@@ -86,8 +86,8 @@ Click on the `Manage Profiles` button to open the profiles management panel.
 image::module-05-mta-dls/05-03-dls-06.png[VSCode Tab,link=self,window=blank,title="VSCode Tab"]
 
 - Create a new profile `quarkus-profile`
-- Profile Name: `quarkus-profile``
-- Target Technologies: `quarkus``, `quarkus3+``, `jakarta-ee``
+- Profile Name: `quarkus-profile`
+- Target Technologies: `quarkus`, `quarkus3+`, `jakarta-ee`
 
 image::module-05-mta-dls/05-03-dls-07.png[VSCode Tab,link=self,window=blank,title="Review profiles"]
 

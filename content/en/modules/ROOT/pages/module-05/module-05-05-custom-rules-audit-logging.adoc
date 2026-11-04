@@ -133,7 +133,7 @@ NOTE: Read each finding **message** carefully. Notice how the rule text is writt
 
 . The `rules/` directory exists in `parasol-insurance-eap` and contains `logging.yaml` (copied or downloaded from this guide if needed).
 
-. You can explain in your own words what at least three of the five `audit-logging-****` rules detect.
+. You can explain in your own words what at least three of the five `audit-logging-***` rules detect.
 
 . An MTA profile is configured with the custom `rules/` path and has been used to run analysis.
 
