@@ -99,7 +99,7 @@ IMPORTANT: If you only run `quarkus-profile` without the custom rules path or up
 
 == Exercise 3: Run analysis and inspect custom findings
 
-. Congratulations on completing exercise 3! now it's time to run analysis. Since we are using the same active profile as before `quarkus-profile`. head to the analysis panel again and run the analysis. 
+. Now it's time to run analysis. Since we are using the same active profile as before `quarkus-profile`. head to the analysis panel again and run the analysis. 
 
 . When the Analysis panel populates, filter or search for findings related to **audit** / **`Audit`**. Expand incidents and confirm you can map them back to the rule IDs you read in `logging.yaml`. At minimum you should see a **dependency** finding for `audit-logging-library` **1.0.0** in `pom.xml` (rule `audit-logging-0001`).
 
