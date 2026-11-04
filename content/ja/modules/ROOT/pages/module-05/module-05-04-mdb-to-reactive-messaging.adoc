@@ -60,7 +60,7 @@ public class EmailIntakeMDB {
 * `@EJB` インジェクションはサポートされていません。
   `EmailRoutingService` と `EmailStoreBean` では、 `@EJB` を CDI の `@Inject` に置き換えてください（これらの依存コンポーネントも、今後 CDI に移行します）。
 * `javax` パッケージは `jakarta` に置き換えられています。
-  必要な箇所では、 `javax.*` のインポートを対応する `jakarta.*` に置き換えてください。
+  必要な箇所では、 `javax.\*` のインポートを対応する `jakarta.*` に置き換えてください。
 
 == 演習 2: AI ソリューションを生成して確認する
 
