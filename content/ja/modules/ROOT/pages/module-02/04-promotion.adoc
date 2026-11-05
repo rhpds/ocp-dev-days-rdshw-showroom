@@ -274,4 +274,4 @@ image::m02-approval-attestation-json.png[predicate と subject を含む in-toto
 
 == 次のステップ
 
-xref:module-02/05-namespace-security.adoc[Namespaceを保護する] に進み、Policy Controller が未承認の image の deploy をどのように防ぐかを確認してください。
+xref:module-02/05-namespace-security.adoc[名前空間を保護する] に進み、Policy Controller が未承認の image の deploy をどのように防ぐかを確認してください。

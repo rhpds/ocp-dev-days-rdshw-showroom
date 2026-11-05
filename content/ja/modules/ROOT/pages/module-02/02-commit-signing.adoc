@@ -44,7 +44,7 @@ image::m02-gitsign-login-prompt.png[Keycloak SSO からの成功コード,link=s
 
 . コードを **gitsign login** ターミナルに貼り付け、 **Return** を押します。
 +
-NOTE: これは Linux ターミナルです。ブラウザーや環境によっては、 `Ctrl+V` ではなく kbd:[Ctrl+Shift+V] で貼り付ける必要があります。
+NOTE: これは Linux ターミナルです。ブラウザーや環境によっては、 kbd:[Ctrl+V] ではなく kbd:[Ctrl+Shift+V] で貼り付ける必要があります。
 +
 image::m02-gitsign-code-paste.png[gitsign ターミナルに検証コードを貼り付ける,link=self,window=blank,width=700]
 +
@@ -114,4 +114,4 @@ Dev Spaces はローカルブラウザーのないコンテナー内で実行さ
 
 == 次のステップ
 
-xref:module-02/03-sandbox-pipeline.adoc[Sandbox Pipeline の確認] に進み、パイプラインがどのように署名を検証し、イメージをスキャンするかを確認してください。
+xref:module-02/03-sandbox-pipeline.adoc[Sandbox pipeline を確認する] に進み、パイプラインがどのように署名を検証し、イメージをスキャンするかを確認してください。

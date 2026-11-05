@@ -393,7 +393,7 @@ camel get
 
 {empty} +
 
-テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの利用開始,window=_blank] の手順に従ってください。
+テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] の手順に従ってください。
 
 準備ができたら、テストメッセージを _Kafka_ に送信します。
 

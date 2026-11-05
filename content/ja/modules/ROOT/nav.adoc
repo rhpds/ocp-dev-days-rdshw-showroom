@@ -25,7 +25,7 @@
 ** xref:module-02/04-promotion.adoc[次のステージへ]
 *** xref:module-02/04-promotion.adoc#section-1[セクション 1: リクエストのマージ]
 *** xref:module-02/04-promotion.adoc#section-2[セクション 2: 本番環境に昇格する]
-** xref:module-02/05-namespace-security.adoc[Namespaceを保護する]
+** xref:module-02/05-namespace-security.adoc[名前空間を保護する]
 
 * xref:module-03/index.adoc[Module 3: AI のためのアプリケーション接続]
 ** xref:module-03/intro/intro.1.adoc[はじめに]

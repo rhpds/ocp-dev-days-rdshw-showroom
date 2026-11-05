@@ -1,4 +1,4 @@
-= Sandbox pipeline の確認
+= Sandbox pipeline を確認する
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 

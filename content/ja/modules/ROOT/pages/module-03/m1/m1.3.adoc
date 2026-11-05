@@ -518,7 +518,7 @@ image::module-03/m1/kaoto-service-x12-all-enabled.png[width=90%]
 +
 [TIP]
 --
-. `store-pdf-s3` の動作
+.`store-pdf-s3` の動作
 [%collapsible]
 ====
 *Routes* ドロップダウンからこのステップを選択すると、sub-route を確認できます。ここでは XSLT template を適用して XML の保険証券から PDF を生成し、S3 object storage にアップロードした後、ドキュメントへの presigned link を返します。

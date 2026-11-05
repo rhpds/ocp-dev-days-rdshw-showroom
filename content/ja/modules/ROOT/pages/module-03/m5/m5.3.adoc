@@ -167,7 +167,7 @@ camel run * --local-kamelet-dir ../support/kamelets
 
 . _Rocket.Chat_ ウィンドウに切り替えます。
 +
-TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの初期設定,window=_blank] の手順に従ってください（新しいタブで開きます）。
+TIP: まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] の手順に従ってください（新しいタブで開きます）。
 +
 {empty} +
 
@@ -335,7 +335,7 @@ include::_figures/rc-gold-profile.adoc[]
 
 {empty} +
 
-NOTE: LLM の応答は確定的ではないため、正確な文言は上のサンプルと異なる場合があります。重要なのは *GOLD TIER ANALYSIS* バナーと、「顧客プロファイル」、「感情とリスク」、「未解決の問題」、「推奨アクション」の 4 つのセクションです。
+NOTE: LLM の応答は確定的ではないため、正確な文言は上のサンプルと異なる場合があります。重要なのは *GOLD TIER ANALYSIS* バナーと、Customer Profile、Sentiment & Risk、Open Issues、Recommended Action の 4 つのセクションです。
 
 {empty} +
 

@@ -9,7 +9,7 @@ OpenShift Dev Day Roadshow へようこそ。Red Hat OpenShift で、最新の�
 
 [.tile]
 ****
-xref:module-01/00-intro.adoc[モジュール 1: 開発者の体験]
+xref:module-01/00-intro.adoc[モジュール 1: 開発者エクスペリエンス]
 
 Developer Hub を通じたセルフサービスのオンボーディング、Dev Spaces でのクラウドベース開発、AI 支援コーディング、自動化された CI/CD pipeline、GitOps を活用した本番環境への deploy まで、OpenShift での開発者の一連の流れを体験します。
 

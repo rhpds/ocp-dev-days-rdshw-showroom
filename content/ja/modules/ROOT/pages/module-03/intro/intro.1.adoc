@@ -193,7 +193,7 @@ NOTE: 各ラボには、より細かいレベルのアーキテクチャ図が�
 
 * https://developers.redhat.com/products/openshift-dev-spaces[Red Hat OpenShift Dev Spaces,window=_blank]: OpenShift ワークスペースとブラウザー内 IDE を提供し、クラウドアプリケーションを迅速に開発できる、Kubernetes ネイティブのコラボレーション開発ソリューションです。
 
-* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: ハイブリッドクラウドインフラストラクチャを自由に選択し、アプリケーションを大規模に構築、モダナイズ、デプロイできるインテグレーションアプリケーション開発プラットフォームです。
+* https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: ハイブリッドクラウドインフラストラクチャを自由に選択し、アプリケーションを大規模に構築、モダナイズ、デプロイできる統合アプリケーション開発プラットフォームです。
 
 * https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Red Hat OpenShift とインテグレーションされ、最適化された、永続的なソフトウェア定義ストレージと不可欠なデータサービスです。
 

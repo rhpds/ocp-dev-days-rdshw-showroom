@@ -92,7 +92,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
 +
 [.copypaste.value]
 ****
-こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
+Hi, I need some help with a policy application I submitted recently.
 ****
 +
 {blank}
@@ -103,7 +103,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
 +
 [.copypaste.value]
 ****
-もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
+Of course! Could you share your policy reference so we can look into it?
 ****
 
 {empty} +
@@ -192,7 +192,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
               4:10
             </div>
             <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
-              こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
+              Hi, I need some help with a policy application I submitted recently.
             </div>
           </div>
           <div style="background-color: #eee; display: flex; align-items: baseline; padding: 5px 0px;">
@@ -200,7 +200,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
               4:11
             </div>
             <div style="margin-left: 12px; font-size: 15px; color: #333; line-height: 1.2;">
-              <span style="font-weight:700">{user-username}@rocketchat:</span> もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
+              <span style="font-weight:700">{user-username}@rocketchat:</span> Of course! Could you share your policy reference so we can look into it?
             </div>
           </div>
         </div>
@@ -235,7 +235,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
                 <span style="font-size: 11px; color: #aaa;">4:10 PM</span>
               </div>
               <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
-                <span style="font-weight:700">{user-username}@matrix:</span> こんにちは。最近提出した保険契約の申請について、少し助けていただきたいです。
+                <span style="font-weight:700">{user-username}@matrix:</span> Hi, I need some help with a policy application I submitted recently.
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ image::module-03/m3/openshift-topology-running.png[width=60%]
                 <span style="font-size: 11px; color: #aaa;">4:11 PM</span>
               </div>
               <div style="font-size: 14px; color: #333; line-height: 1.4; margin: 0; padding: 0;">
-                もちろんです。確認しますので、保険契約の参照番号を教えていただけますか？
+                Of course! Could you share your policy reference so we can look into it?
               </div>
             </div>
           </div>
