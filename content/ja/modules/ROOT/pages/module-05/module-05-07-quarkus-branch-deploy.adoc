@@ -20,13 +20,14 @@ image::module-05-mta-dls/05-07-dls-01.jpg[Dev Spaces で新しいターミナル
 
 . `parasol-insurance-eap` プロジェクトのルートにいることを確認します。
 
-. 移行済みのブランチを fetch してチェックアウトします。
+. 移行済みのブランチを fetch してチェックアウトします。 `git reset --hard` は追跡対象ファイルのローカル変更を破棄します。 `git clean -df` は、以前のラボ作業で残った未追跡のファイルやディレクトリー（生成された成果物や Developer Lightspeed が作成したファイルなど）を削除し、ブランチ切り替え後に残らないようにします。
 +
 [.console-input]
 [source,bash]
 ----
 git fetch origin
 git reset --hard
+git clean -df
 git checkout quarkus
 git pull origin quarkus
 ----
@@ -143,10 +144,10 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol の Quarkus inbox,link=self,wi
 
 `quarkus` ブランチから、`openshift/` 配下のマニフェストとクラスター側のバイナリー Docker ビルドを使ってデプロイします。以下の手順では、`oc` にログイン済みで、{user}-ai-mta 名前空間が選択済みであること（`oc project`）を前提とします。
 
-OpenShift へのデプロイを開始するため、まずプロジェクトの名前空間 {user}-ai-mta に移動します。
+OpenShift へのデプロイを開始するため、まずプロジェクトの名前空間 `{user}-ai-mta` に切り替えます。
 
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes",role="copypaste"]
 ----
 oc project {user}-ai-mta
 ----
@@ -209,9 +210,9 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 . アプリケーションをデプロイします（イメージの名前空間は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
 +
 [.console-input]
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sed "s|REPLACE_NAMESPACE|${NS}|g" openshift/deployment.yaml | oc apply -f -
+sed "s|REPLACE_NAMESPACE|{user}-ai-mta|g" openshift/deployment.yaml | oc apply -f -
 oc apply -f openshift/service.yaml
 oc apply -f openshift/route.yaml
 oc rollout status deployment/parasol-insurance
@@ -231,8 +232,8 @@ echo "https://${ROUTE}/"
 [.console-input]
 [source,bash]
 ----
-curl -sk "https://${ROUTE}/api/claims"
-curl -sk "https://${ROUTE}/api/inbox"
+curl -sk "https://${ROUTE}/api/claims" | jq .
+curl -sk "https://${ROUTE}/api/inbox" | jq .
 ----
 
 . OpenShift コンソールで、プロジェクトの **Topology** （または **Workloads → Deployments**）を開き、アプリケーションが動作していることを確認します。

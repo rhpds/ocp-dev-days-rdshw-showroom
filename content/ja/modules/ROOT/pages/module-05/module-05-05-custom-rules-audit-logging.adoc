@@ -42,7 +42,7 @@ JAR と POM は `lib/repository/` にあります。アプリケーションで�
 
 == 演習 1: カスタムルールを確認する
 
-xref:module-05/module-05-logging.adoc[logging.yaml] を開き、Dev Spaces 内の `parasol-insurance-eap/rules/logging.yaml` にコンテンツを **ダウンロード** または **コピー** します (`rules/` ディレクトリーがまだない場合は作成してください)。
+xref:module-05/module-05-logging.adoc[logging.yaml] を開き、ファイルをローカルドライブに **ダウンロード** します。
 
 `logging.yaml` の各 `ruleID`、`when:` 条件、および `message:` をざっと確認します。これらが Analysis パネルに表示される分析結果です。このファイルには **5 つ** のルール (`audit-logging-0001` … `audit-logging-0005`) が定義されています。
 
@@ -89,7 +89,7 @@ image::module-05-mta-dls/05-05-dls-01.jpg[Get Ready to Analyze から Profile Ma
 
 . **Profile Settings** で、このワークショップに合った移行ターゲットを設定します (Quarkus / `quarkus-profile` で使用するものと同じターゲットファミリー)。このリポジトリーのカスタムルールは、Quarkus 3 形式のターゲット向けです。
 
-. **Custom Rules** の下にある **Upload Custom Rules...** をクリックし、ローカルに保存した xref:module-05/module-05-logging.adoc[`logging.yaml`] ファイルをアップロードします (または、`logging.yaml` を含むプロジェクトの `rules/` ディレクトリーをプロファイルに指定します)。
+. **Custom Rules** の下にある **Upload Custom Rules...** をクリックし、先ほどダウンロードした xref:module-05/module-05-logging.adoc[`logging.yaml`] ファイルをアップロードします。
 +
 image::module-05-mta-dls/05-05-dls-02.jpg[Profile Settings で Custom Rules をアップロード,link=self,window=blank,title="Custom Rules"]
 

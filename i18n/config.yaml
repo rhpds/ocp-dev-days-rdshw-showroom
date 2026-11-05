@@ -20,7 +20,6 @@ target_languages:
 # SVG icons, HTML figure templates. They are copied verbatim from en/.
 skip_patterns:
   - "partials/**"
-  - "pages/module-*/_shared/**"
   - "pages/module-*/_figures/**"
   - "pages/module-*/m*/_figures/**"
 # Technical terms to preserve in English across all translations.

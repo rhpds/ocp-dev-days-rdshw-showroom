@@ -1,0 +1,65 @@
+= Translation automation
+
+`scripts/translate.sh --lang <code>` translates new or changed English AsciiDoc files using OpenCode.
+Commit-history changes alone do not make a translation stale when its English source content is unchanged.
+Use `--dry-run` to preview the work without calling the model or changing files.
+Use `--file <path>` to limit translation and guide review to one file, relative to `modules/ROOT/`.
+
+== Shared content
+
+Shared prose in `pages/module-*/_shared/` is translatable content, including the Kaoto introduction and instructions for closing tabs.
+Existing translations are preserved until their English source changes or an explicit guide review is requested.
+Technical partials and figure templates remain excluded through `skip_patterns` in `i18n/config.yaml` and are copied from English during the sync phase.
+Do not add directories containing translated prose to that list: matching files are overwritten with English copies.
+
+== Language guides
+
+An optional `content/<code>/translation-guide.yml` is included in every translation prompt.
+It contains language-specific rules, terminology, exceptions, and editorial context.
+Specific exceptions override general rules, and language-specific terminology overrides generic terminology advice.
+Executable code, resource identifiers, and AsciiDoc structure must still be preserved.
+Open questions are context, not additional requirements.
+Languages without a guide continue to use the generic rules.
+
+Successful full translations and whole-page guide reviews record a content fingerprint in each file's `guide_hash` field in `i18n/translation-status.json`.
+This fingerprint identifies the guide contents, not a manually maintained version number.
+`none` means no guide was present; a missing or empty value means the guide revision is unknown.
+Existing status entries do not need a bulk migration.
+The initial Japanese guide baseline was accepted from the native-reviewed content merged in PR #51 (`433ef3a`), which includes the guide-aligned corrections from PR #48.
+That baseline records the guide fingerprint without advancing existing English-source baselines; pending source updates remain pending.
+
+If the guide is added, changed, or removed, the script lists affected existing translations as `[GUIDE REVIEW]`.
+Legacy entries with an unknown revision are also flagged when a guide exists.
+Guide-only changes do not automatically rewrite pages.
+An incremental English-source update applies the current guide to the changed sections but retains any outstanding whole-page guide review.
+
+Preview the affected pages:
+
+[source,bash]
+----
+./scripts/translate.sh --lang ja --dry-run
+----
+
+Explicitly apply the guide to one existing translation:
+
+[source,bash]
+----
+./scripts/translate.sh --lang ja --review-guide --file pages/index.adoc
+----
+
+Omit `--file` to review all flagged translations.
+Guide review asks the model to preserve human-reviewed wording and make only necessary guide and source corrections.
+Review the resulting diff before merging.
+The GitHub translation workflow exposes the same option as its `review_guide` input.
+`scripts/add-language.sh` delegates initial translation to `translate.sh`, so it uses the same guide handling.
+
+== Offline checks
+
+The integration tests require Python 3, Bash, Git, jq, and yq (Mike Farah v4).
+They run against temporary repositories with a fake OpenCode executable; no model requests are made.
+
+[source,bash]
+----
+python3 -m unittest discover -s scripts/tests -v
+bash -n scripts/translate.sh
+----

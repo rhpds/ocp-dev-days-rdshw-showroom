@@ -62,7 +62,7 @@ GitLab プロジェクトの **parasol-insurance-eap** リポジトリーが Dev
 ワークスペースは新しいブラウザータブで開きます。
 +
 * 発行元またはワークスペースを信頼するよう求められたら、信頼を確認します。（図 3）
-* 初期レイアウトのパネルが表示されたら、ラボ後半で見やすくなるよう **Light** テーマを選択し、 **Mark Done** をクリックします。初期レイアウトのパネルが閉じます。続いて、下の画像の Step 2 に示すように、画面左側の拡張機能アイコンをクリックして、インストール済み拡張機能のパネルを開きます。（図 4）
+* 初期レイアウトのパネルが表示されたら、 **Mark Done** を押します。これにより初期レイアウトのパネルが閉じます。続いて、下の画像の Step 2 に示すように、画面左側の拡張機能アイコンをクリックして、インストール済み拡張機能のパネルを開きます。（図 4）
 +
 image::module-05-mta-dls/05-03-dls-05.png[VS Code のタブ,link=self,window=blank,title="Manage profiles"]
 +
@@ -96,7 +96,7 @@ image::module-05-mta-dls/05-03-dls-07.png[VS Code のタブ,link=self,window=bla
 上記の詳細が正しいことを確認して、このタブを閉じます。
 
 
-上のスクリーンショットで、 **Open Analysis** の横にあるコントロールをクリックし、以下の手順に従ってください。
+上のスクリーンショットで、 **Open Analysis** の横にあるコントロールボタンをクリックし、以下の手順に従ってください。
 次の画像に示すように、MTA パネルから GenAI provider の設定を開きます。
 
 - *1* 設定 `⚙︎` アイコンをクリックします。
@@ -132,7 +132,16 @@ active: *active
 - `baseURL` : chat completions API 経由のリクエストを model が受け付ける URL/route です。
 - `active` : 最後に、このプロファイルが有効であることを確認します。MTA では複数の LLM を設定できますが、一度に有効にできる LLM は 1 つだけです。
 
-image::module-05-mta-dls/05-03-dls-09.png[VS Code のタブ,link=self,window=blank,title="VSCode Tab"]
+編集した場合は `provider-settings.yaml` ファイルを保存し（`Ctrl+S` / `Cmd+S` ）、 **MTA Analysis View** タブに戻ります。
+
+GenAI の設定が完了し、 `quarkus-profile` が選択された状態で、分析サーバーを起動し、最初の分析を実行します。下の画像に両方の手順が示されています。
+
+- *1* MTA Analysis View の右上にある電源アイコンの **Start** をクリックします。 **Server Status** が赤い **Stopped** バッジから緑の **Running** バッジに変わるまで待ちます。サーバーが停止している間は、 **Run Analysis** は無効のままです。
+- *2* サーバーが **Running** になったら、 `quarkus-profile` ドロップダウンの横にある **Run Analysis** をクリックします。
+
+image::module-05-mta-dls/05-03-dls-09.png[MTA サーバーを起動して分析を実行する,link=self,window=blank,title="Start MTA server and run analysis"]
+
+NOTE: 最初の分析には 1〜2 分かかることがあります。完了すると、MTA Analysis View に `parasol-insurance-eap` の移行に関する問題が一覧表示されます。次のセクションでこれらの結果を確認します。
 
 == 確認
 
@@ -142,7 +151,8 @@ Dev Spaces 環境と MTA extension（Developer Lightspeed を含む）が正し�
 * MTA extension アイコンを選択し、MTA Analysis View タブをアクティブにします:
 * 画面右側にある歯車アイコンをクリックします
 * **Get Ready to Analyze** ペインが画面右側に開きます
-* 4 つすべてのメッセージボックスに緑色のチェックマークが表示され、それぞれが完了済みとして表示されていることを確認します
+* 4 つのメッセージボックスに緑色のチェックマークが表示され、それぞれが完了済みとして表示されていることを確認します。 `Hub Configuration` は "Not Configured" のまま黄色で表示されます。
+* 最後に、分析が実行され、複数の項目が表示されていることを確認します（次のセクションで詳しく確認します）。
 
 . Dev Spaces のワークスペースが正しいリポジトリーを参照していることを確認します
 * Dev Spaces 環境の左側にあるファイルアイコンをクリックします

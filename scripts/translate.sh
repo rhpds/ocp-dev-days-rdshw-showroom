@@ -13,6 +13,7 @@ SPECIFIC_FILE=""
 DRY_RUN=false
 CLEAN_ORPHANS=false
 FORCE=false
+REVIEW_GUIDE=false
 
 usage() {
   cat <<EOF
@@ -26,6 +27,7 @@ Options:
   --file <path>        Translate only this file (relative to modules/ROOT/)
   --dry-run            Show what would be translated without calling the API
   --clean-orphans      Remove translated files whose English source no longer exists
+  --review-guide       Apply changed guide rules to existing translations
   --force              Force re-translation of all files, ignoring staleness status
   -h, --help           Show this help
 EOF
@@ -42,6 +44,7 @@ while [[ $# -gt 0 ]]; do
     --dry-run)     DRY_RUN=true; shift ;;
     --clean-orphans) CLEAN_ORPHANS=true; shift ;;
     --force)       FORCE=true; shift ;;
+    --review-guide) REVIEW_GUIDE=true; shift ;;
     -h|--help)     usage ;;
     *)             echo "Unknown option: $1" >&2; exit 1 ;;
   esac
@@ -87,14 +90,37 @@ done < <(yq -r '.skip_patterns[]' "$CONFIG_FILE")
 PRESERVE_TERMS=$(yq -r '.preserve_terms | join(", ")' "$CONFIG_FILE")
 
 LANG_ROOT="$REPO_ROOT/content/$LANG/modules/ROOT"
+GUIDE_FILE="$REPO_ROOT/content/$LANG/translation-guide.yml"
+GUIDE_HASH="none"
+GUIDE_RULES=""
+if [[ -f "$GUIDE_FILE" ]]; then
+  yq '.' "$GUIDE_FILE" >/dev/null
+  GUIDE_HASH=$(git hash-object "$GUIDE_FILE")
+  GUIDE_RULES="Language-specific translation guide (content/$LANG/translation-guide.yml):
+$(cat "$GUIDE_FILE")
+Follow its rules, glossary, and applicable exceptions. Specific exceptions take precedence over general rules; language-specific terminology takes precedence over generic terminology advice. Preserve executable code, resource identifiers, and AsciiDoc structure. Open questions are informational, not new requirements."
+fi
+
+# Relative paths in prompts must resolve consistently, including when invoked elsewhere.
+cd "$REPO_ROOT"
 
 # ── init status file ─────────────────────────────────────────────────────────
 
-if [[ ! -f "$STATUS_FILE" ]]; then
-  echo "{}" > "$STATUS_FILE"
+# Use an isolated status copy during dry runs, including first-run bootstrapping.
+if [[ "$DRY_RUN" == true ]]; then
+  STATUS_SNAPSHOT=$(mktemp)
+  if [[ -f "$STATUS_FILE" ]]; then
+    cp "$STATUS_FILE" "$STATUS_SNAPSHOT"
+  else
+    echo '{}' > "$STATUS_SNAPSHOT"
+  fi
+  STATUS_FILE="$STATUS_SNAPSHOT"
+  trap 'rm -f "$STATUS_SNAPSHOT" "$STATUS_SNAPSHOT.tmp"' EXIT
 fi
-
-if ! jq -e ".[\"$LANG\"]" "$STATUS_FILE" &>/dev/null; then
+if [[ ! -f "$STATUS_FILE" ]]; then
+  echo '{}' > "$STATUS_FILE"
+fi
+if ! jq -e --arg lang "$LANG" '.[$lang]' "$STATUS_FILE" &>/dev/null; then
   jq --arg lang "$LANG" '.[$lang] = {}' "$STATUS_FILE" > "$STATUS_FILE.tmp"
   mv "$STATUS_FILE.tmp" "$STATUS_FILE"
 fi
@@ -125,10 +151,22 @@ get_stored_commit() {
     '.[$lang][$path].source_commit // ""' "$STATUS_FILE"
 }
 
+source_has_changed() {
+  local source_path="$1"
+  local stored_commit="$2"
+  local previous_blob current_blob
+  # Merges, cherry-picks, and reverts can change the last commit without changing
+  # the source text. Compare content before scheduling a model call.
+  previous_blob=$(git -C "$REPO_ROOT" rev-parse --verify "$stored_commit:$source_path" 2>/dev/null) || return 0
+  current_blob=$(git -C "$REPO_ROOT" hash-object "$REPO_ROOT/$source_path")
+  [[ "$previous_blob" != "$current_blob" ]]
+}
+
 update_status() {
   local rel_path="$1"
   local source_commit="$2"
   local model_used="$3"
+  local guide_hash="${4-$GUIDE_HASH}"
   local now
   now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -137,7 +175,8 @@ update_status() {
      --arg commit "$source_commit" \
      --arg time "$now" \
      --arg model "$model_used" \
-     '.[$lang][$path] = {source_commit: $commit, translated_at: $time, model: $model}' \
+     --arg guide "$guide_hash" \
+     '.[$lang][$path] = {source_commit: $commit, translated_at: $time, model: $model, guide_hash: $guide}' \
      "$STATUS_FILE" > "$STATUS_FILE.tmp"
   mv "$STATUS_FILE.tmp" "$STATUS_FILE"
 }
@@ -160,6 +199,16 @@ translation_rules() {
 - IMPORTANT: Always keep a space before and after inline formatting marks (backticks, asterisks, underscores). AsciiDoc requires word boundaries around inline markup. For example: 'テキスト \`code\` テキスト' not 'テキスト\`code\`テキスト'
 - Do not add any commentary, explanations, or markdown fences — just write the translated .adoc file
 RULES
+  if [[ -n "$GUIDE_RULES" ]]; then
+    printf '\n%s\n' "$GUIDE_RULES"
+  fi
+}
+
+guide_needs_review() {
+  local stored
+  stored=$(jq -r --arg lang "$LANG" --arg path "$1" \
+    '.[$lang][$path].guide_hash // ""' "$STATUS_FILE")
+  [[ "$stored" != "$GUIDE_HASH" && ( -n "$stored" || "$GUIDE_HASH" != "none" ) ]]
 }
 
 # ── build file manifest ──────────────────────────────────────────────────────
@@ -182,16 +231,6 @@ while IFS= read -r -d '' file; do
   TRANSLATABLE_FILES+=("$rel_path")
 done < <(find "$EN_ROOT" -name '*.adoc' -type f -print0 | sort -z)
 
-# Also include nav.adoc
-NAV_REL="nav.adoc"
-if [[ -f "$EN_ROOT/$NAV_REL" ]]; then
-  if ! should_skip "$NAV_REL"; then
-    if [[ -z "$SPECIFIC_FILE" || "$SPECIFIC_FILE" == "$NAV_REL" ]]; then
-      TRANSLATABLE_FILES+=("$NAV_REL")
-    fi
-  fi
-fi
-
 echo "    Found ${#TRANSLATABLE_FILES[@]} translatable files"
 
 # ── classify files ───────────────────────────────────────────────────────────
@@ -199,6 +238,8 @@ echo "    Found ${#TRANSLATABLE_FILES[@]} translatable files"
 declare -a NEW_FILES=()
 declare -a STALE_FILES=()
 declare -a CURRENT_FILES=()
+declare -a GUIDE_REVIEW_FILES=()
+declare -a GUIDE_UPDATE_FILES=()
 
 for rel_path in "${TRANSLATABLE_FILES[@]}"; do
   en_file="$EN_ROOT/$rel_path"
@@ -208,20 +249,29 @@ for rel_path in "${TRANSLATABLE_FILES[@]}"; do
 
   if [[ "$FORCE" == true ]]; then
     NEW_FILES+=("$rel_path")
-  elif [[ -z "$stored_commit" ]]; then
+  elif [[ ! -f "$target_file" || -z "$stored_commit" ]]; then
     # No status entry — check if the file is already translated
-    if [[ -f "$target_file" ]] && ! files_are_identical "$en_file" "$target_file"; then
+    if [[ -f "$target_file" && -z "$stored_commit" ]] && ! files_are_identical "$en_file" "$target_file"; then
       # Already translated, bootstrap the status entry
       echo "    Bootstrapping status for already-translated: $rel_path"
-      update_status "$rel_path" "$source_commit" "manual"
-      CURRENT_FILES+=("$rel_path")
+      update_status "$rel_path" "$source_commit" "manual" ""
+      if [[ "$REVIEW_GUIDE" == true ]] && guide_needs_review "$rel_path"; then
+        GUIDE_UPDATE_FILES+=("$rel_path")
+      else
+        CURRENT_FILES+=("$rel_path")
+      fi
     else
       NEW_FILES+=("$rel_path")
     fi
-  elif [[ "$stored_commit" != "$source_commit" ]]; then
+  elif [[ "$stored_commit" != "$source_commit" ]] && source_has_changed "content/en/modules/ROOT/$rel_path" "$stored_commit"; then
     STALE_FILES+=("$rel_path")
+  elif [[ "$REVIEW_GUIDE" == true ]] && guide_needs_review "$rel_path"; then
+    GUIDE_UPDATE_FILES+=("$rel_path")
   else
     CURRENT_FILES+=("$rel_path")
+  fi
+  if [[ -f "$target_file" ]] && guide_needs_review "$rel_path"; then
+    GUIDE_REVIEW_FILES+=("$rel_path")
   fi
 done
 
@@ -256,12 +306,20 @@ echo ""
 echo "==> Translation summary for '$LANG' ($LANG_NAME):"
 echo "    New (untranslated): ${#NEW_FILES[@]}"
 echo "    Stale (needs update): ${#STALE_FILES[@]}"
-echo "    Current (up to date): ${#CURRENT_FILES[@]}"
+echo "    Current (source up to date): $((${#CURRENT_FILES[@]} + ${#GUIDE_UPDATE_FILES[@]}))"
 echo "    Orphaned: $ORPHAN_COUNT"
+echo "    Guide review needed: ${#GUIDE_REVIEW_FILES[@]}"
+echo "    Guide-only updates selected: ${#GUIDE_UPDATE_FILES[@]}"
+if [[ ${#GUIDE_REVIEW_FILES[@]} -gt 0 ]]; then
+  for f in "${GUIDE_REVIEW_FILES[@]}"; do echo "    [GUIDE REVIEW] $f"; done
+  if [[ "$REVIEW_GUIDE" == false ]]; then
+    echo "    Guide-only changes are not applied automatically. Use --review-guide to apply them."
+  fi
+fi
 echo ""
 
-if [[ ${#NEW_FILES[@]} -eq 0 && ${#STALE_FILES[@]} -eq 0 ]]; then
-  echo "==> All translations are up to date."
+if [[ ${#NEW_FILES[@]} -eq 0 && ${#STALE_FILES[@]} -eq 0 && ${#GUIDE_UPDATE_FILES[@]} -eq 0 ]]; then
+  echo "==> No source translations need updating (see any guide review flags above)."
   exit 0
 fi
 
@@ -272,6 +330,9 @@ if [[ "$DRY_RUN" == true ]]; then
   fi
   if [[ ${#STALE_FILES[@]} -gt 0 ]]; then
     for f in "${STALE_FILES[@]}"; do echo "    [STALE] $f"; done
+  fi
+  if [[ ${#GUIDE_UPDATE_FILES[@]} -gt 0 ]]; then
+    for f in "${GUIDE_UPDATE_FILES[@]}"; do echo "    [GUIDE UPDATE] $f"; done
   fi
   exit 0
 fi
@@ -315,18 +376,34 @@ done
 
 # ── translate stale files ────────────────────────────────────────────────────
 
-for rel_path in "${STALE_FILES[@]+"${STALE_FILES[@]}"}"; do
+for rel_path in "${STALE_FILES[@]+"${STALE_FILES[@]}"}" "${GUIDE_UPDATE_FILES[@]+"${GUIDE_UPDATE_FILES[@]}"}"; do
   en_file="content/en/modules/ROOT/$rel_path"
   target_file="content/$LANG/modules/ROOT/$rel_path"
   source_commit=$(get_source_commit "$en_file")
   stored_commit=$(get_stored_commit "$rel_path")
 
-  echo "--- Translating (stale): $rel_path"
+  echo "--- Updating translation: $rel_path"
+
+  # Incremental source updates do not imply that the whole page follows a new guide.
+  applied_guide_hash=$(jq -r --arg lang "$LANG" --arg path "$rel_path" \
+    '.[$lang][$path].guide_hash // ""' "$STATUS_FILE")
+  DIFF_FILE=""
 
   # Get the diff since last translation
   DIFF=$(git -C "$REPO_ROOT" diff "$stored_commit" HEAD -- "$en_file" 2>/dev/null || echo "")
 
-  if [[ -z "$DIFF" ]]; then
+  if [[ "$REVIEW_GUIDE" == true ]] && guide_needs_review "$rel_path"; then
+    applied_guide_hash="$GUIDE_HASH"
+    PROMPT="Read the English source $en_file and existing translation $target_file.
+Review the entire existing translation against the current translation guide and English source.
+Preserve human-reviewed wording wherever it already complies. Apply source changes and only the guide corrections needed; do not rewrite the whole page unnecessarily.
+Write the updated translation to $target_file.
+If no guide is present, use the generic rules below to review the existing translation.
+
+Rules:
+$(translation_rules)"
+  elif [[ -z "$DIFF" ]]; then
+    applied_guide_hash="$GUIDE_HASH"
     # Can't get diff (commit may have been rebased away), fall back to full translation
     echo "    Warning: could not compute diff, doing full translation"
     PROMPT="Read the file $en_file and translate all of its content to $LANG_NAME ($LANG_NATIVE).
@@ -355,7 +432,7 @@ $(translation_rules)"
   fi
 
   if opencode run --model "$MODEL" "$PROMPT"; then
-    update_status "$rel_path" "$source_commit" "$MODEL"
+    update_status "$rel_path" "$source_commit" "$MODEL" "$applied_guide_hash"
     echo "    Done: $rel_path"
   else
     echo "    ERROR: Translation failed for $rel_path" >&2
@@ -371,7 +448,7 @@ done
 
 echo "==> Syncing technical files and images..."
 
-# Sync skip-pattern files (partials, figures, shared)
+# Sync technical skip-pattern files (partials and figures); shared prose is translated.
 for pattern in "${SKIP_PATTERNS[@]}"; do
   while IFS= read -r -d '' file; do
     rel_path="${file#"$EN_ROOT/"}"
