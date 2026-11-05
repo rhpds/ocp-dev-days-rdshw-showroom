@@ -36,7 +36,7 @@ flowchart LR
     INTLabel <--> |"③ 推論"| MaaSLabel
     INTLabel --> |"④ ツール呼び出し\n(MCP)"| ToolsInner
 
-    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>エージェント統合\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI 推論<br>• ツール呼び出し<br>• 統合</div></div>\n]
+    INTLabel[⚙️ <span style='font-weight:bold;font-size:1.2em;color: #EE0000'>エージェントインテグレーション\n</span><p style='margin-top:5px'/><div style='border: solid 1px red; padding: 10px;background-color: #fce4e4'><div style='padding: 5px 0px 5px 25px;text-align:left;color: black;'>• AI 推論<br>• ツール呼び出し<br>• インテグレーション</div></div>\n]
 
     subgraph ToolsLabel ["MCP とバックエンドシステム&nbsp;&nbsp;"]
         subgraph ToolsInner [" "]
@@ -82,7 +82,7 @@ AI エージェントは推論ループに従います。MaaS を介して LLM �
 
 . *環境をセットアップする* — 作業フォルダーを準備し、AI エージェントを設定します。
 . *エージェントを開発する* — 基本ルートから、ツールを備えた完全な構成まで、AI エージェントを段階的に有効化します。
-. *フローを完成させる* — Rocket.Chat、AI エージェント、データベース、S3 ストレージを結ぶ統合を仕上げます。
+. *フローを完成させる* — Rocket.Chat、AI エージェント、データベース、S3 ストレージを結ぶインテグレーションを仕上げます。
 . *フローをテストする* — お客様/担当者のやり取りをシミュレーションし、結果を検証します。
 
 {empty} +

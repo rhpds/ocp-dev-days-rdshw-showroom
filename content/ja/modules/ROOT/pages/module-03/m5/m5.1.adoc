@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab5"]
-== Lab の作業フォルダーをセットアップする
+== ラボの作業フォルダーをセットアップする
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -31,7 +31,7 @@ include::../_shared/close-tabs.adoc[]
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
         end
     end
 
@@ -66,7 +66,7 @@ si-setup
 すべてのリソースで `ready OK` と表示されるはずです。
 
 [subs="attributes"]
-+++
+++++
 <pre style="background-color: #181818; padding: 10px 15px; line-height: 1.4; white-space: pre-wrap; font-family: monospace; font-size: 14px; color: #CBCBCB">Namespace: {username}-devspaces
     <span style="color: #07BC7A">✓</span> Site                    ready  OK
     <span style="color: #07BC7A">✓</span> AccessGrant             ready  OK
@@ -75,9 +75,9 @@ si-setup
 Namespace: shared-database
     <span style="color: #07BC7A">✓</span> AccessToken             ready  OK
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
-+++
+++++
 
-上記の出力は、自分の namespace とデータベースの namespace の間に Service Interconnect の link が確立されたことを示しています。
+上記の出力は、自分の名前空間とデータベースの名前空間の間に Service Interconnect の link が確立されたことを示しています。
 
 {blank}
 
@@ -88,7 +88,7 @@ Namespace: shared-database
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
 
             SI1{{"Service\nInterconnect"}}
         end
@@ -142,19 +142,19 @@ step 9
 .演習をリセットするには、上記のコマンドをいつでも実行できます。
 [%collapsible]
 ====
-この workshop には便利な helper script が含まれており、任意の step に移動したり、lab を既知の正常な状態にリセットしたりできます。
+このワークショップには便利なヘルパースクリプトが含まれており、任意のステップに移動したり、ラボを既知の正常な状態にリセットしたりできます。
 
-* `step N` — lab を step N の最初にリセットします
-* `steps` — lab で利用可能なすべての step を一覧表示します
+* `step N` — ラボをステップ N の最初にリセットします
+* `steps` — ラボで利用可能なすべてのステップを一覧表示します
 * `start` または `restart` — 最初から開始します (`step 1` と同じ)
-* `ff` — *次の* step に進みます
-* `rw` — *前の* step に戻ります
+* `ff` — *次の* ステップに進みます
+* `rw` — *前の* ステップに戻ります
 ====
 --
 +
 {empty} +
 
-. lab フォルダーを確認する
+. ラボフォルダーを確認する
 +
 上記のコマンドを実行したら、エディターのツリービューを見て、問題がないことを確認してください。前の演習で見たフォルダー構成と同じような構成になっているはずです。
 +

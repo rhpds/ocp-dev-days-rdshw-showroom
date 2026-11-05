@@ -5,7 +5,7 @@ include::partial$style.adoc[]
 [id="workshop-journey"]
 == ワークショップの流れ
 
-あなたは Parasol Insurance の統合開発者として、ワークショップのラボを通じて、保険契約の申込を取り込む統合を構築し、カスタマーサポートのためにメッセージングシステムを連携させ、エージェントが問題を解決できるよう AI を組み込み、さらにガバナンスを追加します。これらすべてを、アプリケーション統合および接続ツールを使って実現します。
+あなたは Parasol Insurance のインテグレーション開発者として、ワークショップのラボを通じて、保険契約の申込を取り込むインテグレーションを構築し、カスタマーサポートのためにメッセージングシステムを連携させ、エージェントが問題を解決できるよう AI を組み込み、さらにガバナンスを追加します。これらすべてを、アプリケーションインテグレーションおよび接続ツールを使って実現します。
 
 [TIP]
 --
@@ -45,9 +45,9 @@ image::module-03/intro/showroom-expand-options.png[width=50%]
 
 === アプリケーション接続と AI の融合
 
-これまで、統合と AI は別々の課題でした。一方にはデータフローがあり、もう一方には AI モデルがありました。それが変わりつつあります。このワークショップでは、両者を単一のプラットフォーム上で組み合わせます。
+これまで、インテグレーションと AI は別々の課題でした。一方にはデータフローがあり、もう一方には AI モデルがありました。それが変わりつつあります。このワークショップでは、両者を単一のプラットフォーム上で組み合わせます。
 
-統合エンジンは、システム間のデータ移動、変換の適用、複数ステップのプロセスのオーケストレーションなど、データフローを処理します。接続レイヤーは、クラスターの外部にあるデータベースへのセキュアなアクセスを提供します。イベントブローカーは、メッセージングプラットフォームを疎結合にして、イベント駆動型アーキテクチャを実現します。AI サービスは、大規模言語モデルをエージェント型統合フローで利用できるようにします。また、ゲートウェイは LLM の前段に配置され、認証を強制し、トークン消費をレート制限します。
+インテグレーションエンジンは、システム間のデータ移動、変換の適用、複数ステップのプロセスのオーケストレーションなど、データフローを処理します。接続レイヤーは、クラスターの外部にあるデータベースへのセキュアなアクセスを提供します。イベントブローカーは、メッセージングプラットフォームを疎結合にして、イベント駆動型アーキテクチャを実現します。AI サービスは、大規模言語モデルをエージェント型インテグレーションフローで利用できるようにします。また、ゲートウェイは LLM の前段に配置され、認証を強制し、トークン消費をレート制限します。
 
 ラボを進めながら、これらすべてを実際に扱います。
 
@@ -100,7 +100,7 @@ A | ① セキュアなデータ取り込み | 顧客ポータルは保険契約
 B | ② マルチチャネルコミュニケーション | 顧客が契約書を確認して誤りに気づきます。サポートに連絡しますが、顧客とサポートチームは異なるメッセージングプラットフォームを使用しています。 +
 両方を接続し、一方のプラットフォームのメッセージがもう一方にも表示されるようにします。担当者は顧客がどのプラットフォームを使っているかを気にせず、自分のポータルから返信できます。 +
 C | ③ AI 支援による問題解決 | サポート担当者は、契約内容を調べ、データベースで修正し、契約書を再生成する必要があります。手作業で行う代わりに、担当者はメッセージングポータル内で AI ボットと会話します。 +
-統合レイヤーはリクエストを LLM に送信します。LLM が実行内容（データベースへの問い合わせ、レコードの更新、PDF の再生成）を判断し、結果を返します。すべて自然言語で行われます。 +
+インテグレーションレイヤーはリクエストを LLM に送信します。LLM が実行内容（データベースへの問い合わせ、レコードの更新、PDF の再生成）を判断し、結果を返します。すべて自然言語で行われます。 +
 D | ④ AI 消費のガバナンス | AI をワークフローに組み込んだら、制御が必要です。誰が LLM を呼び出せるのでしょうか。消費できるトークン数はいくつでしょうか。 +
 ゲートウェイを AI サービスの前段に配置し、認証とトークンベースのレート制限を適用します。それぞれ異なるトークン予算を持つ複数のサービス階層を用意します。ある階層の予算がなくなると、システムは次の階層にフォールバックします。
 ****
@@ -142,7 +142,7 @@ flowchart LR
     chatOuter ~~~ SupportAgent
     chatOuter ~~~ Customer
 
-    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel 統合", pos: "b", h: 80, w: 80, constraint: "on" }
+    Camel@{ img: "../../_images/module-03/common/integration-icon.svg", label: "Camel インテグレーション", pos: "b", h: 80, w: 80, constraint: "on" }
     Customer@{ img: "../../_images/module-03/common/customer-icon.svg", label: "顧客", pos: "b", h: 80, w: 80, constraint: "on" }
     Portal@{ img: "../../_images/module-03/common/shop-icon.svg", label: "ポータル", pos: "b", h: 80, w: 80, constraint: "on" }
     Storage@{ img: "../../_images/module-03/common/s3-icon.svg", label: "OpenShift<br>Data Foundation", pos: "b", h: 80, w: 80, constraint: "on" }
@@ -181,11 +181,11 @@ NOTE: 各ラボには、より細かいレベルのアーキテクチャ図が�
 
 === 技術スタック全体
 
-ワークショップを通じて使用する技術スタックを以下に示します。これらを組み合わせることで、アジャイルでスケーラブルな統合ソリューションの可能性を引き出し、コンテナ化されたワークフローのシームレスなオーケストレーション、パイプライン全体にわたる回復力のあるデータ永続化、イベント駆動型マイクロサービスの迅速なデプロイを実現します。これにより、複雑さを最小限に抑えながら、ハイブリッドクラウドアーキテクチャをモダナイズできます。
+ワークショップを通じて使用する技術スタックを以下に示します。これらを組み合わせることで、アジャイルでスケーラブルなインテグレーションソリューションの可能性を引き出し、コンテナ化されたワークフローのシームレスなオーケストレーション、パイプライン全体にわたる回復力のあるデータ永続化、イベント駆動型マイクロサービスの迅速なデプロイを実現します。これにより、複雑さを最小限に抑えながら、ハイブリッドクラウドアーキテクチャをモダナイズできます。
 
 * https://www.redhat.com/en/products/application-foundations[Red Hat Application Foundations,window=_blank]: アプリケーションの構築、デプロイ、運用を支援するために設計されたコンポーネント群です。以下をはじめとする製品が含まれており、ワークショップで使用します。
 
-** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: アプリケーション統合を効率化する汎用性の高いツールキットです。Quarkus と Spring Boot の両方のランタイムで動作し、多様なシステムを接続する手法を簡素化して標準化します。
+** https://developers.redhat.com/products/red-hat-build-of-apache-camel[Red Hat build of Apache Camel,window=_blank]: アプリケーションインテグレーションを効率化する汎用性の高いツールキットです。Quarkus と Spring Boot の両方のランタイムで動作し、多様なシステムを接続する手法を簡素化して標準化します。
 
 ** https://developers.redhat.com/products/streams-for-apache-kafka[Red Hat Streams for Apache Kafka,window=_blank]: Apache Kafka プロジェクトを基盤とする Streams for Apache Kafka は、マイクロサービスやその他のアプリケーションが極めて高いスループットと極めて低いレイテンシーでデータを共有できる、分散型バックボーンを提供します。
 +
@@ -195,7 +195,7 @@ NOTE: 各ラボには、より細かいレベルのアーキテクチャ図が�
 
 * https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift,window=_blank]: ハイブリッドクラウドインフラストラクチャを自由に選択し、アプリケーションを大規模に構築、モダナイズ、デプロイできる統合アプリケーション開発プラットフォームです。
 
-* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Red Hat OpenShift と統合され、最適化された、永続的なソフトウェア定義ストレージと不可欠なデータサービスです。
+* https://www.redhat.com/en/technologies/cloud-computing/openshift-data-foundation[Red Hat OpenShift Data Foundation,window=_blank]: Red Hat OpenShift とインテグレーションされ、最適化された、永続的なソフトウェア定義ストレージと不可欠なデータサービスです。
 
 * https://www.redhat.com/en/technologies/cloud-computing/connectivity-link[Red Hat Connectivity Link,window=_blank]: ネットワーク境界を越えてアプリケーションを接続する、セキュアでスケーラブルなソリューションです。異なる環境で実行されるサービス間のシームレスな通信を可能にします。
 

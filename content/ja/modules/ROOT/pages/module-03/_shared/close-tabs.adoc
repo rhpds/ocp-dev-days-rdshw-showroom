@@ -1,15 +1,15 @@
 
 [TIP]
 --
-Close tabs to clean your workspace before starting a new exercise.
+新しい演習を始める前に、タブを閉じてワークスペースを整理しましょう。
 
-.How to close all tabs
+.すべてのタブを閉じる方法
 [%collapsible]
 ====
 
-From your workspace in your link:{url-codeready}[Red Hat OpenShift Dev Spaces, window="_blank"] environment, follow the steps below:
+ワークスペースの link:{url-codeready}[Red Hat OpenShift Dev Spaces, window="_blank"] 環境で、以下の手順に従います。
 
-Find the menu in the top right corner of the editor and click as follows:
+エディターの右上隅にあるメニューを探し、次のように操作します。
 
 [.indent2]
 [#close-tabs-img]
@@ -31,8 +31,8 @@ close-tabs-img
 
 {blank}
 
-1. Click the kbd:[...] button +
-1. Select  kbd:[Close All].
+1. kbd:[...] ボタンをクリックします。 +
+1. kbd:[Close All] を選択します。
 ====
 --
 

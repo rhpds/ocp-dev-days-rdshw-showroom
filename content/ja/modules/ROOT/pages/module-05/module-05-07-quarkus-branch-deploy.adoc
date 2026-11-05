@@ -141,9 +141,9 @@ image::module-05-mta-dls/05-07-dls-06.png[Parasol の Quarkus inbox,link=self,wi
 
 == 演習 4: OpenShift にデプロイする
 
-`quarkus` ブランチから、`openshift/` 配下のマニフェストとクラスター側のバイナリー Docker ビルドを使ってデプロイします。以下の手順では、`oc` にログイン済みで、{user}-ai-mta namespace が選択済みであること（`oc project`）を前提とします。
+`quarkus` ブランチから、`openshift/` 配下のマニフェストとクラスター側のバイナリー Docker ビルドを使ってデプロイします。以下の手順では、`oc` にログイン済みで、{user}-ai-mta 名前空間が選択済みであること（`oc project`）を前提とします。
 
-OpenShift へのデプロイを開始するため、まずプロジェクト namespace {user}-ai-mta に移動します。
+OpenShift へのデプロイを開始するため、まずプロジェクトの名前空間 {user}-ai-mta に移動します。
 
 [.console-input]
 [source,bash]
@@ -206,7 +206,7 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 
 === デプロイマニフェストを適用する
 
-. アプリケーションをデプロイします（image namespace は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
+. アプリケーションをデプロイします（イメージの名前空間は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
 +
 [.console-input]
 [source,bash]

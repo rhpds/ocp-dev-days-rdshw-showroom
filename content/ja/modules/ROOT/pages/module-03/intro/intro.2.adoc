@@ -5,11 +5,11 @@ include::partial$style.adoc[]
 [id='dev-environment']
 == 開発環境
 
-以下の手順では、このワークショップを通じてアプリケーションを deploy する開発環境と cluster を紹介します。
+以下の手順では、このワークショップを通じてアプリケーションをデプロイする開発環境と、クラスターを紹介します。
 
 === 概要
 
-オープンソースの Eclipse Che を基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes と container を使用して、開発チームや IT チームのメンバーに一貫性があり、安全で、設定不要の開発環境を提供します。ノート PC 上の統合開発環境と同じくらい、すばやく使い慣れた操作感で利用できます。
+オープンソースの Eclipse Che を基盤とする Red Hat OpenShift Dev Spaces は、Kubernetes とコンテナを使用して、開発チームや IT チームのメンバーに一貫性があり、安全で、設定不要の開発環境を提供します。ノート PC 上のインテグレーション開発環境と同じくらい、すばやく使い慣れた操作感で利用できます。
 
 [.text-center]
 image::module-03/intro/devspaces-ide-developer.png[width=70%]
@@ -22,7 +22,7 @@ OpenShift Dev Spaces は OpenShift サブスクリプションに含まれてお
 
 開発環境にアクセスするには、次の手順を実行します。
 
-. 次のリンクをクリックします:{url-codeready}[Console, window="_blank"] link。 +
+. 次のリンクをクリックします。 link:{url-codeready}[Console, window="_blank"]  +
 （右側の *Resources* パネルにある *Red Hat OpenShift Dev Spaces* からもアクセスできます）。
 +
 {blank}
@@ -51,7 +51,7 @@ image::module-03/intro/devspaces-dashboard-auth.png[width=40%]
 +
 {empty} +
 +
-ログインすると、_Dev Spaces_ dashboard が表示されます。ここには、利用可能な workspace が一覧表示されます。
+ログインすると、_Dev Spaces_ ダッシュボードが表示されます。ここには、利用可能なワークスペースが一覧表示されます。
 +
 [.bordered]
 image::module-03/intro/devspaces-dashboard.png[Dev Spaces dashboard]
@@ -60,9 +60,9 @@ image::module-03/intro/devspaces-dashboard.png[Dev Spaces dashboard]
 
 === Dev Spaces Workspace にアクセスする
 
-このワークショップでは、plugin、ソースコード、およびさまざまな Command-Line Interface (CLI) ツールがインストール済みの container image が含まれる、事前設定済みの workspace を 1 つ使用します。
+このワークショップでは、プラグイン、ソースコード、およびさまざまな Command-Line Interface (CLI) ツールがインストール済みのコンテナイメージが含まれる、事前設定済みのワークスペースを 1 つ使用します。
 
-. `camel-lab` という名前の workspace の *Open* リンクをクリックします。
+. `camel-lab` という名前のワークスペースの *Open* リンクをクリックします。
 +
 [.bordered]
 [#devspaces-dashboard-open]
@@ -84,7 +84,7 @@ devspaces-dashboard-open
 // +
 {empty} +
 +
-workspace の instance が起動します。必要な container image と設定がダウンロードされるまで、しばらくお待ちください。
+ワークスペースのインスタンスが起動します。必要なコンテナイメージと設定がダウンロードされるまで、しばらくお待ちください。
 +
 {empty} +
 
@@ -113,7 +113,7 @@ image::module-03/intro/devspaces-trust-authors.png[Workshop Project を信頼, ,
 .上記の通知を見逃しましたか？
 [%collapsible]
 ====
-その場合は、ブラウザーのタブ（workspace のタブ）を閉じてから、手順 1 を繰り返して開き直すのが最も簡単です。 +
+その場合は、ブラウザーのタブ（ワークスペースのタブ）を閉じてから、手順 1 を繰り返して開き直すのが最も簡単です。 +
 通知が再び表示されます。
 ======
 +
@@ -168,9 +168,9 @@ close-tabs-img
 // {empty} +
 
 
-=== Terminal を開く
+=== ターミナルを開く
 
-_Dev Spaces_ で、以下の手順に従って Terminal を開きます。
+_Dev Spaces_ で、以下の手順に従ってターミナルを開きます。
 
 image::module-03/intro/toggle-terminal.png[width=40%]
 
@@ -186,7 +186,7 @@ image::module-03/intro/copypaste.png[width=60%]
 {blank}
 
 . _Copy to clipboard_ ボタンをクリックします。
-. コマンドを Terminal に貼り付けます。
+. コマンドをターミナルに貼り付けます。
 - Linux の場合: kbd:[Ctrl+Shift+v]
 - Mac の場合: kbd:[⌘+v]
 +
@@ -259,7 +259,7 @@ image::module-03/intro/clipboard-settings.png[width=100%]
 
 [.verification]
 ****
-Terminal が表示され、コピーと貼り付けが機能しましたか？
+ターミナルが表示され、コピーと貼り付けが機能しましたか？
 
 [.success]
 これで作業を始める準備ができました。

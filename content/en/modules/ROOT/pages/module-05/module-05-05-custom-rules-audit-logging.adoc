@@ -99,7 +99,7 @@ IMPORTANT: If you only run `quarkus-profile` without the custom rules path or up
 
 == Exercise 3: Run analysis and inspect custom findings
 
-. Congratulations on completing exercise 3! now it's time to run analysis. Since we are using the same active profile as before `quarkus-profile`. head to the analysis panel again and run the analysis. 
+. Now it's time to run analysis. Since we are using the same active profile as before `quarkus-profile`. head to the analysis panel again and run the analysis. 
 
 . When the Analysis panel populates, filter or search for findings related to **audit** / **`Audit`**. Expand incidents and confirm you can map them back to the rule IDs you read in `logging.yaml`. At minimum you should see a **dependency** finding for `audit-logging-library` **1.0.0** in `pom.xml` (rule `audit-logging-0001`).
 
@@ -133,7 +133,7 @@ NOTE: Read each finding **message** carefully. Notice how the rule text is writt
 
 . The `rules/` directory exists in `parasol-insurance-eap` and contains `logging.yaml` (copied or downloaded from this guide if needed).
 
-. You can explain in your own words what at least three of the five `audit-logging-****` rules detect.
+. You can explain in your own words what at least three of the five `audit-logging-***` rules detect.
 
 . An MTA profile is configured with the custom `rules/` path and has been used to run analysis.
 

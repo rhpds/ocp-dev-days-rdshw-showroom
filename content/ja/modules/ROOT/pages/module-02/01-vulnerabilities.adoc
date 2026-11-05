@@ -9,7 +9,7 @@ include::partial$_attributes.adoc[]
 NOTE: このモジュールでは、Red Hat Developer Hub のすべての機能や、日々の開発者のワークフローをどのように支援するかについては扱いません。開発者エクスペリエンスについては、xref:module-01/00-intro.adoc[モジュール 1: 開発者エクスペリエンス] を参照してください。ここでは、開発プロセスに追加されたセキュリティガードレールに焦点を当てます。
 
 [#section-1]
-== セクション 1: コンポーネントを理解する
+== セクション 1: セキュリティ保護されたコンポーネントを理解する
 
 === 演習 1: Developer Hub でアプリケーションコンポーネントを確認する
 
@@ -275,4 +275,4 @@ image::m02-rhda-tpa-link.png[RHDA レポートから TPA を開く Take me there
 
 == 次のステップ
 
-xref:module-02/02-commit-signing.adoc[コミットへの署名] に進み、脆弱性の修正をコミットして、自分のアイデンティティで署名します。
+xref:module-02/02-commit-signing.adoc[コミットに署名する] に進み、脆弱性の修正をコミットして、自分のアイデンティティで署名します。

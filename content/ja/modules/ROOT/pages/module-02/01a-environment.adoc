@@ -38,23 +38,23 @@ NOTE: URL と認証情報は、このラボインターフェースの右側パ�
 |===
 | セクション | 所要時間 | 内容
 
-| 脆弱性への早期対応
+| 脆弱性に早期に対処する
 | 15 分
 | セキュリティ強化済みコンポーネントを確認し、サンドボックスを作成して、RHDA で依存関係の脆弱性を検出・修正する
 
-| commit への署名
+| コミットに署名する
 | 10 分
-| Sigstore のキーレス署名で commit に署名し、GitLab で署名を検証する
+| Sigstore のキーレス署名でコミットに署名し、GitLab で署名を検証する
 
-| サンドボックスの pipeline を確認
+| Sandbox pipeline を確認する
 | 15 分
 | pipeline のセキュリティチェック、署名検証、ACS スキャン結果を確認し、ベースイメージを修正する
 
-| 次のステージへ進む
+| 次のステージへ
 | 25 分
 | merge request を作成し、タグを使って昇格させ、署名済みの承認で Conforma のポリシー違反を解決する
 
-| namespace を保護
+| 名前空間を保護する
 | 10 分
 | 署名のないイメージと未承認のイメージを deploy し、Policy Controller による適用をテストする
 |===
@@ -64,17 +64,17 @@ NOTE: URL と認証情報は、このラボインターフェースの右側パ�
 このモジュールでは、モジュール 1 の技術に加え、セキュリティ関連の以下の技術も使用します。
 
 * **Red Hat Trusted Artifact Signer (RHTAS)** -- Sigstore ベースの署名インフラストラクチャ（Fulcio、Rekor、TUF）
-* **gitsign** -- OIDC を通じて開発者の ID と紐付ける、Sigstore のキーレス commit 署名
-* **Tekton Chains** -- pipeline 成果物への自動署名と SLSA provenance attestation
-* **Conforma (Enterprise Contract)** -- 署名済み attestation を Rego ポリシーに照らして検証するポリシーエンジン
-* **Sigstore Policy Controller** -- deploy 時にイメージ署名と attestation を検証する Kubernetes admission controller
+* **gitsign** -- OIDC を通じて開発者の ID と紐付ける、Sigstore のキーレスコミット署名
+* **Tekton Chains** -- pipeline 成果物への自動署名と SLSA provenance アテステーション
+* **Conforma (Enterprise Contract)** -- 署名済みアテステーションを Rego ポリシーに照らして検証するポリシーエンジン
+* **Sigstore Policy Controller** -- deploy 時にイメージ署名とアテステーションを検証する Kubernetes admission controller
 * **Red Hat Advanced Cluster Security (ACS)** -- イメージの脆弱性スキャンとセキュリティポリシーの適用
 * **Red Hat Dependency Analytics (RHDA)** -- 依存関係の脆弱性をリアルタイムに分析する IDE 拡張機能
 * **Trusted Profile Analyzer (TPA)** -- Lightwell の修正データを備え、SBOM を管理する脆弱性インテリジェンスバックエンド
-* **Quay** -- 署名と attestation を保存できるコンテナイメージレジストリ
+* **Quay** -- 署名とアテステーションを保存できるコンテナイメージレジストリ
 * **SonarQube** -- 静的解析とコード品質スキャン
 * **Parasol Insurance (Secured)** -- サプライチェーンセキュリティを全面的に適用した、サンプル Quarkus アプリケーションの強化版
 
 == 次のステップ
 
-xref:module-02/01-vulnerabilities.adoc[脆弱性への早期対応] に進み、セキュリティ強化済みの開発環境をセットアップして、脆弱性の修正を始めましょう。
+xref:module-02/01-vulnerabilities.adoc[脆弱性に早期に対処する] に進み、セキュリティ強化済みの開発環境をセットアップして、脆弱性の修正を始めましょう。
