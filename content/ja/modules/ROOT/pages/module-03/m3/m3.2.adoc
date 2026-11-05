@@ -125,7 +125,7 @@ flowchart LR
 
 フローの最初のステップでは、イベントの到着元として _Kafka_ を定義します。
 
-NOTE: あなたの _OpenShift_ namespace には、すでに使用可能な _Streams for Apache Kafka_ クラスタ（_Kafka_）が含まれています。
+NOTE: あなたの _OpenShift_ 名前空間には、すでに使用可能な _Streams for Apache Kafka_ クラスター（_Kafka_）が含まれています。
 
 1. pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] ステップにカーソルを合わせ、浮動する {nbsp}{btn-replace}{nbsp} ボタン（replace step）をクリックします。
 1. {ui-filter} に `Kafka` と入力して見つけ、_Kafka_ コンポーネントを選択します。
@@ -218,7 +218,7 @@ _Kafka_ から到着するデータは共通スキーマを使っています。
 --
 Kaoto で次を実行します。
 
-. pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Map...&nbsp;</code>] ステップ内の kbd:[+] ボタンをクリックする
+. pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Map...&nbsp;</code>] ステップ内の kbd:[+] ボタンをクリックする
 . {ui-filter} に `mapper` と入力して _Kaoto DataMapper_ を見つける
 . _Kaoto DataMapper_ タイルをクリックする
 . mapper をクリックして設定パネルを開く
@@ -393,7 +393,7 @@ camel get
 
 {empty} +
 
-テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームの利用開始,window=_blank] の手順に従ってください。
+テストメッセージを送る前に、_Rocket.Chat_ が開いていて、指定されたルームにいることを確認してください。まだログインしていない場合は、xref:module-03/m2/m2.2.adoc[Rocket.Chat プラットフォームのオンボーディング,window=_blank] の手順に従ってください。
 
 準備ができたら、テストメッセージを _Kafka_ に送信します。
 

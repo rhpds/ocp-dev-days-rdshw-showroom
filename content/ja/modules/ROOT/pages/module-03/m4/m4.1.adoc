@@ -3,7 +3,7 @@
 include::partial$style.adoc[]
 
 [id="setup-lab4"]
-== Lab 作業フォルダーを設定する
+== ラボの作業フォルダーをセットアップする
 
 [.indent2]
 include::../_shared/close-tabs.adoc[]
@@ -18,7 +18,7 @@ include::../_shared/close-tabs.adoc[]
 満たす必要がある要件は次のとおりです。
 
 . *データベースへのアクセス*
-. *Kafka と Matrix の統合* （お客様向けメッセージングプラットフォーム）
+. *Kafka と Matrix のインテグレーション* （お客様向けメッセージングプラットフォーム）
 
 {blank}
 
@@ -38,7 +38,7 @@ include::../_shared/close-tabs.adoc[]
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
         end
     end
 
@@ -84,7 +84,7 @@ Namespace: shared-database
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
 ++++
 
-上記の出力は、あなたの namespace とデータベース namespace の間に Service Interconnect リンクが確立されたことを示しています。
+上記の出力は、あなたの名前空間とデータベースの名前空間の間に Service Interconnect リンクが確立されたことを示しています。
 
 {blank}
 
@@ -95,7 +95,7 @@ Namespace: shared-database
 flowchart LR
     subgraph yoursLabel ["{username}-devspaces ."]
         subgraph yours [" "]
-            Camel[⚙️ 統合]
+            Camel[⚙️ インテグレーション]
 
             SI1{{"Service\nInterconnect"}}
         end
@@ -132,10 +132,10 @@ flowchart LR
 {empty} +
 
 [start=2]
-. Kafka と Matrix の統合を有効にする
+. Kafka と Matrix のインテグレーションを有効にする
 +
 ======
-Matrix との Kafka 統合をスケールアップします。
+Matrix との Kafka インテグレーションをスケールアップします。
 
 [.copypaste]
 ****
@@ -192,12 +192,12 @@ step 7
 +
 [TIP]
 --
-上記のコマンドは、いつでも実行して演習をリセットできます。
+.上記のコマンドは、いつでも実行して演習をリセットできます。
 [%collapsible]
 ====
 ワークショップには、任意のステップへ移動したり、既知の正常な状態にラボをリセットしたりできる便利なヘルパースクリプトが含まれています。
 
-* `step N` — ラボを step N の開始時点にリセットする
+* `step N` — ラボをステップ N の開始時点にリセットする
 * `steps` — ラボで利用可能なすべてのステップを一覧表示する
 * `start` または `restart` — 最初の状態に戻る（ `step 1` と同等）
 * `ff` — *次の* ステップへ早送りする

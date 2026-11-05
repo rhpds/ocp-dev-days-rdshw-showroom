@@ -178,8 +178,8 @@ Camel のボットがメッセージを受け取り、`Hello World` と応答し
 {blank}
 
 :fig-time: 5:05 PM
-:fig-user-msg: こんにちは
-:fig-bot-msg: こんにちは
+:fig-user-msg: Hi
+:fig-bot-msg: Hello World
 include::_figures/rc-interaction.adoc[]
 
 これは想定どおりです。ルートはまだハードコードされたダミー応答を使っています。次の手順で、推論して自然に応答できる本物の AI エージェントに置き換えます。
@@ -288,7 +288,7 @@ _Rocket.Chat_ のウィンドウに戻り、次のように入力します。
 +
 [.copypaste.value]
 ****
-もう一度、こんにちは
+Hi again
 ****
 +
 AI エージェントはメッセージを処理します。MaaS を通じて LLM に送信され、LLM がそれを推論して自然言語の応答を返します。次のような表示が見えるはずです。
@@ -296,13 +296,13 @@ AI エージェントはメッセージを処理します。MaaS を通じて LL
 {blank}
 +
 :fig-time: 5:06 PM
-:fig-user-msg: もう一度、こんにちは
-:fig-bot-msg: こんにちは。どのようにお手伝いできますか？
+:fig-user-msg: Hi again
+:fig-bot-msg: Hello! How can I assist you today?
 include::_figures/rc-interaction.adoc[]
 +
 {empty} +
 +
-ボットは応答していますが、実際の作業もできるでしょうか。+
+ボットは応答していますが、実際の作業もできるでしょうか。 +
 *まだできません*。MCP サーバーとツールは演習内に存在しますが、まだ有効ではありません。
 +
 {blank}
@@ -313,7 +313,7 @@ include::_figures/rc-interaction.adoc[]
 +
 [.copypaste.value]
 ****
-保険証券 61356291 を表示してもらえますか？
+Can you show me policy document 61356291
 ****
 +
 NOTE: このラボには、使用できるサンプルの保険証券 (`61356291`) が用意されています。上のコマンドで参照しているのはこの保険証券です。
@@ -327,8 +327,8 @@ TIP: 取り込みラボで生成した保険証券を取得することもでき
 {blank}
 +
 :fig-time: 5:07 PM
-:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
-:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
+:fig-user-msg: Can you show me policy document 61356291
+:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
 include::_figures/rc-interaction.adoc[]
 +
 予想どおり、ボットは要求を拒否します。
@@ -568,7 +568,7 @@ _Rocket.Chat_ に戻り、もう一度尋ねます。
 +
 [.copypaste.value]
 ****
-保険証券 61356291 を表示してもらえますか？
+Can you show me policy document 61356291
 ****
 +
 [TIP]
@@ -581,8 +581,8 @@ _Rocket.Chat_ に戻り、もう一度尋ねます。
 {blank}
 
 :fig-time: 5:10 PM
-:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
-:fig-bot-msg: 申し訳ありません。現在、その PDF を取得する機能がありません。
+:fig-user-msg: Can you show me policy document 61356291
+:fig-bot-msg: I'm sorry, I don't have the capability to retrieve that PDF right now.
 include::_figures/rc-interaction.adoc[]
 
 その場合は、次の 1 つまたは両方を試してください。
@@ -593,7 +593,7 @@ include::_figures/rc-interaction.adoc[]
 +
 [.copypaste.value]
 ****
-ツールを使って保険証券を取得し、もう一度試してください。
+Please try again using the tool to get policy documents
 ****
 +
 これにより LLM は正しいツールに向きやすくなり、たいていはこれで動作します。
@@ -609,8 +609,8 @@ include::_figures/rc-interaction.adoc[]
 {blank}
 +
 :fig-time: 6:47 PM
-:fig-user-msg: 保険証券 61356291 を表示してもらえますか？
-:fig-bot-msg: ご依頼の保険証券はこちらです。
+:fig-user-msg: Can you show me policy document 61356291
+:fig-bot-msg: Here is the policy document you requested.
 :fig-attach-title: Policy Document 61356291 PDF ▾
 :fig-attach-desc: Click to view or download
 include::_figures/rc-interaction-attach.adoc[]
@@ -639,7 +639,7 @@ AI ボットはデータを取得するだけではありません。データ�
 
 [.copypaste.value]
 ****
-顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
+The customer would like to remove the Roadside Assistance coverage, could you please adjust the policy document?
 ****
 
 エージェントシステムは保険証券を調べ、該当する補償項目を見つけ、必要なツールを起動してデータベースを更新し、変更内容の要約を返します。
@@ -647,8 +647,8 @@ AI ボットはデータを取得するだけではありません。データ�
 {blank}
 
 :fig-time: 6:49 PM
-:fig-user-msg: 顧客がロードサイドアシスタンス補償を削除したいと希望しています。保険証券を修正してもらえますか？
-:fig-bot-msg: データベースの記録を更新しました。ロードサイドアシスタンス補償（項目 4）を削除し、集計値を再計算しました。新しい保険証券を確認しますか？
+:fig-user-msg: The customer would like to remove the Roadside Assistance coverage, could you please adjust the policy document?
+:fig-bot-msg: The database records have been updated. The Roadside Assistance coverage (Item 4) has been removed, and the summary values have been recalculated. Would you like to see the new policy document?
 include::_figures/rc-interaction.adoc[]
 
 エージェントシステムは自律的に動作しました。保険証券を確認し、補償項目を特定し、データベースの記録を更新し、合計を再計算し、変更を確認しました。すべて 1 回の自然言語リクエストから行われています。
@@ -659,7 +659,7 @@ include::_figures/rc-interaction.adoc[]
 
 [.copypaste.value]
 ****
-更新された保険証券を表示してもらえますか？
+Can you show me the updated policy document?
 ****
 
 どちらの場合でも、ボットは更新済み PDF のリンクを返します。
@@ -667,7 +667,7 @@ include::_figures/rc-interaction.adoc[]
 {blank}
 
 :fig-time: 6:50 PM
-:fig-bot-msg: 保険証券 61356291 の更新済み PDF はこちらです。
+:fig-bot-msg: Here is the updated PDF for Policy Document 61356291.
 :fig-attach-title: Policy Document 61356291 PDF ▾
 :fig-attach-desc: Click to view or download
 include::_figures/rc-bot-attach.adoc[]
@@ -698,7 +698,7 @@ NOTE: 文書の右上に赤い *Amended* タグが表示されていることに
 
 [.copypaste.value]
 ****
-チケットを起票してもらえますか？説明した詳細を含め、適切な部門に保険証券の修正処理を依頼してください。
+Could you please raise a ticket? Include the details explained, and ask the right departments to process the policy amendment accordingly.
 ****
 
 エージェントシステムは会話の文脈を集め、HelpDesk システムにチケットを作成し、確認メッセージを返します。
@@ -706,8 +706,8 @@ NOTE: 文書の右上に赤い *Amended* タグが表示されていることに
 {blank}
 
 :fig-time: 6:52 PM
-:fig-user-msg: チケットを起票してもらえますか？説明した詳細を含め、適切な部門に顧客への返金を依頼してください。
-:fig-bot-msg: ID 1025 のチケットを作成しました。このチケットを顧客と共有しますか？
+:fig-user-msg: Could you please raise a ticket? Include the details explained, and ask the right departments to refund the customer accordingly.
+:fig-bot-msg: A ticket has been created with ID 1025. Would you like to share this ticket with the customer?
 include::_figures/rc-interaction.adoc[]
 
 {empty} +
@@ -722,7 +722,7 @@ IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済み�
 +
 [.copypaste.value]
 ****
-はい、顧客と共有してください。
+Yes, please share it with the customer.
 ****
 +
 {blank}
@@ -733,7 +733,7 @@ IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済み�
 +
 [.copypaste.value]
 ****
-チケットを顧客と共有してもらえますか？
+Could you share the ticket with the customer?
 ****
 +
 {blank}
@@ -748,8 +748,8 @@ IMPORTANT: この先に進む前に、必ず _Matrix_ にオンボード済み�
 {blank}
 
 :fig-time: 6:53 PM
-:fig-user-msg: はい、顧客と共有してください。
-:fig-bot-msg: チケット #1025 を顧客と共有しました。顧客には HelpDesk システムへのリンクが送信されます。
+:fig-user-msg: Yes, please share it with the customer.
+:fig-bot-msg: The ticket #1025 has been successfully shared with the customer. They will receive a link to the HelpDesk system.
 include::_figures/rc-interaction.adoc[]
 
 覚えておいてください。顧客は _Matrix_ メッセージングプラットフォームからやり取りします。ボットがチケットを共有したと示したということは、顧客がチケット参照付きのメッセージを受け取っているはずです。_Matrix_ のウィンドウに切り替えて確認してください。

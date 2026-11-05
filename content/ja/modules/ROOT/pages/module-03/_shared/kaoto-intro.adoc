@@ -1,18 +1,18 @@
-Most of the processing flows you'll edit during this workshop use *Kaoto*, the visual integration designer for Apache Camel. Kaoto is a VS Code extension that renders Camel definitions graphically so you can design and configure routes without editing YAML by hand.
+このワークショップで編集する処理フローのほとんどは、Apache Camel 向けのビジュアルインテグレーションデザイナーである *Kaoto* を使用します。Kaoto は VS Code 拡張機能で、Camel の定義をグラフィカルに描画するため、YAML を手で編集せずにルートを設計・設定できます。
 
 image::module-03/common/vs-code-kaoto.png[width=40%]
 
-Among other tasks, Kaoto helps you to:
+Kaoto を使うと、主に次のようなことができます。
 
-* Create Camel routes (the primary way to define processing flows)
-* Create Kamelets (reusable building blocks for your routes)
-* Create data transformations
-* Apply EIPs (Enterprise Integration Patterns)
+* Camel ルートを作成する(処理フローを定義する主な方法)
+* Kamelet を作成する(ルートで再利用できる部品)
+* データ変換を作成する
+* EIP(Enterprise Integration Patterns)を適用する
 
 {empty} +
 
-Here's what the Kaoto canvas looks like — each step in the route is rendered as a visual node that you can click to configure:
+Kaoto のキャンバスは次のように表示されます。ルート内の各ステップはビジュアルなノードとして描画され、クリックして設定できます。
 
 image::module-03/common/kaoto-overview.png[width=100%]
 
-NOTE: The Kaoto extension is already pre-installed in your Dev Spaces environment.
+NOTE: Kaoto 拡張機能は、Dev Spaces 環境にあらかじめインストールされています。

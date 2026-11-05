@@ -50,4 +50,4 @@ Parasol の CISO オフィスは、すべての本番環境へのデプロイメ
 
 == 次のステップ
 
-アクセスリンクと認証情報については xref:module-02/01a-environment.adoc[環境の詳細] ページに進み、その後 xref:module-02/01-vulnerabilities.adoc[脆弱性への早期対応] に進んでください。
+アクセスリンクと認証情報については xref:module-02/01a-environment.adoc[環境の詳細] ページに進み、その後 xref:module-02/01-vulnerabilities.adoc[脆弱性に早期に対処する] に進んでください。

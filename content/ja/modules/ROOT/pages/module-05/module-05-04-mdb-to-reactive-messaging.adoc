@@ -25,7 +25,7 @@ Parasol Insurance の EAP アプリケーションでは、受信メールの JS
 
 * **リソース効率:** 数千件のメッセージを、わずかな数の CPU スレッドで処理できます。
 * **柔軟なスケーリング:** EJB コンテナの「負担」がないため、Quarkus のリアクティブサービスは Kubernetes 上ですばやくスケールアップ / スケールダウンできます。
-* **開発者体験:** Quarkus は、何十行もの XML や複雑な `@ActivationConfigProperty` を、シンプルな `@Incoming` アノテーションに置き換えます。
+* **開発者エクスペリエンス:** Quarkus は、何十行もの XML や複雑な `@ActivationConfigProperty` を、シンプルな `@Incoming` アノテーションに置き換えます。
 
 == 演習 1: EmailIntakeMDB の分析を確認する
 
@@ -60,7 +60,7 @@ public class EmailIntakeMDB {
 * `@EJB` インジェクションはサポートされていません。
   `EmailRoutingService` と `EmailStoreBean` では、 `@EJB` を CDI の `@Inject` に置き換えてください（これらの依存コンポーネントも、今後 CDI に移行します）。
 * `javax` パッケージは `jakarta` に置き換えられています。
-  必要な箇所では、 `javax.*` のインポートを対応する `jakarta.*` に置き換えてください。
+  必要な箇所では、 `javax.\*` のインポートを対応する `jakarta.*` に置き換えてください。
 
 == 演習 2: AI ソリューションを生成して確認する
 
@@ -78,7 +78,6 @@ image::module-05-mta-dls/05-04-dls-03.jpg[EmailIntakeMDB の Get Solution,link=s
 
 TIP: 生成は分析と密接に連動しています。つまり、新しい生成が作成されて受け入れられるたびに、分析が再実行されます。生成中に分析パネルへアクセスしようとしても、アクティブにはなりません。これは設計どおりです。
 
-+
 image::module-05-mta-dls/05-04-dls-04.jpg[EmailIntakeMDB の生成結果,link=self,window=blank,title="EmailIntakeMDB"]
 
 `EmailIntakeMDB` に対して想定される変更を確認しましょう。
