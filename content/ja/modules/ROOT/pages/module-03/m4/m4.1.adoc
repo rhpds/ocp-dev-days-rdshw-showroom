@@ -84,7 +84,7 @@ Namespace: shared-database
     <span style="color: #07BC7A">✓</span> Link                    ready  OK</pre>
 ++++
 
-上記の出力は、あなたの namespace とデータベース namespace の間に Service Interconnect リンクが確立されたことを示しています。
+上記の出力は、あなたの名前空間とデータベースの名前空間の間に Service Interconnect リンクが確立されたことを示しています。
 
 {blank}
 

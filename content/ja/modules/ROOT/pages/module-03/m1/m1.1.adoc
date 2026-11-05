@@ -13,7 +13,7 @@ NOTE: この演習では要点に集中できるよう単一のクラスター�
 
 === データベースに接続できないのはなぜですか？
 
-バックエンドデータベースは、厳格なネットワークポリシーが適用された隔離名前空間 (*shared-database*) でホストされています。他の名前空間からの直接アクセスは許可されていません。
+バックエンドデータベースは、厳格なネットワークポリシーが適用された隔離された名前空間 (*shared-database*) でホストされています。他の名前空間からの直接アクセスは許可されていません。
 
 [.mermaid]
 [subs="attributes"]
@@ -244,8 +244,8 @@ flowchart LR
 [start=0]
 . `shared-database` 名前空間には *Site* がすでにあります _(事前設定済み)_
 . `linkAccess` を有効にして、名前空間に *Site* を作成します
-. データベース名前空間が接続できるように *AccessGrant* を生成します
-. link を確立するため、データベース名前空間に *AccessToken* を作成します
+. データベースの名前空間が接続できるように *AccessGrant* を生成します
+. link を確立するため、データベースの名前空間に *AccessToken* を作成します
 
 *データベースサービスを公開* — remote database に local（`{username}-devspaces` 内）からアクセスできるようにします。
 
@@ -356,7 +356,7 @@ flowchart LR
 
 === network を確立する
 
-最初に、名前空間とデータベース名前空間の間に secure network を設定します。Site、AccessGrant、AccessToken を作成し、これらを組み合わせて 2 つの環境間に暗号化 link を確立します。
+最初に、名前空間とデータベースの名前空間の間に secure network を設定します。Site、AccessGrant、AccessToken を作成し、これらを組み合わせて 2 つの環境間に暗号化 link を確立します。
 
 {empty} +
 
@@ -511,7 +511,7 @@ flowchart LR
 
 {empty} +
 
-==== 手順 3: データベース名前空間に AccessToken を作成する
+==== 手順 3: データベースの名前空間に AccessToken を作成する
 
 データベースから名前空間への link を確立するため、`shared-database` 名前空間に AccessToken を作成します。token 名は `token-{username}` にする必要があります。
 
@@ -582,7 +582,7 @@ flowchart LR
 
 === データベースサービスを公開する
 
-network の準備ができ、名前空間とデータベース名前空間が暗号化 link で接続されました。しかし、network だけではデータベースにアクセスできません。Service Interconnect に、名前空間へ公開する *サービス* を指定する必要があります。
+network の準備ができ、名前空間とデータベースの名前空間が暗号化 link で接続されました。しかし、network だけではデータベースにアクセスできません。Service Interconnect に、名前空間へ公開する *サービス* を指定する必要があります。
 
 ここで Listener と Connector を使います。データベース側の Connector はすでに設定済みです（Step 0 で確認しました）。次に、あなた側で対応する Listener を作成します。
 
@@ -824,7 +824,7 @@ flowchart LR
 
 次の作業が完了しました。
 
-* *network を確立* — 名前空間に Site と AccessGrant を作成し、データベース名前空間に AccessToken を作成して、暗号化 link を確立しました。
+* *network を確立* — 名前空間に Site と AccessGrant を作成し、データベースの名前空間に AccessToken を作成して、暗号化 link を確立しました。
 * *サービスを公開* — Listener を作成し、network 経由で remote database に local からアクセスできるようにしました。
 * *接続を確認* — script を使い、暗号化 link 経由でデータベースにクエリーを実行しました。
 

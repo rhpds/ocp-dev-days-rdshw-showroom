@@ -36,7 +36,7 @@ Sec-fix done, security posture improved
 
 === 演習 2: MR check pipeline を確認する
 
-. merge request を作成すると、check pipeline が自動的に開始されます。「これは preprod で build できるか、正常に通るか、標準に準拠しているか」を確認します。失敗した場合、変更を含む branch はマージできません。これが **merge request check pipeline** です。サンドボックスではなく、Parasol の secured build namespace で実行されます。
+. merge request を作成すると、check pipeline が自動的に開始されます。「これは preprod で build できるか、正常に通るか、標準に準拠しているか」を確認します。失敗した場合、変更を含む branch はマージできません。これが **merge request check pipeline** です。サンドボックスではなく、Parasol の secured build 名前空間で実行されます。
 +
 image::m02-gitlab-mr-pipeline-running.png[マージがブロックされた状態で実行中の MR check pipeline,link=self,window=blank,width=700]
 
@@ -155,7 +155,7 @@ Approved for production release. All ACS policy checks passed, vulnerabilities r
 +
 image::m02-approval-submit.png[理由と Submit ボタンがある Release Approval ダイアログ,link=self,window=blank,width=500]
 +
-承認は container image に **署名済み attestation** として記録されます。commit の署名と同様に、あなたの ID で署名されます。
+承認はコンテナイメージに **署名済み attestation** として記録されます。commit の署名と同様に、あなたの ID で署名されます。
 +
 image::m02-approval-success.png[透明性ログの index とともにリリースが正常に承認された状態,link=self,window=blank,width=500]
 +
@@ -167,7 +167,7 @@ image::m02-approval-attestation.png[署名者と理由を示す承認 attestatio
 
 === 演習 5: tag-promote pipeline を再実行する
 
-. GitLab に戻って新しい tag (例: `v2.1`) を作成します。または、OpenShift Console の secured-build namespace から pipeline を再実行します。
+. GitLab に戻って新しい tag (例: `v2.1`) を作成します。または、OpenShift Console の secured-build 名前空間から pipeline を再実行します。
 
 . 今度は `ec-validate` task が承認 attestation を検出し、pipeline は成功します。
 
@@ -202,7 +202,7 @@ image::m02-gitlab-prod-mr-merge.png[production MR の Merge ボタン,link=self,
 
 . manifests repository の MR を承認してマージします。
 
-. Argo CD が変更を検出し、新しい署名済み、attestation 付き、検証済み、承認済みの image を `secured-prod` namespace に rollout します。
+. Argo CD が変更を検出し、新しい署名済み、attestation 付き、検証済み、承認済みの image を `secured-prod` 名前空間に rollout します。
 
 === これが重要な理由
 
@@ -226,7 +226,7 @@ image::m02-gitlab-prod-mr-merge.png[production MR の Merge ボタン,link=self,
 ====
 **Tekton Chains** は Sigstore の keyless signing を使って、pipeline artifact に自動で署名します:
 
-* pipeline の実行ごとに、Chains は pipeline service account の ID を使って **Fulcio** に有効期間の短い証明書を要求します
+* pipeline の実行ごとに、Chains は pipeline サービスアカウントの ID を使って **Fulcio** に有効期間の短い証明書を要求します
 * すべての task 結果を含む **SLSA provenance attestation** を作成します
 * attestation と署名は **Rekor** (透明性ログ) に記録され、registry 内の image に付与されます
 

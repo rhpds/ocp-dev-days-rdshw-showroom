@@ -20,7 +20,7 @@ image::m02-rhdh-sandbox-pipeline-running.png[Developer Hub での task の詳細
 * **verify-commit-signature** -- commit に署名があるか確認する
 * **maven-build** -- アプリケーションをコンパイルする
 * **sonar-scan** -- SonarQube によるコード品質分析を実行する
-* **build-and-push** -- container image を build し、registry に push する
+* **build-and-push** -- コンテナイメージを build し、registry に push する
 * **acs-image-scan** -- 既知の脆弱性がないか image をスキャンする
 * **acs-image-check** -- ACS のセキュリティポリシーに照らして image を確認する
 * **report-to-commit** -- 結果を commit comment として GitLab に投稿する
@@ -52,7 +52,7 @@ image::m02-rhdh-pipeline-output-icon.png[pipeline run の Output アイコン,li
 +
 image::m02-pipeline-acs-tasks.png[pipeline 内の ACS image scan と image check task,link=self,window=blank,width=400]
 +
-**Image Scan** タブには、container image で検出されたすべての CVE が重要度別に表示されます。
+**Image Scan** タブには、コンテナイメージで検出されたすべての CVE が重要度別に表示されます。
 +
 image::m02-rhdh-acs-image-scan.png[重要度別の CVE を表示する ACS Image Scan の結果,link=self,window=blank,width=700]
 +
@@ -110,7 +110,7 @@ pipeline は最後まで実行されます（sandbox では強制されません
 
 === 演習 1: ACS ポリシー違反を理解する
 
-commit には署名があり、アプリケーションの build は成功しました。また、Dependency Analytics を活用し、Quarkus framework のバージョンをアップグレードしたことで、アプリケーションの脆弱性の大部分を修正できました。しかし、ACS のポリシーチェックで違反が検出され、__アプリケーション image には依然として多数の脆弱性が残っています__。これらの違反はアプリケーションコードではなく、container の **base image** に起因します。
+commit には署名があり、アプリケーションの build は成功しました。また、Dependency Analytics を活用し、Quarkus framework のバージョンをアップグレードしたことで、アプリケーションの脆弱性の大部分を修正できました。しかし、ACS のポリシーチェックで違反が検出され、__アプリケーション image には依然として多数の脆弱性が残っています__。これらの違反はアプリケーションコードではなく、コンテナの **base image** に起因します。
 
 . GitLab の commit comment で ACS ポリシーチェックの結果を確認します。次のような違反が表示されることがあります。
 * `Parasol: Curl in Image`
@@ -168,13 +168,13 @@ image::m02-gitlab-commit-report-after-fix.png[修正後、ACS ポリシーチェ
 .**クリックして実装の詳細を表示**
 [%collapsible]
 ====
-**Red Hat Advanced Cluster Security (ACS)** は、container image のスキャンとポリシー適用を行います。このユースケースに関連する主な機能は次のとおりです。
+**Red Hat Advanced Cluster Security (ACS)** は、コンテナイメージのスキャンとポリシー適用を行います。このユースケースに関連する主な機能は次のとおりです。
 
-* **Image scanning** -- container image のすべての layer に含まれる既知の脆弱性（CVE）を特定する
+* **Image scanning** -- コンテナイメージのすべての layer に含まれる既知の脆弱性（CVE）を特定する
 * **Policy enforcement** -- image で許容される内容に関するルール（package manager を含まない、修正可能な重大度の高い CVE がない、など）を定義する
 * **Policies as Code** -- セキュリティポリシーを Git repository 内の `SecurityPolicy` Custom Resource として定義し、ArgoCD を介して deploy する
 
-TIP: ACS にはさらに多くの機能があります。このユースケースでは、その一部に焦点を当てています。ネットワークフローの評価、ネットワークポリシーの構築とシミュレーション、許容される container の動作の baseline 定義と baseline 違反時の対応、各種 runtime policy の適用、CIS や NIST などの業界標準および独自の制御項目に対する cluster compliance のレポートなど、その他にも多くの機能があります。
+TIP: ACS にはさらに多くの機能があります。このユースケースでは、その一部に焦点を当てています。ネットワークフローの評価、ネットワークポリシーの構築とシミュレーション、許容されるコンテナの動作の baseline 定義と baseline 違反時の対応、各種 runtime policy の適用、CIS や NIST などの業界標準および独自の制御項目に対するクラスター compliance のレポートなど、その他にも多くの機能があります。
 
 
 この環境で使用されるポリシーは、GitLab の `acs-policies` repository の **Parasol Secured Build Gate** category に保存されています。ACS console で確認できます。

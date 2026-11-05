@@ -339,7 +339,7 @@ image::module-03/common/kaoto-design-tab.png[width=50%]
 
 . *route を実行してテストする*
 +
-Dev Spaces 内の VS Code terminal で、route を実行します。
+Dev Spaces 内の VS Code ターミナルで、route を実行します。
 +
 {blank}
 +
@@ -583,7 +583,7 @@ Test Portal に戻り、別の保険申込を送信します。今度は変換�
 
 {empty} +
 
-完了したら、terminal で kbd:[Ctrl+C] を押して Camel を停止します。
+完了したら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
 
 {empty} +
 

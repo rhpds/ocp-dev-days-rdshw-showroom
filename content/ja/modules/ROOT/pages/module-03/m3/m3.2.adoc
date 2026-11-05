@@ -125,7 +125,7 @@ flowchart LR
 
 フローの最初のステップでは、イベントの到着元として _Kafka_ を定義します。
 
-NOTE: あなたの _OpenShift_ namespace には、すでに使用可能な _Streams for Apache Kafka_ クラスタ（_Kafka_）が含まれています。
+NOTE: あなたの _OpenShift_ 名前空間には、すでに使用可能な _Streams for Apache Kafka_ クラスター（_Kafka_）が含まれています。
 
 1. pass:[<span style="color: #B0380C;">&#x2757; To do: Kafka</span>] ステップにカーソルを合わせ、浮動する {nbsp}{btn-replace}{nbsp} ボタン（replace step）をクリックします。
 1. {ui-filter} に `Kafka` と入力して見つけ、_Kafka_ コンポーネントを選択します。
