@@ -218,7 +218,7 @@ _Kafka_ から到着するデータは共通スキーマを使っています。
 --
 Kaoto で次を実行します。
 
-. pass:[<code style="background-color: #B0380C; color: white;">&nbsp;To do: Map...&nbsp;</code>] ステップ内の kbd:[+] ボタンをクリックする
+. pass:[<code style="background-color: #4494E5; color: white;">&nbsp;To do: Map...&nbsp;</code>] ステップ内の kbd:[+] ボタンをクリックする
 . {ui-filter} に `mapper` と入力して _Kaoto DataMapper_ を見つける
 . _Kaoto DataMapper_ タイルをクリックする
 . mapper をクリックして設定パネルを開く

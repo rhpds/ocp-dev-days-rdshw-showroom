@@ -45,18 +45,18 @@
 
 ** xref:module-03/m3/m3.0.adoc[セクション 3: マルチチャネルハブ]
 *** xref:module-03/m3/m3.0.adoc[はじめに]
-*** xref:module-03/m3/m3.1.adoc[Lab の作業フォルダーをセットアップする]
+*** xref:module-03/m3/m3.1.adoc[ラボの作業フォルダーをセットアップする]
 *** xref:module-03/m3/m3.2.adoc[Kafka から Rocket.Chat へ]
 *** xref:module-03/m3/m3.3.adoc[OpenShift で本番稼働させる]
 
 ** xref:module-03/m4/m4.0.adoc[セクション 4: AI サポートエージェント]
 *** xref:module-03/m4/m4.0.adoc[はじめに]
-*** xref:module-03/m4/m4.1.adoc[Lab の作業フォルダーをセットアップする]
+*** xref:module-03/m4/m4.1.adoc[ラボの作業フォルダーをセットアップする]
 *** xref:module-03/m4/m4.2.adoc[Agentic Flow を構築する]
 
 ** xref:module-03/m5/m5.0.adoc[セクション 5: LLM ガバナンス]
 *** xref:module-03/m5/m5.0.adoc[はじめに]
-*** xref:module-03/m5/m5.1.adoc[Lab の作業フォルダーをセットアップする]
+*** xref:module-03/m5/m5.1.adoc[ラボの作業フォルダーをセットアップする]
 *** xref:module-03/m5/m5.2.adoc[ポリシーを設定する]
 *** xref:module-03/m5/m5.3.adoc[認証をテストする]
 *** xref:module-03/m5/m5.4.adoc[トークンのレート制限をテストする]
