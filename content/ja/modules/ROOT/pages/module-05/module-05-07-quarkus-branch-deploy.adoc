@@ -206,7 +206,7 @@ oc start-build parasol-insurance --from-dir=/tmp/parasol-build --follow
 
 === デプロイマニフェストを適用する
 
-. アプリケーションをデプロイします（image の名前空間は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
+. アプリケーションをデプロイします（イメージの名前空間は現在のプロジェクトから置換されます）。Deployment は Secret `parasol-db` を、**`%prod`** プロファイルが期待する `POSTGRESQL_*` 変数へマップします。
 +
 [.console-input]
 [source,bash]

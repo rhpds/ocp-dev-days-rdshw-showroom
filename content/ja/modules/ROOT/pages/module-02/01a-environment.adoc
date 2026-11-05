@@ -44,7 +44,7 @@ NOTE: URL と認証情報は、このラボインターフェースの右側パ�
 
 | コミットに署名する
 | 10 分
-| Sigstore のキーレス署名で commit に署名し、GitLab で署名を検証する
+| Sigstore のキーレス署名でコミットに署名し、GitLab で署名を検証する
 
 | Sandbox pipeline を確認する
 | 15 分
@@ -64,14 +64,14 @@ NOTE: URL と認証情報は、このラボインターフェースの右側パ�
 このモジュールでは、モジュール 1 の技術に加え、セキュリティ関連の以下の技術も使用します。
 
 * **Red Hat Trusted Artifact Signer (RHTAS)** -- Sigstore ベースの署名インフラストラクチャ（Fulcio、Rekor、TUF）
-* **gitsign** -- OIDC を通じて開発者の ID と紐付ける、Sigstore のキーレス commit 署名
-* **Tekton Chains** -- pipeline 成果物への自動署名と SLSA provenance attestation
-* **Conforma (Enterprise Contract)** -- 署名済み attestation を Rego ポリシーに照らして検証するポリシーエンジン
-* **Sigstore Policy Controller** -- deploy 時にイメージ署名と attestation を検証する Kubernetes admission controller
+* **gitsign** -- OIDC を通じて開発者の ID と紐付ける、Sigstore のキーレスコミット署名
+* **Tekton Chains** -- pipeline 成果物への自動署名と SLSA provenance アテステーション
+* **Conforma (Enterprise Contract)** -- 署名済みアテステーションを Rego ポリシーに照らして検証するポリシーエンジン
+* **Sigstore Policy Controller** -- deploy 時にイメージ署名とアテステーションを検証する Kubernetes admission controller
 * **Red Hat Advanced Cluster Security (ACS)** -- イメージの脆弱性スキャンとセキュリティポリシーの適用
 * **Red Hat Dependency Analytics (RHDA)** -- 依存関係の脆弱性をリアルタイムに分析する IDE 拡張機能
 * **Trusted Profile Analyzer (TPA)** -- Lightwell の修正データを備え、SBOM を管理する脆弱性インテリジェンスバックエンド
-* **Quay** -- 署名と attestation を保存できるコンテナイメージレジストリ
+* **Quay** -- 署名とアテステーションを保存できるコンテナイメージレジストリ
 * **SonarQube** -- 静的解析とコード品質スキャン
 * **Parasol Insurance (Secured)** -- サプライチェーンセキュリティを全面的に適用した、サンプル Quarkus アプリケーションの強化版
 

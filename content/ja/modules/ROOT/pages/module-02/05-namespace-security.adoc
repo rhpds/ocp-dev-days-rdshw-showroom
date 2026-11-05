@@ -110,7 +110,7 @@ oc delete deployment test-unsigned test-no-approval -n {user}-secured-prod 2>/de
 | ポリシー | 検証内容
 
 | `parasol-image-signature-required`
-| イメージは Tekton Chains（keyless、Fulcio/Rekor 経由）または Red Hat（release3 公開鍵）のいずれかによって署名されている必要があります
+| イメージは Tekton Chains（キーレス、Fulcio/Rekor 経由）または Red Hat（release3 公開鍵）のいずれかによって署名されている必要があります
 
 | `parasol-signed-commit-required`
 | SLSA provenance アテステーションには `verify-commit-signature` タスクが含まれ、 `SIGNATURE_STATUS: SIGNED` である必要があります
@@ -156,7 +156,7 @@ metadata:
 | 段階 | セキュリティ制御
 
 | **コード** | Red Hat Dependency Analytics が IDE で脆弱性を特定します
-| **コミット** | Sigstore の keyless 署名により、すべてのコミットが検証済み ID に結び付けられます
+| **コミット** | Sigstore のキーレス署名により、すべてのコミットが検証済み ID に結び付けられます
 | **サンドボックスビルド** | ACS スキャンとポリシーチェックが早期フィードバックを提供します（情報提供のみ）
 | **マージリクエスト** | 署名検証が強制され、違反があると ACS ポリシーがマージをブロックします
 | **マージ後のビルド** | Tekton Chains がイメージに署名し、SLSA アテステーションを生成します

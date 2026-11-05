@@ -157,6 +157,73 @@ terms:
       Kubernetesのリソース種別としての固有名詞「Service」（例: 表内の「Service (自動作成)」）は翻訳しない。
       一般名詞としての「a service / the service」のみ対象。
 
+  - en: commit
+    ja: コミット
+    notes: >-
+      module-02/03-sandbox-pipeline.adoc, 04-promotion.adoc で特に多数未翻訳のまま残っていたため統一。
+      「commit message」→「コミットメッセージ」、「commit comment」→「コミットのコメント」、
+      「commit report」→「コミットレポート」のように複合語も訳す。
+      ただし `verify-commit-signature`・`report-to-commit`・`parasol-signed-commit-required` などの
+      リテラルなタスク名・ポリシー名、`commit.gpgsign` のような Git 設定キー名、
+      画像ファイル名（例: `m02-devspaces-commit.png`）は対象外。
+
+  - en: attestation
+    ja: アテステーション
+    notes: >-
+      module-02/04-promotion.adoc, 01a-environment.adoc で未翻訳のまま残っていたため統一
+      （05-namespace-security.adoc, 00-intro.adoc では既に「アテステーション」が使われていた）。
+      「SLSA attestation」→「SLSA アテステーション」、「SLSA provenance attestation」→「SLSA provenance アテステーション」、
+      「in-toto attestation」→「in-toto アテステーション」のように、製品名・仕様名はそのまま残し、
+      一般名詞部分のみ訳す。ただし「Attestation Detail」「Attestation signature check」のように、
+      実際のUI・出力に表示される文字列を模したボールド表記は翻訳しない。
+
+  - en: component
+    ja: コンポーネント
+    notes: >-
+      module-02/04-promotion.adoc で未翻訳のまま残っていたため統一（他ファイルでは既に「コンポーネント」が定着）。
+      Camel のプロパティキー（例: `camel.component.langchain4j-agent...`）や画像ファイル名
+      （例: `m02-rhdh-secured-component.png`）内の literal な "component" は対象外。
+
+  - en: image (container image)
+    ja: イメージ
+    notes: >-
+      module-02/03-sandbox-pipeline.adoc, 04-promotion.adoc で特に多数未翻訳のまま残っていたため統一
+      （05-namespace-security.adoc, 01a-environment.adoc では既に「イメージ」が定着）。
+      「base image」→「ベースイメージ」、「container image」→「コンテナイメージ」、
+      「image scan」→「イメージスキャン」のように複合語も訳す。
+      ただし `image::`（AsciiDocの画像挿入マクロ）、`--image=docker.io/...` のようなリテラルな
+      CLIフラグ、`acs-image-scan`・`acs-image-check` などのリテラルなタスク名、
+      `parasol-image-signature-required` のようなリテラルなポリシー名、
+      `**Image signature check**` のような実際のConforma出力ラベルを模したボールド表記、
+      コピペ用コードブロック内の文字列は対象外。
+
+  - en: sandbox
+    ja: サンドボックス
+    notes: >-
+      module-02/01-vulnerabilities.adoc, 04-promotion.adoc, 02-commit-signing.adoc,
+      05-namespace-security.adoc, 01a-environment.adoc では、環境を指す一般名詞としての
+      "sandbox" を「サンドボックス」に統一する（例: 「サンドボックスとは異なり」）。
+
+      例外: module-02/03-sandbox-pipeline.adoc だけは "sandbox" を英語のまま維持する。
+      このファイルでは「Sandbox pipeline」（ページタイトル・見出し・本文で確立された
+      Tekton pipeline のステージ名）と、「sandbox branch」のように一般名詞として使われる
+      "sandbox" が混在しており、確実に見分けるのが難しいため、ファイル全体で統一して
+      英語のまま残すことで合意した（例: 「sandbox の外では」「sandbox branch」「sandbox では
+      強制されません」）。ただし同ファイル内でも「component」など他の確定した用語の翻訳は
+      維持し、"sandbox" 部分だけ英語にする（例: 「sandboxコンポーネント」）。
+      `**Sandbox Build Results**` のような実際のGitLabコメント出力ラベルを模した
+      ボールド表記、コピペ用ログ出力ブロック内の "sandboxes" はどのファイルでも対象外。
+
+  - en: comment
+    ja: コメント
+    notes: >-
+      module-02/03-sandbox-pipeline.adoc に1箇所未翻訳で残っていたため統一
+      （「commit comment」→「コミットのコメント」は commit の項目を参照）。
+
+  - en: package manager
+    ja: パッケージマネージャー
+    notes: module-02/03-sandbox-pipeline.adoc の2箇所が未翻訳で残っていたため統一。
+
   - en: terminal
     ja: ターミナル
 
@@ -166,6 +233,17 @@ terms:
 
   - en: mesh
     ja: メッシュ
+
+  - en: key pair
+    ja: キーペア
+    notes: module-02/02-commit-signing.adoc で「鍵ペア」となっていたため「キーペア」に統一。
+
+  - en: keyless (signature / signing)
+    ja: キーレス署名
+    notes: >-
+      module-02/02-commit-signing.adoc で「鍵レス」という誤記があったため「キーレス」に統一。
+      英語の signature（名詞: 署名そのもの）と signing（動名詞: 署名する行為・方式）は、
+      日本語の「署名」がどちらの意味も自然にカバーできるため、訳し分けずどちらも「キーレス署名」とする。
 
   - en: network policy
     ja: ネットワークポリシー
