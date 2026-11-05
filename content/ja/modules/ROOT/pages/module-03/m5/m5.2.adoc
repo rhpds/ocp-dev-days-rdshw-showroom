@@ -17,7 +17,7 @@ include::partial$style.adoc[]
 | チャットインターフェースから LLM API へトラフィックをルーティングする _Gateway API_ スタックです。LLM API は内部エンドポイントの場合も外部エンドポイントの場合もあります。ゲートウェイはこの違いを抽象化し、ポリシーを一貫して適用できるポイントを提供します。
 
 | **Kuadrant Operator & System**
-| `kuadrant-system` namespace にインストールされた _Connectivity Link_ operator です。
+| `kuadrant-system` 名前空間にインストールされた _Connectivity Link_ operator です。
 
 | **ユーザー Secret**
 | `silver` と `gold` の 2 つの tier 用の API key secret です。詳細は以下を参照してください。
@@ -31,7 +31,7 @@ include::partial$style.adoc[]
 
 {blank}
 
-. Dev Spaces IDE の terminal で次のコマンドを実行し、gateway が稼働していることを確認します。
+. Dev Spaces IDE のターミナルで次のコマンドを実行し、gateway が稼働していることを確認します。
 +
 {blank}
 +
@@ -52,7 +52,7 @@ internal-ai-gateway   openshift-default   internal-ai-gateway-openshift-default.
 ++++
 {empty} +
 
-. `ai-proxy-route` という専用の HTTPRoute が、LLM API をターゲットとして `{user-username}-devspaces` namespace に作成されています。これは、認証およびレート制限ポリシーを適用する Gateway API リソースです。
+. `ai-proxy-route` という専用の HTTPRoute が、LLM API をターゲットとして `{user-username}-devspaces` 名前空間に作成されています。これは、認証およびレート制限ポリシーを適用する Gateway API リソースです。
 +
 次のコマンドを実行して、存在を確認します。
 +
@@ -143,7 +143,7 @@ type: Opaque
 
 === AuthPolicy を確認して適用する
 
-AuthPolicy を確認し、次のコマンドを terminal に貼り付けて *適用* します。
+AuthPolicy を確認し、次のコマンドをターミナルに貼り付けて *適用* します。
 
 [.copypaste]
 ****
@@ -214,7 +214,7 @@ EOF
 
 このポリシーの主なフィールド:
 
-* `namespace: {user-username}-devspaces` -- ポリシーはユーザーの namespace に作成されます。
+* `namespace: {user-username}-devspaces` -- ポリシーはユーザーの名前空間に作成されます。
 * `name: ai-proxy-route` -- `ai-proxy-route` HTTPRoute を対象とします。この route に一致するすべてのリクエストは認証を通過する必要があります。
 * `app: my-llm-{user-username}` -- 有効な API key を見つけるため、このラベルを持つ _Kubernetes_ Secret を検索します。
 * `prefix: Bearer` -- `Authorization` header に API key が指定されることを想定します。
@@ -228,7 +228,7 @@ EOF
 
 {blank}
 
-. devspaces terminal で次のコマンドを実行し、AuthPolicy が正常に作成されたことを確認します。
+. devspaces のターミナルで次のコマンドを実行し、AuthPolicy が正常に作成されたことを確認します。
 +
 {blank}
 +
@@ -262,5 +262,5 @@ oc describe authpolicy -n {user-username}-devspaces | grep -v "Content" | grep -
 AuthPolicy が強制適用されています。認証のテストに進んでください。
 
 [.fail]
-正しい YAML を貼り付けたことと、namespace が `{user-username}-devspaces` に設定されていることを確認してください。
+正しい YAML を貼り付けたことと、名前空間が `{user-username}-devspaces` に設定されていることを確認してください。
 ****

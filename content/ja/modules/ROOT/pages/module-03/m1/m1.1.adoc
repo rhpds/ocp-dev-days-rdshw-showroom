@@ -5,15 +5,15 @@ include::partial$style.adoc[]
 [id='lab3-service-interconnect']
 == データベース接続を有効にする
 
-統合フローからデータベースにアクセスする必要がありますが、まだ接続できません。原因を確認し、接続を有効にしましょう。
+インテグレーションフローからデータベースにアクセスする必要がありますが、まだ接続できません。原因を確認し、接続を有効にしましょう。
 
-NOTE: この演習では要点に集中できるよう単一の cluster を使用しますが、Service Interconnect は network policy では対応しきれない、複数の cluster、リージョン、クラウドプロバイダーにまたがるマルチサイト mesh に対応するよう設計されています。最後に、より広い用途を示す実例を簡単に紹介します。
+NOTE: この演習では要点に集中できるよう単一のクラスターを使用しますが、Service Interconnect はネットワークポリシーでは対応しきれない、複数のクラスター、リージョン、クラウドプロバイダーにまたがるマルチサイトメッシュに対応するよう設計されています。最後に、より広い用途を示す実例を簡単に紹介します。
 
 {empty} +
 
 === データベースに接続できないのはなぜですか？
 
-バックエンドデータベースは、厳格な network policy が適用された隔離 namespace (*shared-database*) でホストされています。他の namespace からの直接アクセスは許可されていません。
+バックエンドデータベースは、厳格なネットワークポリシーが適用された隔離された名前空間 (*shared-database*) でホストされています。他の名前空間からの直接アクセスは許可されていません。
 
 [.mermaid]
 [subs="attributes"]
@@ -39,7 +39,7 @@ flowchart LR
     style DB fill:#336,color:#fff
 ----
 
-試してみましょう — _Dev Spaces_ の terminal からデータベースに簡単な query を実行します。
+試してみましょう — _Dev Spaces_ のターミナルからデータベースに簡単なクエリーを実行します。
 
 {blank}
 
@@ -51,10 +51,10 @@ flowchart LR
 
 // [TIP]
 // --
-// .この command は何をしますか？
+// .このコマンドは何をしますか？
 // [%collapsible]
 // ====
-// * `postgres.shared-database.svc:5432` — 接続先のサービス、namespace、PostgreSQL ポート
+// * `postgres.shared-database.svc:5432` — 接続先のサービス、名前空間、PostgreSQL ポート
 // * `-v` — 詳細表示を有効にし、接続試行を表示します
 // * `--connect-timeout 3` — 接続待ちを続けず、3 秒後にタイムアウトします
 // ====
@@ -68,16 +68,16 @@ sql postgres.shared-database.svc:5432 \
 
 [TIP]
 --
-.この command は何をしますか？
+.このコマンドは何をしますか？
 [%collapsible]
 ====
 * `sql` — PostgreSQL データベースに接続してクエリーを実行するラボ用ヘルパースクリプト
-* `postgres.shared-database.svc:5432` — データベースアドレス（サービス、namespace、ポート）
+* `postgres.shared-database.svc:5432` — データベースアドレス（サービス、名前空間、ポート）
 * `"SELECT count(*) FROM policies"` — データベース内のレコード数を数えます
 ====
 --
 
-接続は timeout になります。データベースには namespace から直接アクセスできません。
+接続はタイムアウトになります。データベースには名前空間から直接アクセスできません。
 
 {blank}
 
@@ -89,11 +89,11 @@ sql postgres.shared-database.svc:5432 \
 
 {empty} +
 
-=== Service Interconnect で namespace 間を接続する
+=== Service Interconnect で名前空間間を接続する
 
-{rhsi}（オープンソースプロジェクト https://skupper.io[Skupper.io,window=_blank] を基に構築）は、namespace 間にアプリケーションレベルの暗号化接続を作成することでこの問題を解決します。VPN や firewall rule は不要で、サービスをパブリックネットワークに公開する必要もありません。
+{rhsi}（オープンソースプロジェクト https://skupper.io[Skupper.io,window=_blank] を基に構築）は、名前空間間にアプリケーションレベルの暗号化接続を作成することでこの問題を解決します。VPN やファイアウォールルールは不要で、サービスをパブリックネットワークに公開する必要もありません。
 
-設定が完了すると、namespace 内に local service が作成され、remote database に traffic が透過的に転送されます。
+設定が完了すると、名前空間内に local サービスが作成され、remote database に traffic が透過的に転送されます。
 
 {blank}
 
@@ -127,11 +127,11 @@ flowchart LR
     style DB fill:#336,color:#fff
 ----
 
-アプリケーションから見ると、データベースは local service として扱われます。特別な設定は必要ありません。
+アプリケーションから見ると、データベースは local サービスとして扱われます。特別な設定は必要ありません。
 
 {empty} +
 
-//NOTE: この演習では、基本概念の学習に集中できるよう、同じ cluster 上の 2 つの namespace を接続します。簡単な network policy で解決できることに、なぜ Service Interconnect が必要なのか疑問に思うかもしれません。答えは規模です。Service Interconnect は、複数の cluster、リージョン、クラウドプロバイダーにサービスがまたがり、多数の接続が同じ secure mesh を共有するマルチサイトネットワーク向けに設計されています。ここで学ぶ内容は、実際のシナリオにそのまま応用できます。演習の最後に簡単な例を紹介します。
+//NOTE: この演習では、基本概念の学習に集中できるよう、同じクラスター上の 2 つの名前空間を接続します。簡単なネットワークポリシーで解決できることに、なぜ Service Interconnect が必要なのか疑問に思うかもしれません。答えは規模です。Service Interconnect は、複数のクラスター、リージョン、クラウドプロバイダーにサービスがまたがり、多数の接続が同じ secure メッシュを共有するマルチサイトネットワーク向けに設計されています。ここで学ぶ内容は、実際のシナリオにそのまま応用できます。演習の最後に簡単な例を紹介します。
 
 //{empty} +
 
@@ -187,13 +187,13 @@ flowchart LR
 
 [.mermaid-hints-simple]
 ****
-S2 | Site | Skupper network の基盤です。参加する各 namespace で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
-S1 | Site | Skupper network の基盤です。参加する各 namespace で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
+S2 | Site | Skupper network の基盤です。参加する各名前空間で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
+S1 | Site | Skupper network の基盤です。参加する各名前空間で Site を実行します。Site は AccessGrant と AccessToken を通じて相互に検出します。 +
 Grant | AccessGrant | 接続を受け入れる側で作成します。remote Site が接続するための credential を生成します。ネットワークへの招待状と考えてください。 +
 Token | AccessToken | grant の詳細を使って接続元で作成します。2 つの Site 間に暗号化 link を確立します。 +
-Listener | Listener | namespace 内で remote service を local に公開します。routing key で相手側の Connector と対応付け、remote service を local service のように扱えるようにします。 +
-Connector | Connector | local service を Skupper network に接続します。service を公開し、他の namespace にある対応する Listener からアクセスできるようにします。 +
-SVC2 | Service (自動作成) | Listener を作成すると、Service Interconnect がローカル Kubernetes service を自動作成します。アプリケーションはデータベースがローカルにあるかのようにこの service に接続します。
+Listener | Listener | 名前空間内で remote サービスを local に公開します。routing key で相手側の Connector と対応付け、remote サービスを local サービスのように扱えるようにします。 +
+Connector | Connector | local サービスを Skupper network に接続します。サービスを公開し、他の名前空間にある対応する Listener からアクセスできるようにします。 +
+SVC2 | Service (自動作成) | Listener を作成すると、Service Interconnect がローカル Kubernetes サービスを自動作成します。アプリケーションはデータベースがローカルにあるかのようにこのサービスに接続します。
 ****
 
 TIP: 図の各構成要素にカーソルを合わせると、その役割が表示されます。
@@ -204,7 +204,7 @@ TIP: 図の各構成要素にカーソルを合わせると、その役割が表
 
 === この演習で行うこと
 
-Service Interconnect の構成はすべて 2 段階で行います。まず、環境を接続する secure mesh で *network を確立* し、次にその network 経由で *service を公開* します。network の準備ができたら、新しい service の追加は Listener と Connector を組み合わせるだけです。network の変更は必要ありません。
+Service Interconnect の構成はすべて 2 段階で行います。まず、環境を接続する secure メッシュで *network を確立* し、次にその network 経由で *サービスを公開* します。network の準備ができたら、新しいサービスの追加は Listener と Connector を組み合わせるだけです。network の変更は必要ありません。
 
 {empty} +
 
@@ -218,7 +218,7 @@ flowchart LR
         end
     end
 
-    subgraph svcLabel ["② service を公開"]
+    subgraph svcLabel ["② サービスを公開"]
         subgraph svc [" "]
             direction LR
             LA@{ shape: processes, label: "Listener" } --- CA@{ shape: processes, label: "Connector" }
@@ -239,19 +239,19 @@ flowchart LR
 
 この演習では、次の手順になります。
 
-*ネットワークを確立* — namespace 間にセキュアリンクを作成します。
+*ネットワークを確立* — 名前空間間にセキュアリンクを作成します。
 
 [start=0]
-. `shared-database` namespace には *Site* がすでにあります _(事前設定済み)_
-. `linkAccess` を有効にして、namespace に *Site* を作成します
-. データベース namespace が接続できるように *AccessGrant* を生成します
-. link を確立するため、データベース namespace に *AccessToken* を作成します
+. `shared-database` 名前空間には *Site* がすでにあります _(事前設定済み)_
+. `linkAccess` を有効にして、名前空間に *Site* を作成します
+. データベースの名前空間が接続できるように *AccessGrant* を生成します
+. link を確立するため、データベースの名前空間に *AccessToken* を作成します
 
-*データベース service を公開* — remote database に local（`{username}-devspaces` 内）からアクセスできるようにします。
+*データベースサービスを公開* — remote database に local（`{username}-devspaces` 内）からアクセスできるようにします。
 
 [start=4]
 . Skupper network と port `5432` の PostgreSQL を接続する *Connector* はすでにあります _(事前設定済み)_
-. remote database を local service として公開する *Listener* を作成します
+. remote database を local サービスとして公開する *Listener* を作成します
 
 {blank}
 
@@ -307,7 +307,7 @@ flowchart LR
 
 === 手順 0: サーバー側を確認する（任意）
 
-`shared-database` namespace には read-only access があります。platform team が設定した内容を確認してみましょう。
+`shared-database` 名前空間には read-only access があります。platform team が設定した内容を確認してみましょう。
 
 Skupper resource を表示します。
 
@@ -356,13 +356,13 @@ flowchart LR
 
 === network を確立する
 
-最初に、namespace とデータベース namespace の間に secure network を設定します。Site、AccessGrant、AccessToken を作成し、これらを組み合わせて 2 つの環境間に暗号化 link を確立します。
+最初に、名前空間とデータベースの名前空間の間に secure network を設定します。Site、AccessGrant、AccessToken を作成し、これらを組み合わせて 2 つの環境間に暗号化 link を確立します。
 
 {empty} +
 
-==== 手順 1: namespace に Site を作成する
+==== 手順 1: 名前空間に Site を作成する
 
-`linkAccess` を有効にした Site を作成します。これにより namespace は、データベースからの接続を受け入れられる *listening site* になります。
+`linkAccess` を有効にした Site を作成します。これにより名前空間は、データベースからの接続を受け入れられる *listening site* になります。
 
 {blank}
 
@@ -511,9 +511,9 @@ flowchart LR
 
 {empty} +
 
-==== 手順 3: データベース namespace に AccessToken を作成する
+==== 手順 3: データベースの名前空間に AccessToken を作成する
 
-データベースから namespace への link を確立するため、`shared-database` namespace に AccessToken を作成します。token 名は `token-{username}` にする必要があります。
+データベースから名前空間への link を確立するため、`shared-database` 名前空間に AccessToken を作成します。token 名は `token-{username}` にする必要があります。
 
 grant の詳細を取り出して、AccessToken を作成します。
 
@@ -580,9 +580,9 @@ flowchart LR
 
 {empty} +
 
-=== データベース service を公開する
+=== データベースサービスを公開する
 
-network の準備ができ、namespace とデータベース namespace が暗号化 link で接続されました。しかし、network だけではデータベースにアクセスできません。Service Interconnect に、namespace へ公開する *service* を指定する必要があります。
+network の準備ができ、名前空間とデータベースの名前空間が暗号化 link で接続されました。しかし、network だけではデータベースにアクセスできません。Service Interconnect に、名前空間へ公開する *サービス* を指定する必要があります。
 
 ここで Listener と Connector を使います。データベース側の Connector はすでに設定済みです（Step 0 で確認しました）。次に、あなた側で対応する Listener を作成します。
 
@@ -590,7 +590,7 @@ network の準備ができ、namespace とデータベース namespace が暗号
 
 ==== 手順 4: Listener を作成してデータベースを local に公開する
 
-Listener は namespace 内に local service を作成し、暗号化 link 経由で remote PostgreSQL データベース に traffic を転送します。
+Listener は名前空間内に local サービスを作成し、暗号化 link 経由で remote PostgreSQL データベース に traffic を転送します。
 
 {blank}
 
@@ -609,7 +609,7 @@ spec:
 EOF
 ****
 
-IMPORTANT: `routingKey` は `shared-database` namespace の Connector に設定された値と一致する必要があります。platform team は `postgres` に設定しています。
+IMPORTANT: `routingKey` は `shared-database` 名前空間の Connector に設定された値と一致する必要があります。platform team は `postgres` に設定しています。
 
 Listener の準備ができたことを確認します。
 
@@ -629,7 +629,7 @@ oc get listener postgres-listener -n {username}-devspaces
 postgres-listener   postgres      5432   postgres   Ready    true                     OK</pre>
 ++++
 
-Listener を作成すると、Service Interconnect はバックエンド service を環境内の local service として自動的に公開します。
+Listener を作成すると、Service Interconnect はバックエンドサービスを環境内の local サービスとして自動的に公開します。
 
 {blank}
 
@@ -647,7 +647,7 @@ flowchart RL
     style Listener fill:#e8f5e9,stroke:#66bb6a
 ----
 
-`postgres` service が利用可能であることを確認します。
+`postgres` サービスが利用可能であることを確認します。
 
 {blank}
 
@@ -656,7 +656,7 @@ flowchart RL
 oc get svc postgres -n {username}-devspaces
 ****
 
-service が local で利用可能になっているはずです。
+サービスが local で利用可能になっているはずです。
 
 {blank}
 
@@ -700,10 +700,10 @@ flowchart LR
 
 // [TIP]
 // --
-// .この command は何をしますか？
+// .このコマンドは何をしますか？
 // [%collapsible]
 // ====
-// * `camel cmd send` — command line から Camel endpoint に message を送信します
+// * `camel cmd send` — コマンドラインから Camel endpoint に message を送信します
 // * `--uri "sql:SELECT count(*) FROM invoices"` — 設定済みデータベースに SQL query を実行します
 // * `--properties application.properties` — データベース接続設定を読み込みます
 // * `--reply` — 応答を待って表示します
@@ -724,7 +724,7 @@ flowchart LR
 //  <span style="background-color: yellow; color: black">[{count=1}]</span></pre>
 // ++++
 
-接続が機能することを確認しましょう。先ほどと同じ query を、今度は local service に対して実行します。_Service Interconnect_ によって、namespace からデータベースに接続できるようになりました。
+接続が機能することを確認しましょう。先ほどと同じクエリーを、今度は local サービスに対して実行します。_Service Interconnect_ によって、名前空間からデータベースに接続できるようになりました。
 
 {blank}
 
@@ -736,11 +736,11 @@ sql postgres:5432 \
 
 [TIP]
 --
-.この command は何をしますか？
+.このコマンドは何をしますか？
 [%collapsible]
 ====
 * `sql` — PostgreSQL データベースに接続してクエリーを実行するラボ用ヘルパースクリプト
-* `postgres:5432` — _Service Interconnect_ によって local に公開されたデータベース service
+* `postgres:5432` — _Service Interconnect_ によって local に公開されたデータベースサービス
 * `"SELECT count(*) FROM policies"` — データベース内のレコード数を数えます
 ====
 --
@@ -824,11 +824,11 @@ flowchart LR
 
 次の作業が完了しました。
 
-* *network を確立* — namespace に Site と AccessGrant を作成し、データベース namespace に AccessToken を作成して、暗号化 link を確立しました。
-* *service を公開* — Listener を作成し、network 経由で remote database に local からアクセスできるようにしました。
-* *接続を確認* — script を使い、暗号化 link 経由でデータベースに query を実行しました。
+* *network を確立* — 名前空間に Site と AccessGrant を作成し、データベースの名前空間に AccessToken を作成して、暗号化 link を確立しました。
+* *サービスを公開* — Listener を作成し、network 経由で remote database に local からアクセスできるようにしました。
+* *接続を確認* — script を使い、暗号化 link 経由でデータベースにクエリーを実行しました。
 
-データベースは安全に隔離された環境にあります。暗号化された Skupper link を通じて、接続はデータベース側 *から* あなた側 *へ* 開始されました。network policy の変更、VPN、昇格した権限はいずれも不要です。
+データベースは安全に隔離された環境にあります。暗号化された Skupper link を通じて、接続はデータベース側 *から* あなた側 *へ* 開始されました。ネットワークポリシーの変更、VPN、昇格した権限はいずれも不要です。
 
 確立した link は引き続き有効です。次の演習ではこの link を使って、policy application の取り込み、データベースへの保存、PDF policy document の生成という一連の data flow を実装します。
 
@@ -836,9 +836,9 @@ flowchart LR
 
 === この演習の先へ：大規模環境での Service Interconnect
 
-この lab では、概念を説明するために同じ cluster 上の 2 つの namespace を接続しました。実環境で Service Interconnect の真価が発揮されるのは、複数の cluster、リージョン、クラウドプロバイダーにまたがる service を、同じ secure mesh で接続するときです。
+この lab では、概念を説明するために同じクラスター上の 2 つの名前空間を接続しました。実環境で Service Interconnect の真価が発揮されるのは、複数のクラスター、リージョン、クラウドプロバイダーにまたがるサービスを、同じ secure メッシュで接続するときです。
 
-各地域に店舗があり、それぞれで AI を活用した service を実行する小売企業を考えてみましょう。edge site では学習データを収集し、local に deploy された model で inference を実行します。冗長化された on-prem data center が、新しい AI/ML model の学習や更新版の店舗への配信といった大規模な処理を担います。地域 hub は、近隣の edge から traffic を集約して core に転送します。
+各地域に店舗があり、それぞれで AI を活用したサービスを実行する小売企業を考えてみましょう。edge site では学習データを収集し、local に deploy された model で inference を実行します。冗長化された on-prem data center が、新しい AI/ML model の学習や更新版の店舗への配信といった大規模な処理を担います。地域 hub は、近隣の edge から traffic を集約して core に転送します。
 
 {blank}
 
@@ -910,17 +910,17 @@ flowchart LR
 
 各 edge site は学習データを core に送信し、更新済み model を受信します。Site 間に複数の link を設けて冗長な routing を実現するため、経路の 1 つに障害が発生しても、traffic は別の経路を流れます。hub はさらに resilience を高めます。Frankfurt hub が停止した場合、edge は Singapore 経由で再 routing できます。冗長化された data center により、メンテナンス中や障害時も AI pipeline の可用性を保てます。
 
-ここでも、学んだ 2 段階のパターンをそのまま適用できます。Site と link が network を形成し、Listener と Connector が両端で特定の service を公開します。異なるのは規模です。1 つの cluster 上の 2 つの namespace ではなく、複数のリージョン、hub、data center にまたがります。基本要素は同じです。
+ここでも、学んだ 2 段階のパターンをそのまま適用できます。Site と link が network を形成し、Listener と Connector が両端で特定のサービスを公開します。異なるのは規模です。1 つのクラスター上の 2 つの名前空間ではなく、複数のリージョン、hub、data center にまたがります。基本要素は同じです。
 
 {empty} +
 
 [.verification]
 ****
-command の出力に `[{count=1}]` が表示され、データベース query の成功を確認できましたか？
+コマンドの出力に `[{count=1}]` が表示され、データベースクエリーの成功を確認できましたか？
 
 [.success]
 よくできました — データベース接続の準備ができました。次の演習に進んでください。
 
 [.fail]
-Service Interconnect resource を確認し、command を再実行する前に link の status が `Ready` であることを確かめてください。
+Service Interconnect resource を確認し、コマンドを再実行する前に link の status が `Ready` であることを確かめてください。
 ****

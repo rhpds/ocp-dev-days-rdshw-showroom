@@ -339,7 +339,7 @@ image::module-03/common/kaoto-design-tab.png[width=50%]
 
 . *route を実行してテストする*
 +
-Dev Spaces 内の VS Code terminal で、route を実行します。
+Dev Spaces 内の VS Code ターミナルで、route を実行します。
 +
 {blank}
 +
@@ -518,7 +518,7 @@ image::module-03/m1/kaoto-service-x12-all-enabled.png[width=90%]
 +
 [TIP]
 --
-. `store-pdf-s3` の動作
+.`store-pdf-s3` の動作
 [%collapsible]
 ====
 *Routes* ドロップダウンからこのステップを選択すると、sub-route を確認できます。ここでは XSLT template を適用して XML の保険証券から PDF を生成し、S3 object storage にアップロードした後、ドキュメントへの presigned link を返します。
@@ -556,7 +556,7 @@ Test Portal に戻り、別の保険申込を送信します。今度は変換�
     <div style="margin-top: 16px">
       <div style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: 8px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-        データベースを確認
+        Check Database
       </div>
     </div>
   </div>
@@ -583,7 +583,7 @@ Test Portal に戻り、別の保険申込を送信します。今度は変換�
 
 {empty} +
 
-完了したら、terminal で kbd:[Ctrl+C] を押して Camel を停止します。
+完了したら、ターミナルで kbd:[Ctrl+C] を押して Camel を停止します。
 
 {empty} +
 

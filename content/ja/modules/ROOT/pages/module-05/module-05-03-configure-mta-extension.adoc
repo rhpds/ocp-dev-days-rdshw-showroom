@@ -86,8 +86,8 @@ image::module-05-mta-dls/05-03-dls-04.png[VS Code のタブ,link=self,window=bla
 image::module-05-mta-dls/05-03-dls-06.png[VS Code のタブ,link=self,window=blank,title="VSCode Tab"]
 
 - 新しいプロファイル `quarkus-profile` を作成します
-- Profile Name: `quarkus-profile``
-- Target Technologies: `quarkus``, `quarkus3+``, `jakarta-ee``
+- Profile Name: `quarkus-profile`
+- Target Technologies: `quarkus`, `quarkus3+`, `jakarta-ee`
 
 image::module-05-mta-dls/05-03-dls-07.png[VS Code のタブ,link=self,window=blank,title="Review profiles"]
 

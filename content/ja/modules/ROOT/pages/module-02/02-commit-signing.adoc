@@ -2,9 +2,9 @@
 include::partial$_attributes.adoc[]
 :imagesdir: ../../assets/images
 
-すべてのコミットには物語があります。しかし、その物語が真実だとどうすれば分かるのでしょうか。コミットの作成者は `git config` コマンドひとつで偽装できます。リポジトリーへのアクセスが侵害されることもあります。SSH や GPG の鍵は、紛失したり、盗まれたり、共有されたりする可能性があります。従来のコード署名は、開発者が管理、ローテーション、保護しなければならない長期間有効な鍵ペアに依存しています。しかし、多くの開発者はこうした管理を実際には行っていません。
+すべてのコミットには物語があります。しかし、その物語が真実だとどうすれば分かるのでしょうか。コミットの作成者は `git config` コマンドひとつで偽装できます。リポジトリーへのアクセスが侵害されることもあります。SSH や GPG の鍵は、紛失したり、盗まれたり、共有されたりする可能性があります。従来のコード署名は、開発者が管理、ローテーション、保護しなければならない長期間有効なキーペアに依存しています。しかし、多くの開発者はこうした管理を実際には行っていません。
 
-ここでは、クラスターのインフラストラクチャーコンポーネントとしてデプロイされた **Red Hat Trusted Artifact Signer (RHTAS)** による **Sigstore の鍵レス署名** を使います。署名を鍵ペアではなく開発者の *アイデンティティー* に結び付けることで、この問題を解決します。コミットに署名する際は、組織の ID プロバイダー（この演習では Keycloak SSO）で認証します。Fulcio（RHTAS の認証局）が短期間有効な証明書を発行し、署名は Rekor の透明性ログに記録されます。証明書は数分以内に有効期限が切れるため、管理、紛失、ローテーションする鍵はありません。
+ここでは、クラスターのインフラストラクチャーコンポーネントとしてデプロイされた **Red Hat Trusted Artifact Signer (RHTAS)** による **Sigstore のキーレス署名** を使います。署名をキーペアではなく開発者の *アイデンティティー* に結び付けることで、この問題を解決します。コミットに署名する際は、組織の ID プロバイダー（この演習では Keycloak SSO）で認証します。Fulcio（RHTAS の認証局）が短期間有効な証明書を発行し、署名は Rekor の透明性ログに記録されます。証明書は数分以内に有効期限が切れるため、管理、紛失、ローテーションする鍵はありません。
 
 このセクションでは、先ほど行った脆弱性の修正をコミットし、自分のアイデンティティーで署名します。
 
@@ -44,7 +44,7 @@ image::m02-gitsign-login-prompt.png[Keycloak SSO からの成功コード,link=s
 
 . コードを **gitsign login** ターミナルに貼り付け、 **Return** を押します。
 +
-NOTE: これは Linux ターミナルです。ブラウザーや環境によっては、 `Ctrl+V` ではなく kbd:[Ctrl+Shift+V] で貼り付ける必要があります。
+NOTE: これは Linux ターミナルです。ブラウザーや環境によっては、 kbd:[Ctrl+V] ではなく kbd:[Ctrl+Shift+V] で貼り付ける必要があります。
 +
 image::m02-gitsign-code-paste.png[gitsign ターミナルに検証コードを貼り付ける,link=self,window=blank,width=700]
 +
@@ -54,7 +54,7 @@ image::m02-gitsign-code-paste.png[gitsign ターミナルに検証コードを�
 +
 image::m02-devspaces-sync-changes.png[Source Control パネルの Sync Changes ボタン,link=self,window=blank,width=300]
 
-. Developer Hub で Sandbox Component に戻り、コンポーネントページの **View Source** をクリックするか、 {gitlab_url}[{gitlab_url}^] に移動して、コミットを見つけます。コミットの横に署名バッジ（未検証）が表示されているはずです。
+. Developer Hub でサンドボックスコンポーネントに戻り、コンポーネントページの **View Source** をクリックするか、 {gitlab_url}[{gitlab_url}^] に移動して、コミットを見つけます。コミットの横に署名バッジ（未検証）が表示されているはずです。
 +
 image::m02-rhdh-view-source.png[サンドボックスコンポーネントページの View Source リンク,link=self,window=blank,width=700]
 +
@@ -89,7 +89,7 @@ git config --global gitsign.rekor "https://rekor-server-trusted-artifact-signer.
 git config --global gitsign.issuer "https://sso.{subdomain}/realms/sso"
 ----
 
-**Sigstore の鍵レスフロー** は次のように動作します。
+**Sigstore のキーレスフロー** は次のように動作します。
 
 . 開発者がコミットを開始します
 . Gitsign が認証のため OIDC プロバイダー（Keycloak）にリダイレクトします
@@ -114,4 +114,4 @@ Dev Spaces はローカルブラウザーのないコンテナー内で実行さ
 
 == 次のステップ
 
-xref:module-02/03-sandbox-pipeline.adoc[Sandbox Pipeline の確認] に進み、パイプラインがどのように署名を検証し、イメージをスキャンするかを確認してください。
+xref:module-02/03-sandbox-pipeline.adoc[Sandbox pipeline を確認する] に進み、パイプラインがどのように署名を検証し、イメージをスキャンするかを確認してください。
