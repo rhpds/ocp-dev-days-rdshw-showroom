@@ -63,3 +63,18 @@ They run against temporary repositories with a fake OpenCode executable; no mode
 python3 -m unittest discover -s scripts/tests -v
 bash -n scripts/translate.sh
 ----
+
+== Showroom runtime attributes
+
+Showroom content image v1.4.2 injects provisioning attributes into the first content source's `antora.yml` only.
+In this repository that source is English, so other language versions would otherwise render literal `{user}`, `{password}`, and unresolved service URLs.
+Both playbooks register `extensions/shared-language-attributes.js` to inherit English component attributes during Antora's `contentClassified` event.
+Explicit attributes on each language version take precedence, preserving settings such as `page-lang`.
+The extension does not write credentials to repository files or log their values.
+
+Check attribute inheritance with:
+
+[source,bash]
+----
+node --test scripts/tests/shared-language-attributes.test.js
+----
