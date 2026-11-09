@@ -7,6 +7,9 @@ module.exports.register = function () {
       if (!english?.asciidoc?.attributes) continue
       for (const translated of component.versions) {
         if (translated === english) continue
+        // Antora can share these config objects with the site or other versions.
+        // Allocate both objects instead of mutating them, so inherited attributes
+        // only affect this language version.
         translated.asciidoc = {
           ...translated.asciidoc,
           attributes: {
