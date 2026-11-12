@@ -563,6 +563,8 @@ Test Portal に戻り、別の保険申込を送信します。今度は変換�
 </div>
 ++++
 +
+{empty} +
++
 *View Policy Document (PDF)* をクリックして、ブラウザーで開きます。Insurer セクションに Parasol Insurance の情報が表示されているはずです。
 +
 {blank}

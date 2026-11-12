@@ -15,7 +15,7 @@ TIP: レイアウト表示（Split / Instructions / Tabs）を切り替えた後
 
 === 演習 1: Developer Hubを探索する
 
-. 右側の **Developer Hub** タブを選択するか、{rhdh_url}[{rhdh_url}^] で **Red Hat Developer Hub** を開きます
+. 右側の **Developer Hub** タブを選択するか、 {rhdh_url}[{rhdh_url}^] で **Red Hat Developer Hub** を開きます
 
 . OIDCプロバイダーを使用して、認証情報でログインします:
 +
@@ -186,7 +186,7 @@ GitLabへのログインを求められる場合があります。同じ認証�
 
 . Developer Hubのコンポーネント概要ページで、**Open in Dev Spaces** リンクをクリックし、機能ブランチ用のクラウドワークスペースを開きます。
 +
-または、{devspaces_url}[{devspaces_url}^] からDev Spacesを直接開き、リポジトリーURLを使ってワークスペースを作成できます。
+または、 {devspaces_url}[{devspaces_url}^] からDev Spacesを直接開き、リポジトリーURLを使ってワークスペースを作成できます。
 +
 image::rhdh-devspaces-link.png[Red Hat Developer Hubに表示される、事前設定済みDev Spacesを開くリンク,link=self,window=blank,width=700]
 

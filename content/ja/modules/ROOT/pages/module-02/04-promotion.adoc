@@ -230,7 +230,7 @@ image::m02-gitlab-prod-mr-merge.png[production MR の Merge ボタン,link=self,
 * すべての task 結果を含む **SLSA provenance アテステーション** を作成します
 * アテステーションと署名は **Rekor** (透明性ログ) に記録され、registry 内のイメージに付与されます
 
-**Conforma (Enterprise Contract)** は、{gitlab_url}/parasol/conforma-policies[`conforma-policies` GitLab repository^] に格納された一連の Rego ポリシーに照らしてアテステーションを検証します。`parasol-software-supply-chain` bundle のポリシーでは、次の項目をチェックします:
+**Conforma (Enterprise Contract)** は、 {gitlab_url}/parasol/conforma-policies[`conforma-policies` GitLab repository^] に格納された一連の Rego ポリシーに照らしてアテステーションを検証します。`parasol-software-supply-chain` bundle のポリシーでは、次の項目をチェックします:
 
 * 必須の task が実行されている (verify-commit-signature、acs-image-scan、acs-image-check、sonar-scan)
 * コミットの署名 status が `SIGNED` (未署名または bot によるコミットではない)
